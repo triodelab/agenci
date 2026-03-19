@@ -1,7 +1,8 @@
 import { ClerkProvider } from '@clerk/nextjs'
 import { Geist, Geist_Mono } from "next/font/google"
 
-import "@workspace/ui/globals.css"
+import "@workspace/ui/globals.css";
+import "@/styles/tokens.css";
 import { Providers } from "@/components/providers"
 import { Toaster } from "@workspace/ui/components/sonner";
 
@@ -21,7 +22,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="no" suppressHydrationWarning data-scroll-behavior="smooth">
       <body
         className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased `}
       >

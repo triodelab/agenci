@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard/
+Disallow: /conversations/
+Disallow: /playground/
+Disallow: /resources/
+Disallow: /user/
+Disallow: /widget-customization/
+Disallow: /sign-in/
+Disallow: /sign-up/
+Disallow: /api/
+
+Sitemap: https://agenci.no/sitemap.xml
