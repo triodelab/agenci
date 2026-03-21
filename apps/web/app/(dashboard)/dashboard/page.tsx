@@ -15,5 +15,5 @@ export default function Page() {
       <OrganizationSwitcher hidePersonal />
       <Button onClick={() => addUser()}>Add</Button>
     </div>
-  )
+  );
 }

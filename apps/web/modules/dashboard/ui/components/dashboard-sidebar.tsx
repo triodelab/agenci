@@ -2,6 +2,7 @@
 
 import { OrganizationSwitcher, UserButton } from "@clerk/nextjs";
 import {
+  BotIcon,
   CreditCardIcon,
   InboxIcon,
   LayoutDashboardIcon,
@@ -64,6 +65,11 @@ const accountItems = [
     url: "/billing",
     icon: CreditCardIcon,
   },
+  {
+    title: "Agents",
+    url: "/agents",
+    icon: BotIcon
+  }
 ];
 
 export const DashboardSidebar = () => {

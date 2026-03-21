@@ -37,7 +37,7 @@ export const ConversationsPanel = () => {
         statusFilter === "all"
           ? undefined
           : statusFilter,
-    },
+    }, 
     {
       initialNumItems: 10,
     },

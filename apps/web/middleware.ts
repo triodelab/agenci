@@ -33,6 +33,11 @@ export default clerkMiddleware(async (auth, req) => {
 
     return NextResponse.redirect(orgSelection);
   }
+
+  // Logged-in users with an org should use the app shell at /dashboard, not the marketing page at /.
+  if (userId && orgId && req.nextUrl.pathname === "/") {
+    return NextResponse.redirect(new URL("/dashboard", req.url));
+  }
 });
 
 export const config = {

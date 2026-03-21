@@ -66,5 +66,7 @@ export default defineSchema({
   .index("by_expires_at", ["expiresAt"]),
   users: defineTable({
     name: v.string(),
-  }),
+    email: v.string(),
+    clerk_id: v.string(),
+  }).index("by_clerk_id", ["clerk_id"]),
 });
