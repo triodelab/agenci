@@ -19,6 +19,8 @@
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
+    "dev:fresh": "rm -rf apps/web/.next && turbo dev",
+    "dev:web:clean": "rm -rf apps/web/.next && turbo dev --filter=web",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "dev:widget": "npx turbo -F widget dev",

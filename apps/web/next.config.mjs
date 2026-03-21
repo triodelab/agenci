@@ -1,10 +1,18 @@
-import {withSentryConfig} from "@sentry/nextjs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+import { withSentryConfig } from "@sentry/nextjs";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+/** Repo root (agenci/) — anbefalt for pnpm-monorepo slik at tracing og chunks resolver riktig */
+const monorepoRoot = path.join(__dirname, "../..");
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   transpilePackages: ["@workspace/ui"],
   devIndicators: false,
- 
-}
+  outputFileTracingRoot: monorepoRoot,
+};
 
 export default withSentryConfig(nextConfig, {
 // For all available options, see:

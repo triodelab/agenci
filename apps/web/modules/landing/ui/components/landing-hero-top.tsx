@@ -2,30 +2,15 @@
 
 import Link from "next/link";
 import { motion, useReducedMotion } from "motion/react";
-import { ArrowUpRight, LayoutDashboard, Package, Zap } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
 import { AuthAwareLink } from "@/components/auth-aware-link";
-import { heroCtas, heroMiniFeatures } from "@/modules/landing/content/hero";
-import { LANDING_AUTH_PATHS } from "@/modules/landing/constants";
-import { cn } from "@workspace/ui/lib/utils";
-
-const miniFeatureIcons = [LayoutDashboard, Zap, Package];
-
-const container = {
-  hidden: { opacity: 0 },
-  visible: (reduced: boolean) => ({
-    opacity: 1,
-    transition: {
-      staggerChildren: reduced ? 0 : 0.1,
-      delayChildren: reduced ? 0 : 0.12,
-    },
-  }),
-};
-
-const item = {
-  hidden: { opacity: 0, y: 18 },
-  visible: { opacity: 1, y: 0 },
-};
+import { heroCtas, heroStats } from "@/modules/landing/content/hero";
+import {
+  LANDING_AUTH_PATHS,
+  LANDING_SECTION_IDS,
+} from "@/modules/landing/constants";
+import { LandingGradientText } from "@/modules/landing/ui/components/landing-gradient-text";
 
 export function LandingHeroTop() {
   const reduced = useReducedMotion();
@@ -43,7 +28,7 @@ export function LandingHeroTop() {
             <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-500/50 opacity-75 motion-reduce:animate-none" />
             <span className="relative inline-flex size-2 rounded-full bg-emerald-500" />
           </span>
-          Agenci · bygget for norsk kundeservice
+          Bygget for norsk kundeservice · klar for EU/EØS
         </span>
       </motion.div>
 
@@ -52,12 +37,12 @@ export function LandingHeroTop() {
         initial={reduced ? false : { opacity: 0, y: 22 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.55, delay: 0.06 }}
-        className="mx-auto mt-10 max-w-4xl text-center text-4xl font-semibold leading-[1.08] tracking-tight text-foreground md:mt-12 md:text-5xl lg:text-[3.35rem] lg:leading-[1.06]"
+        className="mx-auto mt-10 max-w-[18ch] text-center text-4xl font-semibold leading-[1.06] tracking-tight text-foreground sm:max-w-none md:mt-12 md:text-5xl lg:max-w-4xl lg:text-[3.5rem] lg:leading-[1.05]"
       >
-        <span className="block">Automatiser kundeservice</span>
-        <span className="mt-1 block bg-gradient-to-r from-foreground via-foreground to-primary bg-clip-text text-transparent md:mt-1.5">
-          og salg med AI
-        </span>
+        <span className="block">Kundeservice som</span>
+        <LandingGradientText className="mt-1 block md:mt-1.5">
+          jobber mens dere sover
+        </LandingGradientText>
       </motion.h1>
 
       <motion.p
@@ -66,8 +51,8 @@ export function LandingHeroTop() {
         transition={{ duration: 0.48, delay: 0.14 }}
         className="mx-auto mt-6 max-w-2xl text-center text-base leading-relaxed text-muted-foreground md:text-lg md:leading-relaxed"
       >
-        Rask, presis support døgnet rundt — med widget, dashboard og kontroll på
-        innhold. Sett opp på minutter, skaler uten friksjon.
+        Agenci kombinerer widget, AI og dashboard slik at besøkende får presise svar døgnet rundt — og
+        teamet beholder kontroll på innhold, tone og eskalering.
       </motion.p>
 
       <motion.div
@@ -83,10 +68,10 @@ export function LandingHeroTop() {
                 key={cta.label}
                 asChild
                 size="lg"
-                className="group h-12 rounded-2xl bg-primary px-7 text-base font-medium text-primary-foreground shadow-[0_12px_40px_-12px_rgba(37,99,235,0.55)] transition-all hover:bg-primary/92 hover:shadow-[0_16px_48px_-12px_rgba(37,99,235,0.45)]"
+                className="group h-12 rounded-2xl bg-primary px-7 text-base font-medium text-primary-foreground shadow-[0_12px_40px_-12px_color-mix(in_oklab,var(--primary)_45%,transparent)] transition-all hover:bg-primary/92 hover:shadow-[0_16px_48px_-12px_color-mix(in_oklab,var(--primary)_38%,transparent)]"
               >
                 <AuthAwareLink
-                  href={LANDING_AUTH_PATHS.signIn}
+                  href={cta.href}
                   loggedInHref={LANDING_AUTH_PATHS.appHome}
                   className="inline-flex items-center gap-2"
                 >
@@ -102,7 +87,7 @@ export function LandingHeroTop() {
               asChild
               size="lg"
               variant="outline"
-              className="h-12 rounded-2xl border-border/80 bg-background/80 px-7 text-base backdrop-blur-sm"
+              className="h-12 rounded-2xl border-primary/20 bg-background/80 px-7 text-base backdrop-blur-sm hover:border-primary/40 hover:bg-primary/[0.06]"
             >
               <Link href={cta.href}>{cta.label}</Link>
             </Button>
@@ -110,45 +95,35 @@ export function LandingHeroTop() {
         })}
       </motion.div>
 
-      <motion.div
-        variants={container}
-        initial="hidden"
-        animate="visible"
-        custom={!!reduced}
-        className="mx-auto mt-16 grid max-w-5xl grid-cols-1 gap-5 md:mt-20 md:grid-cols-3 md:gap-5"
+      <motion.p
+        initial={reduced ? false : { opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.35, delay: 0.26 }}
+        className="mt-5 text-center"
       >
-        {heroMiniFeatures.map((feat, i) => {
-          const Icon = miniFeatureIcons[i % miniFeatureIcons.length]!;
-          return (
-            <motion.div
-              key={feat.title}
-              variants={item}
-              transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <div
-                className={cn(
-                  "group relative h-full rounded-2xl border border-border/60 bg-card/90 p-6 text-center shadow-[0_4px_24px_-8px_rgba(15,23,42,0.08)] transition-all duration-300",
-                  "hover:-translate-y-1 hover:border-border hover:shadow-[0_20px_50px_-20px_rgba(15,23,42,0.12)]",
-                  "dark:shadow-[0_4px_24px_-8px_rgba(0,0,0,0.35)] dark:hover:shadow-[0_24px_60px_-24px_rgba(0,0,0,0.45)]",
-                )}
-              >
-                <div
-                  aria-hidden
-                  className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-primary/25 to-transparent opacity-0 transition-opacity group-hover:opacity-100"
-                />
-                <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-xl border border-border/70 bg-background/80 text-primary">
-                  <Icon className="size-5" />
-                </div>
-                <h2 className="text-base font-semibold tracking-tight text-foreground">
-                  {feat.title}
-                </h2>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                  {feat.description}
-                </p>
-              </div>
-            </motion.div>
-          );
-        })}
+        <Link
+          href={`/#${LANDING_SECTION_IDS.product}`}
+          className="text-sm text-muted-foreground underline-offset-4 transition-colors hover:text-foreground"
+        >
+          Utforsk produktet ↓
+        </Link>
+      </motion.p>
+
+      <motion.div
+        initial={reduced ? false : { opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.45, delay: 0.28 }}
+        className="mx-auto mt-10 grid max-w-4xl grid-cols-2 gap-3 sm:grid-cols-4 md:mt-12 md:gap-4"
+      >
+        {heroStats.map((stat) => (
+          <div
+            key={stat.label}
+            className="rounded-2xl border border-border/50 bg-card/50 px-3 py-4 text-center backdrop-blur-sm dark:bg-card/30 md:px-4 md:py-5"
+          >
+            <p className="text-xl font-semibold tracking-tight text-foreground md:text-2xl">{stat.value}</p>
+            <p className="mt-1.5 text-xs leading-snug text-muted-foreground md:text-[13px]">{stat.label}</p>
+          </div>
+        ))}
       </motion.div>
     </div>
   );

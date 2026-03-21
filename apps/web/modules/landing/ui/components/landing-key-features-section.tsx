@@ -119,7 +119,7 @@ const transitionVariants = {
 export function LandingKeyFeaturesSection() {
     return (
         <section
-          id={LANDING_SECTION_IDS.features}
+          id="legacy-features"
           aria-labelledby="features-heading"
           className="relative overflow-hidden bg-background py-24 md:py-36"
         >

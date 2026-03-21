@@ -1,21 +1,17 @@
 import { LandingHeroSection } from "@/modules/landing/ui/components/landing-hero-section";
+import { LandingProductOverviewSection } from "@/modules/landing/ui/components/landing-product-overview-section";
 import { LandingHowItWorksSection } from "@/modules/landing/ui/components/landing-how-it-works-section";
 import { LandingUseCasesSection } from "@/modules/landing/ui/components/landing-use-cases-section";
-import { LandingKeyFeaturesSection } from "@/modules/landing/ui/components/landing-key-features-section";
-import { LandingIntegrationsSection } from "@/modules/landing/ui/components/landing-integrations-section";
-import { LandingTrustSection } from "@/modules/landing/ui/components/landing-trust-section";
 import { LandingPricingSection } from "@/modules/landing/ui/components/landing-pricing-section";
 import { LandingFaqSection } from "@/modules/landing/ui/components/landing-faq-section";
-import { LandingCtaSection } from "@/modules/landing/ui/components/landing-cta-section";
 import { LandingContactSection } from "@/modules/landing/ui/components/landing-contact-section";
 import { LandingFooter } from "@/modules/landing/ui/components/landing-footer";
-import { ScrollToHash } from "@/components/scroll-to-hash";
 import { StructuredData } from "@/components/structured-data";
 
+/** Forside: hero → produkt → hvordan → brukstilfeller → pris → FAQ → kontakt → footer */
 export function LandingPageView() {
   return (
     <>
-      <ScrollToHash />
       <StructuredData />
       <a
         href="#main-content"
@@ -29,14 +25,11 @@ export function LandingPageView() {
         className="overflow-x-hidden font-sans antialiased [text-rendering:optimizeLegibility]"
       >
         <LandingHeroSection />
+        <LandingProductOverviewSection />
         <LandingHowItWorksSection />
         <LandingUseCasesSection />
-        <LandingKeyFeaturesSection />
-        <LandingIntegrationsSection />
-        <LandingTrustSection />
         <LandingPricingSection />
         <LandingFaqSection />
-        <LandingCtaSection />
         <LandingContactSection />
         <LandingFooter />
       </main>

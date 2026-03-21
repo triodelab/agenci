@@ -5,6 +5,7 @@ import { ConvexReactClient } from "convex/react";
 import { ConvexProviderWithClerk } from "convex/react-clerk";
 import { useAuth } from "@clerk/nextjs";
 import { ThemeProvider } from "@/components/theme-provider";
+import { ScrollToHash } from "@/components/scroll-to-hash";
 import { parseConvexDeploymentUrl } from "@/lib/convex-url";
 
 const convexUrl = parseConvexDeploymentUrl(process.env.NEXT_PUBLIC_CONVEX_URL);
@@ -19,6 +20,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
         enableSystem
         disableTransitionOnChange
       >
+        <ScrollToHash />
         {children}
       </ThemeProvider>
     </ConvexProviderWithClerk>

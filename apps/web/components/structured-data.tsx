@@ -1,3 +1,11 @@
+/** Sikker serialisering i <script type="application/ld+json"> (unngår `</script>` i strenger som bryter HTML). */
+function jsonLdStringify(value: unknown) {
+  return JSON.stringify(value)
+    .replace(/</g, "\\u003c")
+    .replace(/\u2028/g, "\\u2028")
+    .replace(/\u2029/g, "\\u2029");
+}
+
 export function StructuredData() {
   const base = process.env.NEXT_PUBLIC_APP_URL ?? "https://agenci.no";
 
@@ -40,11 +48,11 @@ export function StructuredData() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdStringify(structuredData) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationData) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdStringify(organizationData) }}
       />
     </>
   );

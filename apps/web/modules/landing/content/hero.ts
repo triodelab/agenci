@@ -10,7 +10,7 @@ import {
 export const heroCtas = [
   {
     label: "Start gratis prøveperiode",
-    href: LANDING_AUTH_PATHS.signIn,
+    href: LANDING_AUTH_PATHS.signUp,
     variant: "primary" as const,
   },
   {
