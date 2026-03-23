@@ -23,7 +23,12 @@ export const INTEGRATIONS = [
 
 export type IntegrationId = (typeof INTEGRATIONS)[number]["id"];
 
-export const HTML_SCRIPT = `<script src="https://next15-echo-widget.vercel.app/widget.js" data-organization-id="{{ORGANIZATION_ID}}"></script>`;
-export const REACT_SCRIPT = `<script src="https://next15-echo-widget.vercel.app/widget.js" data-organization-id="{{ORGANIZATION_ID}}"></script>`;
-export const NEXTJS_SCRIPT = `<script src="https://next15-echo-widget.vercel.app/widget.js" data-organization-id="{{ORGANIZATION_ID}}"></script>`;
-export const JAVASCRIPT_SCRIPT = `<script src="https://next15-echo-widget.vercel.app/widget.js" data-organization-id="{{ORGANIZATION_ID}}"></script>`;
+/** Bygg inn egen URL når widget er deployet (f.eks. https://cdn.example.com/widget.js). */
+const embedScriptSrc =
+  process.env.NEXT_PUBLIC_WIDGET_EMBED_SCRIPT_URL?.trim() ||
+  "https://next15-echo-widget.vercel.app/widget.js";
+
+export const HTML_SCRIPT = `<script src="${embedScriptSrc}" data-organization-id="{{ORGANIZATION_ID}}"></script>`;
+export const REACT_SCRIPT = `<script src="${embedScriptSrc}" data-organization-id="{{ORGANIZATION_ID}}"></script>`;
+export const NEXTJS_SCRIPT = `<script src="${embedScriptSrc}" data-organization-id="{{ORGANIZATION_ID}}"></script>`;
+export const JAVASCRIPT_SCRIPT = `<script src="${embedScriptSrc}" data-organization-id="{{ORGANIZATION_ID}}"></script>`;

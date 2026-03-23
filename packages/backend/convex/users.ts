@@ -1,5 +1,5 @@
 import { UserJSON } from "@clerk/backend";
-import { v, Validator } from "convex/values";
+import { ConvexError, v, Validator } from "convex/values";
 import { internalMutation, query, QueryCtx, mutation } from "./_generated/server";
 
 export const getMany = query({
@@ -11,30 +11,41 @@ export const getMany = query({
   },
 });
 
+/** Synk innlogget Clerk-bruker til `users` (tabellen har ikke organizationId). */
 export const add = mutation({
   args: {},
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
 
     if (identity === null) {
-      throw new Error("Not authenticated");
+      throw new ConvexError({
+        code: "UNAUTHORIZED",
+        message: "Not authenticated",
+      });
     }
 
-    const orgId = identity.orgId as string;
-
-    if (!orgId) {
-      throw new Error("Missing organization");
+    const clerkId = identity.subject;
+    const existing = await userByClerkId(ctx, clerkId);
+    if (existing !== null) {
+      return existing._id;
     }
 
-    throw new Error("Tracking test");
+    const name =
+      (typeof identity.name === "string" && identity.name.length > 0
+        ? identity.name
+        : null) ??
+      (typeof identity.email === "string" && identity.email.length > 0
+        ? identity.email
+        : null) ??
+      "Bruker";
+    const email =
+      typeof identity.email === "string" ? identity.email : "";
 
-    const userId = await ctx.db.insert("users", {
-      name: "Antonio",
-      email: "antonio@example.com",
-      clerk_id: identity?.subject ?? "",
+    return await ctx.db.insert("users", {
+      name,
+      email,
+      clerk_id: clerkId,
     });
-
-    return userId;
   },
 });
 
@@ -51,7 +62,7 @@ export const upsertFromClerk = internalMutation({
     const userAttributes = {
       name: `${data.first_name} ${data.last_name}`,
       clerk_id: data.id,
-      email: data.email_addresses[0].email_address,
+      email: data.email_addresses[0]?.email_address ?? "",
     };
 
     const user = await userByClerkId(ctx, data.id);

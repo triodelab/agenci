@@ -32,6 +32,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { Button } from "@workspace/ui/components/button";
+import {
+  DashboardPageShell,
+} from "@/modules/dashboard/ui/components/dashboard-page-shell";
 import { VapiConnectedView } from "../components/vapi-connected-view";
 
 const vapiFeatures: Feature[] = [
@@ -218,28 +221,31 @@ export const VapiView = () => {
     <>
       <VapiPluginForm open={connectOpen} setOpen={setConnectOpen} />
       <VapiPluginRemoveForm open={removeOpen} setOpen={setRemoveOpen} />
-      <div className="flex min-h-screen flex-col bg-muted p-8">
-        <div className="mx-auto w-full max-w-screen-md">
-          <div className="space-y-2">
-            <h1 className="text-2xl md:text-4xl">Vapi Plugin</h1>
-            <p className="text-muted-foreground">Connect Vapi to enable AI voice calls and phone support</p>
-          </div>
+      <DashboardPageShell contentClassName="max-w-screen-md">
+        <header className="space-y-2">
+          <h1 className="text-2xl font-semibold tracking-tight md:text-4xl">
+            Vapi Plugin
+          </h1>
+          <p className="text-muted-foreground leading-relaxed">
+            Koble Vapi for stemme i nettleser og telefon — ett sted for nøkler og
+            status.
+          </p>
+        </header>
 
-          <div className="mt-8">
-            {vapiPlugin ? (
-              <VapiConnectedView onDisconnect={toggleConnection} />
-            ) : (
-              <PluginCard
-                serviceImage="/vapi.jpg"
-                serviceName="Vapi"
-                features={vapiFeatures}
-                isDisabled={vapiPlugin === undefined}
-                onSubmit={toggleConnection}
-              />
-            )}
-          </div>
+        <div className="mt-8">
+          {vapiPlugin ? (
+            <VapiConnectedView onDisconnect={toggleConnection} />
+          ) : (
+            <PluginCard
+              serviceImage="/vapi.jpg"
+              serviceName="Vapi"
+              features={vapiFeatures}
+              isDisabled={vapiPlugin === undefined}
+              onSubmit={toggleConnection}
+            />
+          )}
         </div>
-      </div>
+      </DashboardPageShell>
     </>
   );
 };

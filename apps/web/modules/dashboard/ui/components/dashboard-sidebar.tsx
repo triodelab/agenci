@@ -10,7 +10,6 @@ import {
   Mic,
   PaletteIcon,
 } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -85,7 +84,7 @@ export const DashboardSidebar = () => {
 
   return (
     <Sidebar className="group" collapsible="icon">
-      <SidebarHeader>
+      <SidebarHeader className="border-b border-border/50 pb-2">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild size="lg">
@@ -111,7 +110,9 @@ export const DashboardSidebar = () => {
       <SidebarContent>
         {/* Customer Support */}
         <SidebarGroup>
-          <SidebarGroupLabel>Customer Support</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-[0.65rem] font-semibold uppercase tracking-wider text-muted-foreground">
+            Customer Support
+          </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {customerSupportItems.map((item) => (
@@ -120,7 +121,10 @@ export const DashboardSidebar = () => {
                     asChild
                     isActive={isActive(item.url)}
                     className={cn(
-                      isActive(item.url) && "bg-gradient-to-b from-sidebar-primary to-[#0b63f3]! text-sidebar-primary-foreground! hover:to-[#0b63f3]/90!"
+                      "rounded-xl font-medium transition-colors",
+                      isActive(item.url)
+                        ? "bg-primary text-primary-foreground shadow-sm hover:bg-primary/90"
+                        : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
                     )}
                     tooltip={item.title}
                   >
@@ -137,7 +141,9 @@ export const DashboardSidebar = () => {
 
         {/* Configuration */}
         <SidebarGroup>
-          <SidebarGroupLabel>Configuration</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-[0.65rem] font-semibold uppercase tracking-wider text-muted-foreground">
+            Configuration
+          </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {configurationItems.map((item) => (
@@ -146,7 +152,10 @@ export const DashboardSidebar = () => {
                     asChild
                     isActive={isActive(item.url)}
                     className={cn(
-                      isActive(item.url) && "bg-gradient-to-b from-sidebar-primary to-[#0b63f3]! text-sidebar-primary-foreground! hover:to-[#0b63f3]/90!"
+                      "rounded-xl font-medium transition-colors",
+                      isActive(item.url)
+                        ? "bg-primary text-primary-foreground shadow-sm hover:bg-primary/90"
+                        : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
                     )}
                     tooltip={item.title}
                   >
@@ -163,7 +172,9 @@ export const DashboardSidebar = () => {
 
         {/* Account */}
         <SidebarGroup>
-          <SidebarGroupLabel>Account</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-[0.65rem] font-semibold uppercase tracking-wider text-muted-foreground">
+            Account
+          </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {accountItems.map((item) => (
@@ -172,7 +183,10 @@ export const DashboardSidebar = () => {
                     asChild
                     isActive={isActive(item.url)}
                     className={cn(
-                      isActive(item.url) && "bg-gradient-to-b from-sidebar-primary to-[#0b63f3]! text-sidebar-primary-foreground! hover:to-[#0b63f3]/90!"
+                      "rounded-xl font-medium transition-colors",
+                      isActive(item.url)
+                        ? "bg-primary text-primary-foreground shadow-sm hover:bg-primary/90"
+                        : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
                     )}
                     tooltip={item.title}
                   >
@@ -187,7 +201,7 @@ export const DashboardSidebar = () => {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter>
+      <SidebarFooter className="border-t border-border/50">
         <SidebarMenu>
           <SidebarMenuItem>
             <UserButton

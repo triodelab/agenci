@@ -1,5 +1,6 @@
 "use client";
 
+import { useAuth } from "@clerk/nextjs";
 import { useInfiniteScroll } from "@workspace/ui/hooks/use-infinite-scroll";
 import { InfiniteScrollTrigger } from "@workspace/ui/components/infinite-scroll-trigger";
 import { formatDistanceToNow } from "date-fns";
@@ -26,18 +27,21 @@ import { Skeleton } from "@workspace/ui/components/skeleton";
 
 export const ConversationsPanel = () => {
   const pathname = usePathname();
+  const { isLoaded: authLoaded, orgId: clerkOrgId } = useAuth();
 
   const statusFilter = useAtomValue(statusFilterAtom);
   const setStatusFilter = useSetAtom(statusFilterAtom);
 
   const conversations = usePaginatedQuery(
     api.private.conversations.getMany,
-    {
-      status: 
-        statusFilter === "all"
-          ? undefined
-          : statusFilter,
-    }, 
+    !authLoaded || !clerkOrgId
+      ? "skip"
+      : {
+          status:
+            statusFilter === "all"
+              ? undefined
+              : statusFilter,
+        },
     {
       initialNumItems: 10,
     },

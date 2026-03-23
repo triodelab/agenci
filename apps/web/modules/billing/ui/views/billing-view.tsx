@@ -1,22 +1,26 @@
 "use client";
 
+import {
+  DashboardPagePanel,
+  DashboardPageShell,
+} from "@/modules/dashboard/ui/components/dashboard-page-shell";
 import { PricingTable } from "../components/pricing-table";
 
 export const BillingView = () => {
   return (
-    <div className="flex min-h-screen flex-col bg-muted p-8">
-      <div className="mx-auto w-full max-w-screen-md">
-        <div className="space-y-2">
-          <h1 className="text-2xl md:text-4xl">Plans & Billing</h1>
-          <p>
-            Choose the plan that&apos;s right for you
-          </p>
-        </div>
+    <DashboardPageShell contentClassName="max-w-3xl">
+      <header className="space-y-2">
+        <h1 className="text-2xl font-semibold tracking-tight md:text-4xl">
+          Plans & Billing
+        </h1>
+        <p className="text-muted-foreground leading-relaxed">
+          Velg plan som passer teamet deres.
+        </p>
+      </header>
 
-        <div className="mt-8">
-          <PricingTable />
-        </div>
-      </div>
-    </div>
-  )
-}
+      <DashboardPagePanel className="mt-8">
+        <PricingTable />
+      </DashboardPagePanel>
+    </DashboardPageShell>
+  );
+};

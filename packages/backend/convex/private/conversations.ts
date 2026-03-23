@@ -1,5 +1,6 @@
 import { mutation, query } from "../_generated/server";
 import { ConvexError, v } from "convex/values";
+import { getOrgIdOrNull } from "../lib/auth";
 import { supportAgent } from "../system/ai/agents/supportAgent";
 import { MessageDoc } from "@convex-dev/agent";
 import { paginationOptsValidator, PaginationResult } from "convex/server";
@@ -15,16 +16,7 @@ export const updateStatus = mutation({
     ),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-
-    if (identity === null) {
-      throw new ConvexError({
-        code: "UNAUTHORIZED",
-        message: "Identity not found",
-      });
-    }
-
-    const orgId = identity.orgId as string;
+    const orgId = await getOrgIdOrNull(ctx);
 
     if (!orgId) {
       throw new ConvexError({
@@ -60,22 +52,10 @@ export const getOne = query({
     conversationId: v.id("conversations"),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-
-    if (identity === null) {
-      throw new ConvexError({
-        code: "UNAUTHORIZED",
-        message: "Identity not found",
-      });
-    }
-
-    const orgId = identity.orgId as string;
+    const orgId = await getOrgIdOrNull(ctx);
 
     if (!orgId) {
-      throw new ConvexError({
-        code: "UNAUTHORIZED",
-        message: "Organization not found",
-      });
+      return null;
     }
 
     const conversation = await ctx.db.get(args.conversationId);
@@ -122,22 +102,14 @@ export const getMany = query({
     ),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-
-    if (identity === null) {
-      throw new ConvexError({
-        code: "UNAUTHORIZED",
-        message: "Identity not found",
-      });
-    }
-
-    const orgId = identity.orgId as string;
+    const orgId = await getOrgIdOrNull(ctx);
 
     if (!orgId) {
-      throw new ConvexError({
-        code: "UNAUTHORIZED",
-        message: "Organization not found",
-      });
+      return {
+        page: [],
+        isDone: true,
+        continueCursor: "",
+      };
     }
 
     let conversations: PaginationResult<Doc<"conversations">>;

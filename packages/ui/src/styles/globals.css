@@ -17,7 +17,7 @@
   --primary: oklch(0.6231 0.188 259.8145);
   --primary-foreground: oklch(1 0 0);
   --secondary: oklch(0.967 0.0029 264.5419);
-  --secondary-foreground: oklch(0.4461 0.0263 256.8018) a;
+  --secondary-foreground: oklch(0.4461 0.0263 256.8018);
   --muted: oklch(0.9846 0.0017 247.8389);
   --muted-foreground: oklch(0.551 0.0234 264.3637);
   --accent: oklch(0.97 0 0);
@@ -43,7 +43,7 @@
   --font-sans: Inter, sans-serif;
   --font-serif: Source Serif 4, serif;
   --font-mono: JetBrains Mono, monospace;
-  --radius: 0.475rem;
+  --radius: 0.625rem;
   --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
   --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
   --shadow-sm:
@@ -96,7 +96,7 @@
   --font-sans: Inter, sans-serif;
   --font-serif: Source Serif 4, serif;
   --font-mono: JetBrains Mono, monospace;
-  --radius: 0.475rem;
+  --radius: 0.625rem;
   --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
   --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
   --shadow-sm:
@@ -164,6 +164,10 @@
   --shadow-2xl: var(--shadow-2xl);
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 @layer base {
   button:not([disabled]),
   [role="button"]:not([disabled]) {
@@ -179,5 +183,11 @@
     @apply bg-background text-foreground;
     letter-spacing: var(--tracking-normal);
     font-weight: 500;
+  }
+}
+
+@layer utilities {
+  .perspective-distant {
+    perspective: 2000px;
   }
 }

@@ -1,26 +1,19 @@
 import { ConvexError, v } from "convex/values";
 import { mutation, query } from "../_generated/server";
+import { getOrgIdOrNull } from "../lib/auth";
 
 export const remove = mutation({
   args: {
     service: v.union(v.literal("vapi"))
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    
-    if (identity === null) {
-      throw new ConvexError({
-        code: "UNAUTHORIZED",
-        message: "Identity not found",
-      });
-    }
-
-    const orgId = identity.orgId as string;
+    const orgId = await getOrgIdOrNull(ctx);
 
     if (!orgId) {
       throw new ConvexError({
-        code: "UNAUTHORIZED",
-        message: "Organization not found",
+        code: "BAD_REQUEST",
+        message:
+          "No organization in session. Select an organization in Clerk (JWT template must include orgId).",
       });
     }
 
@@ -47,22 +40,10 @@ export const getOne = query({
     service: v.union(v.literal("vapi"))
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    
-    if (identity === null) {
-      throw new ConvexError({
-        code: "UNAUTHORIZED",
-        message: "Identity not found",
-      });
-    }
-
-    const orgId = identity.orgId as string;
+    const orgId = await getOrgIdOrNull(ctx);
 
     if (!orgId) {
-      throw new ConvexError({
-        code: "UNAUTHORIZED",
-        message: "Organization not found",
-      });
+      return null;
     }
 
     return await ctx.db

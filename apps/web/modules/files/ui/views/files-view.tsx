@@ -22,6 +22,10 @@ import { api } from "@workspace/backend/_generated/api";
 import type { PublicFile } from "@workspace/backend/private/files";
 import { Button } from "@workspace/ui/components/button";
 import { FileIcon, MoreHorizontalIcon, PlusIcon, TrashIcon } from "lucide-react";
+import {
+  DashboardPagePanel,
+  DashboardPageShell,
+} from "@/modules/dashboard/ui/components/dashboard-page-shell";
 import { UploadDialog } from "../components/upload-dialog";
 import { useState } from "react";
 import { DeleteFileDialog } from "../components/delete-file-dialog";
@@ -72,19 +76,18 @@ export const FilesView = () => {
         onOpenChange={setUploadDialogOpen}
         open={uploadDialogOpen}
       />
-      <div className="flex min-h-screen flex-col bg-muted p-8">
-        <div className="mx-auto w-full max-w-screen-md">
-          <div className="space-y-2">
-            <h1 className="text-2xl md:text-4xl">
-              Knowledge Base
-            </h1>
-            <p className="text-muted-foreground">
-              Upload and manage documents for your AI assistant
-            </p>
-          </div>
+      <DashboardPageShell contentClassName="max-w-screen-md">
+        <header className="space-y-2">
+          <h1 className="text-2xl font-semibold tracking-tight md:text-4xl">
+            Knowledge Base
+          </h1>
+          <p className="text-muted-foreground leading-relaxed">
+            Last opp og administrer dokumenter for AI-assistenten.
+          </p>
+        </header>
 
-          <div className="mt-8 rounded-lg border bg-background">
-            <div className="flex items-center justify-end border-b px-6 py-4">
+        <DashboardPagePanel className="mt-8 overflow-hidden p-0">
+          <div className="flex items-center justify-end border-b border-border/60 bg-muted/20 px-6 py-4">
               <Button
                 onClick={() => setUploadDialogOpen(true)}
               >
@@ -176,9 +179,8 @@ export const FilesView = () => {
                 />
               </div>
             )}
-          </div>
-        </div>
-      </div>
+        </DashboardPagePanel>
+      </DashboardPageShell>
     </>
   );
 };

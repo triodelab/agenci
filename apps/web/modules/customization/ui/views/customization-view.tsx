@@ -3,6 +3,10 @@
 import { api } from "@workspace/backend/_generated/api";
 import { useQuery } from "convex/react";
 import { Loader2Icon } from "lucide-react";
+import {
+  DashboardPagePanel,
+  DashboardPageShell,
+} from "@/modules/dashboard/ui/components/dashboard-page-shell";
 import { CustomizationForm } from "../components/customization-form";
 
 export const CustomizationView = () => {
@@ -13,30 +17,32 @@ export const CustomizationView = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-y-2 bg-muted p-8">
-        <Loader2Icon className="text-muted-foreground animate-spin" />
-        <p className="text-muted-foreground text-sm">Loading settings...</p>
-      </div>
+      <DashboardPageShell contentClassName="max-w-3xl">
+        <div className="flex min-h-[40vh] flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-border/60 bg-muted/30 py-16">
+          <Loader2Icon className="size-8 animate-spin text-primary" />
+          <p className="text-muted-foreground text-sm">Laster innstillinger…</p>
+        </div>
+      </DashboardPageShell>
     );
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-muted p-8">
-      <div className="max-w-screen-md mx-auto w-full">
-        <div className="space-y-2">
-          <h1 className="text-2xl md:text-4xl">Widget Customization</h1>
-          <p className="text-muted-foreground">
-            Customize how your chat widget looks and behaves for your customers
-          </p>
-        </div>
+    <DashboardPageShell contentClassName="max-w-3xl">
+      <header className="space-y-2">
+        <h1 className="text-2xl font-semibold tracking-tight md:text-4xl">
+          Widget Customization
+        </h1>
+        <p className="max-w-2xl text-muted-foreground leading-relaxed">
+          Tilpass hvordan chat-widgeten ser ut og oppfører seg for kundene dine.
+        </p>
+      </header>
 
-        <div className="mt-8">
-          <CustomizationForm
-            initialData={widgetSettings}
-            hasVapiPlugin={!!vapiPlugin}
-          />
-        </div>
-      </div>
-    </div>
+      <DashboardPagePanel className="mt-8">
+        <CustomizationForm
+          initialData={widgetSettings}
+          hasVapiPlugin={!!vapiPlugin}
+        />
+      </DashboardPagePanel>
+    </DashboardPageShell>
   );
 };

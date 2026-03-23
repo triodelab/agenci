@@ -1,6 +1,7 @@
 import { ConvexError, v } from "convex/values";
 import { generateText } from "ai";
 import { action, mutation, query } from "../_generated/server";
+import { getOrgIdOrNull } from "../lib/auth";
 import { components, internal } from "../_generated/api";
 import { supportAgent } from "../system/ai/agents/supportAgent";
 import { paginationOptsValidator } from "convex/server";
@@ -13,16 +14,7 @@ export const enhanceResponse = action({
     prompt: v.string(),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-
-    if (identity === null) {
-      throw new ConvexError({
-        code: "UNAUTHORIZED",
-        message: "Identity not found",
-      });
-    }
-
-    const orgId = identity.orgId as string;
+    const orgId = await getOrgIdOrNull(ctx);
 
     if (!orgId) {
       throw new ConvexError({
@@ -69,16 +61,7 @@ export const create = mutation({
     conversationId: v.id("conversations"),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-
-    if (identity === null) {
-      throw new ConvexError({
-        code: "UNAUTHORIZED",
-        message: "Identity not found",
-      });
-    }
-
-    const orgId = identity.orgId as string;
+    const orgId = await getOrgIdOrNull(ctx);
 
     if (!orgId) {
       throw new ConvexError({
@@ -86,6 +69,8 @@ export const create = mutation({
         message: "Organization not found",
       });
     }
+
+    const identity = await ctx.auth.getUserIdentity();
 
     const conversation = await ctx.db.get(args.conversationId);
 
@@ -119,7 +104,7 @@ export const create = mutation({
     await saveMessage(ctx, components.agent, {
       threadId: conversation.threadId,
       // TODO: Check if "agentName" is needed or not
-      agentName: identity.familyName,
+      agentName: identity?.familyName,
       message: {
         role: "assistant",
         content: args.prompt,
@@ -134,22 +119,14 @@ export const getMany = query({
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-
-    if (identity === null) {
-      throw new ConvexError({
-        code: "UNAUTHORIZED",
-        message: "Identity not found",
-      });
-    }
-
-    const orgId = identity.orgId as string;
+    const orgId = await getOrgIdOrNull(ctx);
 
     if (!orgId) {
-      throw new ConvexError({
-        code: "UNAUTHORIZED",
-        message: "Organization not found",
-      });
+      return {
+        page: [],
+        isDone: true,
+        continueCursor: "",
+      };
     }
 
     const conversation = await ctx.db

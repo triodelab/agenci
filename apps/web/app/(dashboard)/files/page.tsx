@@ -1,20 +1,11 @@
-import { Protect } from "@clerk/nextjs";
-
-import { PremiumFeatureOverlay } from "@/modules/billing/ui/components/premium-feature-overlay";
+import { ProPlanGate } from "@/modules/billing/ui/components/pro-plan-gate";
 import { FilesView } from "@/modules/files/ui/views/files-view";
 
 const Page = () => {
   return (
-    <Protect
-      condition={(has) => has({ plan: "pro" })}
-      fallback={
-        <PremiumFeatureOverlay>
-          <FilesView />
-        </PremiumFeatureOverlay>
-      }
-    >
+    <ProPlanGate>
       <FilesView />
-    </Protect>
+    </ProPlanGate>
   );
 };
  

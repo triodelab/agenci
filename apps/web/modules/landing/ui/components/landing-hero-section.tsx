@@ -8,7 +8,7 @@ export function LandingHeroSection() {
   return (
     <>
       <LandingNav />
-      <div className="relative overflow-visible bg-background">
+      <div className="relative overflow-visible bg-[var(--hero-bg)] dark:bg-background">
         <div
           aria-hidden
           className="landing-hero-mesh pointer-events-none absolute inset-x-0 top-0 z-0 h-[min(88vh,860px)]"
