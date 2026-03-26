@@ -1,12 +1,25 @@
+import { jsonSchema } from "ai";
 import { createTool } from "@convex-dev/agent";
-import z from "zod";
 import { internal } from "../../../_generated/api";
 import { supportAgent } from "../agents/supportAgent";
 
+type EscalateArgs = {
+  reason?: string;
+};
+
 export const escalateConversation = createTool({
-  description: "Escalate a conversation",
-  args: z.object({}),
-  handler: async (ctx) => {
+  description: "Escalate a conversation to a human operator",
+  args: jsonSchema<EscalateArgs>({
+    type: "object",
+    properties: {
+      reason: {
+        type: "string",
+        description: "Kort årsak til eskalering (valgfritt)",
+      },
+    },
+    additionalProperties: false,
+  }),
+  handler: async (ctx, _args) => {
     if (!ctx.threadId) {
       return "Missing thread ID";
     }
@@ -20,7 +33,7 @@ export const escalateConversation = createTool({
       message: {
         role: "assistant",
         content: "Conversation escalated to a human operator.",
-      }
+      },
     });
 
     return "Conversation escalated to a human operator";

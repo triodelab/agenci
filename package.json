@@ -26,7 +26,8 @@
     "dev:widget": "npx turbo -F widget dev",
     "dev:web": "npx turbo -F web dev",
     "dev:backend": "npx turbo -F @agenci/backend dev",
-    "dev:setup": "npx turbo -F @agenci/backend dev:setup"
+    "dev:setup": "npx turbo -F @agenci/backend dev:setup",
+    "verify": "pnpm exec tsc --noEmit -p apps/web && pnpm exec tsc --noEmit -p apps/widget && pnpm -F @agenci/backend test:openai-mini && pnpm -F @agenci/backend test:openai-mini:convex"
   },
   "devDependencies": {
     "@workspace/eslint-config": "workspace:*",

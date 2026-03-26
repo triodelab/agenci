@@ -8,14 +8,15 @@ import {
 } from "@workspace/ui/components/dropdown-menu";
 import { useInfiniteScroll } from "@workspace/ui/hooks/use-infinite-scroll";
 import { InfiniteScrollTrigger } from "@workspace/ui/components/infinite-scroll-trigger";
-import { usePaginatedQuery } from "convex/react";
+import { useAction, usePaginatedQuery } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
 import type { PublicFile } from "@workspace/backend/private/files";
 import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
 import { ScrollArea } from "@workspace/ui/components/scroll-area";
 import { UploadDialog } from "../components/upload-dialog";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
+import { toast } from "sonner";
 import { DeleteFileDialog } from "../components/delete-file-dialog";
 import {
   FileIcon,
@@ -142,6 +143,15 @@ function KnowledgeSourceRow({
   );
 }
 
+function isValidHttpUrl(url: string): boolean {
+  try {
+    const u = new URL(url.trim());
+    return u.protocol === "http:" || u.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
 export const FilesView = () => {
   const files = usePaginatedQuery(
     api.private.files.list,
@@ -150,6 +160,7 @@ export const FilesView = () => {
       initialNumItems: 10,
     },
   );
+  const addWebpage = useAction(api.private.files.addWebpage);
 
   const {
     topElementRef,
@@ -169,6 +180,36 @@ export const FilesView = () => {
   const [selectedFile, setSelectedFile] = useState<PublicFile | null>(null);
   const [dataset, setDataset] = useState<DatasetKey>("general");
   const [webUrl, setWebUrl] = useState("");
+  const [isImportingWebpage, setIsImportingWebpage] = useState(false);
+
+  const canAddWebpage = useMemo(
+    () => isValidHttpUrl(webUrl) && !isImportingWebpage,
+    [webUrl, isImportingWebpage],
+  );
+
+  const handleAddWebpage = async () => {
+    if (!canAddWebpage) {
+      return;
+    }
+    setIsImportingWebpage(true);
+    try {
+      const result = await addWebpage({ url: webUrl.trim() });
+      toast.success(
+        `Nettside lagt til: ${result.title ?? result.url}`,
+      );
+      setWebUrl("");
+    } catch (e) {
+      const msg =
+        e instanceof Error
+          ? e.message
+          : typeof e === "object" && e && "message" in e
+            ? String((e as { message: unknown }).message)
+            : "Kunne ikke importere nettside";
+      toast.error(msg);
+    } finally {
+      setIsImportingWebpage(false);
+    }
+  };
 
   const handleDeleteClick = (file: PublicFile) => {
     setSelectedFile(file);
@@ -345,19 +386,27 @@ export const FilesView = () => {
               <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
                 <Input
                   className="h-10 flex-1 rounded-lg border-border/70 bg-card/90 text-[13px] shadow-sm"
+                  disabled={isImportingWebpage}
                   onChange={(e) => setWebUrl(e.target.value)}
-                  placeholder="https://publicwebpage.com/docs/topic"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && canAddWebpage) {
+                      e.preventDefault();
+                      void handleAddWebpage();
+                    }
+                  }}
+                  placeholder="https://eksempel.no/hjelp"
                   type="url"
                   value={webUrl}
                 />
                 <div className="flex shrink-0 flex-wrap items-center gap-2">
                   <Button
                     className="h-10 rounded-lg px-4 text-[13px] font-medium"
-                    disabled
+                    disabled={!canAddWebpage}
+                    onClick={() => void handleAddWebpage()}
                     type="button"
                     variant="secondary"
                   >
-                    Add Webpage
+                    {isImportingWebpage ? "Henter…" : "Legg til nettside"}
                   </Button>
                   <Button
                     className="h-10 rounded-lg px-4 text-[13px] font-medium"
@@ -396,8 +445,8 @@ export const FilesView = () => {
                   <UploadIcon className="size-7" strokeWidth={1.5} />
                 </div>
                 <p className="max-w-md text-[13px] leading-relaxed text-muted-foreground">
-                  Train Ai agents on your business by adding webpages, FAQ,
-                  PDFs, playbooks, images, and more
+                  Legg inn kunnskap med nettside (over) eller fil (nede til
+                  høyre). Alt indekseres for AI-søk per organisasjon.
                 </p>
                 <p className="text-[12px] text-muted-foreground/80">
                   Drag &amp; drop

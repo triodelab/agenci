@@ -34,7 +34,7 @@ import {
   AIMessageContent,
 } from "@workspace/ui/components/ai/message";
 import { AIResponse } from "@workspace/ui/components/ai/response";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { cn } from "@workspace/ui/lib/utils";
 
 const formSchema = z.object({
@@ -105,18 +105,24 @@ export const WidgetChatScreen = () => {
   });
 
   const createMessage = useAction(api.public.messages.create);
+  const [isAwaitingAssistant, setIsAwaitingAssistant] = useState(false);
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (!conversation || !contactSessionId) {
       return;
     }
 
     form.reset();
-
-    await createMessage({
-      threadId: conversation.threadId,
-      prompt: values.message,
-      contactSessionId,
-    });
+    setIsAwaitingAssistant(true);
+    try {
+      await createMessage({
+        threadId: conversation.threadId,
+        prompt: values.message,
+        contactSessionId,
+      });
+    } finally {
+      setIsAwaitingAssistant(false);
+    }
   };
 
   return (
@@ -172,6 +178,34 @@ export const WidgetChatScreen = () => {
               </AIMessage>
             )
           })}
+          {isAwaitingAssistant ? (
+            <AIMessage from="assistant" key="__typing">
+              <AIMessageContent
+                className={cn(
+                  "!border-[var(--widget-input-border)]/80 !bg-[var(--widget-bubble-assistant-bg)] !text-[var(--widget-bubble-assistant-text)] dark:!border-[var(--widget-input-border)]/80 dark:!bg-[var(--widget-bubble-assistant-bg)] dark:!text-[var(--widget-bubble-assistant-text)]",
+                )}
+              >
+                <span className="inline-flex items-center gap-1.5">
+                  <span className="sr-only">Skriver</span>
+                  <span className="inline-flex items-center gap-1">
+                    {[0, 1, 2].map((i) => (
+                      <span
+                        aria-hidden
+                        className="inline-block size-1.5 rounded-full bg-current opacity-80 motion-safe:animate-bounce"
+                        key={i}
+                        style={{ animationDelay: `${i * 0.14}s` }}
+                      />
+                    ))}
+                  </span>
+                </span>
+              </AIMessageContent>
+              <DicebearAvatar
+                imageUrl="/logo.svg"
+                seed="assistant"
+                size={32}
+              />
+            </AIMessage>
+          ) : null}
         </AIConversationContent>
       </AIConversation>
       {toUIMessages(messages.results ?? [])?.length === 1 && (
@@ -205,12 +239,16 @@ export const WidgetChatScreen = () => {
           >
             <FormField
               control={form.control}
-              disabled={conversation?.status === "resolved"}
+              disabled={
+                conversation?.status === "resolved" || isAwaitingAssistant
+              }
               name="message"
               render={({ field }) => (
                 <AIInputTextarea
                   className="!resize-none !bg-transparent !text-[var(--widget-input-text)] placeholder:!text-[var(--widget-input-placeholder)] dark:!bg-transparent"
-                  disabled={conversation?.status === "resolved"}
+                  disabled={
+                    conversation?.status === "resolved" || isAwaitingAssistant
+                  }
                   onChange={field.onChange}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && !e.shiftKey) {
@@ -230,8 +268,12 @@ export const WidgetChatScreen = () => {
             <AIInputToolbar>
               <AIInputTools />
               <AIInputSubmit
-                disabled={conversation?.status === "resolved" || !form.formState.isValid}
-                status="ready"
+                disabled={
+                  conversation?.status === "resolved" ||
+                  !form.formState.isValid ||
+                  isAwaitingAssistant
+                }
+                status={isAwaitingAssistant ? "submitted" : "ready"}
                 type="submit"
               />
             </AIInputToolbar>

@@ -2,6 +2,7 @@ import { ConvexError, v } from "convex/values";
 import { generateText } from "ai";
 import { action, mutation, query } from "../_generated/server";
 import { getOrgIdOrNull } from "../lib/auth";
+import { hasActiveSubscriptionAccess } from "../lib/subscriptionAccess";
 import { components, internal } from "../_generated/api";
 import { supportAgent } from "../system/ai/agents/supportAgent";
 import { paginationOptsValidator } from "convex/server";
@@ -30,7 +31,7 @@ export const enhanceResponse = action({
       },
     );
 
-    if (subscription?.status !== "active") {
+    if (!hasActiveSubscriptionAccess(orgId, subscription)) {
       throw new ConvexError({
         code: "BAD_REQUEST",
         message: "Missing subscription"

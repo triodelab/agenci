@@ -1,12 +1,26 @@
+import { jsonSchema } from "ai";
 import { createTool } from "@convex-dev/agent";
-import z from "zod";
 import { internal } from "../../../_generated/api";
 import { supportAgent } from "../agents/supportAgent";
 
+type ResolveArgs = {
+  summary?: string;
+};
+
 export const resolveConversation = createTool({
-  description: "Resolve a conversation",
-  args: z.object({}),
-  handler: async (ctx) => {
+  description:
+    "Mark the conversation as resolved when the user's issue is fully addressed",
+  args: jsonSchema<ResolveArgs>({
+    type: "object",
+    properties: {
+      summary: {
+        type: "string",
+        description: "Kort oppsummering av løsningen (valgfritt)",
+      },
+    },
+    additionalProperties: false,
+  }),
+  handler: async (ctx, _args) => {
     if (!ctx.threadId) {
       return "Missing thread ID";
     }
@@ -20,7 +34,7 @@ export const resolveConversation = createTool({
       message: {
         role: "assistant",
         content: "Conversation resolved.",
-      }
+      },
     });
 
     return "Conversation resolved";

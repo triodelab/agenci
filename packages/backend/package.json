@@ -4,7 +4,9 @@
   "scripts": {
     "dev": "convex dev",
     "predev": "convex dev --until-success && convex dashboard",
-    "dev:setup": "convex dev --configure --until-success"
+    "dev:setup": "convex dev --configure --until-success",
+    "test:openai-mini": "bash scripts/test-openai-mini.sh",
+    "test:openai-mini:convex": "convex run system/ai/pingMini:ping '{}'"
   },
   "exports": {
     "./convex": "./convex/*.ts"

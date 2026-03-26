@@ -3,6 +3,7 @@ import { action, query } from "../_generated/server";
 import { components, internal } from "../_generated/api";
 import { supportAgent } from "../system/ai/agents/supportAgent";
 import { paginationOptsValidator } from "convex/server";
+import { hasActiveSubscriptionAccess } from "../lib/subscriptionAccess";
 import { escalateConversation } from "../system/ai/tools/escalateConversation";
 import { resolveConversation } from "../system/ai/tools/resolveConversation";
 import { saveMessage } from "@convex-dev/agent";
@@ -63,7 +64,11 @@ export const create = action({
     );
 
     const shouldTriggerAgent =
-      conversation.status === "unresolved" && subscription?.status === "active"
+      conversation.status === "unresolved" &&
+      hasActiveSubscriptionAccess(
+        conversation.organizationId,
+        subscription,
+      );
 
     if (shouldTriggerAgent) {
       await supportAgent.generateText(
