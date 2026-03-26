@@ -15,6 +15,7 @@ import { useMutation } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
 import { Doc } from "@workspace/backend/_generated/dataModel";
 import { useAtomValue, useSetAtom } from "jotai";
+import { useWidgetDisplayTitle } from "@/lib/widget-display-title";
 import { contactSessionIdAtomFamily, organizationIdAtom, screenAtom } from "../../atoms/widget-atoms";
 
 const formSchema = z.object({
@@ -24,6 +25,7 @@ const formSchema = z.object({
 
 export const WidgetAuthScreen = () => {
   const setScreen = useSetAtom(screenAtom);
+  const widgetTitle = useWidgetDisplayTitle();
 
   const organizationId = useAtomValue(organizationIdAtom);
   const setContactSessionId = useSetAtom(
@@ -73,7 +75,10 @@ export const WidgetAuthScreen = () => {
   return (
     <>
       <WidgetHeader>
-        <div className="flex flex-col justify-between gap-y-2 px-2 py-6 font-semibold">
+        <div className="flex flex-col justify-between gap-y-2 px-2 pb-6 pt-1 font-semibold">
+          <p className="text-center text-[15px] font-semibold tracking-tight">
+            {widgetTitle}
+          </p>
           <p className="text-3xl">
             Hi there! 👋
           </p>

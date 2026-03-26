@@ -11,12 +11,14 @@ import {
 } from "@workspace/ui/components/ai/message";
 import { useVapi } from "@/modules/widget/hooks/use-vapi";
 import { WidgetHeader } from "@/modules/widget/ui/components/widget-header";
+import { useWidgetDisplayTitle } from "@/lib/widget-display-title";
 import { useSetAtom } from "jotai";
 import { screenAtom } from "../../atoms/widget-atoms";
 import { cn } from "@workspace/ui/lib/utils";
 
 export const WidgetVoiceScreen = () => {
   const setScreen = useSetAtom(screenAtom);
+  const widgetTitle = useWidgetDisplayTitle();
   const {
     isConnected,
     isSpeaking,
@@ -37,7 +39,7 @@ export const WidgetVoiceScreen = () => {
           >
             <ArrowLeftIcon />
           </Button>
-          <p>Voice Chat</p>
+          <p className="truncate font-semibold">{widgetTitle}</p>
         </div>
       </WidgetHeader>
       {transcript.length > 0 ? (

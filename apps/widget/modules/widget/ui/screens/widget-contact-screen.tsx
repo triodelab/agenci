@@ -1,6 +1,7 @@
 import { ArrowLeftIcon, CheckIcon, CopyIcon, PhoneIcon } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
 import { WidgetHeader } from "@/modules/widget/ui/components/widget-header";
+import { useWidgetDisplayTitle } from "@/lib/widget-display-title";
 import { useAtomValue, useSetAtom } from "jotai";
 import { screenAtom, widgetSettingsAtom } from "../../atoms/widget-atoms";
 import { useState } from "react";
@@ -9,6 +10,7 @@ import Link from "next/link";
 export const WidgetContactScreen = () => {
   const setScreen = useSetAtom(screenAtom);
   const widgetSettings = useAtomValue(widgetSettingsAtom);
+  const widgetTitle = useWidgetDisplayTitle();
 
   const phoneNumber = widgetSettings?.vapiSettings?.phoneNumber;
 
@@ -39,7 +41,7 @@ export const WidgetContactScreen = () => {
           >
             <ArrowLeftIcon />
           </Button>
-          <p>Contact Us</p>
+          <p className="truncate font-semibold">{widgetTitle}</p>
         </div>
       </WidgetHeader>
       <div className="flex h-full flex-col items-center justify-center gap-y-4">

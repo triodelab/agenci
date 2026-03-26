@@ -33,6 +33,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { Button } from "@workspace/ui/components/button";
 import {
+  DashboardPageHeader,
   DashboardPageShell,
 } from "@/modules/dashboard/ui/components/dashboard-page-shell";
 import { VapiConnectedView } from "../components/vapi-connected-view";
@@ -222,17 +223,13 @@ export const VapiView = () => {
       <VapiPluginForm open={connectOpen} setOpen={setConnectOpen} />
       <VapiPluginRemoveForm open={removeOpen} setOpen={setRemoveOpen} />
       <DashboardPageShell contentClassName="max-w-screen-md">
-        <header className="space-y-2">
-          <h1 className="text-2xl font-semibold tracking-tight md:text-4xl">
-            Vapi Plugin
-          </h1>
-          <p className="text-muted-foreground leading-relaxed">
-            Koble Vapi for stemme i nettleser og telefon — ett sted for nøkler og
-            status.
-          </p>
-        </header>
+        <DashboardPageHeader
+          description="Koble Vapi for stemme i nettleser og telefon — ett sted for nøkler og status."
+          kicker="Stemme"
+          title="Vapi Plugin"
+        />
 
-        <div className="mt-8">
+        <div className="mt-2">
           {vapiPlugin ? (
             <VapiConnectedView onDisconnect={toggleConnection} />
           ) : (

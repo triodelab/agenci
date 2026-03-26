@@ -14,9 +14,12 @@ export const DashboardLayout = async ({ children }: { children: React.ReactNode 
     <AuthGuard>
       <OrganizationGuard>
         <Provider>
-          <SidebarProvider defaultOpen={defaultOpen}>
+          <SidebarProvider
+            className="dashboard-app-shell"
+            defaultOpen={defaultOpen}
+          >
             <DashboardSidebar />
-            <main className="app-dashboard-main flex min-h-0 flex-1 flex-col border-l border-border/40">
+            <main className="app-dashboard-main app-dashboard-canvas flex min-h-0 min-h-svh min-w-0 flex-1 flex-col overflow-hidden border-border/60 border-l md:min-h-0">
               {children}
             </main>
           </SidebarProvider>

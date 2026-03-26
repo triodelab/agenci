@@ -1,6 +1,24 @@
 import { cn } from "@workspace/ui/lib/utils";
 
-/** Ytre padding og sentrert kolonne — felles dashboard-sider (kun layout, ikke logikk). */
+export type DashboardPagePanelVariant =
+  | "glass"
+  | "terminal"
+  | "bento"
+  | "lattice"
+  | "plain";
+
+const dashboardPagePanelVariantClass: Record<DashboardPagePanelVariant, string> = {
+  glass: "dash-panel-glass",
+  terminal: "dash-panel-terminal",
+  bento: "dash-bento-block",
+  lattice: "dash-lattice-card",
+  plain: "app-dashboard-panel",
+};
+
+/**
+ * Felles innholdsflate for dashboard (som workspace `SidebarInset`):
+ * full bredde, scroll, konsistent padding — matcher nøytral widget-/shadcn-oppsett.
+ */
 export function DashboardPageShell({
   children,
   className,
@@ -8,33 +26,63 @@ export function DashboardPageShell({
 }: {
   children: React.ReactNode;
   className?: string;
-  /** Tailwind max-width, f.eks. `max-w-3xl` eller `max-w-screen-md` */
+  /** Overstyr f.eks. `max-w-3xl` eller `max-w-full` */
   contentClassName?: string;
 }) {
   return (
     <div
       className={cn(
-        "flex min-h-full flex-col bg-transparent px-4 py-8 sm:px-6 md:px-8 lg:py-10",
+        "flex min-h-0 flex-1 flex-col overflow-auto bg-transparent text-foreground antialiased",
         className,
       )}
     >
-      <div className={cn("mx-auto w-full max-w-3xl", contentClassName)}>
+      <div
+        className={cn(
+          "mx-auto w-full max-w-5xl flex-1 px-4 py-7 md:px-10 md:py-10",
+          contentClassName,
+        )}
+      >
         {children}
       </div>
     </div>
   );
 }
 
-/** Kort med myk skygge — tokens fra `styles/tokens.css`. */
+export function DashboardPageHeader({
+  kicker,
+  title,
+  description,
+}: {
+  kicker?: string;
+  title: string;
+  description?: string;
+}) {
+  return (
+    <header className="dash-page-header-accent space-y-3 sm:space-y-3.5">
+      {kicker ? <p className="dash-page-kicker">{kicker}</p> : null}
+      <h1 className="dash-page-title">{title}</h1>
+      {description ? <p className="dash-page-desc">{description}</p> : null}
+    </header>
+  );
+}
+
 export function DashboardPagePanel({
   children,
   className,
+  variant = "plain",
 }: {
   children: React.ReactNode;
   className?: string;
+  variant?: DashboardPagePanelVariant;
 }) {
   return (
-    <div className={cn("app-dashboard-panel p-6 md:p-8", className)}>
+    <div
+      className={cn(
+        dashboardPagePanelVariantClass[variant],
+        variant === "terminal" ? "p-6 md:p-8" : "p-6 md:p-8",
+        className,
+      )}
+    >
       {children}
     </div>
   );

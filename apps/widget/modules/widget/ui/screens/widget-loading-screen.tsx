@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { LoaderIcon } from "lucide-react";
 import { useAtomValue, useSetAtom } from "jotai";
+import { useWidgetDisplayTitle } from "@/lib/widget-display-title";
 import { contactSessionIdAtomFamily, errorMessageAtom, loadingMessageAtom, organizationIdAtom, screenAtom, vapiSecretsAtom, widgetSettingsAtom } from "@/modules/widget/atoms/widget-atoms";
 import { WidgetHeader } from "@/modules/widget/ui/components/widget-header";
 import { useAction, useMutation, useQuery } from "convex/react";
@@ -13,6 +14,7 @@ type InitStep = "org" | "session" | "settings" | "vapi" | "done";
 export const WidgetLoadingScreen = ({ organizationId }: { organizationId: string | null }) => {
   const [step, setStep] = useState<InitStep>("org")
   const [sessionValid, setSessionValid] = useState(false);
+  const widgetTitle = useWidgetDisplayTitle();
 
   const loadingMessage = useAtomValue(loadingMessageAtom);
   const setWidgetSettings = useSetAtom(widgetSettingsAtom);
@@ -163,7 +165,10 @@ export const WidgetLoadingScreen = ({ organizationId }: { organizationId: string
   return (
     <>
       <WidgetHeader>
-        <div className="flex flex-col justify-between gap-y-2 px-2 py-6 font-semibold">
+        <div className="flex flex-col justify-between gap-y-2 px-2 pb-6 pt-1 font-semibold">
+          <p className="text-center text-[15px] font-semibold tracking-tight">
+            {widgetTitle}
+          </p>
           <p className="text-3xl">
             Hi there! 👋
           </p>

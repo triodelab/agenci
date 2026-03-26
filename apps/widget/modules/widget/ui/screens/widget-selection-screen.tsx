@@ -4,6 +4,7 @@ import { WidgetHeader } from "@/modules/widget/ui/components/widget-header";
 import { Button } from "@workspace/ui/components/button";
 import { useAtomValue, useSetAtom } from "jotai";
 import { ChevronRightIcon, MessageSquareTextIcon, MicIcon, PhoneIcon } from "lucide-react";
+import { useWidgetDisplayTitle } from "@/lib/widget-display-title";
 import { contactSessionIdAtomFamily, conversationIdAtom, errorMessageAtom, hasVapiSecretsAtom, organizationIdAtom, screenAtom, widgetSettingsAtom } from "../../atoms/widget-atoms";
 import { useMutation } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
@@ -16,6 +17,7 @@ export const WidgetSelectionScreen = () => {
   const setConversationId = useSetAtom(conversationIdAtom);
 
   const widgetSettings = useAtomValue(widgetSettingsAtom);
+  const widgetTitle = useWidgetDisplayTitle();
   const hasVapiSecrets = useAtomValue(hasVapiSecretsAtom);
   const organizationId = useAtomValue(organizationIdAtom);
   const contactSessionId = useAtomValue(
@@ -56,7 +58,10 @@ export const WidgetSelectionScreen = () => {
   return (
     <>
       <WidgetHeader>
-        <div className="flex flex-col justify-between gap-y-2 px-2 py-6 font-semibold">
+        <div className="flex flex-col justify-between gap-y-2 px-2 pb-6 pt-1 font-semibold">
+          <p className="text-center text-[15px] font-semibold tracking-tight">
+            {widgetTitle}
+          </p>
           <p className="text-3xl">
             Hi there! 👋
           </p>

@@ -29,8 +29,8 @@ export const VapiConnectedView = ({ onDisconnect }: VapiConnectedViewProps) => {
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
+      <Card className="dash-panel-glass border-0 shadow-none">
+        <CardHeader className="px-6 pt-6 pb-4 md:px-8 md:pt-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Image
@@ -56,8 +56,8 @@ export const VapiConnectedView = ({ onDisconnect }: VapiConnectedViewProps) => {
         </CardHeader>
       </Card>
 
-      <Card>
-        <CardHeader>
+      <Card className="dash-bento-block border-0 shadow-none">
+        <CardHeader className="space-y-0 px-6 pb-4 pt-6 md:px-8 md:pt-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="flex size-12 items-center justify-center rounded-lg border bg-muted">
@@ -80,7 +80,7 @@ export const VapiConnectedView = ({ onDisconnect }: VapiConnectedViewProps) => {
         </CardHeader>
       </Card>
 
-      <div className="overflow-hidden rounded-lg border bg-background">
+      <div className="dash-lattice-card overflow-hidden rounded-2xl border-0 bg-card shadow-none">
         <Tabs
           className="gap-0"
           defaultValue="phone-numbers"

@@ -9,6 +9,8 @@ export default defineSchema({
     .index("by_organization_id", ["organizationId"]),
   widgetSettings: defineTable({
     organizationId: v.string(),
+    /** Vises i widget-header (f.eks. «Agenci»). */
+    widgetTitle: v.optional(v.string()),
     greetMessage: v.string(),
     defaultSuggestions: v.object({
       suggestion1: v.optional(v.string()),
@@ -19,6 +21,34 @@ export default defineSchema({
       assistantId: v.optional(v.string()),
       phoneNumber: v.optional(v.string()),
     }),
+    appearance: v.optional(
+      v.object({
+        position: v.optional(
+          v.union(
+            v.literal("center"),
+            v.literal("bottom-right"),
+            v.literal("bottom-left"),
+            v.literal("custom"),
+          ),
+        ),
+        customX: v.optional(v.number()),
+        customY: v.optional(v.number()),
+        width: v.optional(v.number()),
+        height: v.optional(v.number()),
+        borderRadius: v.optional(v.number()),
+        headerColor: v.optional(v.string()),
+        headerTextColor: v.optional(v.string()),
+        bubbleUserColor: v.optional(v.string()),
+        bubbleUserTextColor: v.optional(v.string()),
+        bubbleAssistantColor: v.optional(v.string()),
+        bubbleAssistantTextColor: v.optional(v.string()),
+        backgroundColor: v.optional(v.string()),
+        inputBorderColor: v.optional(v.string()),
+        inputBackgroundColor: v.optional(v.string()),
+        inputTextColor: v.optional(v.string()),
+        inputPlaceholderColor: v.optional(v.string()),
+      }),
+    ),
   })
   .index("by_organization_id", ["organizationId"]),
   plugins: defineTable({

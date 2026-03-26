@@ -9,7 +9,7 @@ export const WidgetFooter = () => {
   const setScreen = useSetAtom(screenAtom);
 
   return (
-    <footer className="flex items-center justify-between border-t bg-background">
+    <footer className="flex items-center justify-between border-t border-[var(--widget-input-border)]/50 bg-[var(--widget-input-bg)]">
       <Button
         className="h-14 flex-1 rounded-none"
         onClick={() => setScreen("selection")}

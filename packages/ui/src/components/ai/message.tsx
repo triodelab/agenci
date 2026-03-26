@@ -28,14 +28,18 @@ export const AIMessageContent = ({
   <div
     className={cn(
       "break-words",
-      "flex flex-col gap-2 rounded-lg border border-border px-3 py-2 text-sm",
-      "bg-background text-foreground",
-      "group-[.is-user]:border-transparent group-[.is-user]:bg-gradient-to-b group-[.is-user]:from-primary group-[.is-user]:to-[#0b63f3] group-[.is-user]:text-primary-foreground",
+      "flex flex-col gap-2 rounded-xl border px-3.5 py-2.5 text-sm leading-relaxed",
+      /* Visitor / bot side — lys boble (Chatbase-lignende) */
+      "border-zinc-200/90 bg-zinc-100/95 text-zinc-900",
+      "dark:border-zinc-700/80 dark:bg-zinc-800/85 dark:text-zinc-100",
+      /* Operator side — mørk boble (ikke brand-blå) */
+      "group-[.is-user]:border-transparent group-[.is-user]:bg-zinc-900 group-[.is-user]:text-white",
+      "dark:group-[.is-user]:bg-zinc-100 dark:group-[.is-user]:text-zinc-950",
       className
     )}
     {...props}
   >
-    <div className="is-user:dark">{children}</div>
+    {children}
   </div>
 );
 

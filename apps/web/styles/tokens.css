@@ -31,9 +31,9 @@
   --podium-card-muted: oklch(0.68 0 0);
   --hero-badge-bg: rgba(255, 255, 255, 0.7);
   --hero-icon-box-bg: rgba(255, 255, 255, 0.6);
-  /* Accent kun for knapper – ikke på tekst (bytt fra orange/lilla her) */
-  --accent-primary: #2563eb;
-  --accent-primary-hover: #1d4ed8;
+  /* Accent — teal, matcher app primary (ikke lilla «chatbot-SaaS»-klone) */
+  --accent-primary: #0d9488;
+  --accent-primary-hover: #0f766e;
   --accent-secondary: #475569;
   --accent-secondary-hover: #334155;
   /* Borders & text – nøytral, ingen farge på tekst */
@@ -180,27 +180,496 @@
     radial-gradient(ellipse 45% 35% at 100% 100%, rgba(56, 189, 248, 0.08), transparent 60%);
 }
 
-/* ─── App dashboard (myk bakgrunn, ikke kopier gammel mappe-struktur) ─── */
-.app-dashboard-main {
-  background:
-    radial-gradient(ellipse 120% 80% at 50% -20%, color-mix(in oklch, var(--primary) 6%, transparent), transparent 55%),
-    linear-gradient(180deg, oklch(0.985 0.004 264) 0%, oklch(0.995 0.002 264) 45%, oklch(0.98 0.006 264) 100%);
+/**
+ * Dashboard — Chatbase-lignende: dot-grid, svarte primærknapper.
+ * Svart «filled» valg kun i hovedsidebar; andre lister bruker --dash-nav-* (grå + sort kant).
+ * Marketing/landing uendret.
+ */
+.dashboard-app-shell {
+  /* Lister (konversasjon, knowledge, …): diskret valgt */
+  --dash-nav-active-bg: oklch(0.94 0 0);
+  --dash-nav-active-border: oklch(0.15 0 0);
+  --dash-inbox-active: var(--dash-nav-active-bg);
+  --dash-inbox-active-border: var(--dash-nav-active-border);
+  --dash-knowledge-active: var(--dash-nav-active-bg);
+  --dash-knowledge-folder: oklch(0.97 0 0);
+  --background: oklch(0.985 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  /* Primær = svart (Chatbase / shadcn clean) */
+  --primary: oklch(0.15 0 0);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.97 0.005 264);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.965 0.005 264);
+  --muted-foreground: oklch(0.48 0.02 264);
+  --accent: oklch(0.96 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.58 0.22 27);
+  --border: oklch(0.91 0.005 264);
+  --input: oklch(0.91 0.005 264);
+  --ring: oklch(0.45 0.02 264);
+  --radius: 0.625rem;
+  /* Sidebar: nøytral off-white, tydelig fra canvas */
+  --sidebar: oklch(0.97 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.15 0 0);
+  --sidebar-primary-foreground: oklch(0.99 0 0);
+  --sidebar-accent: oklch(0.94 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.9 0.006 264);
+  --sidebar-ring: oklch(0.45 0.02 264);
 }
 
-.dark .app-dashboard-main {
-  background:
-    radial-gradient(ellipse 100% 60% at 50% -15%, color-mix(in oklch, var(--primary) 12%, transparent), transparent 50%),
-    linear-gradient(180deg, oklch(0.14 0.01 264) 0%, oklch(0.12 0.01 264) 100%);
+.dark .dashboard-app-shell {
+  --dash-nav-active-bg: oklch(0.26 0 0);
+  --dash-nav-active-border: oklch(0.92 0 0);
+  --dash-knowledge-folder: oklch(0.24 0 0);
+  --background: oklch(0.145 0.01 264);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.18 0.012 264);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.18 0.012 264);
+  --popover-foreground: oklch(0.985 0 0);
+  /* Mørk modus: primærknapp = nesten hvit på svart */
+  --primary: oklch(0.97 0 0);
+  --primary-foreground: oklch(0.12 0 0);
+  --secondary: oklch(0.25 0.012 264);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.25 0.012 264);
+  --muted-foreground: oklch(0.65 0.02 264);
+  --accent: oklch(0.28 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 14%);
+  --ring: oklch(0.65 0.02 264);
+  --sidebar: oklch(0.16 0.012 264);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.97 0 0);
+  --sidebar-primary-foreground: oklch(0.12 0 0);
+  --sidebar-accent: oklch(0.26 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 9%);
+  --sidebar-ring: oklch(0.65 0.02 264);
 }
 
-/* Innholdsblokk: kort, skygge, konsistent på tvers av dashboard-sider */
-.app-dashboard-panel {
-  border-radius: var(--radius-card);
+/* Sidetitler — felles hierarki på alle dashboard-sider */
+.dash-page-kicker {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+.dash-page-title {
+  font-size: clamp(1.625rem, 2.2vw + 1rem, 2.125rem);
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  line-height: 1.15;
+  color: var(--foreground);
+}
+
+.dash-page-desc {
+  max-width: 36rem;
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: var(--muted-foreground);
+}
+
+/* ─── Dashboard-flater — rene, abstrakte kort (nøytralt, Chatbase-lignende) ─── */
+
+.dash-panel-glass {
+  position: relative;
+  border-radius: 1rem;
+  border: 1px solid color-mix(in oklch, var(--border) 92%, transparent);
+  background: var(--card);
+  box-shadow:
+    0 1px 0 oklch(1 0 0 / 0.65) inset,
+    0 1px 2px oklch(0 0 0 / 0.04),
+    0 12px 40px -24px oklch(0 0 0 / 0.08);
+}
+
+.dark .dash-panel-glass {
+  border-color: color-mix(in oklch, var(--border) 100%, transparent);
+  box-shadow:
+    0 1px 0 oklch(1 0 0 / 0.06) inset,
+    0 1px 2px oklch(0 0 0 / 0.2),
+    0 12px 40px -24px oklch(0 0 0 / 0.35);
+}
+
+.dash-panel-terminal {
+  border-radius: 1.25rem;
+  border: 1px solid oklch(0.34 0.035 268);
+  background: linear-gradient(168deg, oklch(0.19 0.028 268) 0%, oklch(0.11 0.022 268) 100%);
+  color: oklch(0.93 0.012 268);
+  box-shadow:
+    inset 0 1px 0 oklch(1 0 0 / 0.07),
+    0 28px 56px -24px oklch(0 0 0 / 0.4);
+}
+
+.dark .dash-panel-terminal {
+  border-color: oklch(0.38 0.04 268);
+  background: linear-gradient(168deg, oklch(0.16 0.03 268) 0%, oklch(0.1 0.025 268) 100%);
+}
+
+.dash-bento-block {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1rem;
   border: 1px solid color-mix(in oklch, var(--border) 88%, transparent);
   background: var(--card);
-  box-shadow: var(--shadow-soft);
+  box-shadow:
+    0 1px 0 oklch(1 0 0 / 0.55) inset,
+    0 1px 2px oklch(0 0 0 / 0.04);
+}
+
+.dark .dash-bento-block {
+  box-shadow:
+    0 1px 0 oklch(1 0 0 / 0.06) inset,
+    0 1px 2px oklch(0 0 0 / 0.2);
+}
+
+.dash-integration-orb {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  border-radius: 1rem;
+  border: 1px solid color-mix(in oklch, var(--border) 85%, transparent);
+  background: var(--card);
+  padding: 1.75rem 1.25rem;
+  text-align: center;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+  box-shadow: 0 1px 2px oklch(0 0 0 / 0.04);
+}
+
+.dash-integration-orb:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in oklch, var(--border) 100%, transparent);
+  box-shadow: 0 8px 24px -12px oklch(0 0 0 / 0.12);
+}
+
+.dark .dash-integration-orb:hover {
+  box-shadow: 0 8px 24px -12px oklch(0 0 0 / 0.35);
+}
+
+.dash-integration-orb-icon {
+  display: flex;
+  width: 4.5rem;
+  height: 4.5rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.875rem;
+  background: color-mix(in oklch, var(--muted) 55%, var(--card));
+  box-shadow: 0 0 0 1px color-mix(in oklch, var(--border) 70%, transparent);
+}
+
+.dash-file-matrix-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 7rem 6rem 3.5rem;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+  border-bottom: 1px solid color-mix(in oklch, var(--border) 80%, transparent);
+  background: color-mix(in oklch, var(--muted) 22%, transparent);
+}
+
+.dash-file-matrix-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 7rem 6rem 3.5rem;
+  gap: 1rem;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid color-mix(in oklch, var(--border) 45%, transparent);
+  transition: background-color 0.15s ease;
+}
+
+.dash-file-matrix-row:last-child {
+  border-bottom: none;
+}
+
+.dash-file-matrix-row:hover {
+  background: color-mix(in oklch, var(--muted) 35%, var(--card));
+}
+
+.dash-plugin-split {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 1rem;
+  border: 1px solid color-mix(in oklch, var(--border) 88%, transparent);
+  background: var(--card);
+  box-shadow: 0 12px 40px -20px oklch(0 0 0 / 0.1);
+}
+
+.dark .dash-plugin-split {
+  box-shadow: 0 12px 40px -20px oklch(0 0 0 / 0.4);
+}
+
+@media (min-width: 1024px) {
+  .dash-plugin-split {
+    flex-direction: row;
+    align-items: stretch;
+    min-height: 22rem;
+  }
+}
+
+.dash-plugin-split-main {
+  flex: 1;
+  padding: 2.25rem 2rem;
+}
+
+@media (min-width: 1024px) {
+  .dash-plugin-split-main {
+    padding: 2.5rem 2.75rem;
+  }
+}
+
+.dash-plugin-split-cta {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1rem;
+  padding: 2rem;
+  background: color-mix(in oklch, var(--muted) 55%, var(--card));
+  color: var(--foreground);
+  border-top: 1px solid color-mix(in oklch, var(--border) 80%, transparent);
+}
+
+@media (min-width: 1024px) {
+  .dash-plugin-split-cta {
+    width: 15rem;
+    flex-shrink: 0;
+    border-top: none;
+    border-left: 1px solid color-mix(in oklch, var(--border) 80%, transparent);
+  }
+}
+
+.dash-lattice-card {
+  border-radius: 1.125rem;
+  border: 1px solid color-mix(in oklch, var(--border) 95%, transparent);
+  background: var(--card);
+  box-shadow:
+    0 1px 0 oklch(1 0 0 / 0.55) inset,
+    0 1px 2px oklch(0 0 0 / 0.04);
+}
+
+.dark .dash-lattice-card {
+  box-shadow:
+    0 1px 0 oklch(1 0 0 / 0.06) inset,
+    0 1px 2px oklch(0 0 0 / 0.2);
+}
+
+.dash-contact-glow {
+  border-radius: 1rem;
+  border: 1px solid color-mix(in oklch, var(--border) 85%, transparent);
+  background: var(--card);
+  box-shadow:
+    0 1px 0 oklch(1 0 0 / 0.5) inset,
+    0 1px 2px oklch(0 0 0 / 0.04);
+}
+
+.dark .dash-contact-glow {
+  box-shadow:
+    0 1px 0 oklch(1 0 0 / 0.06) inset,
+    0 1px 2px oklch(0 0 0 / 0.2);
+}
+
+/* Tom tilstand — samtaler */
+.dash-empty-orbit {
+  position: relative;
+  border-radius: 1rem;
+  border: 1px solid color-mix(in oklch, var(--border) 88%, transparent);
+  background: var(--card);
+  box-shadow:
+    0 1px 0 oklch(1 0 0 / 0.55) inset,
+    0 1px 2px oklch(0 0 0 / 0.04);
+}
+
+/* Kontakt — metadata-akkordion (kompakt «arkiv») */
+.dash-accordion-frost {
+  border-radius: 0.75rem;
+  border: 1px solid color-mix(in oklch, var(--border) 85%, transparent);
+  background: color-mix(in oklch, var(--card) 88%, var(--muted));
+  box-shadow: 0 1px 2px oklch(0 0 0 / 0.04);
+}
+
+/* Dashboard-forside — rutenett med tydelige celler */
+.dash-stat-board {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .dash-stat-board {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.dash-stat-tile {
+  border-radius: 1.125rem;
+  border: 1px solid color-mix(in oklch, var(--border) 88%, transparent);
+  background: var(--card);
+  padding: 1.25rem 1.35rem;
+  box-shadow: 0 1px 2px oklch(0 0 0 / 0.04);
+}
+
+.dark .dash-stat-tile {
+  box-shadow: 0 1px 2px oklch(0 0 0 / 0.2);
+}
+
+/* Skjema — samme rene flate som bento */
+.dash-form-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1rem;
+  border: 1px solid color-mix(in oklch, var(--border) 88%, transparent);
+  background: var(--card);
+  box-shadow:
+    0 1px 0 oklch(1 0 0 / 0.55) inset,
+    0 1px 2px oklch(0 0 0 / 0.04);
+}
+
+.dark .dash-form-card {
+  box-shadow:
+    0 1px 0 oklch(1 0 0 / 0.06) inset,
+    0 1px 2px oklch(0 0 0 / 0.2);
+}
+
+/* Hovedflate — synlig «workspace»-canvas (mesh, ikke flat grå) */
+.app-dashboard-main {
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--background);
+  background-image: none;
+}
+
+/* Chatbase-lignende dot-grid (lys grå prikker på off-white) */
+.app-dashboard-main.app-dashboard-canvas {
+  background-color: oklch(0.985 0 0);
+  background-image: radial-gradient(oklch(0.88 0 0) 1px, transparent 1px);
+  background-size: 20px 20px;
+  background-attachment: fixed;
+}
+
+.dark .app-dashboard-main.app-dashboard-canvas {
+  background-color: oklch(0.145 0.01 264);
+  background-image: radial-gradient(oklch(0.32 0.01 264) 1px, transparent 1px);
+  background-size: 20px 20px;
+  background-attachment: fixed;
+}
+
+/* Modaler (upload m.m.) — samme dot-grid som dashboard */
+.dash-modal-dot-bg {
+  background-color: oklch(0.985 0 0);
+  background-image: radial-gradient(oklch(0.88 0 0) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.dark .dash-modal-dot-bg {
+  background-color: oklch(0.145 0.01 264);
+  background-image: radial-gradient(oklch(0.32 0.01 264) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Innholdspaneler — hvite kort på prikket canvas (minimal skygge) */
+.app-dashboard-panel {
+  border-radius: calc(var(--radius) + 4px);
+  border: 1px solid color-mix(in oklch, var(--border) 100%, transparent);
+  background: var(--card);
+  box-shadow: 0 1px 2px oklch(0 0 0 / 0.04);
 }
 
 .dark .app-dashboard-panel {
-  box-shadow: 0 4px 24px -8px oklch(0 0 0 / 0.35);
+  box-shadow: 0 1px 2px oklch(0 0 0 / 0.25);
+}
+
+/* Sidekolonner — ren hvit/grå flate (prikker fra hovedcanvas synlig i gap) */
+.dash-subpane-rail {
+  border-right: 1px solid color-mix(in oklch, var(--border) 90%, transparent);
+  background: var(--card);
+}
+
+.dash-subpane-main {
+  background: transparent;
+}
+
+.dark .dash-subpane-main {
+  background: transparent;
+}
+
+/* Sidetittel — tynn svart/hvit akzent (Chatbase) */
+.dash-page-header-accent {
+  position: relative;
+  margin-bottom: 2rem;
+  padding-bottom: 1.75rem;
+  padding-left: 1rem;
+  border-bottom: 1px solid color-mix(in oklch, var(--border) 90%, transparent);
+}
+
+@media (min-width: 640px) {
+  .dash-page-header-accent {
+    margin-bottom: 2.5rem;
+    padding-bottom: 2rem;
+  }
+}
+
+.dash-page-header-accent::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.15rem;
+  bottom: 1.75rem;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--foreground);
+}
+
+.dark .dash-page-header-accent::before {
+  background: var(--foreground);
+}
+
+.dash-resize-handle {
+  width: 1px;
+  background: color-mix(in oklch, var(--border) 65%, transparent);
+  transition: background-color 0.2s ease;
+}
+
+.dash-resize-handle:hover {
+  background: color-mix(in oklch, var(--foreground) 18%, var(--border));
+}
+
+/* Samtale-tråd — ren leseflate */
+.dash-thread-canvas {
+  background: var(--card);
+}
+
+.dark .dash-thread-canvas {
+  background: var(--card);
+}
+
+/* Inbox / tabell verktøylinje */
+.dash-surface-header {
+  border-bottom: 1px solid color-mix(in oklch, var(--border) 85%, transparent);
+  background: var(--card);
+}
+
+.dark .dash-surface-header {
+  background: color-mix(in oklch, var(--muted) 35%, var(--card));
 }

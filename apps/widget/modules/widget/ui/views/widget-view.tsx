@@ -1,8 +1,12 @@
 "use client";
 
 import { useAtomValue } from "jotai";
+import {
+  mergeWidgetAppearance,
+  widgetAppearanceToRootStyle,
+} from "@workspace/ui/lib/widget-appearance";
 import { WidgetAuthScreen } from "@/modules/widget/ui/screens/widget-auth-screen";
-import { screenAtom } from "@/modules/widget/atoms/widget-atoms";
+import { screenAtom, widgetSettingsAtom } from "@/modules/widget/atoms/widget-atoms";
 import { WidgetErrorScreen } from "@/modules/widget/ui/screens/widget-error-screen";
 import { WidgetLoadingScreen } from "@/modules/widget/ui/screens/widget-loading-screen";
 import { WidgetSelectionScreen } from "@/modules/widget/ui/screens/widget-selection-screen";
@@ -17,6 +21,9 @@ interface Props {
 
 export const WidgetView = ({ organizationId }: Props) => {
   const screen = useAtomValue(screenAtom);
+  const widgetSettings = useAtomValue(widgetSettingsAtom);
+  const appearance = mergeWidgetAppearance(widgetSettings?.appearance ?? undefined);
+  const rootStyle = widgetAppearanceToRootStyle(appearance);
 
   const screenComponents = {
     loading: <WidgetLoadingScreen organizationId={organizationId} />,
@@ -30,7 +37,10 @@ export const WidgetView = ({ organizationId }: Props) => {
   }
 
   return (
-    <main className="flex h-full min-h-[min(100vh-1.5rem,800px)] w-full max-w-md flex-col overflow-hidden rounded-2xl border border-border/70 bg-card shadow-[var(--shadow-lift)] ring-1 ring-black/[0.04] dark:ring-white/[0.06]">
+    <main
+      className="flex h-full min-h-0 w-full flex-col overflow-hidden border border-border/70 shadow-[var(--shadow-lift)] ring-1 ring-black/[0.04] dark:ring-white/[0.06]"
+      style={rootStyle}
+    >
       {screenComponents[screen]}
     </main>
   );

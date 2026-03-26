@@ -6,19 +6,33 @@ import { isDevBypassPremium } from "@/lib/dev-bypass";
 export const PricingTable = () => {
   if (isDevBypassPremium) {
     return (
-      <div className="mx-auto flex max-w-lg flex-col gap-3 rounded-lg border border-dashed p-8 text-center text-muted-foreground text-sm">
-        <p className="font-medium text-foreground">
-          Billing UI er omgått (utvikling)
-        </p>
-        <p>
-          <code className="rounded bg-muted px-1.5 py-0.5 text-xs">
+      <div className="grid gap-5 sm:grid-cols-3">
+        <div className="dash-panel-glass flex flex-col gap-3 p-6 text-left">
+          <p className="dash-page-kicker">Dev</p>
+          <p className="text-lg font-semibold tracking-tight text-foreground">Bypass aktiv</p>
+          <p className="text-muted-foreground text-[13px] leading-relaxed">
+            Billing UI er omgått i dette miljøet.
+          </p>
+        </div>
+        <div className="dash-bento-block flex flex-col gap-3 p-6 text-left">
+          <p className="dash-page-kicker">Miljøvariabel</p>
+          <code className="break-all rounded-lg bg-muted/60 px-2 py-1.5 font-mono text-[11px] text-foreground">
             NEXT_PUBLIC_DEV_BYPASS_PREMIUM=true
-          </code>{" "}
-          er satt. Clerk PricingTable rendres ikke når billing er av i Clerk.
-        </p>
-        <p className="text-xs">
-          Fjern bypass eller aktiver billing i Clerk for å teste ekte priser.
-        </p>
+          </code>
+          <p className="text-muted-foreground text-[12px] leading-relaxed">
+            Clerk PricingTable rendres ikke når billing er av i Clerk.
+          </p>
+        </div>
+        <div className="app-dashboard-panel flex flex-col justify-between gap-4 p-6 text-left shadow-sm">
+          <div>
+            <p className="text-[10px] font-medium tracking-[0.18em] text-muted-foreground uppercase">
+              Neste steg
+            </p>
+            <p className="mt-2 text-[14px] leading-relaxed text-foreground">
+              Fjern bypass eller aktiver billing i Clerk for å teste ekte priser.
+            </p>
+          </div>
+        </div>
       </div>
     );
   }
@@ -29,11 +43,12 @@ export const PricingTable = () => {
         forOrganizations
         appearance={{
           elements: {
-            pricingTableCard: "shadow-none! border! rounded-lg!",
-            pricingTableCardHeader: "bg-background!",
-            pricingTableCardBody: "bg-background!",
-            pricingTableCardFooter: "bg-background!",
-          }
+            pricingTableCard:
+              "shadow-none! border! rounded-2xl! border-border/80! bg-card/95! backdrop-blur-sm!",
+            pricingTableCardHeader: "bg-transparent!",
+            pricingTableCardBody: "bg-transparent!",
+            pricingTableCardFooter: "bg-transparent!",
+          },
         }}
       />
     </div>

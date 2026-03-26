@@ -62,3 +62,8 @@ Uten dette feltet er `orgId` tom i Convex selv om du har valgt organisasjon i Cl
 2. **Sjekk JWT** – Etter du har lagt inn `orgId` / `org_id` i malen `convex`, logg ut og inn i appen.
 
 3. Hvis feilen **fortsatt** sier nøyaktig `Organization not found` fra `getMany`, kjører **sky-Convex fortsatt gammel kode** (før «tom liste»-fiks). Da er det nesten alltid punkt 1.
+
+## Se også (øvrige Convex-variabler)
+
+- **[`../.env.example`](../.env.example)** — kommentert liste over bl.a. `OPENAI_API_KEY`, `CLERK_WEBHOOK_SECRET`, AWS (Vapi).
+- **[`docs/LOCAL_TESTING.md`](../../../docs/LOCAL_TESTING.md)** (fra monorepo-rot) — OpenAI, webhooks, **`subscriptions`** / aktiv plan, og kort sjekkliste.

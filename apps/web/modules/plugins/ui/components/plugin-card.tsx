@@ -3,10 +3,10 @@ import Image from "next/image";
 import { Button } from "@workspace/ui/components/button";
 
 export interface Feature {
-  icon: LucideIcon,
+  icon: LucideIcon;
   label: string;
   description: string;
-};
+}
 
 interface PluginCardProps {
   isDisabled?: boolean;
@@ -14,7 +14,7 @@ interface PluginCardProps {
   serviceImage: string;
   features: Feature[];
   onSubmit: () => void;
-};
+}
 
 export const PluginCard = ({
   isDisabled,
@@ -24,64 +24,70 @@ export const PluginCard = ({
   onSubmit,
 }: PluginCardProps) => {
   return (
-    <div className="h-fit w-full rounded-lg border bg-background p-8">
-      <div className="mb-6 flex items-center justify-center gap-6">
-        <div className="flex flex-col items-center">
-          <Image
-            alt={serviceName}
-            className="rounded object-contain"
-            height={40}
-            width={40}
-            src={serviceImage}
-          />
+    <div className="dash-plugin-split h-fit w-full overflow-hidden rounded-2xl border border-border/80 shadow-sm">
+      <div className="dash-plugin-split-main">
+        <div className="mb-10 flex flex-wrap items-center justify-center gap-6 md:justify-start">
+          <div className="flex flex-col items-center">
+            <Image
+              alt={serviceName}
+              className="rounded-xl object-contain ring-1 ring-border/45"
+              height={48}
+              width={48}
+              src={serviceImage}
+            />
+          </div>
+          <div className="flex items-center text-muted-foreground">
+            <ArrowLeftRightIcon className="size-5" strokeWidth={1.5} />
+          </div>
+          <div className="flex flex-col items-center">
+            <Image
+              alt="Platform"
+              className="object-contain opacity-95"
+              height={48}
+              width={48}
+              src="/logo.svg"
+            />
+          </div>
         </div>
 
-        <div className="flex flex-col items-center gap-1">
-          <ArrowLeftRightIcon />
-        </div>
-
-        <div className="flex flex-col items-center">
-          <Image
-            alt="Platform"
-            className="object-contain"
-            height={40}
-            width={40}
-            src="/logo.svg"
-          />
-        </div>
-      </div>
-
-      <div className="mb-6 text-center">
-        <p className="text-lg">
+        <p className="mb-8 text-left text-[1.35rem] font-semibold tracking-tight text-foreground md:text-[1.5rem]">
           Connect your {serviceName} account
         </p>
-      </div>
 
-      <div className="mb-6">
-        <div className="space-y-4">
+        <ul className="space-y-5">
           {features.map((feature) => (
-            <div className="flex items-center gap-3" key={feature.label}>
-              <div className="flex size-8 items-center justify-center rounded-lg border bg-muted">
-                <feature.icon className="size-4 text-muted-foreground" />
+            <li className="flex gap-4" key={feature.label}>
+              <div className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-muted/60 ring-1 ring-border/35">
+                <feature.icon className="size-[18px] text-muted-foreground" strokeWidth={1.75} />
               </div>
-              <div>
-                <div className="font-medium text-sm">{feature.label}</div>
-                <div className="text-muted-foreground text-xs">{feature.description}</div>
+              <div className="min-w-0 pt-0.5">
+                <div className="font-medium text-[14px] tracking-tight text-foreground">
+                  {feature.label}
+                </div>
+                <div className="mt-1 text-[13px] leading-relaxed text-muted-foreground">
+                  {feature.description}
+                </div>
               </div>
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
 
-      <div className="text-center">
+      <div className="dash-plugin-split-cta">
+        <p className="text-[11px] font-semibold tracking-[0.18em] text-muted-foreground uppercase">
+          Neste steg
+        </p>
+        <p className="text-[15px] font-medium leading-snug text-foreground">
+          Koble til og aktiver stemme i widget og dashbord.
+        </p>
         <Button
-          className="size-full"
+          className="mt-2 h-11 w-full rounded-xl font-medium"
           disabled={isDisabled}
           onClick={onSubmit}
-          variant="default"
+          type="button"
         >
           Connect
-          <PlugIcon />
+          <PlugIcon className="size-4" />
         </Button>
       </div>
     </div>

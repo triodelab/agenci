@@ -12,6 +12,7 @@ import { ArrowLeftIcon, MenuIcon } from "lucide-react";
 import { DicebearAvatar } from "@workspace/ui/components/dicebear-avatar";
 import { useInfiniteScroll } from "@workspace/ui/hooks/use-infinite-scroll";
 import { InfiniteScrollTrigger } from "@workspace/ui/components/infinite-scroll-trigger";
+import { useWidgetDisplayTitle } from "@/lib/widget-display-title";
 import { contactSessionIdAtomFamily, conversationIdAtom, organizationIdAtom, screenAtom, widgetSettingsAtom } from "../../atoms/widget-atoms";
 import { useAction, useQuery } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
@@ -34,6 +35,7 @@ import {
 } from "@workspace/ui/components/ai/message";
 import { AIResponse } from "@workspace/ui/components/ai/response";
 import { useMemo } from "react";
+import { cn } from "@workspace/ui/lib/utils";
 
 const formSchema = z.object({
   message: z.string().min(1, "Message is required"),
@@ -44,6 +46,7 @@ export const WidgetChatScreen = () => {
   const setConversationId = useSetAtom(conversationIdAtom);
 
   const widgetSettings = useAtomValue(widgetSettingsAtom);
+  const widgetTitle = useWidgetDisplayTitle();
   const conversationId = useAtomValue(conversationIdAtom);
   const organizationId = useAtomValue(organizationIdAtom);
   const contactSessionId = useAtomValue(
@@ -117,8 +120,8 @@ export const WidgetChatScreen = () => {
   };
 
   return (
-    <>
-      <WidgetHeader className="flex items-center justify-between">
+    <div className="flex min-h-0 flex-1 flex-col">
+      <WidgetHeader className="flex shrink-0 items-center justify-between">
         <div className="flex items-center gap-x-2">
           <Button
             onClick={onBack}
@@ -127,7 +130,7 @@ export const WidgetChatScreen = () => {
           >
             <ArrowLeftIcon />
           </Button>
-          <p>Chat</p>
+          <p className="truncate font-semibold">{widgetTitle}</p>
         </div>
         <Button
           size="icon"
@@ -136,7 +139,7 @@ export const WidgetChatScreen = () => {
           <MenuIcon />
         </Button>
       </WidgetHeader>
-      <AIConversation>
+      <AIConversation className="min-h-0 flex-1">
         <AIConversationContent>
           <InfiniteScrollTrigger
             canLoadMore={canLoadMore}
@@ -150,7 +153,13 @@ export const WidgetChatScreen = () => {
                 from={message.role === "user" ? "user" : "assistant"}
                 key={message.id}
               >
-                <AIMessageContent>
+                <AIMessageContent
+                  className={cn(
+                    message.role === "user"
+                      ? "!border-transparent !bg-[var(--widget-bubble-user-bg)] !text-[var(--widget-bubble-user-text)] dark:!bg-[var(--widget-bubble-user-bg)] dark:!text-[var(--widget-bubble-user-text)]"
+                      : "!border-[var(--widget-input-border)]/80 !bg-[var(--widget-bubble-assistant-bg)] !text-[var(--widget-bubble-assistant-text)] dark:!border-[var(--widget-input-border)]/80 dark:!bg-[var(--widget-bubble-assistant-bg)] dark:!text-[var(--widget-bubble-assistant-text)]",
+                  )}
+                >
                   <AIResponse>{message.content}</AIResponse>
                 </AIMessageContent>
                 {message.role === "assistant" && (
@@ -191,7 +200,7 @@ export const WidgetChatScreen = () => {
       )}
       <Form {...form}>
           <AIInput
-            className="rounded-none border-x-0 border-b-0"
+            className="shrink-0 rounded-none border-x-0 border-b-0 border-[var(--widget-input-border)] bg-[var(--widget-input-bg)]"
             onSubmit={form.handleSubmit(onSubmit)}
           >
             <FormField
@@ -200,6 +209,7 @@ export const WidgetChatScreen = () => {
               name="message"
               render={({ field }) => (
                 <AIInputTextarea
+                  className="!resize-none !bg-transparent !text-[var(--widget-input-text)] placeholder:!text-[var(--widget-input-placeholder)] dark:!bg-transparent"
                   disabled={conversation?.status === "resolved"}
                   onChange={field.onChange}
                   onKeyDown={(e) => {
@@ -227,6 +237,6 @@ export const WidgetChatScreen = () => {
             </AIInputToolbar>
           </AIInput>
       </Form>
-    </>
+    </div>
   );
 };

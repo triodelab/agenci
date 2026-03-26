@@ -4,7 +4,9 @@ import { CustomizationView } from "@/modules/customization/ui/views/customizatio
 const Page = () => {
   return (
     <ProPlanGate>
-      <CustomizationView />
+      <div className="flex h-full min-h-0 flex-1 flex-col">
+        <CustomizationView />
+      </div>
     </ProPlanGate>
   );
 };

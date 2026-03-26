@@ -3,6 +3,7 @@
 import { useAtomValue, useSetAtom } from "jotai";
 import { formatDistanceToNow } from "date-fns";
 import { ArrowLeftIcon } from "lucide-react";
+import { useWidgetDisplayTitle } from "@/lib/widget-display-title";
 import { contactSessionIdAtomFamily, conversationIdAtom, organizationIdAtom, screenAtom } from "@/modules/widget/atoms/widget-atoms";
 import { ConversationStatusIcon } from "@workspace/ui/components/conversation-status-icon";
 import { WidgetHeader } from "@/modules/widget/ui/components/widget-header";
@@ -16,6 +17,7 @@ import { InfiniteScrollTrigger } from "@workspace/ui/components/infinite-scroll-
 export const WidgetInboxScreen = () => {
   const setScreen = useSetAtom(screenAtom);
   const setConversationId = useSetAtom(conversationIdAtom);
+  const widgetTitle = useWidgetDisplayTitle();
 
   const organizationId = useAtomValue(organizationIdAtom);
   const contactSessionId = useAtomValue(
@@ -51,7 +53,7 @@ export const WidgetInboxScreen = () => {
           >
             <ArrowLeftIcon />
           </Button>
-          <p>Inbox</p>
+          <p className="truncate font-semibold">{widgetTitle}</p>
         </div>
       </WidgetHeader>
       <div className="flex flex-1 flex-col gap-y-2 p-4 overflow-y-auto">

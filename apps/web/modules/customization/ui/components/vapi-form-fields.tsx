@@ -19,10 +19,14 @@ import { FormSchema } from "../../types";
 
 interface VapiFormFieldsProps {
   form: UseFormReturn<FormSchema>;
-};
+  labelClassName?: string;
+  selectTriggerClassName?: string;
+}
 
 export const VapiFormFields = ({
   form,
+  labelClassName,
+  selectTriggerClassName,
 }: VapiFormFieldsProps) => {
   const { data: assistants, isLoading: assistantsLoading } = useVapiAssistants();
   const { data: phoneNumbers, isLoading: phoneNumbersLoading } = useVapiPhoneNumbers();
@@ -30,20 +34,20 @@ export const VapiFormFields = ({
   const disabled = form.formState.isSubmitting;
 
   return (
-    <>
+    <div className="space-y-8">
       <FormField
         control={form.control}
         name="vapiSettings.assistantId"
         render={({ field }) => (
-          <FormItem>
-            <FormLabel>Voice Assistant</FormLabel>
+          <FormItem className="space-y-2">
+            <FormLabel className={labelClassName}>Voice Assistant</FormLabel>
             <Select
               disabled={assistantsLoading || disabled}
               onValueChange={field.onChange}
               value={field.value}
             >
               <FormControl>
-                <SelectTrigger>
+                <SelectTrigger className={selectTriggerClassName}>
                   <SelectValue
                     placeholder={
                       assistantsLoading
@@ -74,18 +78,18 @@ export const VapiFormFields = ({
         control={form.control}
         name="vapiSettings.phoneNumber"
         render={({ field }) => (
-          <FormItem>
-            <FormLabel>Display Phone Number</FormLabel>
+          <FormItem className="space-y-2">
+            <FormLabel className={labelClassName}>Display Phone Number</FormLabel>
             <Select
               disabled={phoneNumbersLoading || disabled}
               onValueChange={field.onChange}
               value={field.value}
             >
               <FormControl>
-                <SelectTrigger>
+                <SelectTrigger className={selectTriggerClassName}>
                   <SelectValue
                     placeholder={
-                      assistantsLoading
+                      phoneNumbersLoading
                         ? "Loading phone numbers..."
                         : "Select a phone number"
                     }
@@ -109,6 +113,6 @@ export const VapiFormFields = ({
           </FormItem>
         )}
       />
-    </>
-  )
+    </div>
+  );
 };

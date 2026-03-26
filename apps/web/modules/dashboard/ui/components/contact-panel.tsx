@@ -1,6 +1,7 @@
 "use client";
 
 import Bowser from "bowser";
+import { useUser } from "@clerk/nextjs";
 import {
   Accordion,
   AccordionContent,
@@ -11,12 +12,26 @@ import { getCountryFlagUrl, getCountryFromTimezone } from "@/lib/country-utils";
 import { api } from "@workspace/backend/_generated/api";
 import { Id } from "@workspace/backend/_generated/dataModel";
 import { Button } from "@workspace/ui/components/button";
-import { DicebearAvatar } from "@workspace/ui/components/dicebear-avatar";
 import { useQuery } from "convex/react";
-import { ClockIcon, GlobeIcon, MailIcon, MonitorIcon } from "lucide-react";
+import {
+  ClockIcon,
+  FileTextIcon,
+  GlobeIcon,
+  MailIcon,
+  MapPinIcon,
+  MonitorIcon,
+  PhoneIcon,
+  UserIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { Skeleton } from "@workspace/ui/components/skeleton";
+import { cn } from "@workspace/ui/lib/utils";
+import {
+  LegacyCollapsibleSection,
+  LegacyDetailRow,
+} from "./legacy-ui";
 
 type InfoItem = {
   label: string;
@@ -31,15 +46,90 @@ type InfoSection = {
   items: InfoItem[];
 };
 
+type StatusDot = "amber" | "orange" | "slate" | null;
+
+function statusLabel(
+  status: "unresolved" | "escalated" | "resolved",
+): {
+  status: string;
+  priority: string;
+  statusDot: StatusDot;
+  priorityDot: StatusDot;
+} {
+  switch (status) {
+    case "unresolved":
+      return {
+        status: "Åpen",
+        priority: "—",
+        statusDot: null,
+        priorityDot: null,
+      };
+    case "escalated":
+      return {
+        status: "Under arbeid",
+        priority: "Haster",
+        statusDot: "amber",
+        priorityDot: "orange",
+      };
+    case "resolved":
+      return {
+        status: "Lukket",
+        priority: "—",
+        statusDot: "slate",
+        priorityDot: null,
+      };
+    default:
+      return { status: status, priority: "—", statusDot: null, priorityDot: null };
+  }
+}
+
+const dotClass: Record<NonNullable<StatusDot>, string> = {
+  amber: "bg-amber-400 dark:bg-amber-500",
+  orange: "bg-orange-500 dark:bg-orange-400",
+  slate: "bg-muted-foreground/45",
+};
+
+function StatusInfoRow({
+  label,
+  value,
+  valueDot,
+}: {
+  label: string;
+  value: React.ReactNode;
+  valueDot?: StatusDot;
+}) {
+  return (
+    <div className="flex items-start justify-between gap-4">
+      <span className="shrink-0 text-muted-foreground">{label}</span>
+      <span className="flex min-w-0 items-center justify-end gap-2 text-right text-sm font-medium text-foreground">
+        {valueDot ? (
+          <span
+            aria-hidden
+            className={cn("size-2 shrink-0 rounded-full", dotClass[valueDot])}
+          />
+        ) : null}
+        <span className="min-w-0">{value}</span>
+      </span>
+    </div>
+  );
+}
+
 export const ContactPanel = () => {
   const params = useParams();
-  const conversationId = params.conversationId as (Id<"conversations"> | null);
+  const conversationId = params.conversationId as Id<"conversations"> | undefined;
+  const { user } = useUser();
 
-  const contactSession = useQuery(api.private.contactSessions.getOneByConversationId, 
-    conversationId ? {
-      conversationId,
-    } : "skip",
+  const [infoOpen, setInfoOpen] = useState(true);
+  const [contactOpen, setContactOpen] = useState(true);
+  const [threadOpen, setThreadOpen] = useState(true);
+  const [techOpen, setTechOpen] = useState(false);
+
+  const detail = useQuery(
+    api.private.conversations.getOne,
+    conversationId ? { conversationId } : "skip",
   );
+
+  const sessionMeta = detail?.contactSession;
 
   const parseUserAgent = useMemo(() => {
     return (userAgent?: string) => {
@@ -62,16 +152,17 @@ export const ContactPanel = () => {
     };
   }, []);
 
-  const userAgentInfo = useMemo(() => 
-    parseUserAgent(contactSession?.metadata?.userAgent), 
-  [contactSession?.metadata?.userAgent, parseUserAgent]);
+  const userAgentInfo = useMemo(
+    () => parseUserAgent(sessionMeta?.metadata?.userAgent),
+    [sessionMeta?.metadata?.userAgent, parseUserAgent],
+  );
 
   const countryInfo = useMemo(() => {
-    return getCountryFromTimezone(contactSession?.metadata?.timezone);
-  }, [contactSession?.metadata?.timezone]);
+    return getCountryFromTimezone(sessionMeta?.metadata?.timezone);
+  }, [sessionMeta?.metadata?.timezone]);
 
   const accordionSections = useMemo<InfoSection[]>(() => {
-    if (!contactSession?.metadata) {
+    if (!sessionMeta?.metadata) {
       return [];
     }
 
@@ -79,170 +170,290 @@ export const ContactPanel = () => {
       {
         id: "device-info",
         icon: MonitorIcon,
-        title: "Device Information",
+        title: "Enhet",
         items: [
           {
-            label: "Browser",
+            label: "Nettleser",
             value:
-              userAgentInfo.browser + 
-                (userAgentInfo.browserVersion
-                  ? ` ${userAgentInfo.browserVersion}`
-                  : ""
-                ),
+              userAgentInfo.browser +
+              (userAgentInfo.browserVersion
+                ? ` ${userAgentInfo.browserVersion}`
+                : ""),
           },
           {
             label: "OS",
             value:
               userAgentInfo.os +
-                (userAgentInfo.osVersion ? ` ${userAgentInfo.osVersion}` : ""),
+              (userAgentInfo.osVersion ? ` ${userAgentInfo.osVersion}` : ""),
           },
           {
-            label: "Device",
+            label: "Enhet",
             value:
               userAgentInfo.device +
-                (
-                  userAgentInfo.deviceModel
-                    ? ` - ${userAgentInfo.deviceModel}`
-                    : ""
-                ),
-              className: "capitalize"
+              (userAgentInfo.deviceModel ? ` – ${userAgentInfo.deviceModel}` : ""),
+            className: "capitalize",
           },
           {
-            label: "Screen",
-            value: contactSession.metadata.screenResolution,
+            label: "Skjerm",
+            value: sessionMeta.metadata.screenResolution,
           },
           {
             label: "Viewport",
-            value: contactSession.metadata.viewportSize,
+            value: sessionMeta.metadata.viewportSize,
           },
           {
-            label: "Cookies",
-            value: contactSession.metadata.cookieEnabled ? "Enabled" : "Disabled"
+            label: "Informasjonskapsler",
+            value: sessionMeta.metadata.cookieEnabled ? "På" : "Av",
           },
         ],
       },
       {
         id: "location-info",
         icon: GlobeIcon,
-        title: "Location & Language",
+        title: "Språk og sted",
         items: [
           ...(countryInfo
             ? [
-              {
-                label: "Country",
-                value: (
-                  <span>
-                    {countryInfo.name}
-                  </span>
-                )
-              }
-            ]
-            : []
-          ),
+                {
+                  label: "Land",
+                  value: <span>{countryInfo.name}</span>,
+                },
+              ]
+            : []),
           {
-            label: "Language",
-            value: contactSession.metadata.language,
+            label: "Språk",
+            value: sessionMeta.metadata.language,
           },
           {
-            label: "Timezone",
-            value: contactSession.metadata.timezone,
+            label: "Tidssone",
+            value: sessionMeta.metadata.timezone,
           },
           {
-            label: "UTC Offset",
-            value: contactSession.metadata.timezoneOffset,
-          }
-        ]
+            label: "UTC",
+            value: String(sessionMeta.metadata.timezoneOffset),
+          },
+        ],
       },
       {
         id: "section-details",
-        title: "Section details",
+        title: "Økt",
         icon: ClockIcon,
         items: [
           {
-            label: "Session Started",
-            value: new Date(
-              contactSession._creationTime
-            ).toLocaleString(),
-          }
+            label: "Startet",
+            value: new Date(sessionMeta._creationTime).toLocaleString(),
+          },
         ],
-      }
+      },
     ];
-  }, [contactSession, userAgentInfo, countryInfo]);
+  }, [sessionMeta, userAgentInfo, countryInfo]);
 
-  if (contactSession === undefined || contactSession === null) {
+  if (!conversationId) {
     return null;
   }
 
-  return (
-    <div className="flex h-full w-full flex-col bg-background text-foreground">
-      <div className="flex flex-col gap-y-4 p-4">
-        <div className="flex items-center gap-x-2">
-          <DicebearAvatar
-            badgeImageUrl={
-              countryInfo?.code
-                ? getCountryFlagUrl(countryInfo.code)
-                : undefined
-            }
-            seed={contactSession._id}
-            size={42}
-          />
-          <div className="flex-1 overflow-hidden">
-            <div className="flex items-center gap-x-2">
-              <h4 className="line-clamp-1">
-                {contactSession.name}
-              </h4>
-            </div>
-            <p className="line-clamp-1 text-muted-foreground text-sm">
-              {contactSession.email}
-            </p>
-          </div>
+  if (detail === undefined) {
+    return (
+      <aside className="flex h-full min-h-0 flex-col overflow-hidden bg-background">
+        <header className="border-border/80 border-b bg-background/95 px-4 py-3 backdrop-blur supports-[backdrop-filter]:bg-background/90">
+          <Skeleton className="h-5 w-24" />
+        </header>
+        <div className="space-y-4 p-4">
+          <Skeleton className="h-24 w-full" />
+          <Skeleton className="h-32 w-full" />
         </div>
-        <Button asChild className="w-full" size="lg">
-          <Link href={`mailto:${contactSession.email}`}>
-            <MailIcon />
-            <span>Send Email</span>
-          </Link>
-        </Button>
-      </div>
+      </aside>
+    );
+  }
 
-      <div>
-        {contactSession.metadata && (
-          <Accordion
-            className="w-full rounded-none border-y"
-            collapsible
-            type="single"
-          >
-            {accordionSections.map((section) => (
-              <AccordionItem
-                className="rounded-none outline-none has-focus-visible:z-10 has-focus-visible:border-ring has-focus-visible:ring-[3px] has-focus-visible:ring-ring/50"
-                key={section.id}
-                value={section.id}
-              >
-                <AccordionTrigger
-                  className="flex w-full flex-1 items-start justify-between gap-4 rounded-none bg-accent px-5 py-4 text-left font-medium text-sm outline-none transition-all hover:no-underline disabled:pointer-events-none disabled:opacity-50"
+  if (detail === null) {
+    return (
+      <aside className="flex h-full min-h-0 flex-col bg-background p-4 text-[13px] text-muted-foreground">
+        Fant ikke samtalen.
+      </aside>
+    );
+  }
+
+  if (!detail.contactSession) {
+    return (
+      <aside className="flex h-full min-h-0 flex-col bg-background p-4 text-[13px] text-muted-foreground">
+        Ingen kontakt koblet til denne samtalen.
+      </aside>
+    );
+  }
+
+  const contactSession = detail.contactSession;
+
+  const {
+    status: statusText,
+    priority: priorityText,
+    statusDot,
+    priorityDot,
+  } = statusLabel(detail.status);
+  const assignedName =
+    user?.fullName || user?.primaryEmailAddress?.emailAddress || "—";
+  const started = new Date(detail._creationTime).toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+  });
+
+  return (
+    <aside
+      aria-label="Samtaledetaljer"
+      className="flex h-full min-h-0 w-full flex-col overflow-hidden bg-background"
+    >
+      <header className="shrink-0 border-border/80 border-b bg-background/95 px-4 py-3 backdrop-blur supports-[backdrop-filter]:bg-background/90">
+        <h2 className="text-base font-semibold tracking-tight text-foreground">
+          Detaljer
+        </h2>
+      </header>
+
+      <div className="min-h-0 flex-1 overflow-y-auto">
+        <LegacyCollapsibleSection
+          onOpenChange={setInfoOpen}
+          open={infoOpen}
+          title="Status"
+        >
+          <div className="space-y-3 border-b border-border bg-background p-4">
+            <StatusInfoRow
+              label="Status"
+              value={statusText}
+              valueDot={statusDot}
+            />
+            <StatusInfoRow
+              label="Prioritet"
+              value={priorityText}
+              valueDot={priorityDot}
+            />
+            <StatusInfoRow label="Tildelt" value={assignedName} />
+            <StatusInfoRow label="Dato" value={started} />
+          </div>
+        </LegacyCollapsibleSection>
+
+        <LegacyCollapsibleSection
+          onOpenChange={setContactOpen}
+          open={contactOpen}
+          title="Kunde"
+        >
+          <div className="space-y-3 border-b border-border bg-background p-4">
+            <LegacyDetailRow
+              icon={<UserIcon className="size-4" />}
+              label="Navn"
+              value={contactSession.name}
+            />
+            <LegacyDetailRow
+              icon={<MailIcon className="size-4" />}
+              label="E-post"
+              value={
+                <a
+                  className="text-primary hover:underline"
+                  href={`mailto:${contactSession.email}`}
                 >
-                  <div className="flex items-center gap-4">
-                    <section.icon className="size-4 shrink-0" />
-                    <span>{section.title}</span>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent className="px-5 py-4">
-                  <div className="space-y-2 text-sm">
-                    {section.items.map((item) => (
-                      <div className="flex justify-between" key={`${section.id}-${item.label}`}>
-                        <span className="text-muted-foreground">
-                          {item.label}:
-                        </span>
-                        <span className={item.className}>{item.value}</span>
+                  {contactSession.email}
+                </a>
+              }
+            />
+            <LegacyDetailRow
+              icon={<PhoneIcon className="size-4" />}
+              label="Telefon"
+              value="Ikke oppgitt"
+            />
+            <LegacyDetailRow
+              icon={<MapPinIcon className="size-4" />}
+              label="Adresse"
+              value="Ikke oppgitt"
+            />
+            <Button
+              asChild
+              className="mt-1 w-full"
+              size="sm"
+              variant="outline"
+            >
+              <Link href={`mailto:${contactSession.email}`}>
+                <MailIcon className="mr-2 size-4" />
+                Send e-post
+              </Link>
+            </Button>
+          </div>
+        </LegacyCollapsibleSection>
+
+        <LegacyCollapsibleSection
+          onOpenChange={setThreadOpen}
+          open={threadOpen}
+          title="Samtale"
+        >
+          <div className="space-y-3 border-b border-border bg-background p-4">
+            <div>
+              <p className="mb-1.5 text-xs font-medium text-muted-foreground">
+                Emne
+              </p>
+              <span className="rounded-md bg-foreground/10 px-2 py-0.5 text-xs font-medium">
+                Chat · {contactSession.name}
+              </span>
+            </div>
+            <LegacyDetailRow
+              icon={<FileTextIcon className="size-4" />}
+              label="Oppsummering"
+              value={
+                contactSession.metadata?.referrer
+                  ? String(contactSession.metadata.referrer)
+                  : "Samtale med besøkende"
+              }
+            />
+            <LegacyDetailRow
+              icon={<GlobeIcon className="size-4" />}
+              label="Språk"
+              value={contactSession.metadata?.language ?? "—"}
+            />
+          </div>
+        </LegacyCollapsibleSection>
+
+        {contactSession.metadata ? (
+          <LegacyCollapsibleSection
+            onOpenChange={setTechOpen}
+            open={techOpen}
+            title="Teknisk"
+          >
+            <div className="border-b border-border bg-background">
+              <Accordion
+                className="border-0"
+                collapsible
+                type="single"
+              >
+                {accordionSections.map((section) => (
+                  <AccordionItem
+                    className="border-border/60 border-b px-4 last:border-b-0"
+                    key={section.id}
+                    value={section.id}
+                  >
+                    <AccordionTrigger className="py-3 text-left text-[12px] font-medium hover:no-underline">
+                      <div className="flex items-center gap-2">
+                        <section.icon className="size-3.5 text-muted-foreground" />
+                        {section.title}
                       </div>
-                    ))}
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
-        )}
+                    </AccordionTrigger>
+                    <AccordionContent className="pb-3">
+                      <div className="space-y-2 border-border/40 border-t pt-3 text-[12px]">
+                        {section.items.map((item) => (
+                          <div
+                            className="flex justify-between gap-3"
+                            key={`${section.id}-${item.label}`}
+                          >
+                            <span className="text-muted-foreground">
+                              {item.label}
+                            </span>
+                            <span className={item.className}>{item.value}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            </div>
+          </LegacyCollapsibleSection>
+        ) : null}
       </div>
-    </div>
+    </aside>
   );
 };

@@ -3,7 +3,11 @@ import { ConversationsLayout } from "@/modules/dashboard/ui/layouts/conversation
 const Layout = ({
   children
 }: { children: React.ReactNode; }) => {
-  return <ConversationsLayout>{children}</ConversationsLayout>
+  return (
+    <div className="flex h-full min-h-0 flex-1 flex-col">
+      <ConversationsLayout>{children}</ConversationsLayout>
+    </div>
+  );
 };
 
 export default Layout;

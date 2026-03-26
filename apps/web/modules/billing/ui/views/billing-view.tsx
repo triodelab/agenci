@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  DashboardPageHeader,
   DashboardPagePanel,
   DashboardPageShell,
 } from "@/modules/dashboard/ui/components/dashboard-page-shell";
@@ -9,16 +10,13 @@ import { PricingTable } from "../components/pricing-table";
 export const BillingView = () => {
   return (
     <DashboardPageShell contentClassName="max-w-3xl">
-      <header className="space-y-2">
-        <h1 className="text-2xl font-semibold tracking-tight md:text-4xl">
-          Plans & Billing
-        </h1>
-        <p className="text-muted-foreground leading-relaxed">
-          Velg plan som passer teamet deres.
-        </p>
-      </header>
+      <DashboardPageHeader
+        description="Velg plan som passer teamet deres."
+        kicker="Konto"
+        title="Plans & Billing"
+      />
 
-      <DashboardPagePanel className="mt-8">
+      <DashboardPagePanel className="mt-2" variant="lattice">
         <PricingTable />
       </DashboardPagePanel>
     </DashboardPageShell>

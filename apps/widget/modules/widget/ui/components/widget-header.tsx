@@ -10,9 +10,13 @@ export const WidgetHeader = ({
   return (
     <header
       className={cn(
-        "bg-gradient-to-br from-primary via-primary to-primary/90 p-4 text-primary-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]",
+        "p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]",
         className,
       )}
+      style={{
+        backgroundColor: "var(--widget-header-bg)",
+        color: "var(--widget-header-text)",
+      }}
     >
       {children}
     </header>
