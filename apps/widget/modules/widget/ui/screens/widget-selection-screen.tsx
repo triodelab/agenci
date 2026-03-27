@@ -5,7 +5,15 @@ import { Button } from "@workspace/ui/components/button";
 import { useAtomValue, useSetAtom } from "jotai";
 import { ChevronRightIcon, MessageSquareTextIcon, MicIcon, PhoneIcon } from "lucide-react";
 import { useWidgetDisplayTitle } from "@/lib/widget-display-title";
-import { contactSessionIdAtomFamily, conversationIdAtom, errorMessageAtom, hasVapiSecretsAtom, organizationIdAtom, screenAtom, widgetSettingsAtom } from "../../atoms/widget-atoms";
+import {
+  contactSessionIdAtomFamily,
+  conversationIdAtomFamily,
+  errorMessageAtom,
+  hasVapiSecretsAtom,
+  organizationIdAtom,
+  screenAtom,
+  widgetSettingsAtom,
+} from "../../atoms/widget-atoms";
 import { useMutation } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
 import { useState } from "react";
@@ -14,12 +22,14 @@ import { WidgetFooter } from "../components/widget-footer";
 export const WidgetSelectionScreen = () => {
   const setScreen = useSetAtom(screenAtom);
   const setErrorMessage = useSetAtom(errorMessageAtom);
-  const setConversationId = useSetAtom(conversationIdAtom);
+  const organizationId = useAtomValue(organizationIdAtom);
+  const setConversationId = useSetAtom(
+    conversationIdAtomFamily(organizationId || ""),
+  );
 
   const widgetSettings = useAtomValue(widgetSettingsAtom);
   const widgetTitle = useWidgetDisplayTitle();
   const hasVapiSecrets = useAtomValue(hasVapiSecretsAtom);
-  const organizationId = useAtomValue(organizationIdAtom);
   const contactSessionId = useAtomValue(
     contactSessionIdAtomFamily(organizationId || "")
   );

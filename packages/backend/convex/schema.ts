@@ -99,4 +99,13 @@ export default defineSchema({
     email: v.string(),
     clerk_id: v.string(),
   }).index("by_clerk_id", ["clerk_id"]),
+  /** Operatør «forventet svar» fra Playground (Chatbase-lignende forbedring av AI-svar). */
+  answerTrainingExamples: defineTable({
+    organizationId: v.string(),
+    conversationId: v.id("conversations"),
+    userMessage: v.string(),
+    assistantMessage: v.string(),
+    expectedResponse: v.string(),
+    createdAt: v.number(),
+  }).index("by_organization_id", ["organizationId"]),
 });

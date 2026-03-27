@@ -14,9 +14,15 @@ import { WidgetHeader } from "@/modules/widget/ui/components/widget-header";
 import { useMutation } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
 import { Doc } from "@workspace/backend/_generated/dataModel";
+import { useSearchParams } from "next/navigation";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useWidgetDisplayTitle } from "@/lib/widget-display-title";
-import { contactSessionIdAtomFamily, organizationIdAtom, screenAtom } from "../../atoms/widget-atoms";
+import {
+  contactSessionIdAtomFamily,
+  conversationIdAtomFamily,
+  organizationIdAtom,
+  screenAtom,
+} from "../../atoms/widget-atoms";
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -24,13 +30,23 @@ const formSchema = z.object({
 });
 
 export const WidgetAuthScreen = () => {
+  const searchParams = useSearchParams();
+  const playgroundEmbed =
+    searchParams.get("playground") === "1" ||
+    searchParams.get("playground") === "true";
+
   const setScreen = useSetAtom(screenAtom);
   const widgetTitle = useWidgetDisplayTitle();
 
   const organizationId = useAtomValue(organizationIdAtom);
   const setContactSessionId = useSetAtom(
-    contactSessionIdAtomFamily(organizationId || "")
+    contactSessionIdAtomFamily(organizationId || ""),
   );
+  const setConversationId = useSetAtom(
+    conversationIdAtomFamily(organizationId || ""),
+  );
+
+  const createConversation = useMutation(api.public.conversations.create);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -62,6 +78,8 @@ export const WidgetAuthScreen = () => {
       currentUrl: window.location.href,
     };
 
+    setConversationId(null);
+
     const contactSessionId = await createContactSession({
       ...values,
       organizationId,
@@ -69,7 +87,17 @@ export const WidgetAuthScreen = () => {
     });
 
     setContactSessionId(contactSessionId);
-    setScreen("selection");
+
+    if (playgroundEmbed) {
+      const conversationId = await createConversation({
+        contactSessionId,
+        organizationId,
+      });
+      setConversationId(conversationId);
+      setScreen("chat");
+    } else {
+      setScreen("selection");
+    }
   };
 
   return (

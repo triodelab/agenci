@@ -21,24 +21,28 @@ export function LegacyCollapsibleSection({
   children: ReactNode;
 }) {
   return (
-    <Collapsible onOpenChange={onOpenChange} open={open}>
-      <CollapsibleTrigger
-        className={cn(
-          "flex w-full items-center justify-between border-b border-border bg-background px-4 py-3 text-left transition-colors hover:bg-foreground/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset",
-        )}
-      >
-        <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          {title}
-        </span>
-        <ChevronDown
-          aria-hidden
+    <div className="app-dashboard-panel overflow-hidden rounded-2xl">
+      <Collapsible onOpenChange={onOpenChange} open={open}>
+        <CollapsibleTrigger
           className={cn(
-            "size-4 text-muted-foreground transition-transform",
-            open && "rotate-180",
+            "flex w-full items-center justify-between px-4 py-3.5 text-left transition-colors hover:bg-foreground/[0.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset",
           )}
-        />
-      </CollapsibleTrigger>
-      <CollapsibleContent>{children}</CollapsibleContent>
-    </Collapsible>
+        >
+          <span className="text-[11px] font-semibold tracking-[0.14em] text-muted-foreground uppercase">
+            {title}
+          </span>
+          <ChevronDown
+            aria-hidden
+            className={cn(
+              "size-4 shrink-0 text-muted-foreground transition-transform",
+              open && "rotate-180",
+            )}
+          />
+        </CollapsibleTrigger>
+        <CollapsibleContent className="border-border/50 border-t">
+          {children}
+        </CollapsibleContent>
+      </Collapsible>
+    </div>
   );
 }

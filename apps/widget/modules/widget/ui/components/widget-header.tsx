@@ -10,7 +10,7 @@ export const WidgetHeader = ({
   return (
     <header
       className={cn(
-        "p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]",
+        "w-full min-w-0 p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] sm:p-4",
         className,
       )}
       style={{

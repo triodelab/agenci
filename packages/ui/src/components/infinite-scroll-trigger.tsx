@@ -20,18 +20,23 @@ export const InfiniteScrollTrigger = ({
   className,
   ref,
 }: InfiniteScrollTriggerProps) => {
-  let text = loadMoreText;
-
-  if (isLoadingMore) {
-    text = "Loading...";
-  } else if (!canLoadMore) {
-    text = noMoreText;
+  /** Når alt er lastet: tom sentinel (beholder ref til scroll-observer), ingen støy i UI. */
+  if (!canLoadMore && !isLoadingMore) {
+    return (
+      <div
+        aria-hidden
+        className={cn("h-1 w-full shrink-0", className)}
+        ref={ref}
+      />
+    );
   }
+
+  const text = isLoadingMore ? "Loading..." : loadMoreText;
 
   return (
     <div className={cn("flex w-full justify-center py-2", className)} ref={ref}>
       <Button
-        disabled={!canLoadMore || isLoadingMore}
+        disabled={isLoadingMore}
         onClick={onLoadMore}
         size="sm"
         variant="ghost"

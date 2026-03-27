@@ -13,6 +13,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+
+import { LogoIcon } from "@/components/logo";
 import {
   Sidebar,
   SidebarContent,
@@ -80,14 +82,7 @@ export const DashboardSidebar = () => {
           )}
           href="/dashboard"
         >
-          <span
-            className={cn(
-              "grid size-10 shrink-0 place-items-center rounded-xl bg-foreground text-sm font-bold text-background shadow-sm",
-            )}
-            aria-hidden
-          >
-            A
-          </span>
+          <LogoIcon className="size-10 shrink-0 rounded-xl object-contain shadow-sm ring-1 ring-border/15" />
           <span className="min-w-0 flex-1 text-left group-data-[collapsible=icon]:hidden">
             <span className="block truncate font-semibold text-[15px] text-sidebar-foreground tracking-tight">
               Agenci

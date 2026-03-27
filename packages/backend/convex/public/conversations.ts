@@ -1,9 +1,41 @@
-import { mutation, query } from "../_generated/server";
+import { mutation, query, type MutationCtx } from "../_generated/server";
 import { components, internal } from "../_generated/api";
 import { ConvexError, v } from "convex/values";
 import { supportAgent } from "../system/ai/agents/supportAgent";
 import { MessageDoc, saveMessage } from "@convex-dev/agent";
 import { paginationOptsValidator } from "convex/server";
+import type { Doc } from "../_generated/dataModel";
+
+async function createNewConversation(
+  ctx: MutationCtx,
+  args: { organizationId: string; session: Doc<"contactSessions"> },
+) {
+  const widgetSettings = await ctx.db
+    .query("widgetSettings")
+    .withIndex("by_organization_id", (q) =>
+      q.eq("organizationId", args.organizationId),
+    )
+    .unique();
+
+  const { threadId } = await supportAgent.createThread(ctx, {
+    userId: args.organizationId,
+  });
+
+  await saveMessage(ctx, components.agent, {
+    threadId,
+    message: {
+      role: "assistant",
+      content: widgetSettings?.greetMessage || "Hello, how can I help you today?",
+    },
+  });
+
+  return ctx.db.insert("conversations", {
+    contactSessionId: args.session._id,
+    status: "unresolved",
+    organizationId: args.organizationId,
+    threadId,
+  });
+}
 
 export const getMany = query({
   args: {
@@ -113,37 +145,56 @@ export const create = mutation({
       });
     }
 
-    // This refreshes the user's session if they are within the threshold
     await ctx.runMutation(internal.system.contactSessions.refresh, {
       contactSessionId: args.contactSessionId,
     });
 
-    const widgetSettings = await ctx.db
-      .query("widgetSettings")
-      .withIndex("by_organization_id", (q) => 
-        q.eq("organizationId", args.organizationId),
-      )
-      .unique();
-
-    const { threadId } = await supportAgent.createThread(ctx, {
-      userId: args.organizationId,
-    });
-
-    await saveMessage(ctx, components.agent, {
-      threadId,
-      message: {
-        role: "assistant",
-        content: widgetSettings?.greetMessage || "Hello, how can I help you today?",
-      },
-    });
-
-    const conversationId = await ctx.db.insert("conversations", {
-      contactSessionId: session._id,
-      status: "unresolved",
+    return createNewConversation(ctx, {
       organizationId: args.organizationId,
-      threadId,
+      session,
+    });
+  },
+});
+
+/**
+ * Gjenopptar siste åpne samtale for kontaktsesjonen når ID er gyldig;
+ * ellers opprettes ny samtale (som ved «Start chat»).
+ */
+export const resumeOrCreate = mutation({
+  args: {
+    organizationId: v.string(),
+    contactSessionId: v.id("contactSessions"),
+    resumeConversationId: v.optional(v.id("conversations")),
+  },
+  handler: async (ctx, args) => {
+    const session = await ctx.db.get(args.contactSessionId);
+
+    if (!session || session.expiresAt < Date.now()) {
+      throw new ConvexError({
+        code: "UNAUTHORIZED",
+        message: "Invalid session",
+      });
+    }
+
+    await ctx.runMutation(internal.system.contactSessions.refresh, {
+      contactSessionId: args.contactSessionId,
     });
 
-    return conversationId;
+    if (args.resumeConversationId) {
+      const conversation = await ctx.db.get(args.resumeConversationId);
+      if (
+        conversation &&
+        conversation.contactSessionId === session._id &&
+        conversation.organizationId === args.organizationId &&
+        conversation.status === "unresolved"
+      ) {
+        return conversation._id;
+      }
+    }
+
+    return createNewConversation(ctx, {
+      organizationId: args.organizationId,
+      session,
+    });
   },
 });

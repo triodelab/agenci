@@ -1,8 +1,10 @@
-import { Geist, Geist_Mono } from "next/font/google"
+import { Suspense } from "react";
+import { Geist, Geist_Mono } from "next/font/google";
+import { LoaderIcon } from "lucide-react";
 
 import "@workspace/ui/globals.css";
 import "../../web/styles/tokens.css";
-import { Providers } from "@/components/providers"
+import { Providers } from "@/components/providers";
 
 const fontSans = Geist({
   subsets: ["latin"],
@@ -25,9 +27,15 @@ export default function RootLayout({
         className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased `}
       >
         <Providers>
-          <div className="box-border flex min-h-screen w-full items-start justify-center bg-[var(--hero-bg)] p-3 sm:items-center sm:p-4 dark:bg-background">
+          <Suspense
+            fallback={
+              <div className="flex min-h-[100dvh] w-full items-center justify-center bg-background text-muted-foreground">
+                <LoaderIcon aria-hidden className="size-8 animate-spin" />
+              </div>
+            }
+          >
             {children}
-          </div>
+          </Suspense>
         </Providers>
       </body>
     </html>

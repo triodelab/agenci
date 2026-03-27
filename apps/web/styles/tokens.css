@@ -281,27 +281,252 @@
   color: var(--muted-foreground);
 }
 
-/* ─── Dashboard-flater — rene, abstrakte kort (nøytralt, Chatbase-lignende) ─── */
-
-.dash-panel-glass {
-  position: relative;
-  border-radius: 1rem;
-  border: 1px solid color-mix(in oklch, var(--border) 92%, transparent);
-  background: var(--card);
-  box-shadow:
-    0 1px 0 oklch(1 0 0 / 0.65) inset,
-    0 1px 2px oklch(0 0 0 / 0.04),
-    0 12px 40px -24px oklch(0 0 0 / 0.08);
+.dash-page-desc-wide {
+  max-width: 42rem;
 }
 
-.dark .dash-panel-glass {
-  border-color: color-mix(in oklch, var(--border) 100%, transparent);
+/* Fullbredde arbeidsflate (oversikt, integrasjoner) */
+.dash-workspace-inner {
+  max-width: none;
+}
+
+/*
+ * Felles «glass» dashboard-kort — samme uttrykk som overview hero-aside:
+ * halvtransparent kort, blur, lys kant, radial highlight, hårlinje i bunn.
+ */
+.dash-card-surface,
+.dash-stat-metric,
+.dash-tile-premium,
+.dash-panel-glass,
+.dash-bento-block,
+.dash-lattice-card,
+.dash-form-card,
+.dash-empty-orbit,
+.dash-contact-glow,
+.dash-stat-tile,
+.dash-plugin-split,
+.dash-integration-orb,
+.dash-accordion-frost,
+.app-dashboard-panel {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  border-radius: 1rem;
+  border: 1px solid color-mix(in oklch, var(--border) 70%, transparent);
+  background: color-mix(in oklch, var(--card) 82%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow:
+    0 1px 0 oklch(1 0 0 / 0.55) inset,
+    0 12px 40px -28px oklch(0 0 0 / 0.12);
+}
+
+.dark .dash-card-surface,
+.dark .dash-stat-metric,
+.dark .dash-tile-premium,
+.dark .dash-panel-glass,
+.dark .dash-bento-block,
+.dark .dash-lattice-card,
+.dark .dash-form-card,
+.dark .dash-empty-orbit,
+.dark .dash-contact-glow,
+.dark .dash-stat-tile,
+.dark .dash-plugin-split,
+.dark .dash-integration-orb,
+.dark .dash-accordion-frost,
+.dark .app-dashboard-panel {
+  border-color: color-mix(in oklch, var(--border) 80%, transparent);
+  background: color-mix(in oklch, var(--card) 60%, transparent);
   box-shadow:
     0 1px 0 oklch(1 0 0 / 0.06) inset,
-    0 1px 2px oklch(0 0 0 / 0.2),
-    0 12px 40px -24px oklch(0 0 0 / 0.35);
+    0 16px 48px -24px oklch(0 0 0 / 0.45);
 }
 
+.dash-card-surface::before,
+.dash-stat-metric::before,
+.dash-tile-premium::before,
+.dash-panel-glass::before,
+.dash-bento-block::before,
+.dash-lattice-card::before,
+.dash-form-card::before,
+.dash-empty-orbit::before,
+.dash-contact-glow::before,
+.dash-stat-tile::before,
+.dash-plugin-split::before,
+.dash-integration-orb::before,
+.dash-accordion-frost::before,
+.app-dashboard-panel::before {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    ellipse 120% 90% at 100% 0%,
+    oklch(0.93 0 0 / 0.55),
+    transparent 58%
+  );
+}
+
+.dark .dash-card-surface::before,
+.dark .dash-stat-metric::before,
+.dark .dash-tile-premium::before,
+.dark .dash-panel-glass::before,
+.dark .dash-bento-block::before,
+.dark .dash-lattice-card::before,
+.dark .dash-form-card::before,
+.dark .dash-empty-orbit::before,
+.dark .dash-contact-glow::before,
+.dark .dash-stat-tile::before,
+.dark .dash-plugin-split::before,
+.dark .dash-integration-orb::before,
+.dark .dash-accordion-frost::before,
+.dark .app-dashboard-panel::before {
+  background: radial-gradient(
+    ellipse 120% 90% at 100% 0%,
+    oklch(0.28 0.01 264 / 0.42),
+    transparent 58%
+  );
+}
+
+.dash-card-surface::after,
+.dash-stat-metric::after,
+.dash-tile-premium::after,
+.dash-panel-glass::after,
+.dash-bento-block::after,
+.dash-lattice-card::after,
+.dash-form-card::after,
+.dash-empty-orbit::after,
+.dash-contact-glow::after,
+.dash-stat-tile::after,
+.dash-plugin-split::after,
+.dash-integration-orb::after,
+.dash-accordion-frost::after,
+.app-dashboard-panel::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  z-index: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in oklch, var(--border) 60%, transparent),
+    transparent
+  );
+}
+
+.dash-card-surface > *,
+.dash-stat-metric > *,
+.dash-tile-premium > *,
+.dash-panel-glass > *,
+.dash-bento-block > *,
+.dash-lattice-card > *,
+.dash-form-card > *,
+.dash-empty-orbit > *,
+.dash-contact-glow > *,
+.dash-stat-tile > *,
+.dash-plugin-split > *,
+.dash-integration-orb > *,
+.dash-accordion-frost > *,
+.app-dashboard-panel > * {
+  position: relative;
+  z-index: 1;
+}
+
+.dash-tile-premium {
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.25s ease,
+    transform 0.2s ease;
+}
+
+.dash-tile-premium:hover {
+  border-color: color-mix(in oklch, var(--foreground) 14%, var(--border));
+  box-shadow:
+    0 1px 0 oklch(1 0 0 / 0.72) inset,
+    0 20px 48px -24px oklch(0 0 0 / 0.16);
+  transform: translateY(-1px);
+}
+
+.dark .dash-tile-premium:hover {
+  border-color: color-mix(in oklch, var(--foreground) 12%, var(--border));
+  box-shadow:
+    0 1px 0 oklch(1 0 0 / 0.08) inset,
+    0 20px 48px -24px oklch(0 0 0 / 0.55);
+}
+
+.dash-integration-orb {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1.75rem 1.25rem;
+  text-align: center;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.dash-integration-orb:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in oklch, var(--foreground) 12%, var(--border));
+  box-shadow:
+    0 1px 0 oklch(1 0 0 / 0.65) inset,
+    0 16px 40px -20px oklch(0 0 0 / 0.14);
+}
+
+.dark .dash-integration-orb:hover {
+  box-shadow:
+    0 1px 0 oklch(1 0 0 / 0.07) inset,
+    0 16px 40px -20px oklch(0 0 0 / 0.4);
+}
+
+.dash-plugin-split {
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 1024px) {
+  .dash-plugin-split {
+    flex-direction: row;
+    align-items: stretch;
+    min-height: 22rem;
+  }
+}
+
+.dash-stat-tile {
+  padding: 1.25rem 1.35rem;
+}
+
+.dash-lattice-card {
+  border-radius: 1.125rem;
+}
+
+.dash-accordion-frost {
+  border-radius: 0.75rem;
+}
+
+/* Horisontal flyt-stripe (oversikt) */
+.dash-flow-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.25rem;
+  padding: 0.875rem 1rem;
+  border-radius: 0.875rem;
+  border: 1px solid color-mix(in oklch, var(--border) 80%, transparent);
+  background: color-mix(in oklch, var(--muted) 28%, transparent);
+  backdrop-filter: blur(8px);
+}
+
+/* Terminal-panel (Vapi) — egen estetikk, ikke glass-kort */
 .dash-panel-terminal {
   border-radius: 1.25rem;
   border: 1px solid oklch(0.34 0.035 268);
@@ -315,51 +540,6 @@
 .dark .dash-panel-terminal {
   border-color: oklch(0.38 0.04 268);
   background: linear-gradient(168deg, oklch(0.16 0.03 268) 0%, oklch(0.1 0.025 268) 100%);
-}
-
-.dash-bento-block {
-  position: relative;
-  overflow: hidden;
-  border-radius: 1rem;
-  border: 1px solid color-mix(in oklch, var(--border) 88%, transparent);
-  background: var(--card);
-  box-shadow:
-    0 1px 0 oklch(1 0 0 / 0.55) inset,
-    0 1px 2px oklch(0 0 0 / 0.04);
-}
-
-.dark .dash-bento-block {
-  box-shadow:
-    0 1px 0 oklch(1 0 0 / 0.06) inset,
-    0 1px 2px oklch(0 0 0 / 0.2);
-}
-
-.dash-integration-orb {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  border-radius: 1rem;
-  border: 1px solid color-mix(in oklch, var(--border) 85%, transparent);
-  background: var(--card);
-  padding: 1.75rem 1.25rem;
-  text-align: center;
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease,
-    border-color 0.2s ease;
-  box-shadow: 0 1px 2px oklch(0 0 0 / 0.04);
-}
-
-.dash-integration-orb:hover {
-  transform: translateY(-2px);
-  border-color: color-mix(in oklch, var(--border) 100%, transparent);
-  box-shadow: 0 8px 24px -12px oklch(0 0 0 / 0.12);
-}
-
-.dark .dash-integration-orb:hover {
-  box-shadow: 0 8px 24px -12px oklch(0 0 0 / 0.35);
 }
 
 .dash-integration-orb-icon {
@@ -406,28 +586,6 @@
   background: color-mix(in oklch, var(--muted) 35%, var(--card));
 }
 
-.dash-plugin-split {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  border-radius: 1rem;
-  border: 1px solid color-mix(in oklch, var(--border) 88%, transparent);
-  background: var(--card);
-  box-shadow: 0 12px 40px -20px oklch(0 0 0 / 0.1);
-}
-
-.dark .dash-plugin-split {
-  box-shadow: 0 12px 40px -20px oklch(0 0 0 / 0.4);
-}
-
-@media (min-width: 1024px) {
-  .dash-plugin-split {
-    flex-direction: row;
-    align-items: stretch;
-    min-height: 22rem;
-  }
-}
-
 .dash-plugin-split-main {
   flex: 1;
   padding: 2.25rem 2rem;
@@ -440,6 +598,8 @@
 }
 
 .dash-plugin-split-cta {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -459,55 +619,6 @@
   }
 }
 
-.dash-lattice-card {
-  border-radius: 1.125rem;
-  border: 1px solid color-mix(in oklch, var(--border) 95%, transparent);
-  background: var(--card);
-  box-shadow:
-    0 1px 0 oklch(1 0 0 / 0.55) inset,
-    0 1px 2px oklch(0 0 0 / 0.04);
-}
-
-.dark .dash-lattice-card {
-  box-shadow:
-    0 1px 0 oklch(1 0 0 / 0.06) inset,
-    0 1px 2px oklch(0 0 0 / 0.2);
-}
-
-.dash-contact-glow {
-  border-radius: 1rem;
-  border: 1px solid color-mix(in oklch, var(--border) 85%, transparent);
-  background: var(--card);
-  box-shadow:
-    0 1px 0 oklch(1 0 0 / 0.5) inset,
-    0 1px 2px oklch(0 0 0 / 0.04);
-}
-
-.dark .dash-contact-glow {
-  box-shadow:
-    0 1px 0 oklch(1 0 0 / 0.06) inset,
-    0 1px 2px oklch(0 0 0 / 0.2);
-}
-
-/* Tom tilstand — samtaler */
-.dash-empty-orbit {
-  position: relative;
-  border-radius: 1rem;
-  border: 1px solid color-mix(in oklch, var(--border) 88%, transparent);
-  background: var(--card);
-  box-shadow:
-    0 1px 0 oklch(1 0 0 / 0.55) inset,
-    0 1px 2px oklch(0 0 0 / 0.04);
-}
-
-/* Kontakt — metadata-akkordion (kompakt «arkiv») */
-.dash-accordion-frost {
-  border-radius: 0.75rem;
-  border: 1px solid color-mix(in oklch, var(--border) 85%, transparent);
-  background: color-mix(in oklch, var(--card) 88%, var(--muted));
-  box-shadow: 0 1px 2px oklch(0 0 0 / 0.04);
-}
-
 /* Dashboard-forside — rutenett med tydelige celler */
 .dash-stat-board {
   display: grid;
@@ -518,36 +629,6 @@
   .dash-stat-board {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-}
-
-.dash-stat-tile {
-  border-radius: 1.125rem;
-  border: 1px solid color-mix(in oklch, var(--border) 88%, transparent);
-  background: var(--card);
-  padding: 1.25rem 1.35rem;
-  box-shadow: 0 1px 2px oklch(0 0 0 / 0.04);
-}
-
-.dark .dash-stat-tile {
-  box-shadow: 0 1px 2px oklch(0 0 0 / 0.2);
-}
-
-/* Skjema — samme rene flate som bento */
-.dash-form-card {
-  position: relative;
-  overflow: hidden;
-  border-radius: 1rem;
-  border: 1px solid color-mix(in oklch, var(--border) 88%, transparent);
-  background: var(--card);
-  box-shadow:
-    0 1px 0 oklch(1 0 0 / 0.55) inset,
-    0 1px 2px oklch(0 0 0 / 0.04);
-}
-
-.dark .dash-form-card {
-  box-shadow:
-    0 1px 0 oklch(1 0 0 / 0.06) inset,
-    0 1px 2px oklch(0 0 0 / 0.2);
 }
 
 /* Hovedflate — synlig «workspace»-canvas (mesh, ikke flat grå) */
@@ -586,18 +667,6 @@
   background-color: oklch(0.145 0.01 264);
   background-image: radial-gradient(oklch(0.32 0.01 264) 1px, transparent 1px);
   background-size: 20px 20px;
-}
-
-/* Innholdspaneler — hvite kort på prikket canvas (minimal skygge) */
-.app-dashboard-panel {
-  border-radius: calc(var(--radius) + 4px);
-  border: 1px solid color-mix(in oklch, var(--border) 100%, transparent);
-  background: var(--card);
-  box-shadow: 0 1px 2px oklch(0 0 0 / 0.04);
-}
-
-.dark .app-dashboard-panel {
-  box-shadow: 0 1px 2px oklch(0 0 0 / 0.25);
 }
 
 /* Sidekolonner — ren hvit/grå flate (prikker fra hovedcanvas synlig i gap) */
@@ -673,3 +742,44 @@
 .dark .dash-surface-header {
   background: color-mix(in oklch, var(--muted) 35%, var(--card));
 }
+
+/* Kunnskaps-playground — lett prikk-rutenett (Chatbase-lignende arbeidsflate) */
+.dash-knowledge-playground {
+  background-color: color-mix(in oklch, var(--muted) 22%, var(--background));
+  background-image: radial-gradient(
+    circle at center,
+    color-mix(in oklch, var(--foreground) 10%, transparent) 1px,
+    transparent 1px
+  );
+  background-size: 22px 22px;
+}
+
+.dark .dash-knowledge-playground {
+  background-color: color-mix(in oklch, var(--muted) 18%, var(--background));
+  background-image: radial-gradient(
+    circle at center,
+    color-mix(in oklch, var(--foreground) 16%, transparent) 1px,
+    transparent 1px
+  );
+}
+
+/* Samtale-playground — lett rutenett i chatteflate (Chatbase-lignende) */
+.dash-conversations-canvas {
+  background-color: color-mix(in oklch, var(--muted) 12%, var(--background));
+  background-image: radial-gradient(
+    circle at center,
+    color-mix(in oklch, var(--foreground) 8%, transparent) 1px,
+    transparent 1px
+  );
+  background-size: 20px 20px;
+}
+
+.dark .dash-conversations-canvas {
+  background-color: color-mix(in oklch, var(--muted) 10%, var(--background));
+  background-image: radial-gradient(
+    circle at center,
+    color-mix(in oklch, var(--foreground) 12%, transparent) 1px,
+    transparent 1px
+  );
+}
+

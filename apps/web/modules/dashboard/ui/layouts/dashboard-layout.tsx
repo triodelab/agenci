@@ -1,5 +1,6 @@
 import { AuthGuard } from "@/modules/auth/ui/components/auth-guard"
 import { OrganizationGuard } from "@/modules/auth/ui/components/organization-guard"
+import { DashboardMainArea } from "@/modules/dashboard/ui/components/dashboard-main-area";
 import { DashboardSidebar } from "@/modules/dashboard/ui/components/dashboard-sidebar";
 import { SidebarProvider } from "@workspace/ui/components/sidebar";
 import { Provider } from "jotai";
@@ -19,9 +20,7 @@ export const DashboardLayout = async ({ children }: { children: React.ReactNode 
             defaultOpen={defaultOpen}
           >
             <DashboardSidebar />
-            <main className="app-dashboard-main app-dashboard-canvas flex min-h-0 min-h-svh min-w-0 flex-1 flex-col overflow-hidden border-border/60 border-l md:min-h-0">
-              {children}
-            </main>
+            <DashboardMainArea>{children}</DashboardMainArea>
           </SidebarProvider>
         </Provider>
       </OrganizationGuard>

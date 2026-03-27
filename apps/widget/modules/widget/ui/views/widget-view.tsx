@@ -1,6 +1,8 @@
 "use client";
 
 import { useAtomValue } from "jotai";
+import { useSearchParams } from "next/navigation";
+import { cn } from "@workspace/ui/lib/utils";
 import {
   mergeWidgetAppearance,
   widgetAppearanceToRootStyle,
@@ -17,9 +19,14 @@ import { WidgetContactScreen } from "../screens/widget-contact-screen";
 
 interface Props {
   organizationId: string | null;
-};
+}
 
 export const WidgetView = ({ organizationId }: Props) => {
+  const searchParams = useSearchParams();
+  const embedPlayground =
+    searchParams.get("playground") === "1" ||
+    searchParams.get("playground") === "true";
+
   const screen = useAtomValue(screenAtom);
   const widgetSettings = useAtomValue(widgetSettingsAtom);
   const appearance = mergeWidgetAppearance(widgetSettings?.appearance ?? undefined);
@@ -38,7 +45,12 @@ export const WidgetView = ({ organizationId }: Props) => {
 
   return (
     <main
-      className="flex h-full min-h-0 w-full flex-col overflow-hidden border border-border/70 shadow-[var(--shadow-lift)] ring-1 ring-black/[0.04] dark:ring-white/[0.06]"
+      className={cn(
+        "flex h-full min-h-0 w-full flex-col overflow-hidden",
+        embedPlayground
+          ? "rounded-none border-0 shadow-none ring-0"
+          : "border border-border/70 shadow-[var(--shadow-lift)] ring-1 ring-black/[0.04] dark:ring-white/[0.06]",
+      )}
       style={rootStyle}
     >
       {screenComponents[screen]}

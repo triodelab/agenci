@@ -4,13 +4,11 @@ import { useOrganization } from "@clerk/nextjs";
 import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
-import { CopyIcon, ExternalLinkIcon } from "lucide-react";
+import { Badge } from "@workspace/ui/components/badge";
+import { CopyIcon, ExternalLinkIcon, LockIcon } from "lucide-react";
 import { getWidgetPreviewUrl } from "@/lib/widget-preview-url";
 import { toast } from "sonner";
-import {
-  DashboardPageHeader,
-  DashboardPageShell,
-} from "@/modules/dashboard/ui/components/dashboard-page-shell";
+import { DashboardPageShell } from "@/modules/dashboard/ui/components/dashboard-page-shell";
 import { IntegrationId, INTEGRATIONS } from "../../constants";
 import Image from "next/image";
 import {
@@ -55,20 +53,28 @@ export const IntegrationsView = () => {
         onOpenChange={setDialogOpen}
         snippet={selectedSnippet}
       />
-      <DashboardPageShell contentClassName="max-w-screen-md">
-        <DashboardPageHeader
-          description="Koble nettsiden til chat-widgeten med organisasjons-ID og innebyggingskode."
-          kicker="Integrasjoner"
-          title="Setup & Integrations"
-        />
+      <DashboardPageShell>
+        <header className="dash-page-header-accent mb-10 space-y-3 sm:mb-12">
+          <p className="dash-page-kicker">Integrasjoner</p>
+          <h1 className="dash-page-title">Setup &amp; innebygging</h1>
+          <p className="dash-page-desc dash-page-desc-wide">
+            Kobler nettsiden til samme organisasjon som i dashbordet. Velg rammeverk under for
+            ferdig snippet — eller kopier org-ID til egen integrasjon.
+          </p>
+        </header>
 
-        <div className="mt-2 space-y-12">
-          <div className="app-dashboard-panel space-y-5 rounded-2xl p-6 md:p-8 [&_strong]:font-medium [&_strong]:text-foreground">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
+        <div className="grid grid-cols-1 gap-8 xl:grid-cols-12 xl:gap-10">
+          <div className="dash-panel-glass space-y-6 p-7 md:p-8 xl:col-span-5">
+            <div className="space-y-1">
+              <p className="text-[10px] font-semibold tracking-[0.18em] text-muted-foreground uppercase">
+                Organisasjons-ID
+              </p>
+              <p className="text-[13px] leading-relaxed text-muted-foreground">
+                Samme ID brukes i widget-scriptet og i test-URL.
+              </p>
+            </div>
+            <div className="flex flex-col gap-4">
               <div className="min-w-0 flex-1 space-y-2">
-                <p className="text-[10px] font-medium tracking-[0.18em] text-muted-foreground uppercase">
-                  org_id
-                </p>
                 <Label className="sr-only" htmlFor="organization-id">
                   Organization ID
                 </Label>
@@ -77,10 +83,10 @@ export const IntegrationsView = () => {
                   id="organization-id"
                   readOnly
                   value={organization?.id ?? ""}
-                  className="rounded-xl border-border bg-muted/40 font-mono text-sm text-foreground"
+                  className="h-11 rounded-xl border-border/80 bg-muted/30 font-mono text-[13px] text-foreground"
                 />
               </div>
-              <div className="flex shrink-0 flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2">
                 <Button
                   className="gap-2 rounded-xl"
                   onClick={handleCopy}
@@ -89,7 +95,7 @@ export const IntegrationsView = () => {
                   variant="outline"
                 >
                   <CopyIcon className="size-4" />
-                  Copy
+                  Kopier ID
                 </Button>
                 <Button
                   className="gap-2 rounded-xl"
@@ -110,47 +116,84 @@ export const IntegrationsView = () => {
                 </Button>
               </div>
             </div>
-            <p className="text-sm leading-relaxed text-muted-foreground">
-              Du må ha <strong>widget</strong> kjørende (
-              <code className="rounded-md bg-muted px-1.5 py-0.5 font-mono text-xs text-foreground">
-                pnpm dev:widget
-              </code>
-              , port 3001). Knappen åpner riktig URL med{" "}
+            <p className="border-border/60 border-t pt-5 text-[13px] leading-relaxed text-muted-foreground">
+              Lokalt: kjør <strong className="text-foreground">pnpm dev:widget</strong> (port
+              3001). «Åpne widget» legger på{" "}
               <code className="rounded-md bg-muted px-1.5 py-0.5 font-mono text-xs text-foreground">
                 ?organizationId=
               </code>{" "}
-              ferdig utfylt.
+              automatisk.
             </p>
           </div>
 
-          <div className="space-y-6">
-            <div className="space-y-1">
+          <div className="flex flex-col gap-6 xl:col-span-7">
+            <div className="space-y-2">
               <p className="dash-page-kicker">Velg plattform</p>
-              <h2 className="text-lg font-semibold tracking-tight text-foreground">
-                Integrations
+              <h2 className="text-[17px] font-semibold tracking-tight text-foreground sm:text-lg">
+                Innebyggingskode
               </h2>
-              <p className="max-w-md text-muted-foreground text-[13px] leading-relaxed">
-                Én trykk — du får ferdig innebyggingskode til chatboksen.
+              <p className="max-w-xl text-[13px] leading-relaxed text-muted-foreground">
+                Ett trykk åpner dialog med script-tag klar til liming. Fungerer i ren HTML eller
+                i layout-komponent i React/Next.
               </p>
             </div>
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
               {INTEGRATIONS.map((integration) => (
                 <button
                   key={integration.id}
                   onClick={() => handleIntegrationClick(integration.id)}
                   type="button"
-                  className="dash-integration-orb group text-foreground"
+                  className="dash-integration-orb group min-h-[8.5rem] text-foreground"
                 >
                   <span className="dash-integration-orb-icon transition-transform duration-200 group-hover:scale-[1.04]">
                     <Image
                       alt={integration.title}
-                      height={36}
+                      height={40}
                       src={integration.icon}
-                      width={36}
+                      width={40}
                     />
                   </span>
-                  <span className="font-semibold text-[14px] tracking-tight">{integration.title}</span>
+                  <span className="font-semibold text-[14px] tracking-tight">
+                    {integration.title}
+                  </span>
                 </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="dash-panel-glass space-y-6 p-7 md:p-8 xl:col-span-12">
+            <div className="space-y-1">
+              <p className="dash-page-kicker">Veikart</p>
+              <h2 className="text-[17px] font-semibold tracking-tight text-foreground sm:text-lg">
+                Flere datakilder
+              </h2>
+              <p className="max-w-3xl text-[13px] leading-relaxed text-muted-foreground">
+                Typiske kilder fra e-post, netthandel og CRM. Ikke aktive ennå — her er
+                retningen slik at produktet føles komplett og gjennomtenkt.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {(
+                [
+                  { name: "Gmail", hint: "Vedlegg og tråder som kunnskap" },
+                  { name: "Shopify", hint: "Produkt- og ordredata" },
+                  { name: "Stripe", hint: "Faktura og kundestatus" },
+                  { name: "HubSpot", hint: "CRM-synk" },
+                ] as const
+              ).map((row) => (
+                <div
+                  className="flex min-h-[5.5rem] items-center justify-between gap-3 rounded-xl border border-border/60 bg-muted/15 px-4 py-3"
+                  key={row.name}
+                >
+                  <div className="min-w-0 text-left">
+                    <p className="font-medium text-[14px] text-foreground">{row.name}</p>
+                    <p className="mt-0.5 text-[12px] text-muted-foreground">{row.hint}</p>
+                  </div>
+                  <Badge className="shrink-0 gap-1 text-[10px]" variant="secondary">
+                    <LockIcon className="size-3" />
+                    Kommer
+                  </Badge>
+                </div>
               ))}
             </div>
           </div>

@@ -13,7 +13,13 @@ import { DicebearAvatar } from "@workspace/ui/components/dicebear-avatar";
 import { useInfiniteScroll } from "@workspace/ui/hooks/use-infinite-scroll";
 import { InfiniteScrollTrigger } from "@workspace/ui/components/infinite-scroll-trigger";
 import { useWidgetDisplayTitle } from "@/lib/widget-display-title";
-import { contactSessionIdAtomFamily, conversationIdAtom, organizationIdAtom, screenAtom, widgetSettingsAtom } from "../../atoms/widget-atoms";
+import {
+  contactSessionIdAtomFamily,
+  conversationIdAtomFamily,
+  organizationIdAtom,
+  screenAtom,
+  widgetSettingsAtom,
+} from "../../atoms/widget-atoms";
 import { useAction, useQuery } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
 import { Form, FormField } from "@workspace/ui/components/form";
@@ -43,12 +49,16 @@ const formSchema = z.object({
 
 export const WidgetChatScreen = () => {
   const setScreen = useSetAtom(screenAtom);
-  const setConversationId = useSetAtom(conversationIdAtom);
+  const organizationId = useAtomValue(organizationIdAtom);
+  const setConversationId = useSetAtom(
+    conversationIdAtomFamily(organizationId || ""),
+  );
 
   const widgetSettings = useAtomValue(widgetSettingsAtom);
   const widgetTitle = useWidgetDisplayTitle();
-  const conversationId = useAtomValue(conversationIdAtom);
-  const organizationId = useAtomValue(organizationIdAtom);
+  const conversationId = useAtomValue(
+    conversationIdAtomFamily(organizationId || ""),
+  );
   const contactSessionId = useAtomValue(
     contactSessionIdAtomFamily(organizationId || "")
   );
@@ -126,30 +136,35 @@ export const WidgetChatScreen = () => {
   };
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col">
-      <WidgetHeader className="flex shrink-0 items-center justify-between">
-        <div className="flex items-center gap-x-2">
+    <div className="flex h-full min-h-0 min-w-0 flex-1 flex-col">
+      <WidgetHeader className="flex w-full min-w-0 shrink-0 items-center justify-between gap-2">
+        <div className="flex min-w-0 flex-1 items-center gap-x-2">
           <Button
+            className="shrink-0"
             onClick={onBack}
             size="icon"
             variant="transparent"
           >
             <ArrowLeftIcon />
           </Button>
-          <p className="truncate font-semibold">{widgetTitle}</p>
+          <p className="min-w-0 flex-1 truncate text-left font-semibold">
+            {widgetTitle}
+          </p>
         </div>
         <Button
+          className="shrink-0"
           size="icon"
           variant="transparent"
         >
           <MenuIcon />
         </Button>
       </WidgetHeader>
-      <AIConversation className="min-h-0 flex-1">
-        <AIConversationContent>
+      <AIConversation className="min-h-0 min-w-0 flex-1 bg-[var(--widget-bg,#fff)]">
+        <AIConversationContent className="px-3 pb-2 pt-1 sm:px-4">
           <InfiniteScrollTrigger
             canLoadMore={canLoadMore}
             isLoadingMore={isLoadingMore}
+            loadMoreText="Last tidligere meldinger"
             onLoadMore={handleLoadMore}
             ref={topElementRef}
           />
@@ -170,7 +185,7 @@ export const WidgetChatScreen = () => {
                 </AIMessageContent>
                 {message.role === "assistant" && (
                   <DicebearAvatar
-                    imageUrl="/logo.svg"
+                    imageUrl="/AgenciLogo.png"
                     seed="assistant"
                     size={32}
                   />
@@ -200,7 +215,7 @@ export const WidgetChatScreen = () => {
                 </span>
               </AIMessageContent>
               <DicebearAvatar
-                imageUrl="/logo.svg"
+                imageUrl="/AgenciLogo.png"
                 seed="assistant"
                 size={32}
               />
@@ -209,7 +224,7 @@ export const WidgetChatScreen = () => {
         </AIConversationContent>
       </AIConversation>
       {toUIMessages(messages.results ?? [])?.length === 1 && (
-        <AISuggestions className="flex w-full flex-col items-end p-2">
+        <AISuggestions className="flex w-full flex-col items-end gap-1.5 px-3 pb-2 sm:px-4">
           {suggestions.map((suggestion) => {
             if (!suggestion) {
               return null;
@@ -233,51 +248,56 @@ export const WidgetChatScreen = () => {
         </AISuggestions>
       )}
       <Form {...form}>
-          <AIInput
-            className="shrink-0 rounded-none border-x-0 border-b-0 border-[var(--widget-input-border)] bg-[var(--widget-input-bg)]"
-            onSubmit={form.handleSubmit(onSubmit)}
-          >
-            <FormField
-              control={form.control}
-              disabled={
-                conversation?.status === "resolved" || isAwaitingAssistant
-              }
-              name="message"
-              render={({ field }) => (
-                <AIInputTextarea
-                  className="!resize-none !bg-transparent !text-[var(--widget-input-text)] placeholder:!text-[var(--widget-input-placeholder)] dark:!bg-transparent"
-                  disabled={
-                    conversation?.status === "resolved" || isAwaitingAssistant
-                  }
-                  onChange={field.onChange}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && !e.shiftKey) {
-                      e.preventDefault();
-                      form.handleSubmit(onSubmit)();
-                    }
-                  }}
-                  placeholder={
-                    conversation?.status === "resolved"
-                      ? "This conversation has been resolved."
-                      : "Type your message..."
-                  }
-                  value={field.value}
-                />
-              )}
-            />
-            <AIInputToolbar>
-              <AIInputTools />
-              <AIInputSubmit
+        <AIInput
+          className="flex shrink-0 flex-row items-end gap-2 divide-y-0 rounded-none border-x-0 border-b-0 border-t border-[var(--widget-input-border)] bg-[var(--widget-input-bg)] p-2"
+          onSubmit={form.handleSubmit(onSubmit)}
+        >
+          <div className="min-w-0 flex-1">
+          <FormField
+            control={form.control}
+            disabled={
+              conversation?.status === "resolved" || isAwaitingAssistant
+            }
+            name="message"
+            render={({ field }) => (
+              <AIInputTextarea
+                className="!min-h-[44px] !max-h-[120px] !resize-none !bg-transparent !py-2.5 !text-[var(--widget-input-text)] placeholder:!text-[var(--widget-input-placeholder)] dark:!bg-transparent"
                 disabled={
-                  conversation?.status === "resolved" ||
-                  !form.formState.isValid ||
-                  isAwaitingAssistant
+                  conversation?.status === "resolved" || isAwaitingAssistant
                 }
-                status={isAwaitingAssistant ? "submitted" : "ready"}
-                type="submit"
+                maxHeight={120}
+                minHeight={44}
+                onChange={field.onChange}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    form.handleSubmit(onSubmit)();
+                  }
+                }}
+                placeholder={
+                  conversation?.status === "resolved"
+                    ? "Samtalen er avsluttet."
+                    : "Skriv en melding…"
+                }
+                value={field.value}
               />
-            </AIInputToolbar>
-          </AIInput>
+            )}
+          />
+          </div>
+          <AIInputToolbar className="shrink-0 border-0 p-0">
+            <AIInputTools />
+            <AIInputSubmit
+              className="size-10 shrink-0 rounded-xl"
+              disabled={
+                conversation?.status === "resolved" ||
+                !form.formState.isValid ||
+                isAwaitingAssistant
+              }
+              status={isAwaitingAssistant ? "submitted" : "ready"}
+              type="submit"
+            />
+          </AIInputToolbar>
+        </AIInput>
       </Form>
     </div>
   );

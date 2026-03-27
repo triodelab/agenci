@@ -3,7 +3,6 @@
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from "@workspace/ui/components/tooltip";
 
@@ -21,13 +20,11 @@ export const Hint = ({
   align = "center",
 }: HintProps) => {
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>{children}</TooltipTrigger>
-        <TooltipContent>
-          <p>{text}</p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <Tooltip>
+      <TooltipTrigger asChild>{children}</TooltipTrigger>
+      <TooltipContent align={align} side={side} sideOffset={6}>
+        <p>{text}</p>
+      </TooltipContent>
+    </Tooltip>
   );
 };

@@ -2,9 +2,19 @@
 
 import { useEffect, useState } from "react";
 import { LoaderIcon } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useWidgetDisplayTitle } from "@/lib/widget-display-title";
-import { contactSessionIdAtomFamily, errorMessageAtom, loadingMessageAtom, organizationIdAtom, screenAtom, vapiSecretsAtom, widgetSettingsAtom } from "@/modules/widget/atoms/widget-atoms";
+import {
+  contactSessionIdAtomFamily,
+  conversationIdAtomFamily,
+  errorMessageAtom,
+  loadingMessageAtom,
+  organizationIdAtom,
+  screenAtom,
+  vapiSecretsAtom,
+  widgetSettingsAtom,
+} from "@/modules/widget/atoms/widget-atoms";
 import { WidgetHeader } from "@/modules/widget/ui/components/widget-header";
 import { useAction, useMutation, useQuery } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
@@ -12,6 +22,11 @@ import { api } from "@workspace/backend/_generated/api";
 type InitStep = "org" | "session" | "settings" | "vapi" | "done";
 
 export const WidgetLoadingScreen = ({ organizationId }: { organizationId: string | null }) => {
+  const searchParams = useSearchParams();
+  const playgroundEmbed =
+    searchParams.get("playground") === "1" ||
+    searchParams.get("playground") === "true";
+
   const [step, setStep] = useState<InitStep>("org")
   const [sessionValid, setSessionValid] = useState(false);
   const widgetTitle = useWidgetDisplayTitle();
@@ -23,6 +38,16 @@ export const WidgetLoadingScreen = ({ organizationId }: { organizationId: string
   const setErrorMessage = useSetAtom(errorMessageAtom);
   const setScreen = useSetAtom(screenAtom);
   const setVapiSecrets = useSetAtom(vapiSecretsAtom);
+  const setConversationId = useSetAtom(
+    conversationIdAtomFamily(organizationId || ""),
+  );
+  const savedConversationId = useAtomValue(
+    conversationIdAtomFamily(organizationId || ""),
+  );
+
+  const resumeOrCreateConversation = useMutation(
+    api.public.conversations.resumeOrCreate,
+  );
 
   const contactSessionId = useAtomValue(contactSessionIdAtomFamily(organizationId || ""));
 
@@ -158,9 +183,81 @@ export const WidgetLoadingScreen = ({ organizationId }: { organizationId: string
       return;
     }
 
-    const hasValidSession = contactSessionId && sessionValid;
-    setScreen(hasValidSession ? "selection" : "auth");
-  }, [step, contactSessionId, sessionValid, setScreen]);
+    const hasValidSession = Boolean(contactSessionId && sessionValid);
+
+    if (!hasValidSession) {
+      setScreen("auth");
+      return;
+    }
+
+    if (!organizationId || !contactSessionId) {
+      setScreen("auth");
+      return;
+    }
+
+    if (!playgroundEmbed) {
+      if (!savedConversationId) {
+        setScreen("selection");
+        return;
+      }
+
+      let cancelled = false;
+      void (async () => {
+        try {
+          const conversationId = await resumeOrCreateConversation({
+            contactSessionId,
+            organizationId,
+            resumeConversationId: savedConversationId,
+          });
+          if (!cancelled) {
+            setConversationId(conversationId);
+            setScreen("chat");
+          }
+        } catch {
+          if (!cancelled) {
+            setScreen("selection");
+          }
+        }
+      })();
+
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    let cancelled = false;
+    void (async () => {
+      try {
+        const conversationId = await resumeOrCreateConversation({
+          contactSessionId,
+          organizationId,
+          resumeConversationId: savedConversationId ?? undefined,
+        });
+        if (!cancelled) {
+          setConversationId(conversationId);
+          setScreen("chat");
+        }
+      } catch {
+        if (!cancelled) {
+          setScreen("selection");
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    step,
+    playgroundEmbed,
+    contactSessionId,
+    sessionValid,
+    organizationId,
+    savedConversationId,
+    resumeOrCreateConversation,
+    setConversationId,
+    setScreen,
+  ]);
 
   return (
     <>

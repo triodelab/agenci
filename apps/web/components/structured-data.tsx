@@ -1,3 +1,5 @@
+import { AGENCI_LOGO_SRC } from "@/components/logo";
+
 /** Sikker serialisering i <script type="application/ld+json"> (unngår `</script>` i strenger som bryter HTML). */
 function jsonLdStringify(value: unknown) {
   return JSON.stringify(value)
@@ -38,7 +40,7 @@ export function StructuredData() {
     "@type": "Organization",
     name: "Agenci",
     url: base,
-    logo: `${base}/logo.png`,
+    logo: `${base}${AGENCI_LOGO_SRC}`,
     description:
       "AI-basert chatbotplattform for å automatisere kundeservice og salg",
     sameAs: [] as string[],

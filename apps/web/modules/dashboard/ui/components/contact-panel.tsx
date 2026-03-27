@@ -89,7 +89,7 @@ const dotClass: Record<NonNullable<StatusDot>, string> = {
   slate: "bg-muted-foreground/45",
 };
 
-function StatusInfoRow({
+function StatusMetric({
   label,
   value,
   valueDot,
@@ -99,17 +99,19 @@ function StatusInfoRow({
   valueDot?: StatusDot;
 }) {
   return (
-    <div className="flex items-start justify-between gap-4">
-      <span className="shrink-0 text-muted-foreground">{label}</span>
-      <span className="flex min-w-0 items-center justify-end gap-2 text-right text-sm font-medium text-foreground">
+    <div className="min-w-0">
+      <p className="text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
+        {label}
+      </p>
+      <div className="mt-1 flex min-h-[1.25rem] items-center gap-2 text-sm font-semibold text-foreground">
         {valueDot ? (
           <span
             aria-hidden
             className={cn("size-2 shrink-0 rounded-full", dotClass[valueDot])}
           />
         ) : null}
-        <span className="min-w-0">{value}</span>
-      </span>
+        <span className="min-w-0 break-words">{value}</span>
+      </div>
     </div>
   );
 }
@@ -254,13 +256,10 @@ export const ContactPanel = () => {
 
   if (detail === undefined) {
     return (
-      <aside className="flex h-full min-h-0 flex-col overflow-hidden bg-background">
-        <header className="border-border/80 border-b bg-background/95 px-4 py-3 backdrop-blur supports-[backdrop-filter]:bg-background/90">
-          <Skeleton className="h-5 w-24" />
-        </header>
-        <div className="space-y-4 p-4">
-          <Skeleton className="h-24 w-full" />
-          <Skeleton className="h-32 w-full" />
+      <aside className="flex h-full min-h-0 flex-col overflow-hidden bg-muted/15 lg:bg-transparent">
+        <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4">
+          <Skeleton className="app-dashboard-panel h-28 w-full rounded-2xl" />
+          <Skeleton className="app-dashboard-panel h-36 w-full rounded-2xl" />
         </div>
       </aside>
     );
@@ -268,16 +267,20 @@ export const ContactPanel = () => {
 
   if (detail === null) {
     return (
-      <aside className="flex h-full min-h-0 flex-col bg-background p-4 text-[13px] text-muted-foreground">
-        Fant ikke samtalen.
+      <aside className="flex h-full min-h-0 flex-col p-4 text-[13px] text-muted-foreground lg:bg-transparent">
+        <div className="app-dashboard-panel rounded-2xl px-4 py-5">
+          Fant ikke samtalen.
+        </div>
       </aside>
     );
   }
 
   if (!detail.contactSession) {
     return (
-      <aside className="flex h-full min-h-0 flex-col bg-background p-4 text-[13px] text-muted-foreground">
-        Ingen kontakt koblet til denne samtalen.
+      <aside className="flex h-full min-h-0 flex-col p-4 text-[13px] text-muted-foreground lg:bg-transparent">
+        <div className="app-dashboard-panel rounded-2xl px-4 py-5">
+          Ingen kontakt koblet til denne samtalen.
+        </div>
       </aside>
     );
   }
@@ -300,33 +303,31 @@ export const ContactPanel = () => {
   return (
     <aside
       aria-label="Samtaledetaljer"
-      className="flex h-full min-h-0 w-full flex-col overflow-hidden bg-background"
+      className="flex h-full min-h-0 w-full flex-col overflow-hidden bg-muted/15 lg:bg-transparent"
     >
-      <header className="shrink-0 border-border/80 border-b bg-background/95 px-4 py-3 backdrop-blur supports-[backdrop-filter]:bg-background/90">
-        <h2 className="text-base font-semibold tracking-tight text-foreground">
-          Detaljer
-        </h2>
-      </header>
+      <h2 className="sr-only">Detaljer</h2>
 
-      <div className="min-h-0 flex-1 overflow-y-auto">
+      <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-4 py-4 lg:py-5">
         <LegacyCollapsibleSection
           onOpenChange={setInfoOpen}
           open={infoOpen}
           title="Status"
         >
-          <div className="space-y-3 border-b border-border bg-background p-4">
-            <StatusInfoRow
-              label="Status"
-              value={statusText}
-              valueDot={statusDot}
-            />
-            <StatusInfoRow
-              label="Prioritet"
-              value={priorityText}
-              valueDot={priorityDot}
-            />
-            <StatusInfoRow label="Tildelt" value={assignedName} />
-            <StatusInfoRow label="Dato" value={started} />
+          <div className="p-4 pt-3">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-4 sm:grid-cols-4">
+              <StatusMetric
+                label="Status"
+                value={statusText}
+                valueDot={statusDot}
+              />
+              <StatusMetric
+                label="Prioritet"
+                value={priorityText}
+                valueDot={priorityDot}
+              />
+              <StatusMetric label="Tildelt" value={assignedName} />
+              <StatusMetric label="Dato" value={started} />
+            </div>
           </div>
         </LegacyCollapsibleSection>
 
@@ -335,7 +336,7 @@ export const ContactPanel = () => {
           open={contactOpen}
           title="Kunde"
         >
-          <div className="space-y-3 border-b border-border bg-background p-4">
+          <div className="space-y-3 p-4 pt-3">
             <LegacyDetailRow
               icon={<UserIcon className="size-4" />}
               label="Navn"
@@ -382,7 +383,7 @@ export const ContactPanel = () => {
           open={threadOpen}
           title="Samtale"
         >
-          <div className="space-y-3 border-b border-border bg-background p-4">
+          <div className="space-y-3 p-4 pt-3">
             <div>
               <p className="mb-1.5 text-xs font-medium text-muted-foreground">
                 Emne
@@ -414,7 +415,7 @@ export const ContactPanel = () => {
             open={techOpen}
             title="Teknisk"
           >
-            <div className="border-b border-border bg-background">
+            <div className="px-2 pb-2">
               <Accordion
                 className="border-0"
                 collapsible
@@ -422,7 +423,7 @@ export const ContactPanel = () => {
               >
                 {accordionSections.map((section) => (
                   <AccordionItem
-                    className="border-border/60 border-b px-4 last:border-b-0"
+                    className="border-border/50 border-b px-2 last:border-b-0"
                     key={section.id}
                     value={section.id}
                   >
@@ -433,16 +434,23 @@ export const ContactPanel = () => {
                       </div>
                     </AccordionTrigger>
                     <AccordionContent className="pb-3">
-                      <div className="space-y-2 border-border/40 border-t pt-3 text-[12px]">
+                      <div className="space-y-3 border-border/40 border-t pt-3 text-[12px]">
                         {section.items.map((item) => (
                           <div
-                            className="flex justify-between gap-3"
+                            className="grid gap-1 sm:grid-cols-[minmax(0,6.5rem)_1fr] sm:gap-x-4 sm:gap-y-0"
                             key={`${section.id}-${item.label}`}
                           >
-                            <span className="text-muted-foreground">
+                            <span className="shrink-0 text-muted-foreground">
                               {item.label}
                             </span>
-                            <span className={item.className}>{item.value}</span>
+                            <span
+                              className={cn(
+                                "min-w-0 break-words text-foreground",
+                                item.className,
+                              )}
+                            >
+                              {item.value}
+                            </span>
                           </div>
                         ))}
                       </div>

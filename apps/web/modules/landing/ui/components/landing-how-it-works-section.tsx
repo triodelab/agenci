@@ -79,9 +79,9 @@ export function LandingHowItWorksSection() {
                   whileInView={reduced ? undefined : { opacity: 1, y: 0 }}
                   viewport={{ once: true, amount: 0.2 }}
                   transition={{ duration: 0.4, delay: i * 0.08 }}
-                  className="relative"
-                >
-                  <div
+        className="relative"
+      >
+        <div
                     className={cn(
                       "h-full rounded-3xl border border-border/50 bg-gradient-to-b from-card/90 to-card/60 p-6 shadow-[0_28px_90px_-50px_rgba(0,0,0,0.18)] backdrop-blur-sm dark:from-card/50 dark:to-card/25 dark:shadow-[0_28px_90px_-50px_rgba(0,0,0,0.45)] md:p-8",
                       "lg:pt-14",
@@ -104,10 +104,10 @@ export function LandingHowItWorksSection() {
                       )}
                     >
                       <Icon className="size-5 text-primary" strokeWidth={2} />
-                    </span>
+                            </span>
                     <h3 className="mt-4 text-xl font-semibold tracking-tight md:text-2xl">
                       {phase.title}
-                    </h3>
+                          </h3>
                     <p className="mt-2 text-sm font-medium text-foreground/90">{phase.lead}</p>
                     <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{phase.body}</p>
                     <ul className="mt-6 space-y-2.5 border-t border-border/40 pt-6 text-sm text-muted-foreground">
@@ -115,9 +115,9 @@ export function LandingHowItWorksSection() {
                         <li key={p} className="flex gap-2">
                           <ArrowRight className="mt-0.5 size-3.5 shrink-0 text-primary" strokeWidth={2} />
                           {p}
-                        </li>
-                      ))}
-                    </ul>
+                              </li>
+                            ))}
+                          </ul>
                   </div>
                 </motion.li>
               );

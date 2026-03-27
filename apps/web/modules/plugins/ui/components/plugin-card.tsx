@@ -2,6 +2,8 @@ import { ArrowLeftRightIcon, type LucideIcon, PlugIcon } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@workspace/ui/components/button";
 
+import { AGENCI_LOGO_SRC } from "@/components/logo";
+
 export interface Feature {
   icon: LucideIcon;
   label: string;
@@ -24,7 +26,7 @@ export const PluginCard = ({
   onSubmit,
 }: PluginCardProps) => {
   return (
-    <div className="dash-plugin-split h-fit w-full overflow-hidden rounded-2xl border border-border/80 shadow-sm">
+    <div className="dash-plugin-split h-fit w-full overflow-hidden rounded-2xl">
       <div className="dash-plugin-split-main">
         <div className="mb-10 flex flex-wrap items-center justify-center gap-6 md:justify-start">
           <div className="flex flex-col items-center">
@@ -41,11 +43,11 @@ export const PluginCard = ({
           </div>
           <div className="flex flex-col items-center">
             <Image
-              alt="Platform"
+              alt="Agenci"
               className="object-contain opacity-95"
               height={48}
               width={48}
-              src="/logo.svg"
+              src={AGENCI_LOGO_SRC}
             />
           </div>
         </div>

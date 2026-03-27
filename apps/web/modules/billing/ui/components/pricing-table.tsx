@@ -23,7 +23,7 @@ export const PricingTable = () => {
             Clerk PricingTable rendres ikke når billing er av i Clerk.
           </p>
         </div>
-        <div className="app-dashboard-panel flex flex-col justify-between gap-4 p-6 text-left shadow-sm">
+        <div className="app-dashboard-panel flex flex-col justify-between gap-4 p-6 text-left">
           <div>
             <p className="text-[10px] font-medium tracking-[0.18em] text-muted-foreground uppercase">
               Neste steg

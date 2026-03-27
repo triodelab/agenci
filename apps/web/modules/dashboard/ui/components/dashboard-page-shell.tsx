@@ -16,8 +16,8 @@ const dashboardPagePanelVariantClass: Record<DashboardPagePanelVariant, string> 
 };
 
 /**
- * Felles innholdsflate for dashboard (som workspace `SidebarInset`):
- * full bredde, scroll, konsistent padding — matcher nøytral widget-/shadcn-oppsett.
+ * Felles innholdsflate for dashboard: bruker hele bredden med rolig, premium padding.
+ * Smal lesing (f.eks. faktura): sett `contentClassName="max-w-3xl mx-auto"`.
  */
 export function DashboardPageShell({
   children,
@@ -26,7 +26,7 @@ export function DashboardPageShell({
 }: {
   children: React.ReactNode;
   className?: string;
-  /** Overstyr f.eks. `max-w-3xl` eller `max-w-full` */
+  /** Overstyr f.eks. `max-w-3xl mx-auto` for smale sider */
   contentClassName?: string;
 }) {
   return (
@@ -38,7 +38,7 @@ export function DashboardPageShell({
     >
       <div
         className={cn(
-          "mx-auto w-full max-w-5xl flex-1 px-4 py-7 md:px-10 md:py-10",
+          "dash-workspace-inner mx-auto w-full flex-1 px-5 py-8 sm:px-8 lg:px-10 xl:px-12 2xl:px-16",
           contentClassName,
         )}
       >

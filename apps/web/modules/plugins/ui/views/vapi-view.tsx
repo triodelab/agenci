@@ -222,7 +222,7 @@ export const VapiView = () => {
     <>
       <VapiPluginForm open={connectOpen} setOpen={setConnectOpen} />
       <VapiPluginRemoveForm open={removeOpen} setOpen={setRemoveOpen} />
-      <DashboardPageShell contentClassName="max-w-screen-md">
+      <DashboardPageShell contentClassName="max-w-5xl">
         <DashboardPageHeader
           description="Koble Vapi for stemme i nettleser og telefon — ett sted for nøkler og status."
           kicker="Stemme"
