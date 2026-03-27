@@ -27,8 +27,15 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
+  useSidebar,
 } from "@workspace/ui/components/sidebar";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@workspace/ui/components/tooltip";
 import { cn } from "@workspace/ui/lib/utils";
+import { ModeToggle } from "@/components/mode-toggle";
 
 const customerSupportItems = [
   { title: "Oversikt", url: "/dashboard", icon: HomeIcon },
@@ -56,6 +63,45 @@ function navButtonClass(active: boolean) {
   );
 }
 
+function SidebarThemeToggle() {
+  const { state, isMobile } = useSidebar();
+  const collapsed = state === "collapsed" && !isMobile;
+
+  const triggerClassName = cn(
+    "shrink-0 rounded-lg border border-sidebar-border/90 bg-card/80 p-1.5 shadow-sm",
+    "hover:bg-sidebar-accent/80 hover:opacity-100",
+  );
+
+  const toggle = (
+    <ModeToggle
+      contentClassName="dashboard-app-shell min-w-[10rem]"
+      triggerClassName={triggerClassName}
+    />
+  );
+
+  if (!collapsed) {
+    return (
+      <div className="flex w-full min-w-0 items-center justify-between gap-2">
+        <span className="truncate text-[13px] font-medium text-sidebar-foreground group-data-[collapsible=icon]:sr-only">
+          Tema
+        </span>
+        {toggle}
+      </div>
+    );
+  }
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <span className="inline-flex w-full justify-center">{toggle}</span>
+      </TooltipTrigger>
+      <TooltipContent side="right" align="center">
+        Tema (lys / mørk / system)
+      </TooltipContent>
+    </Tooltip>
+  );
+}
+
 export const DashboardSidebar = () => {
   const pathname = usePathname();
 
@@ -69,7 +115,6 @@ export const DashboardSidebar = () => {
     <Sidebar
       className={cn(
         "group z-20 border-sidebar-border border-r bg-sidebar",
-        "dark:supports-[backdrop-filter]:bg-sidebar/98 dark:supports-[backdrop-filter]:backdrop-blur-sm",
       )}
       collapsible="icon"
     >
@@ -77,12 +122,12 @@ export const DashboardSidebar = () => {
         <Link
           className={cn(
             "group/brand flex items-center gap-3 rounded-xl px-2 py-2 transition-colors",
-            "hover:bg-sidebar-accent/80",
+            "hover:bg-sidebar-accent",
             "group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0",
           )}
           href="/dashboard"
         >
-          <LogoIcon className="size-10 shrink-0 rounded-xl object-contain shadow-sm ring-1 ring-border/15" />
+          <LogoIcon className="size-10 shrink-0 rounded-xl object-contain shadow-sm ring-1 ring-border/15 dark:brightness-0 dark:invert" />
           <span className="min-w-0 flex-1 text-left group-data-[collapsible=icon]:hidden">
             <span className="block truncate font-semibold text-[15px] text-sidebar-foreground tracking-tight">
               Agenci
@@ -206,6 +251,11 @@ export const DashboardSidebar = () => {
 
       <SidebarFooter className="border-sidebar-border/80 border-t bg-muted/15 px-2 py-3 dark:bg-muted/5">
         <SidebarMenu>
+          <SidebarMenuItem>
+            <div className="flex w-full items-center px-1 py-0.5">
+              <SidebarThemeToggle />
+            </div>
+          </SidebarMenuItem>
           <SidebarMenuItem>
             <UserButton
               showName

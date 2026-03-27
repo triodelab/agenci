@@ -21,6 +21,7 @@ import {
   ArrowUpIcon,
   CheckIcon,
   DownloadIcon,
+  InboxIcon,
   ListIcon,
   MessageSquareIcon,
   RefreshCwIcon,
@@ -30,7 +31,10 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { ConversationStatusIcon } from "@workspace/ui/components/conversation-status-icon";
 import { useAtomValue, useSetAtom } from "jotai/react";
-import { statusFilterAtom } from "../../atoms";
+import {
+  type ConversationListFilter,
+  statusFilterAtom,
+} from "../../atoms";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import { useMemo, useState } from "react";
 import { EmptyState } from "./legacy-ui";
@@ -56,8 +60,7 @@ export const ConversationsPanel = () => {
     !authLoaded || !clerkOrgId
       ? "skip"
       : {
-          status:
-            statusFilter === "all" ? undefined : statusFilter,
+          status: statusFilter,
         },
     {
       initialNumItems: 10,
@@ -174,9 +177,7 @@ export const ConversationsPanel = () => {
           </div>
           <Select
             onValueChange={(value) =>
-              setStatusFilter(
-                value as "unresolved" | "escalated" | "resolved" | "all",
-              )
+              setStatusFilter(value as ConversationListFilter)
             }
             value={statusFilter}
           >
@@ -184,10 +185,10 @@ export const ConversationsPanel = () => {
               <SelectValue placeholder="Filter status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">
+              <SelectItem value="inbox">
                 <div className="flex items-center gap-2">
-                  <ListIcon className="size-4" />
-                  <span>Alle</span>
+                  <InboxIcon className="size-4" />
+                  <span>Innboks</span>
                 </div>
               </SelectItem>
               <SelectItem value="unresolved">
@@ -208,6 +209,12 @@ export const ConversationsPanel = () => {
                   <span>Løst</span>
                 </div>
               </SelectItem>
+              <SelectItem value="all">
+                <div className="flex items-center gap-2">
+                  <ListIcon className="size-4" />
+                  <span>Alle</span>
+                </div>
+              </SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -220,11 +227,19 @@ export const ConversationsPanel = () => {
           description={
             searchQuery.trim()
               ? "Prøv et annet søk eller fjern filter."
-              : "Nye samtaler vises her."
+              : statusFilter === "inbox"
+                ? "Ingen åpne samtaler akkurat nå — enten er alt løst, eller det har ikke kommet inn noe ennå."
+                : statusFilter === "resolved"
+                  ? "Ingen samtaler er merket som løst ennå."
+                  : "Nye samtaler vises her."
           }
           icon={<MessageSquareIcon className="size-10 stroke-[1.25]" />}
           title={
-            searchQuery.trim() ? "Ingen treff" : "Ingen samtaler funnet"
+            searchQuery.trim()
+              ? "Ingen treff"
+              : statusFilter === "inbox"
+                ? "Innboksen er tom"
+                : "Ingen samtaler funnet"
           }
         />
       ) : (

@@ -225,35 +225,36 @@
 }
 
 .dark .dashboard-app-shell {
-  --dash-nav-active-bg: oklch(0.26 0 0);
+  /* Canvas #09090b + kort #121214 — samme par som widget-referansen (zinc-950 / mørk charcoal) */
+  --dash-nav-active-bg: color-mix(in oklch, var(--foreground) 12%, transparent);
   --dash-nav-active-border: oklch(0.92 0 0);
-  --dash-knowledge-folder: oklch(0.24 0 0);
-  --background: oklch(0.145 0.01 264);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.18 0.012 264);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.18 0.012 264);
-  --popover-foreground: oklch(0.985 0 0);
-  /* Mørk modus: primærknapp = nesten hvit på svart */
+  --background: #09090b;
+  --foreground: #fafafa;
+  --card: #121214;
+  --card-foreground: #fafafa;
+  --dash-knowledge-folder: color-mix(in oklch, var(--foreground) 8%, var(--card));
+  --popover: #121214;
+  --popover-foreground: #fafafa;
+  /* Primærknapp: tydelig kontrast uten ekstra grå flate */
   --primary: oklch(0.97 0 0);
-  --primary-foreground: oklch(0.12 0 0);
-  --secondary: oklch(0.25 0.012 264);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.25 0.012 264);
-  --muted-foreground: oklch(0.65 0.02 264);
-  --accent: oklch(0.28 0 0);
-  --accent-foreground: oklch(0.985 0 0);
+  --primary-foreground: #09090b;
+  --secondary: color-mix(in oklch, var(--foreground) 12%, var(--card));
+  --secondary-foreground: #fafafa;
+  --muted: color-mix(in oklch, var(--foreground) 10%, var(--card));
+  --muted-foreground: #a1a1aa;
+  --accent: color-mix(in oklch, var(--foreground) 12%, var(--card));
+  --accent-foreground: #fafafa;
   --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 14%);
+  --border: #1f1f22;
+  --input: #1f1f22;
   --ring: oklch(0.65 0.02 264);
-  --sidebar: oklch(0.16 0.012 264);
-  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar: #09090b;
+  --sidebar-foreground: #fafafa;
   --sidebar-primary: oklch(0.97 0 0);
-  --sidebar-primary-foreground: oklch(0.12 0 0);
-  --sidebar-accent: oklch(0.26 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 9%);
+  --sidebar-primary-foreground: #09090b;
+  --sidebar-accent: color-mix(in oklch, var(--foreground) 10%, var(--card));
+  --sidebar-accent-foreground: #fafafa;
+  --sidebar-border: #1f1f22;
   --sidebar-ring: oklch(0.65 0.02 264);
 }
 
@@ -335,11 +336,13 @@
 .dark .dash-integration-orb,
 .dark .dash-accordion-frost,
 .dark .app-dashboard-panel {
-  border-color: color-mix(in oklch, var(--border) 80%, transparent);
-  background: color-mix(in oklch, var(--card) 60%, transparent);
+  border-color: color-mix(in oklch, var(--border) 100%, transparent);
+  background: var(--card);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
   box-shadow:
-    0 1px 0 oklch(1 0 0 / 0.06) inset,
-    0 16px 48px -24px oklch(0 0 0 / 0.45);
+    0 1px 0 oklch(1 0 0 / 0.07) inset,
+    0 14px 44px -26px oklch(0 0 0 / 0.5);
 }
 
 .dash-card-surface::before,
@@ -650,8 +653,11 @@
 }
 
 .dark .app-dashboard-main.app-dashboard-canvas {
-  background-color: oklch(0.145 0.01 264);
-  background-image: radial-gradient(oklch(0.32 0.01 264) 1px, transparent 1px);
+  background-color: var(--background);
+  background-image: radial-gradient(
+    color-mix(in oklch, var(--foreground) 14%, transparent) 1px,
+    transparent 1px
+  );
   background-size: 20px 20px;
   background-attachment: fixed;
 }
@@ -664,15 +670,22 @@
 }
 
 .dark .dash-modal-dot-bg {
-  background-color: oklch(0.145 0.01 264);
-  background-image: radial-gradient(oklch(0.32 0.01 264) 1px, transparent 1px);
+  background-color: var(--background);
+  background-image: radial-gradient(
+    color-mix(in oklch, var(--foreground) 14%, transparent) 1px,
+    transparent 1px
+  );
   background-size: 20px 20px;
 }
 
-/* Sidekolonner — ren hvit/grå flate (prikker fra hovedcanvas synlig i gap) */
+/* Sidekolonner — samme tone som hovedflate i dark (flat, ikke lysere «stripe») */
 .dash-subpane-rail {
   border-right: 1px solid color-mix(in oklch, var(--border) 90%, transparent);
   background: var(--card);
+}
+
+.dark .dash-subpane-rail {
+  background: var(--background);
 }
 
 .dash-subpane-main {
@@ -740,7 +753,7 @@
 }
 
 .dark .dash-surface-header {
-  background: color-mix(in oklch, var(--muted) 35%, var(--card));
+  background: var(--background);
 }
 
 /* Kunnskaps-playground — lett prikk-rutenett (Chatbase-lignende arbeidsflate) */

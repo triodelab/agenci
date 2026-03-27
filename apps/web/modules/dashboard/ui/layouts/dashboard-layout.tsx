@@ -16,7 +16,7 @@ export const DashboardLayout = async ({ children }: { children: React.ReactNode 
       <OrganizationGuard>
         <Provider>
           <SidebarProvider
-            className="dashboard-app-shell"
+            className="dashboard-app-shell h-svh min-h-0 max-h-svh w-full overflow-hidden"
             defaultOpen={defaultOpen}
           >
             <DashboardSidebar />

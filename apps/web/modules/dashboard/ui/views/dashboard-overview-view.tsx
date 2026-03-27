@@ -94,7 +94,7 @@ function MetricCell({
         <p className="text-[11px] font-semibold tracking-[0.14em] text-muted-foreground uppercase">
           {label}
         </p>
-        <span className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-border/45 bg-background/70 text-muted-foreground">
+        <span className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-border/55 bg-foreground/[0.06] text-foreground/85">
           <Icon className="size-4" strokeWidth={1.5} />
         </span>
       </div>
@@ -196,7 +196,7 @@ export function DashboardOverviewView() {
             <div className="grid gap-3 sm:grid-cols-3">
               <div className="app-dashboard-panel overflow-hidden rounded-2xl">
                 <div className="flex items-center gap-4 px-5 py-5 sm:px-6">
-                  <LibraryBigIcon className="size-5 shrink-0 text-muted-foreground" strokeWidth={1.5} />
+                  <LibraryBigIcon className="size-5 shrink-0 text-foreground/75" strokeWidth={1.5} />
                   <div>
                     <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">
                       Kilder
@@ -210,7 +210,7 @@ export function DashboardOverviewView() {
               </div>
               <div className="app-dashboard-panel overflow-hidden rounded-2xl">
                 <div className="flex items-center gap-4 px-5 py-5 sm:px-6">
-                  <PaletteIcon className="size-5 shrink-0 text-muted-foreground" strokeWidth={1.5} />
+                  <PaletteIcon className="size-5 shrink-0 text-foreground/75" strokeWidth={1.5} />
                   <div>
                     <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">
                       Widget
@@ -223,7 +223,7 @@ export function DashboardOverviewView() {
               </div>
               <div className="app-dashboard-panel overflow-hidden rounded-2xl">
                 <div className="flex items-center gap-4 px-5 py-5 sm:px-6">
-                  <MicIcon className="size-5 shrink-0 text-muted-foreground" strokeWidth={1.5} />
+                  <MicIcon className="size-5 shrink-0 text-foreground/75" strokeWidth={1.5} />
                   <div>
                     <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">
                       Stemme
@@ -269,11 +269,11 @@ export function DashboardOverviewView() {
                   </div>
                   <span
                     className={cn(
-                      "flex size-10 shrink-0 items-center justify-center rounded-xl border border-border/60 bg-muted/30 text-foreground transition-colors group-hover:border-primary/25 group-hover:bg-primary/5",
-                      item.featured && "bg-primary/5",
+                      "flex size-10 shrink-0 items-center justify-center rounded-xl border border-border/60 bg-foreground/[0.06] text-foreground transition-colors group-hover:border-primary/30 group-hover:bg-primary/10",
+                      item.featured && "border-primary/20 bg-primary/10",
                     )}
                   >
-                    <item.icon className="size-[18px]" strokeWidth={1.65} />
+                    <item.icon className="size-[18px] text-foreground/90" strokeWidth={1.65} />
                   </span>
                 </div>
                 <span className="mt-3 inline-flex items-center gap-1 text-[12px] font-medium text-primary">

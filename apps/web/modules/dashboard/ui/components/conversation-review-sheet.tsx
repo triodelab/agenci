@@ -97,10 +97,10 @@ export function ConversationReviewSheet({
   return (
     <Sheet onOpenChange={handleOpenChange} open={open}>
       <SheetContent
-        className="flex w-full flex-col gap-0 overflow-hidden border-border/60 p-0 sm:max-w-xl"
+        className="dashboard-app-shell flex w-full flex-col gap-0 overflow-hidden border-border/60 bg-background p-0 sm:max-w-xl"
         side="right"
       >
-        <SheetHeader className="border-border/60 border-b bg-card/50 px-6 py-5 text-left">
+        <SheetHeader className="border-border/60 border-b bg-background px-6 py-5 text-left">
           <SheetTitle className="text-[18px] font-semibold tracking-tight">
             Review
           </SheetTitle>
@@ -115,7 +115,7 @@ export function ConversationReviewSheet({
             <p className="text-[10px] font-semibold tracking-[0.12em] text-muted-foreground uppercase">
               Generelt
             </p>
-            <div className="grid gap-2 rounded-xl border border-border/60 bg-muted/20 px-4 py-3 text-[13px]">
+            <div className="grid gap-2 rounded-xl border border-border/60 bg-card px-4 py-3 text-[13px]">
               {payload?.contactName ? (
                 <div className="flex justify-between gap-4">
                   <span className="text-muted-foreground">Kontakt</span>
@@ -161,7 +161,7 @@ export function ConversationReviewSheet({
                 Brukermelding
               </Label>
               <Textarea
-                className="min-h-[80px] resize-none rounded-xl border-border/70 bg-muted/25 text-[13px] leading-relaxed"
+                className="min-h-[80px] resize-none rounded-xl border-border/70 bg-muted/30 text-[13px] leading-relaxed"
                 readOnly
                 value={payload?.userMessage ?? ""}
               />
@@ -171,7 +171,7 @@ export function ConversationReviewSheet({
                 Assistentens svar (nå)
               </Label>
               <Textarea
-                className="min-h-[120px] resize-none rounded-xl border-border/70 bg-muted/25 text-[13px] leading-relaxed"
+                className="min-h-[120px] resize-none rounded-xl border-border/70 bg-muted/30 text-[13px] leading-relaxed"
                 readOnly
                 value={payload?.assistantMessage ?? ""}
               />
@@ -184,7 +184,7 @@ export function ConversationReviewSheet({
                 Forventet svar
               </Label>
               <Textarea
-                className="min-h-[160px] resize-y rounded-xl border-border/80 text-[13px] leading-relaxed"
+                className="min-h-[160px] resize-y rounded-xl border-border/80 bg-background text-[13px] leading-relaxed"
                 id="expected-review"
                 onChange={(e) => setExpected(e.target.value)}
                 placeholder="Skriv det korrekte / ønskede svaret her…"
@@ -194,7 +194,7 @@ export function ConversationReviewSheet({
           </section>
         </div>
 
-        <div className="flex shrink-0 gap-3 border-border/60 border-t bg-card px-6 py-4">
+        <div className="flex shrink-0 gap-3 border-border/60 border-t bg-background px-6 py-4">
           <Button
             className="flex-1 rounded-xl"
             onClick={() => handleOpenChange(false)}
@@ -204,10 +204,11 @@ export function ConversationReviewSheet({
             Avbryt
           </Button>
           <Button
-            className="flex-1 rounded-xl bg-foreground font-medium text-background hover:bg-foreground/90"
+            className="flex-1 rounded-xl font-medium"
             disabled={saving || !expected.trim() || !payload}
             onClick={() => void handleSubmit()}
             type="button"
+            variant="default"
           >
             {saving ? "Lagrer…" : "Oppdater svar"}
           </Button>

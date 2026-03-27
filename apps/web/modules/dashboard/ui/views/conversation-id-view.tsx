@@ -212,9 +212,9 @@ export const ConversationIdView = ({
   };
 
   return (
-    <div className="flex h-full min-h-0 flex-col bg-background">
+    <div className="flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden bg-background">
       <Tabs
-        className="flex min-h-0 flex-1 flex-col"
+        className="flex min-h-0 min-w-0 flex-1 flex-col gap-0 overflow-hidden"
         onValueChange={(v) => setPlaygroundTab(v as "chat" | "details")}
         value={playgroundTab}
       >
@@ -268,23 +268,24 @@ export const ConversationIdView = ({
             </div>
           </div>
         </header>
-        <div className="flex min-h-0 flex-1 flex-col lg:flex-row lg:overflow-hidden">
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden lg:flex-row">
           <div
             className={cn(
-              "flex min-h-0 min-w-0 flex-1 flex-col",
-              playgroundTab === "chat" ? "flex" : "hidden lg:flex",
+              "grid min-h-0 min-w-0 flex-1 grid-rows-[minmax(0,1fr)_auto] overflow-hidden",
+              playgroundTab === "chat" ? "grid" : "hidden lg:grid",
             )}
           >
-            <AIConversation className="dash-conversations-canvas min-h-0 flex-1">
-            <AIConversationContent className="px-0 py-0">
-              <div className="mx-auto w-full max-w-[min(100%,40rem)] px-4 py-5 sm:px-6">
-                <InfiniteScrollTrigger
-                  canLoadMore={canLoadMore}
-                  isLoadingMore={isLoadingMore}
-                  onLoadMore={handleLoadMore}
-                  ref={topElementRef}
-                />
-                <div className="flex flex-col gap-4">
+            <div className="flex min-h-0 min-w-0 flex-col overflow-hidden">
+              <AIConversation className="dash-conversations-canvas min-h-0 min-w-0 flex-1">
+                <AIConversationContent className="px-0 py-0">
+                  <div className="mx-auto w-full max-w-[min(100%,40rem)] px-4 py-5 sm:px-6">
+                    <InfiniteScrollTrigger
+                      canLoadMore={canLoadMore}
+                      isLoadingMore={isLoadingMore}
+                      onLoadMore={handleLoadMore}
+                      ref={topElementRef}
+                    />
+                    <div className="flex flex-col gap-4">
                   {uiMessages.map((message, index) => {
                     const content =
                       typeof message.content === "string"
@@ -336,14 +337,15 @@ export const ConversationIdView = ({
                       </div>
                     );
                   })}
-                </div>
-              </div>
-            </AIConversationContent>
-            <AIConversationScrollButton />
-          </AIConversation>
+                    </div>
+                  </div>
+                </AIConversationContent>
+                <AIConversationScrollButton />
+              </AIConversation>
+            </div>
 
-          <div className="shrink-0 border-border/60 border-t bg-card/80 px-4 py-3 backdrop-blur-sm dark:bg-card/40">
-            <Form {...form}>
+            <div className="shrink-0 border-border/60 border-t bg-background px-4 py-3">
+              <Form {...form}>
               <AIInput
                 className="mx-auto w-full max-w-[min(100%,40rem)] rounded-xl border border-border/70 bg-card p-2 shadow-sm"
                 onSubmit={form.handleSubmit(onSubmit)}
@@ -402,8 +404,8 @@ export const ConversationIdView = ({
                   />
                 </AIInputToolbar>
               </AIInput>
-            </Form>
-          </div>
+              </Form>
+            </div>
           </div>
 
           <div
@@ -428,7 +430,7 @@ export const ConversationIdView = ({
 
 export const ConversationIdViewLoading = () => {
   return (
-    <div className="flex h-full min-h-0 flex-col bg-background">
+    <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-background">
       <header className="flex shrink-0 items-center gap-4 border-border/60 border-b bg-card/90 px-4 py-3">
         <Skeleton className="size-10 shrink-0 rounded-full" />
         <div className="space-y-2">

@@ -15,7 +15,7 @@ export function DashboardMainArea({ children }: { children: React.ReactNode }) {
   return (
     <main
       className={cn(
-        "app-dashboard-main flex min-h-0 min-h-svh min-w-0 flex-1 flex-col overflow-hidden border-border/60 border-l md:min-h-0",
+        "app-dashboard-main flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden border-border/60 border-l",
         !overviewPlain && "app-dashboard-canvas",
       )}
     >

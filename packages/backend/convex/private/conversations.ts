@@ -93,12 +93,18 @@ export const getOne = query({
 export const getMany = query({
   args: {
     paginationOpts: paginationOptsValidator,
+    /**
+     * inbox = uavklart + eskalert (alt som ikke er løst). Standard i UI.
+     * all = alle statuser. Ellers én konkret status.
+     */
     status: v.optional(
       v.union(
+        v.literal("inbox"),
+        v.literal("all"),
         v.literal("unresolved"),
         v.literal("escalated"),
-        v.literal("resolved")
-      )
+        v.literal("resolved"),
+      ),
     ),
   },
   handler: async (ctx, args) => {
@@ -112,27 +118,31 @@ export const getMany = query({
       };
     }
 
+    const mode = args.status ?? "inbox";
+
     let conversations: PaginationResult<Doc<"conversations">>;
 
-    if (args.status) {
-      conversations = await ctx.db
-        .query("conversations")
-        .withIndex("by_status_and_organization_id", (q) => 
-          q
-            .eq(
-              "status",
-              args.status as Doc<"conversations">["status"],
-            )
-            .eq("organizationId", orgId)
-        )
-        .order("desc")
-        .paginate(args.paginationOpts)
-    } else {
+    if (mode === "all") {
       conversations = await ctx.db
         .query("conversations")
         .withIndex("by_organization_id", (q) => q.eq("organizationId", orgId))
         .order("desc")
-        .paginate(args.paginationOpts)
+        .paginate(args.paginationOpts);
+    } else if (mode === "inbox") {
+      conversations = await ctx.db
+        .query("conversations")
+        .withIndex("by_organization_id", (q) => q.eq("organizationId", orgId))
+        .filter((q) => q.neq(q.field("status"), "resolved"))
+        .order("desc")
+        .paginate(args.paginationOpts);
+    } else {
+      conversations = await ctx.db
+        .query("conversations")
+        .withIndex("by_status_and_organization_id", (q) =>
+          q.eq("status", mode).eq("organizationId", orgId),
+        )
+        .order("desc")
+        .paginate(args.paginationOpts);
     }
 
     const conversationsWithAdditionalData = await Promise.all(

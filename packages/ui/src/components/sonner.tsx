@@ -3,22 +3,43 @@
 import { useTheme } from "next-themes"
 import { Toaster as Sonner, ToasterProps } from "sonner"
 
-const Toaster = ({ ...props }: ToasterProps) => {
-  const { theme = "system" } = useTheme()
+import { cn } from "@workspace/ui/lib/utils"
+
+const Toaster = ({
+  className,
+  toastOptions,
+  style,
+  ...props
+}: ToasterProps) => {
+  const { resolvedTheme } = useTheme()
+  const sonnerTheme: ToasterProps["theme"] =
+    resolvedTheme === "dark" ? "dark" : "light"
 
   return (
-    <Sonner
-      theme={theme as ToasterProps["theme"]}
-      className="toaster group"
-      style={
-        {
-          "--normal-bg": "var(--popover)",
-          "--normal-text": "var(--popover-foreground)",
-          "--normal-border": "var(--border)",
-        } as React.CSSProperties
-      }
-      {...props}
-    />
+    <div className="dashboard-app-shell">
+      <Sonner
+        {...props}
+        className={cn("toaster group", className)}
+        style={
+          {
+            "--normal-bg": "var(--card)",
+            "--normal-text": "var(--card-foreground)",
+            "--normal-border": "var(--border)",
+            ...style,
+          } as React.CSSProperties
+        }
+        theme={sonnerTheme}
+        toastOptions={{
+          ...toastOptions,
+          classNames: {
+            toast:
+              "border-border bg-card text-card-foreground shadow-lg backdrop-blur-none",
+            description: "text-muted-foreground",
+            ...toastOptions?.classNames,
+          },
+        }}
+      />
+    </div>
   )
 }
 

@@ -231,7 +231,7 @@ export const CustomizationForm = ({
           ) : null}
         </div>
 
-        <div className="sticky bottom-0 z-10 border-border/60 border-t bg-card/95 px-8 py-4 backdrop-blur-md supports-[backdrop-filter]:bg-card/80">
+        <div className="sticky bottom-0 z-10 border-border/60 border-t bg-background px-8 py-4">
           <div className="flex flex-col items-stretch justify-between gap-3 sm:flex-row sm:items-center">
             <p className="text-[12px] text-muted-foreground">
               {form.formState.isDirty ? (

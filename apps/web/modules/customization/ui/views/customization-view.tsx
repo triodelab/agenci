@@ -30,7 +30,7 @@ function NavRow({
         "flex w-full items-center gap-3 rounded-[10px] px-2.5 py-2 text-left text-[13px] font-medium transition-colors duration-150",
         active
           ? "border-l-[3px] border-l-foreground bg-[var(--dash-nav-active-bg)] pl-[calc(0.625rem-3px)] text-foreground"
-          : "text-foreground/88 hover:bg-muted/60 hover:text-foreground",
+          : "text-foreground/88 hover:bg-accent hover:text-foreground",
       )}
       onClick={onClick}
       type="button"
@@ -54,7 +54,7 @@ function NavGlyph({
       className={cn(
         "flex size-8 shrink-0 items-center justify-center rounded-[7px] border text-muted-foreground",
         active
-          ? "border-foreground/15 bg-muted/70 text-foreground"
+          ? "border-foreground/20 bg-[var(--dash-nav-active-bg)] text-foreground"
           : "border-border/50 bg-[var(--dash-knowledge-folder)]",
         className,
       )}
@@ -191,7 +191,7 @@ export const CustomizationView = () => {
       <div className="dash-subpane-main flex min-h-0 min-w-0 flex-1 flex-col">
         <header
           className={cn(
-            "shrink-0 border-border/60 border-b bg-card/40 backdrop-blur-sm dark:bg-card/25",
+            "shrink-0 border-border/60 border-b bg-background",
             section === "appearance" ? "px-6 py-4" : "px-8 py-6",
           )}
         >

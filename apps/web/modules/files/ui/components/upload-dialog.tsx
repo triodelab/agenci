@@ -113,12 +113,12 @@ export const UploadDialog = ({
     <Dialog onOpenChange={onOpenChange} open={open}>
       <DialogContent
         className={cn(
-          "dash-modal-dot-bg gap-0 overflow-hidden rounded-2xl border border-border p-0 shadow-2xl",
+          "dashboard-app-shell dash-modal-dot-bg gap-0 overflow-hidden rounded-2xl border border-border bg-card p-0 shadow-2xl",
           "w-[min(100vw-1.5rem,48rem)] max-w-none sm:w-[min(100vw-2rem,48rem)]",
         )}
         showCloseButton={false}
       >
-        <DialogHeader className="flex flex-row items-start gap-4 border-border border-b bg-card/90 px-6 pt-6 pb-5 text-left backdrop-blur-sm dark:bg-card/80 sm:gap-5">
+        <DialogHeader className="flex flex-row items-start gap-4 border-border border-b bg-card px-6 pt-6 pb-5 text-left sm:gap-5">
           <div className="min-w-0 flex-1 space-y-2">
             <DialogTitle className="font-semibold text-xl text-foreground tracking-tight">
               Upload Document
@@ -130,7 +130,7 @@ export const UploadDialog = ({
           </div>
           <DialogClose
             className={cn(
-              "mt-0.5 inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-border bg-card/90 opacity-100 shadow-sm transition-colors",
+              "mt-0.5 inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-border bg-muted/40 opacity-100 shadow-sm transition-colors",
               "hover:bg-muted",
               "focus-visible:ring-2 focus-visible:ring-foreground/15 focus-visible:ring-offset-0 focus-visible:outline-none",
             )}
@@ -200,9 +200,9 @@ export const UploadDialog = ({
                 "text/plain": [".txt"],
               }}
               className={cn(
-                "min-h-[14rem] rounded-xl border border-dashed border-border/80 bg-card/85 p-10 shadow-sm",
-                "text-foreground backdrop-blur-[1px] dark:bg-card/50",
-                "hover:border-foreground/25 hover:bg-card",
+                "min-h-[14rem] rounded-xl border border-dashed border-border/80 bg-muted/25 p-10 shadow-sm",
+                "text-foreground",
+                "hover:border-foreground/25 hover:bg-muted/35",
                 "focus-visible:border-foreground/30 focus-visible:ring-2 focus-visible:ring-foreground/10 focus-visible:ring-offset-0",
               )}
               disabled={isUploading}
@@ -244,7 +244,7 @@ export const UploadDialog = ({
           </div>
         </div>
 
-        <DialogFooter className="gap-3 border-border border-t bg-card/90 px-6 py-5 backdrop-blur-sm dark:bg-card/80 sm:justify-end sm:px-8">
+        <DialogFooter className="gap-3 border-border border-t bg-card px-6 py-5 sm:justify-end sm:px-8">
           <Button
             className="h-11 min-w-[6.5rem] rounded-xl"
             disabled={isUploading}
@@ -255,12 +255,13 @@ export const UploadDialog = ({
             Cancel
           </Button>
           <Button
-            className="h-11 min-w-[7.5rem] rounded-xl bg-foreground text-background hover:bg-foreground/90"
+            className="h-11 min-w-[7.5rem] rounded-xl font-medium"
             disabled={
               uploadedFiles.length === 0 || isUploading || !uploadForm.category
             }
             onClick={handleUpload}
             type="button"
+            variant="default"
           >
             {isUploading ? "Uploading…" : "Upload"}
           </Button>
