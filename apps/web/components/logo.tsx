@@ -53,3 +53,44 @@ export const LogoStroke = ({ className }: { className?: string }) => {
     />
   );
 };
+
+/**
+ * Én linje: venstre del av `AgenciLogo.png` (ikon / «A») + «genci».
+ * PNG er ofte hele ordmerket — smal `overflow-hidden` viser kun venstre del så vi ikke får dobbel «A».
+ * `surface`: mørk flate → lys glyf; lys flate → mørk glyf.
+ */
+export function AgenciNavWordmark({
+  className,
+  surface,
+}: {
+  className?: string;
+  surface: "dark" | "light";
+}) {
+  return (
+    <span
+      className={cn(
+        "inline-flex select-none items-center gap-0 whitespace-nowrap text-[17px] font-semibold leading-none tracking-[-0.03em]",
+        className,
+      )}
+      aria-hidden
+    >
+      {/* Avklippet venstre del av PNG (hele filen er ofte ordmerket) — smal boks = kun ikon/A */}
+      <span className="relative inline-flex h-[1.1em] w-[0.96em] shrink-0 overflow-hidden">
+        <Image
+          alt=""
+          src={AGENCI_LOGO_SRC}
+          width={640}
+          height={160}
+          className={cn(
+            "block h-[1.1em] w-auto max-w-none object-left object-contain",
+            surface === "dark"
+              ? "brightness-0 invert"
+              : "brightness-0 contrast-[1.05]",
+          )}
+          priority
+        />
+      </span>
+      <span className="-ml-[0.07em] pl-0">genci</span>
+    </span>
+  );
+}

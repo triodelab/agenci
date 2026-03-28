@@ -40,7 +40,7 @@ export const WidgetSelectionScreen = () => {
   const handleNewConversation = async () => {
     if (!organizationId) {
       setScreen("error");
-      setErrorMessage("Missing Organization ID");
+      setErrorMessage("Organisasjons-ID mangler");
       return;
     }
     
@@ -73,10 +73,10 @@ export const WidgetSelectionScreen = () => {
             {widgetTitle}
           </p>
           <p className="text-3xl">
-            Hi there! 👋
+            Hei! 👋
           </p>
           <p className="text-lg">
-            Let&apos;s get you started
+            La oss komme i gang
           </p>
         </div>
       </WidgetHeader>
@@ -89,7 +89,7 @@ export const WidgetSelectionScreen = () => {
         >
           <div className="flex items-center gap-x-2">
             <MessageSquareTextIcon className="size-4" />
-            <span>Start chat</span>
+            <span>Start samtale</span>
           </div>
           <ChevronRightIcon />
         </Button>
@@ -102,7 +102,7 @@ export const WidgetSelectionScreen = () => {
           >
             <div className="flex items-center gap-x-2">
               <MicIcon className="size-4" />
-              <span>Start voice call</span>
+              <span>Start talesamtale</span>
             </div>
             <ChevronRightIcon />
           </Button>
@@ -116,7 +116,7 @@ export const WidgetSelectionScreen = () => {
           >
             <div className="flex items-center gap-x-2">
               <PhoneIcon className="size-4" />
-              <span>Call us</span>
+              <span>Ring oss</span>
             </div>
             <ChevronRightIcon />
           </Button>

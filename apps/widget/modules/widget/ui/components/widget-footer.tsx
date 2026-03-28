@@ -17,7 +17,10 @@ export const WidgetFooter = () => {
         variant="ghost"
       >
         <HomeIcon
-          className={cn("size-5", screen === "selection" && "text-primary")}
+          className={cn(
+            "size-5 text-muted-foreground",
+            screen === "selection" && "text-[var(--widget-header-bg)]",
+          )}
         />
       </Button>
       <Button
@@ -27,7 +30,10 @@ export const WidgetFooter = () => {
         variant="ghost"
       >
         <InboxIcon
-          className={cn("size-5", screen === "inbox" && "text-primary")}
+          className={cn(
+            "size-5 text-muted-foreground",
+            screen === "inbox" && "text-[var(--widget-header-bg)]",
+          )}
         />
       </Button>
     </footer>

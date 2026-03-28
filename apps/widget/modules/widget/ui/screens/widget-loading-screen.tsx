@@ -58,15 +58,15 @@ export const WidgetLoadingScreen = ({ organizationId }: { organizationId: string
       return;
     }
 
-    setLoadingMessage("Finding organization ID...");
+    setLoadingMessage("Finner organisasjon…");
 
     if (!organizationId) {
-      setErrorMessage("Organization ID is required");
+      setErrorMessage("Organisasjons-ID er påkrevd");
       setScreen("error");
       return;
     }
 
-    setLoadingMessage("Verifying organization...");
+    setLoadingMessage("Verifiserer organisasjon…");
 
     validateOrganization({ organizationId })
       .then((result) => {
@@ -74,12 +74,12 @@ export const WidgetLoadingScreen = ({ organizationId }: { organizationId: string
           setOrganizationId(organizationId);
           setStep("session");
         } else {
-          setErrorMessage(result.reason || "Invalid configuration");
+          setErrorMessage(result.reason || "Ugyldig konfigurasjon");
           setScreen("error");
         }
       })
       .catch(() => {
-        setErrorMessage("Unable to verify organization");
+        setErrorMessage("Kunne ikke verifisere organisasjonen");
         setScreen("error");
       })
   }, [
@@ -100,7 +100,7 @@ export const WidgetLoadingScreen = ({ organizationId }: { organizationId: string
       return;
     }
 
-    setLoadingMessage("Finding contact session ID...");
+    setLoadingMessage("Finner kontaktsesjon…");
 
     if (!contactSessionId) {
       setSessionValid(false);
@@ -108,7 +108,7 @@ export const WidgetLoadingScreen = ({ organizationId }: { organizationId: string
       return;
     }
 
-    setLoadingMessage("Validating session...");
+    setLoadingMessage("Validerer økt…");
 
     validateContactSession({ contactSessionId })
       .then((result) => {
@@ -132,7 +132,7 @@ export const WidgetLoadingScreen = ({ organizationId }: { organizationId: string
       return;
     }
 
-    setLoadingMessage("Loading widget settings...");
+    setLoadingMessage("Laster widget-innstillinger…");
 
     if (widgetSettings !== undefined) {
       setWidgetSettings(widgetSettings);
@@ -154,12 +154,12 @@ export const WidgetLoadingScreen = ({ organizationId }: { organizationId: string
     }
 
     if (!organizationId) {
-      setErrorMessage("Organization ID is required");
+      setErrorMessage("Organisasjons-ID er påkrevd");
       setScreen("error");
       return;
     }
 
-    setLoadingMessage("Loading voice features...");
+    setLoadingMessage("Laster stemme-funksjoner…");
     getVapiSecrets({ organizationId })
       .then((secrets) => {
         setVapiSecrets(secrets);
@@ -267,17 +267,17 @@ export const WidgetLoadingScreen = ({ organizationId }: { organizationId: string
             {widgetTitle}
           </p>
           <p className="text-3xl">
-            Hi there! 👋
+            Hei! 👋
           </p>
           <p className="text-lg">
-            Let&apos;s get you started
+            La oss komme i gang
           </p>
         </div>
       </WidgetHeader>
       <div className="flex flex-1 flex-col items-center justify-center gap-y-4 p-4 text-muted-foreground">
         <LoaderIcon className="animate-spin" />
         <p className="text-sm">
-         {loadingMessage || "Loading..."}
+         {loadingMessage || "Laster…"}
         </p>
       </div>
     </>

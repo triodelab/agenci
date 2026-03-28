@@ -25,8 +25,8 @@ import {
 } from "../../atoms/widget-atoms";
 
 const formSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  email: z.string().email("Invalid email address"),
+  name: z.string().min(1, "Navn er påkrevd"),
+  email: z.string().email("Ugyldig e-postadresse"),
 });
 
 export const WidgetAuthScreen = () => {
@@ -108,10 +108,10 @@ export const WidgetAuthScreen = () => {
             {widgetTitle}
           </p>
           <p className="text-3xl">
-            Hi there! 👋
+            Hei! 👋
           </p>
           <p className="text-lg">
-            Let&apos;s get you started
+            La oss komme i gang
           </p>
         </div>
       </WidgetHeader>
@@ -128,7 +128,7 @@ export const WidgetAuthScreen = () => {
                 <FormControl>
                   <Input
                     className="h-10 bg-background"
-                    placeholder="e.g. John Doe"
+                    placeholder="f.eks. Ola Nordmann"
                     type="text"
                     {...field}
                   />
@@ -145,7 +145,7 @@ export const WidgetAuthScreen = () => {
                 <FormControl>
                   <Input
                     className="h-10 bg-background"
-                    placeholder="e.g. john.doe@example.com"
+                    placeholder="f.eks. ola@eksempel.no"
                     type="email"
                     {...field}
                   />
@@ -159,7 +159,7 @@ export const WidgetAuthScreen = () => {
             size="lg"
             type="submit"
           >
-            Continue
+            Fortsett
           </Button>
         </form>
       </Form>

@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { MarketingPageLayout } from "@/modules/landing/ui/components/marketing-page-layout";
+import { MarketingSubpageCta } from "@/modules/landing/ui/components/marketing-subpage-cta";
 import { Button } from "@workspace/ui/components/button";
-import { LANDING_AUTH_PATHS } from "@/modules/landing/constants";
+import { LANDING_AUTH_PATHS, LANDING_MARKETING_EYEBROW_CLASS } from "@/modules/landing/constants";
+import { cn } from "@workspace/ui/lib/utils";
 import {
   BookOpen,
   Code2,
@@ -56,7 +58,7 @@ export default function ProduktPage() {
     <MarketingPageLayout>
       <article className="landing-section-mesh border-b border-border/40">
         <div className="mx-auto max-w-3xl px-4 py-14 md:py-20 md:px-6">
-          <p className="text-sm font-medium text-primary">Produkt</p>
+          <p className={cn("text-sm", LANDING_MARKETING_EYEBROW_CLASS)}>Produkt</p>
           <h1 className="mt-3 text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
             Alt dere trenger for AI-drevet kundeservice
           </h1>
@@ -65,10 +67,19 @@ export default function ProduktPage() {
             deres, og gir teamet full oversikt — uten at kunden merker friksjon.
           </p>
           <div className="mt-10 flex flex-wrap gap-3">
-            <Button asChild size="lg" className="rounded-2xl">
+            <Button
+              asChild
+              size="lg"
+              className="rounded-2xl bg-[#2DD4BF] font-semibold text-neutral-950 shadow-[0_14px_36px_-14px_rgba(45,212,191,0.35)] hover:bg-[#2DD4BF]/90"
+            >
               <Link href={LANDING_AUTH_PATHS.signUp}>Kom i gang</Link>
             </Button>
-            <Button asChild variant="outline" size="lg" className="rounded-2xl">
+            <Button
+              asChild
+              variant="outline"
+              size="lg"
+              className="rounded-2xl border-[#2DD4BF]/45 hover:bg-[#2DD4BF]/10"
+            >
               <Link href="/#product">Se oversikt på forsiden</Link>
             </Button>
           </div>
@@ -80,7 +91,7 @@ export default function ProduktPage() {
                 key={title}
                 className="rounded-2xl border border-border/60 bg-card/60 p-6 shadow-sm backdrop-blur-sm dark:bg-card/40"
               >
-                <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <div className="flex size-10 items-center justify-center rounded-xl bg-[#2DD4BF]/12 text-[#0f766e]">
                   <Icon className="size-5" strokeWidth={2} />
                 </div>
                 <h2 className="mt-4 text-lg font-semibold text-foreground">{title}</h2>
@@ -89,6 +100,7 @@ export default function ProduktPage() {
             ))}
           </ul>
         </div>
+        <MarketingSubpageCta />
       </article>
     </MarketingPageLayout>
   );

@@ -44,7 +44,7 @@ import { useMemo, useState } from "react";
 import { cn } from "@workspace/ui/lib/utils";
 
 const formSchema = z.object({
-  message: z.string().min(1, "Message is required"),
+  message: z.string().min(1, "Skriv en melding"),
 });
 
 export const WidgetChatScreen = () => {
@@ -287,7 +287,13 @@ export const WidgetChatScreen = () => {
           <AIInputToolbar className="shrink-0 border-0 p-0">
             <AIInputTools />
             <AIInputSubmit
-              className="size-10 shrink-0 rounded-xl"
+              className={cn(
+                "size-10 shrink-0 rounded-xl border-0 shadow-sm",
+                "!bg-[var(--widget-header-bg)] !text-[var(--widget-header-text)]",
+                "hover:!bg-[var(--widget-header-bg)] hover:opacity-90",
+                "focus-visible:ring-2 focus-visible:ring-[var(--widget-header-text)]/25",
+                "[&_svg]:text-[var(--widget-header-text)]",
+              )}
               disabled={
                 conversation?.status === "resolved" ||
                 !form.formState.isValid ||

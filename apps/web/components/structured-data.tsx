@@ -1,4 +1,5 @@
 import { AGENCI_LOGO_SRC } from "@/components/logo";
+import { getSiteUrl } from "@/lib/site-url";
 
 /** Sikker serialisering i <script type="application/ld+json"> (unngår `</script>` i strenger som bryter HTML). */
 function jsonLdStringify(value: unknown) {
@@ -9,7 +10,7 @@ function jsonLdStringify(value: unknown) {
 }
 
 export function StructuredData() {
-  const base = process.env.NEXT_PUBLIC_APP_URL ?? "https://agenci.no";
+  const base = getSiteUrl();
 
   const structuredData = {
     "@context": "https://schema.org",

@@ -240,7 +240,7 @@ function FilesViewInner() {
       />
 
       <div className="flex h-full min-h-0 w-full flex-1 bg-transparent">
-        {/* Midtkolonne — dataset / kilder (Lemni) */}
+        {/* Midtkolonne — dataset / kilder */}
         <aside className="dash-subpane-rail flex w-[288px] shrink-0 flex-col">
           <header className="border-border/60 border-b px-5 pb-4 pt-6">
             <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">

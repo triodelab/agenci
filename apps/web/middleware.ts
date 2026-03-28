@@ -8,12 +8,26 @@ const isPublicRoute = createRouteMatcher([
   "/produkt",
   "/integrasjoner",
   "/hvordan-det-virker",
+  "/personvern",
+  "/vilkar",
+  "/kontakt",
+  "/sitemap.xml",
+  "/robots.txt",
+  "/api/contact",
+  "/api/newsletter",
 ]);
 
+/** Markedsføring + kontakt — innloggede brukere uten org skal fortsatt kunne besøke */
 const isOrgFreeRoute = createRouteMatcher([
   "/sign-in(.*)",
   "/sign-up(.*)",
-  "/org-selection(.*)"
+  "/org-selection(.*)",
+  "/produkt",
+  "/integrasjoner",
+  "/hvordan-det-virker",
+  "/personvern",
+  "/vilkar",
+  "/kontakt",
 ]);
 
 export default clerkMiddleware(async (auth, req) => {

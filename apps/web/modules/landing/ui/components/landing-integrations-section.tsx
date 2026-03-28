@@ -1,139 +1,86 @@
 "use client";
 
-import { LANDING_SECTION_IDS } from "@/modules/landing/constants";
-import {
-  Gemini,
-  Replit,
-  MagicUI,
-  VSCodium,
-  MediaWiki,
-  GooglePaLM,
-} from "@/components/logos";
-import { cn } from "@workspace/ui/lib/utils";
-import { Button } from "@workspace/ui/components/button";
-import Link from "next/link";
-import { InfiniteSlider } from "@/components/motion-primitives/infinite-slider";
-import { AuthAwareLink } from "@/components/auth-aware-link";
 import { motion, useReducedMotion } from "motion/react";
+import { LANDING_SECTION_IDS } from "@/modules/landing/constants";
+
+const tags = [
+  "CRM & kundelister",
+  "E-post",
+  "Nettbutikk",
+  "Hjelpdesk",
+  "Intern chat",
+  "Egne API-er",
+] as const;
 
 export function LandingIntegrationsSection() {
-  const reduced = useReducedMotion();
-  const integrationLogos = [
-    VSCodium,
-    MediaWiki,
-    GooglePaLM,
-    Gemini,
-    Replit,
-    MagicUI,
-    Gemini,
-    Replit,
-    VSCodium,
-    MediaWiki,
-  ];
+  const reduceMotion = useReducedMotion();
 
   return (
     <section
       id={LANDING_SECTION_IDS.integrations}
+      data-landing-nav-surface="dark"
+      className="relative scroll-mt-24 overflow-hidden bg-[#030306] py-24 md:py-32"
       aria-labelledby="integrations-heading"
     >
-      <div className="relative overflow-hidden bg-background py-24 md:py-36">
-        <div
-          aria-hidden
-          className="landing-section-mesh pointer-events-none absolute inset-0 -z-10 opacity-70"
-        />
-        <div className="relative mx-auto max-w-5xl px-6">
-          <motion.div
-            initial={reduced ? false : { opacity: 0, y: 24 }}
-            whileInView={reduced ? undefined : { opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.55, ease: "easeOut" }}
-            className="relative left-1/2 mt-2 w-screen -translate-x-1/2 px-4 sm:px-6"
-          >
-            <div className="relative mx-auto w-full max-w-[1400px] py-8 md:py-10">
-              <div className="pointer-events-none absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-gradient-to-r from-transparent via-border to-transparent" />
-              <div className="[mask-image:linear-gradient(to_right,transparent,black_12%,black_88%,transparent)]">
-                <InfiniteSlider gap={28} speed={22} speedOnHover={12}>
-                  {integrationLogos.map((Logo, idx) => (
-                    <IntegrationCard key={`${idx}-${Logo.name}`} className="size-14 md:size-16">
-                      <Logo />
-                    </IntegrationCard>
-                  ))}
-                </InfiniteSlider>
-              </div>
-            </div>
-          </motion.div>
+      {/* Rutenett — nesten usynlig, gir «kontrollrom»-følelse */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] [background-size:72px_72px] [mask-image:linear-gradient(180deg,black,transparent_92%)]"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_100%_70%_at_50%_-30%,rgba(45,212,191,0.09),transparent_55%)]"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute bottom-0 left-1/2 h-[min(55vh,480px)] w-[min(100vw,900px)] -translate-x-1/2 rounded-[100%] bg-[radial-gradient(circle_at_center,rgba(45,212,191,0.06),transparent_62%)] blur-[100px]"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute right-0 top-1/3 h-[320px] w-[320px] rounded-full bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.07),transparent_62%)] blur-3xl"
+      />
 
-          <motion.div
-            initial={reduced ? false : { opacity: 0, y: 20 }}
-            whileInView={reduced ? undefined : { opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.45, delay: 0.08 }}
-            className="mx-auto mt-14 max-w-3xl space-y-6 rounded-[2rem] border border-border/50 bg-card/80 p-10 text-center shadow-[0_24px_80px_-40px_rgba(15,23,42,0.2)] backdrop-blur-md dark:bg-card/50 dark:shadow-[0_24px_80px_-40px_rgba(0,0,0,0.45)] md:mt-16 md:p-12"
+      <div className="relative mx-auto max-w-6xl px-5 md:px-10 lg:px-12">
+        <motion.div
+          className="mx-auto max-w-3xl text-center"
+          initial={reduceMotion ? false : { opacity: 0, y: 20 }}
+          whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <p className="text-[11px] font-semibold uppercase tracking-[0.35em] text-teal-400/75 md:text-xs">
+            Integrasjoner
+          </p>
+          <h2
+            id="integrations-heading"
+            className="mt-8 text-balance text-[2rem] font-semibold leading-[1.08] tracking-[-0.045em] text-white sm:text-5xl md:text-[3.25rem] md:leading-[1.05]"
           >
-            <motion.h2
-              id="integrations-heading"
-              className="text-balance text-4xl font-semibold tracking-tight lg:text-[2.75rem]"
-              initial={reduced ? false : { opacity: 0, y: 12 }}
-              whileInView={reduced ? undefined : { opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: 0.12 }}
-            >
-              Integrasjoner som{" "}
-              <span className="bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent">
-                vokser med deg
+            <span className="block">Alt i samme</span>
+            <span className="mt-1 block bg-gradient-to-r from-white via-teal-100/90 to-teal-400/80 bg-clip-text text-transparent">
+              strøm
+            </span>
+          </h2>
+          <p className="mx-auto mt-8 max-w-xl text-pretty text-[15px] leading-relaxed text-zinc-400 md:text-lg md:leading-relaxed">
+            Verktøyene deres snakker sammen — ikke teamet. Én samtaleflate, data der folk faktisk jobber.
+          </p>
+        </motion.div>
+
+        <motion.ul
+          className="mx-auto mt-16 flex max-w-3xl flex-wrap justify-center gap-2.5 md:mt-20 md:gap-3"
+          initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+          whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-40px" }}
+          transition={{ duration: 0.5, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+        >
+          {tags.map((t) => (
+            <li key={t}>
+              <span className="inline-flex rounded-full border border-white/[0.09] bg-white/[0.04] px-4 py-2.5 text-[13px] font-medium text-zinc-200 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)] backdrop-blur-sm transition-[border-color,background-color] duration-300 hover:border-teal-400/25 hover:bg-white/[0.07] md:text-sm">
+                {t}
               </span>
-            </motion.h2>
-            <motion.p
-              className="text-balance text-base text-muted-foreground md:text-lg"
-              initial={reduced ? false : { opacity: 0, y: 12 }}
-              whileInView={reduced ? undefined : { opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: 0.18 }}
-            >
-              Koble Agenci til verktøyene dere bruker. API og webhooks er klar –
-              flere integrasjoner kommer snart.
-            </motion.p>
-
-            <motion.div
-              className="flex flex-col items-center justify-center gap-3 sm:flex-row"
-              initial={reduced ? false : { opacity: 0, y: 10 }}
-              whileInView={reduced ? undefined : { opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: 0.24 }}
-            >
-              <Button size="default" asChild className="rounded-xl shadow-md">
-                <AuthAwareLink>Kom i gang</AuthAwareLink>
-              </Button>
-              <Button variant="outline" size="default" asChild className="rounded-xl bg-background/80">
-                <Link href={`/#${LANDING_SECTION_IDS.contact}`}>Ta kontakt</Link>
-              </Button>
-            </motion.div>
-          </motion.div>
-        </div>
+            </li>
+          ))}
+        </motion.ul>
       </div>
     </section>
-  );
-}
-
-function IntegrationCard({
-  children,
-  className,
-  isCenter = false,
-}: {
-  children: React.ReactNode;
-  className?: string;
-  isCenter?: boolean;
-}) {
-  return (
-    <div
-      className={cn(
-        "relative z-20 flex size-12 shrink-0 items-center justify-center rounded-full border border-border/80 bg-background shadow-md ring-4 ring-background/80 transition-transform hover:scale-105",
-        className
-      )}
-    >
-      <div className={cn("size-fit *:size-5", isCenter && "*:size-8")}>
-        {children}
-      </div>
-    </div>
   );
 }

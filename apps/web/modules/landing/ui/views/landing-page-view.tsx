@@ -1,14 +1,17 @@
-import { LandingHeroSection } from "@/modules/landing/ui/components/landing-hero-section";
-import { LandingProductOverviewSection } from "@/modules/landing/ui/components/landing-product-overview-section";
-import { LandingHowItWorksSection } from "@/modules/landing/ui/components/landing-how-it-works-section";
-import { LandingUseCasesSection } from "@/modules/landing/ui/components/landing-use-cases-section";
-import { LandingPricingSection } from "@/modules/landing/ui/components/landing-pricing-section";
-import { LandingFaqSection } from "@/modules/landing/ui/components/landing-faq-section";
-import { LandingContactSection } from "@/modules/landing/ui/components/landing-contact-section";
-import { LandingFooter } from "@/modules/landing/ui/components/landing-footer";
 import { StructuredData } from "@/components/structured-data";
+import { LandingNav } from "@/modules/landing/ui/components/landing-nav";
+import { LandingContactSection } from "@/modules/landing/ui/components/landing-contact-section";
+import { LandingFaqSection } from "@/modules/landing/ui/components/landing-faq-section";
+import { LandingFinalCtaSection } from "@/modules/landing/ui/components/landing-final-cta-section";
+import { LandingHeroSection } from "@/modules/landing/ui/components/landing-hero-section";
+import { LandingIntegrationsSection } from "@/modules/landing/ui/components/landing-integrations-section";
+import { LandingPricingSection } from "@/modules/landing/ui/components/landing-pricing-section";
+import { LandingWorkflowSection } from "@/modules/landing/ui/components/landing-workflow-section";
+import { LandingFooter } from "@/modules/landing/ui/components/landing-footer";
 
-/** Forside: hero → produkt → hvordan → brukstilfeller → pris → FAQ → kontakt → footer */
+/**
+ * Forside — hero → verdier → integrasjoner → priser → FAQ → kontakt → CTA → footer.
+ */
 export function LandingPageView() {
   return (
     <>
@@ -20,19 +23,20 @@ export function LandingPageView() {
       >
         Hopp til hovedinnhold
       </a>
+      <LandingNav variant="auto" />
       <main
         id="main-content"
-        className="overflow-x-hidden font-sans antialiased [text-rendering:optimizeLegibility]"
+        className="min-h-svh bg-white font-sans antialiased [text-rendering:optimizeLegibility]"
       >
         <LandingHeroSection />
-        <LandingProductOverviewSection />
-        <LandingHowItWorksSection />
-        <LandingUseCasesSection />
+        <LandingWorkflowSection />
+        <LandingIntegrationsSection />
         <LandingPricingSection />
         <LandingFaqSection />
         <LandingContactSection />
-        <LandingFooter />
+        <LandingFinalCtaSection />
       </main>
+      <LandingFooter />
     </>
   );
 }

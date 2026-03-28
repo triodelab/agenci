@@ -1,101 +1,91 @@
 "use client";
 
-import { LANDING_SECTION_IDS } from "@/modules/landing/constants";
-import { LandingGradientText } from "@/modules/landing/ui/components/landing-gradient-text";
-import { LandingSectionHeader } from "@/modules/landing/ui/components/landing-section-header";
-import { cn } from "@workspace/ui/lib/utils";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@workspace/ui/components/accordion";
-import { motion, useReducedMotion } from "motion/react";
+import { LANDING_SECTION_IDS } from "@/modules/landing/constants";
+import { cn } from "@workspace/ui/lib/utils";
 
 const faqs = [
   {
-    q: "Hvor lang tid tar det å komme i gang?",
-    a: "De fleste er live på minutter: lim inn widget, koble til innhold, og sett enkle regler for hva Agenci skal svare på. Deretter finjusterer dere i dashboard.",
+    q: "Hvor raskt kan vi være live?",
+    a: "Mange team er oppe i løpet av dager, ikke uker. Oppsett av widget og grunnleggende svar kan gjøres steg for steg — vi hjelper dere å prioritere det som gir mest effekt først.",
   },
   {
-    q: "Kan samtalen overføres til et menneske?",
-    a: "Ja. Når saken krever det, eller kunden ber om det, kan teamet ta over — uten at historikken går tapt.",
+    q: "Hva skjer med data og personvern?",
+    a: "Dere beholder kontroll over kundedata i tråd med avtale og gjeldende regler. Vi bygger for tydelige roller, innsyn og sporbarhet slik at compliance-teamet kan jobbe trygt.",
   },
   {
-    q: "Hva kan Agenci faktisk svare på?",
-    a: "Typisk kundeservice: FAQ, produktinfo, levering, retur, booking og mer. Dere definerer policy og innhold; Agenci holder seg innenfor det.",
+    q: "Kan Agenci snakke med våre systemer?",
+    a: "Ja — koble til kilder dere allerede bruker (CRM, e-post, nettbutikk med mer). Målet er én samtaleflate uten at teamet må hoppe mellom faner.",
   },
   {
-    q: "Hvordan forholder dere dere til sikkerhet og GDPR?",
-    a: "Vi bygger for B2B med kontroll på data og innhold. Enterprise kan tilpasses avtaler og sikkerhetskrav der det trengs.",
+    q: "Hvordan håndterer dere eskalering til mennesker?",
+    a: "Når en henvendelse trenger menneskelig vurdering, kan den routes til riktig team eller kø med tydelig kontekst — så ingenting stopper opp i en svart boks.",
   },
   {
-    q: "Trenger vi utviklere for å vedlikeholde?",
-    a: "Daglig drift skjer i dashboard: oppdatere tekster, justere tone og se hva kundene spør om. Kodetrengs bare ved første install.",
+    q: "Finnes det bindingstid?",
+    a: "Avhengig av avtale. Snakk med oss om volum, SLA og eventuelle forpliktelser — vi legger opp løsningen sammen med dere.",
   },
 ] as const;
 
 export function LandingFaqSection() {
-  const reduced = useReducedMotion();
-
   return (
     <section
       id={LANDING_SECTION_IDS.faq}
+      data-landing-nav-surface="dark"
+      className="relative scroll-mt-24 overflow-hidden border-t border-white/[0.07] bg-[#050507] py-20 md:py-28"
       aria-labelledby="faq-heading"
-      className="relative scroll-mt-24 overflow-hidden border-b border-border/40 bg-background py-20 md:py-28"
     >
       <div
         aria-hidden
-        className="landing-section-mesh pointer-events-none absolute inset-0 -z-10 opacity-40"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_55%_at_50%_0%,rgba(45,212,191,0.06),transparent_58%)]"
       />
       <div
         aria-hidden
-        className="absolute inset-0 -z-10 bg-[radial-gradient(125%_125%_at_50%_0%,transparent_0%,var(--color-background)_78%)]"
+        className="pointer-events-none absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent"
       />
 
-      <div className="mx-auto max-w-6xl px-4 md:px-8">
-        <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:gap-16 lg:items-start">
-          <div className="lg:sticky lg:top-28">
-            <LandingSectionHeader
-              align="left"
-              eyebrow="FAQ"
-              titleId="faq-heading"
-              title={
-                <>
-                  Det dere lurer på — <LandingGradientText>kort fortalt</LandingGradientText>
-                </>
-              }
-              description="Finnes ikke svaret her? Send en melding, så hjelper vi dere videre."
-              className="max-w-md"
-            />
-          </div>
-
-          <motion.div
-            initial={reduced ? false : { opacity: 0, y: 16 }}
-            whileInView={reduced ? undefined : { opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-40px" }}
-            transition={{ duration: 0.4 }}
-            className="rounded-3xl border border-border/50 bg-card/70 p-2 shadow-[0_28px_90px_-48px_rgba(0,0,0,0.2)] backdrop-blur-sm dark:bg-card/40 dark:shadow-[0_28px_90px_-48px_rgba(0,0,0,0.45)] md:p-3"
+      <div className="relative mx-auto max-w-3xl px-5 md:px-10">
+        <div className="text-center">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-teal-400/70 md:text-xs">
+            FAQ
+          </p>
+          <h2
+            id="faq-heading"
+            className="mt-3 text-balance text-2xl font-semibold tracking-[-0.03em] text-white sm:text-3xl"
           >
-            <Accordion type="single" collapsible className="w-full">
-              {faqs.map((item) => (
-                <AccordionItem key={item.q} value={item.q} className="border-border/45 px-1">
-                  <AccordionTrigger
-                    className={cn(
-                      "rounded-xl px-4 py-4 text-left text-[15px] font-medium hover:no-underline md:px-5 md:py-5",
-                      "data-[state=open]:bg-muted/40",
-                    )}
-                  >
-                    {item.q}
-                  </AccordionTrigger>
-                  <AccordionContent className="px-4 pb-4 text-[15px] leading-relaxed text-muted-foreground md:px-5 md:pb-5">
-                    {item.a}
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
-          </motion.div>
+            Det dere ofte lurer på
+          </h2>
+          <p className="mt-4 text-[15px] leading-relaxed text-zinc-500 md:text-base">
+            Kort fortalt — ta kontakt om dere vil dykke dypere i deres use case.
+          </p>
         </div>
+
+        <Accordion type="single" collapsible className="mt-12 w-full" defaultValue="item-0">
+          {faqs.map((item, i) => (
+            <AccordionItem
+              key={item.q}
+              value={`item-${i}`}
+              className="border-white/[0.08] data-[state=open]:border-white/[0.12]"
+            >
+              <AccordionTrigger
+                className={cn(
+                  "py-5 text-left text-[15px] font-semibold leading-snug text-zinc-100 hover:no-underline md:text-base",
+                  "[&>svg]:text-zinc-500 [&[data-state=open]>svg]:text-teal-400/80",
+                )}
+              >
+                {item.q}
+              </AccordionTrigger>
+              <AccordionContent className="text-[15px] leading-relaxed text-zinc-400 md:text-base">
+                {item.a}
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
       </div>
     </section>
   );

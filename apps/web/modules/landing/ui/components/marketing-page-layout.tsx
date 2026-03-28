@@ -3,7 +3,7 @@
 import { LandingFooter } from "./landing-footer";
 import { LandingNav } from "./landing-nav";
 
-/** Offentlige undersider: samme nav/footer som forsiden */
+/** Offentlige undersider: lys toppnav + footer */
 export function MarketingPageLayout({
   children,
 }: {
@@ -11,8 +11,8 @@ export function MarketingPageLayout({
 }) {
   return (
     <>
-      <LandingNav />
-      <div className="min-h-[60vh] bg-[var(--hero-bg)] pt-[4.75rem] dark:bg-background md:pt-[5.25rem]">
+      <LandingNav variant="light" />
+      <div className="min-h-[60vh] bg-background pt-[4.25rem] md:pt-[4.5rem]">
         {children}
       </div>
       <LandingFooter />

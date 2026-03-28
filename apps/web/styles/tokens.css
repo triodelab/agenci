@@ -134,6 +134,7 @@
 }
 
 /* ─── Landing (delt visuelt språk) ─── */
+
 .landing-hero-mesh {
   background:
     radial-gradient(ellipse 100% 75% at 50% -35%, rgba(59, 130, 246, 0.12), transparent 58%),
@@ -146,6 +147,60 @@
     radial-gradient(ellipse 100% 75% at 50% -35%, rgba(59, 130, 246, 0.18), transparent 58%),
     radial-gradient(ellipse 55% 40% at 95% 15%, rgba(139, 92, 246, 0.12), transparent 52%),
     radial-gradient(ellipse 50% 38% at 5% 75%, rgba(14, 165, 233, 0.1), transparent 48%);
+}
+
+/* Cinematic hero — mørk, teal-forward (Agenci) */
+.landing-hero-cinematic-root {
+  --landing-cinematic-fg: oklch(0.98 0 0);
+  --landing-cinematic-muted: oklch(0.72 0.02 260);
+  background:
+    radial-gradient(ellipse 110% 85% at 15% 15%, rgba(20, 184, 166, 0.14), transparent 52%),
+    radial-gradient(ellipse 90% 70% at 85% 10%, rgba(6, 182, 212, 0.1), transparent 50%),
+    radial-gradient(ellipse 80% 55% at 50% 100%, rgba(16, 185, 129, 0.08), transparent 55%),
+    linear-gradient(180deg, #050508 0%, #080a0c 45%, #07080a 100%);
+  color: var(--landing-cinematic-fg);
+}
+
+.landing-hero-cinematic-mesh {
+  background:
+    radial-gradient(ellipse 100% 75% at 50% -25%, rgba(45, 212, 191, 0.12), transparent 58%),
+    radial-gradient(ellipse 55% 42% at 95% 20%, rgba(34, 211, 238, 0.08), transparent 52%),
+    radial-gradient(ellipse 50% 38% at 5% 75%, rgba(16, 185, 129, 0.09), transparent 50%);
+}
+
+/* Scene: lett 3D-fordypning (egen stil — ikke samme vinkel som referanser) */
+.landing-hero-scene-tilt {
+  transform-origin: 50% 65%;
+  transform: perspective(1280px) rotateX(11deg) rotateY(-5deg) scale(0.94);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-hero-scene-tilt {
+    transform: none;
+  }
+}
+
+/* Hero MP4 — kort-variant */
+.landing-hero-video-tilt {
+  transform: perspective(920px) rotateX(26deg) rotateY(-15deg) scale(1.16);
+  transform-style: preserve-3d;
+}
+
+/* Fullskjerm hero — sterkere tilt / dybde */
+.landing-hero-video-tilt-full {
+  transform: perspective(820px) rotateX(31deg) rotateY(-18deg) scale(1.22);
+  transform-origin: 50% 45%;
+  transform-style: preserve-3d;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-hero-video-tilt {
+    transform: none;
+  }
+
+  .landing-hero-video-tilt-full {
+    transform: none;
+  }
 }
 
 @keyframes landing-hero-widget-float {
@@ -178,6 +233,77 @@
   background:
     radial-gradient(ellipse 80% 50% at 50% -10%, rgba(99, 102, 241, 0.12), transparent 55%),
     radial-gradient(ellipse 45% 35% at 100% 100%, rgba(56, 189, 248, 0.08), transparent 60%);
+}
+
+/* Landing: dashboard-oversikt mock — 3D «kort som lander» */
+.landing-dashboard-overview-perspective {
+  perspective: 1400px;
+  perspective-origin: 50% 0%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-dashboard-overview-perspective {
+    perspective: none;
+  }
+}
+
+/* Landing hero — primær CTA med myk «halo» */
+@keyframes landing-cta-glow-breathe {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.04);
+  }
+}
+
+.landing-hero-cta-shell {
+  position: relative;
+  isolation: isolate;
+}
+
+.landing-hero-cta-shell::before {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  z-index: -1;
+  border-radius: inherit;
+  background: radial-gradient(
+    ellipse 85% 100% at 50% 50%,
+    color-mix(in oklab, var(--primary) 42%, transparent),
+    color-mix(in oklab, rgb(139 92 246) 22%, transparent) 45%,
+    transparent 72%
+  );
+  filter: blur(18px);
+  opacity: 0.65;
+  pointer-events: none;
+}
+
+.dark .landing-hero-cta-shell::before {
+  background: radial-gradient(
+    ellipse 85% 100% at 50% 50%,
+    rgba(139, 92, 246, 0.45),
+    rgba(59, 130, 246, 0.2) 48%,
+    transparent 72%
+  );
+  opacity: 0.55;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-hero-cta-shell::before {
+    animation: none;
+    opacity: 0.45;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .landing-hero-cta-shell::before {
+    animation: landing-cta-glow-breathe 4.2s ease-in-out infinite;
+  }
 }
 
 /**
