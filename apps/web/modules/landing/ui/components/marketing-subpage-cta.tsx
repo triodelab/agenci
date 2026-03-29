@@ -29,7 +29,7 @@ export function MarketingSubpageCta({ omitContactButton = false }: MarketingSubp
           </div>
           <div className="flex flex-shrink-0 flex-wrap gap-3">
             <Button asChild size="lg" className={accentBtn}>
-              <AuthAwareLink href={LANDING_AUTH_PATHS.signUp} loggedInHref={LANDING_AUTH_PATHS.appHome}>
+              <AuthAwareLink href={LANDING_AUTH_PATHS.signUp} loggedInHref={LANDING_AUTH_PATHS.marketingLoggedInCta}>
                 Kom i gang
               </AuthAwareLink>
             </Button>

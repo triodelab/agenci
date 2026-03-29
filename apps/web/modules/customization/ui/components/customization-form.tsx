@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { Button } from "@workspace/ui/components/button";
+import { DashboardAccentButton } from "@/modules/dashboard/ui/components/dashboard-accent";
 import {
   Form,
   FormControl,
@@ -240,13 +240,13 @@ export const CustomizationForm = ({
                 <span>Alle endringer er lagret</span>
               )}
             </p>
-            <Button
-              className="h-10 rounded-lg px-8 text-[13px] font-semibold sm:min-w-[160px]"
+            <DashboardAccentButton
+              className="h-10 px-8 text-[13px] sm:min-w-[160px]"
               disabled={form.formState.isSubmitting || !form.formState.isDirty}
               type="submit"
             >
               {form.formState.isSubmitting ? "Lagrer…" : "Lagre"}
-            </Button>
+            </DashboardAccentButton>
           </div>
         </div>
       </form>

@@ -4,7 +4,11 @@ import { MarketingPageLayout } from "@/modules/landing/ui/components/marketing-p
 import { MarketingSubpageCta } from "@/modules/landing/ui/components/marketing-subpage-cta";
 import { Button, buttonVariants } from "@workspace/ui/components/button";
 import { cn } from "@workspace/ui/lib/utils";
-import { LANDING_AUTH_PATHS, LANDING_MARKETING_EYEBROW_CLASS } from "@/modules/landing/constants";
+import {
+  LANDING_AUTH_PATHS,
+  LANDING_MARKETING_EYEBROW_CLASS,
+  landingSectionHref,
+} from "@/modules/landing/constants";
 import { AuthAwareLink } from "@/components/auth-aware-link";
 import { Plug, Webhook, Database, ArrowRight } from "lucide-react";
 
@@ -63,7 +67,9 @@ export default function IntegrasjonerMarketingPage() {
               size="lg"
               className="rounded-2xl border-[#2DD4BF]/45 hover:bg-[#2DD4BF]/10"
             >
-              <Link href="/#integrations">Se partnerlogoer på forsiden</Link>
+              <Link href={landingSectionHref("integrations")}>
+                Se partnerlogoer på forsiden
+              </Link>
             </Button>
           </div>
         </div>

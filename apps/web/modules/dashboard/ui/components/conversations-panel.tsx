@@ -264,9 +264,10 @@ export const ConversationsPanel = () => {
                 <Link
                   className={cn(
                     "block px-4 py-3 text-left transition-colors duration-150",
-                    "hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset",
-                    selected &&
-                      "border-l-[3px] border-l-foreground bg-background shadow-[inset_0_0_0_1px_rgba(0,0,0,0.04)] dark:shadow-none",
+                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset",
+                    selected
+                      ? "bg-primary text-primary-foreground shadow-sm hover:bg-primary/90"
+                      : "hover:bg-muted/40",
                   )}
                   href={`/conversations/${conversation._id}`}
                   key={conversation._id}
@@ -276,11 +277,25 @@ export const ConversationsPanel = () => {
                     <div className="min-w-0 flex-1">
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0 flex-1">
-                          <p className="truncate text-[14px] font-semibold leading-tight text-foreground">
+                          <p
+                            className={cn(
+                              "truncate text-[14px] font-semibold leading-tight",
+                              selected
+                                ? "text-primary-foreground"
+                                : "text-foreground",
+                            )}
+                          >
                             {displayName}
                           </p>
                           {conversation.contactSession.email ? (
-                            <p className="mt-0.5 truncate text-[11px] leading-snug text-muted-foreground">
+                            <p
+                              className={cn(
+                                "mt-0.5 truncate text-[11px] leading-snug",
+                                selected
+                                  ? "text-primary-foreground/75"
+                                  : "text-muted-foreground",
+                              )}
+                            >
                               {conversation.contactSession.email}
                             </p>
                           ) : null}
@@ -290,7 +305,12 @@ export const ConversationsPanel = () => {
                             status={conversation.status}
                           />
                           <span
-                            className="text-[11px] text-muted-foreground tabular-nums"
+                            className={cn(
+                              "text-[11px] tabular-nums",
+                              selected
+                                ? "text-primary-foreground/70"
+                                : "text-muted-foreground",
+                            )}
                             suppressHydrationWarning
                           >
                             {formatDistanceToNow(lastAt, {
@@ -299,8 +319,22 @@ export const ConversationsPanel = () => {
                           </span>
                         </div>
                       </div>
-                      <p className="text-muted-foreground mt-2 line-clamp-2 text-[12px] leading-snug">
-                        <span className="font-medium text-foreground/70">
+                      <p
+                        className={cn(
+                          "mt-2 line-clamp-2 text-[12px] leading-snug",
+                          selected
+                            ? "text-primary-foreground/80"
+                            : "text-muted-foreground",
+                        )}
+                      >
+                        <span
+                          className={cn(
+                            "font-medium",
+                            selected
+                              ? "text-primary-foreground"
+                              : "text-foreground/70",
+                          )}
+                        >
                           {previewLabel}:{" "}
                         </span>
                         {preview}

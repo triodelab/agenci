@@ -48,9 +48,11 @@ export default clerkMiddleware(async (auth, req) => {
     return NextResponse.redirect(orgSelection);
   }
 
-  // Logged-in users with an org should use the app shell at /dashboard, not the marketing page at /.
+  // Innlogget med org: vanlig besøk til / → dashboard. Unntak: eksplisitt lenke fra app (f.eks. sidefelt «Til forsiden»).
   if (userId && orgId && req.nextUrl.pathname === "/") {
-    return NextResponse.redirect(new URL("/dashboard", req.url));
+    if (req.nextUrl.searchParams.get("from") !== "marketing") {
+      return NextResponse.redirect(new URL("/dashboard", req.url));
+    }
   }
 });
 

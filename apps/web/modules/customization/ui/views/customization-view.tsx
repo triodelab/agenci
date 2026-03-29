@@ -29,8 +29,8 @@ function NavRow({
       className={cn(
         "flex w-full items-center gap-3 rounded-[10px] px-2.5 py-2 text-left text-[13px] font-medium transition-colors duration-150",
         active
-          ? "border-l-[3px] border-l-foreground bg-[var(--dash-nav-active-bg)] pl-[calc(0.625rem-3px)] text-foreground"
-          : "text-foreground/88 hover:bg-accent hover:text-foreground",
+          ? "bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 [&_svg]:text-primary-foreground"
+          : "text-foreground/88 hover:bg-muted/70 hover:text-foreground",
       )}
       onClick={onClick}
       type="button"
@@ -54,7 +54,7 @@ function NavGlyph({
       className={cn(
         "flex size-8 shrink-0 items-center justify-center rounded-[7px] border text-muted-foreground",
         active
-          ? "border-foreground/20 bg-[var(--dash-nav-active-bg)] text-foreground"
+          ? "border-primary-foreground/25 bg-primary-foreground/12 text-primary-foreground"
           : "border-border/50 bg-[var(--dash-knowledge-folder)]",
         className,
       )}

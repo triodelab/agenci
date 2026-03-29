@@ -25,7 +25,9 @@ export function LegacyCollapsibleSection({
       <Collapsible onOpenChange={onOpenChange} open={open}>
         <CollapsibleTrigger
           className={cn(
-            "flex w-full items-center justify-between px-4 py-3.5 text-left transition-colors hover:bg-foreground/[0.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset",
+            "flex w-full items-center justify-between px-4 py-3.5 text-left transition-colors",
+            "bg-muted/30 hover:bg-muted/45 dark:bg-muted/15 dark:hover:bg-muted/25",
+            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset",
           )}
         >
           <span className="text-[11px] font-semibold tracking-[0.14em] text-muted-foreground uppercase">

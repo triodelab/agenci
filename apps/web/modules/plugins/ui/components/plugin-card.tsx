@@ -1,7 +1,6 @@
 import { ArrowLeftRightIcon, type LucideIcon, PlugIcon } from "lucide-react";
 import Image from "next/image";
-import { Button } from "@workspace/ui/components/button";
-
+import { DashboardAccentButton } from "@/modules/dashboard/ui/components/dashboard-accent";
 import { AGENCI_LOGO_SRC } from "@/components/logo";
 
 export interface Feature {
@@ -82,7 +81,7 @@ export const PluginCard = ({
         <p className="text-[15px] font-medium leading-snug text-foreground">
           Koble til og aktiver stemme i widget og dashbord.
         </p>
-        <Button
+        <DashboardAccentButton
           className="mt-2 h-11 w-full rounded-xl font-medium"
           disabled={isDisabled}
           onClick={onSubmit}
@@ -90,7 +89,7 @@ export const PluginCard = ({
         >
           Connect
           <PlugIcon className="size-4" />
-        </Button>
+        </DashboardAccentButton>
       </div>
     </div>
   );

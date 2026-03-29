@@ -838,6 +838,7 @@
   }
 }
 
+/* Sidetittel — vertikal akzent (nøytral, matcher primær/sidebar) */
 .dash-page-header-accent::before {
   content: "";
   position: absolute;
@@ -846,11 +847,20 @@
   bottom: 1.75rem;
   width: 3px;
   border-radius: 2px;
-  background: var(--foreground);
+  background: linear-gradient(
+    180deg,
+    oklch(0.22 0 0) 0%,
+    oklch(0.32 0 0) 55%,
+    color-mix(in oklch, var(--foreground) 40%, var(--muted)) 100%
+  );
 }
 
 .dark .dash-page-header-accent::before {
-  background: var(--foreground);
+  background: linear-gradient(
+    180deg,
+    oklch(0.88 0 0) 0%,
+    oklch(0.72 0 0) 100%
+  );
 }
 
 .dash-resize-handle {

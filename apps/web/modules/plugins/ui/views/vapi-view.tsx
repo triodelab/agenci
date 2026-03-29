@@ -4,6 +4,7 @@ import {
   GlobeIcon,
   PhoneCallIcon,
   PhoneIcon,
+  PlugIcon,
   WorkflowIcon,
 } from "lucide-react";
 import { type Feature, PluginCard } from "../components/plugin-card";
@@ -23,15 +24,18 @@ import {
   FormControl,
   FormField,
   FormItem,
+  FormLabel,
   FormMessage,
 } from "@workspace/ui/components/form";
 import { Input } from "@workspace/ui/components/input";
-import { Label } from "@workspace/ui/components/label";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { Button } from "@workspace/ui/components/button";
+import {
+  DashboardAccentButton,
+} from "@/modules/dashboard/ui/components/dashboard-accent";
 import {
   DashboardPageHeader,
   DashboardPageShell,
@@ -62,9 +66,12 @@ const vapiFeatures: Feature[] = [
 ];
 
 const formSchema = z.object({
-  publicApiKey: z.string().min(1, { message: "Public API key is required" }),
-  privateApiKey: z.string().min(1, { message: "Private API key is required" }),
+  publicApiKey: z.string().min(1, { message: "Offentlig API-nøkkel er påkrevd" }),
+  privateApiKey: z.string().min(1, { message: "Privat API-nøkkel er påkrevd" }),
 });
+
+const vapiKeyInputClassName =
+  "h-10 rounded-lg border-border/70 bg-background text-[13px] shadow-sm [&:-webkit-autofill]:[-webkit-text-fill-color:var(--foreground)] [&:-webkit-autofill]:shadow-[inset_0_0_0_1000px_var(--background)]";
 
 const VapiPluginForm = ({
   open,
@@ -92,69 +99,90 @@ const VapiPluginForm = ({
         },
       });
       setOpen(false);
-      toast.success("Vapi secret created");
+      toast.success("Vapi er koblet til");
     } catch (error) {
       console.error(error);
-      toast.error("Something went wrong");
+      toast.error("Noe gikk galt");
     }
   };
 
   return (
     <Dialog onOpenChange={setOpen} open={open}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Enable Vapi</DialogTitle>
+      <DialogContent className="dashboard-app-shell gap-0 overflow-hidden rounded-2xl border border-border/80 bg-card p-0 text-card-foreground shadow-2xl sm:max-w-lg">
+        <DialogHeader className="border-border/60 border-b bg-muted/25 px-6 py-5 text-left">
+          <DialogTitle className="text-[17px] font-semibold tracking-tight">
+            Koble til Vapi
+          </DialogTitle>
+          <DialogDescription className="text-[13px] leading-relaxed">
+            API-nøkler krypteres og lagres trygt (AWS Secrets Manager).
+          </DialogDescription>
         </DialogHeader>
-        <DialogDescription>
-          Your API keys are safely encrypted and stored using AWS Secrets
-          Manager.
-        </DialogDescription>
         <Form {...form}>
           <form
-            className="flex flex-col gap-y-4"
+            autoComplete="off"
+            className="flex flex-col"
             onSubmit={form.handleSubmit(onSubmit)}
           >
-            <FormField
-              control={form.control}
-              name="publicApiKey"
-              render={({ field }) => (
-                <FormItem>
-                  <Label>Public API key</Label>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      placeholder="Your public API key"
-                      type="password"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="privateApiKey"
-              render={({ field }) => (
-                <FormItem>
-                  <Label>Private API key</Label>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      placeholder="Your private API key"
-                      type="password"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <DialogFooter>
+            <div className="space-y-4 px-6 py-6">
+              <FormField
+                control={form.control}
+                name="publicApiKey"
+                render={({ field }) => (
+                  <FormItem className="space-y-1.5">
+                    <FormLabel className="text-[13px] font-medium">
+                      Offentlig API-nøkkel
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        autoComplete="off"
+                        className={vapiKeyInputClassName}
+                        placeholder="Lim inn fra Vapi-dashboardet"
+                        type="password"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="privateApiKey"
+                render={({ field }) => (
+                  <FormItem className="space-y-1.5">
+                    <FormLabel className="text-[13px] font-medium">
+                      Privat API-nøkkel
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        autoComplete="new-password"
+                        className={vapiKeyInputClassName}
+                        placeholder="Lim inn privat nøkkel"
+                        type="password"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <DialogFooter className="border-border/60 border-t bg-muted/10 px-6 py-4 sm:justify-end sm:gap-2">
               <Button
+                onClick={() => setOpen(false)}
+                type="button"
+                variant="outline"
+              >
+                Avbryt
+              </Button>
+              <DashboardAccentButton
+                className="h-11 min-w-[8.5rem] rounded-xl font-semibold"
                 disabled={form.formState.isSubmitting}
                 type="submit"
               >
-                {form.formState.isSubmitting ? "Connecting..." : "Connect"}
-              </Button>
+                {form.formState.isSubmitting ? "Kobler…" : "Koble til"}
+                <PlugIcon className="size-4" />
+              </DashboardAccentButton>
             </DialogFooter>
           </form>
         </Form>
@@ -178,25 +206,31 @@ const VapiPluginRemoveForm = ({
         service: "vapi",
       });
       setOpen(false);
-      toast.success("Vapi plugin removed");
+      toast.success("Vapi er frakoblet");
     } catch (error) {
       console.error(error);
-      toast.error("Something went wrong");
+      toast.error("Noe gikk galt");
     }
   };
 
   return (
     <Dialog onOpenChange={setOpen} open={open}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Disconnect Vapi</DialogTitle>
+      <DialogContent className="dashboard-app-shell gap-0 overflow-hidden rounded-2xl border border-border/80 bg-card p-0 text-card-foreground shadow-2xl sm:max-w-md">
+        <DialogHeader className="border-border/60 border-b bg-muted/25 px-6 py-5 text-left">
+          <DialogTitle className="text-[17px] font-semibold tracking-tight">
+            Frakoble Vapi
+          </DialogTitle>
+          <DialogDescription className="text-[13px] leading-relaxed">
+            Stemme i widget og dashbord slutter å bruke Vapi. Du kan koble til
+            igjen senere med nye nøkler. Vil du fortsette?
+          </DialogDescription>
         </DialogHeader>
-        <DialogDescription>
-          Are you sure you want to disconnect the Vapi plugin?
-        </DialogDescription>
-        <DialogFooter>
-          <Button onClick={onSubmit} variant="destructive">
-            Disconnect
+        <DialogFooter className="border-border/60 border-t bg-muted/10 px-6 py-4 sm:justify-end sm:gap-2">
+          <Button onClick={() => setOpen(false)} type="button" variant="outline">
+            Avbryt
+          </Button>
+          <Button onClick={onSubmit} type="button" variant="destructive">
+            Frakoble
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -8,6 +8,7 @@ import { Badge } from "@workspace/ui/components/badge";
 import { CopyIcon, ExternalLinkIcon, LockIcon } from "lucide-react";
 import { getWidgetPreviewUrl } from "@/lib/widget-preview-url";
 import { toast } from "sonner";
+import { DashboardAccentButton } from "@/modules/dashboard/ui/components/dashboard-accent";
 import { DashboardPageShell } from "@/modules/dashboard/ui/components/dashboard-page-shell";
 import { IntegrationId, INTEGRATIONS } from "../../constants";
 import Image from "next/image";
@@ -97,7 +98,7 @@ export const IntegrationsView = () => {
                   <CopyIcon className="size-4" />
                   Kopier ID
                 </Button>
-                <Button
+                <DashboardAccentButton
                   className="gap-2 rounded-xl"
                   disabled={!organization}
                   onClick={() => {
@@ -113,7 +114,7 @@ export const IntegrationsView = () => {
                 >
                   <ExternalLinkIcon className="size-4" />
                   Åpne widget
-                </Button>
+                </DashboardAccentButton>
               </div>
             </div>
             <p className="border-border/60 border-t pt-5 text-[13px] leading-relaxed text-muted-foreground">
@@ -223,7 +224,7 @@ export const IntegrationsDialog = ({
 
   return (
     <Dialog onOpenChange={onOpenChange} open={open}>
-      <DialogContent className="gap-0 overflow-hidden rounded-2xl border-border/80 p-0 sm:max-w-lg">
+      <DialogContent className="dashboard-app-shell gap-0 overflow-hidden rounded-2xl border border-border/80 bg-card p-0 text-card-foreground shadow-2xl sm:max-w-lg">
         <DialogHeader className="border-border/60 border-b bg-muted/25 px-6 py-5 text-left">
           <DialogTitle className="text-[17px] font-semibold tracking-tight">
             Integrate with your website

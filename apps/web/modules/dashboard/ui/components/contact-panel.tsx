@@ -103,14 +103,14 @@ function StatusMetric({
       <p className="text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
         {label}
       </p>
-      <div className="mt-1 flex min-h-[1.25rem] items-center gap-2 text-sm font-semibold text-foreground">
+      <div className="mt-1.5 flex min-h-[1.25rem] items-start gap-2 text-sm font-semibold text-foreground">
         {valueDot ? (
           <span
             aria-hidden
-            className={cn("size-2 shrink-0 rounded-full", dotClass[valueDot])}
+            className={cn("mt-1.5 size-2 shrink-0 rounded-full", dotClass[valueDot])}
           />
         ) : null}
-        <span className="min-w-0 break-words">{value}</span>
+        <span className="min-w-0 break-normal leading-snug">{value}</span>
       </div>
     </div>
   );
@@ -314,17 +314,19 @@ export const ContactPanel = () => {
           title="Status"
         >
           <div className="p-4 pt-3">
-            <div className="grid grid-cols-2 gap-x-4 gap-y-4 sm:grid-cols-4">
-              <StatusMetric
-                label="Status"
-                value={statusText}
-                valueDot={statusDot}
-              />
-              <StatusMetric
-                label="Prioritet"
-                value={priorityText}
-                valueDot={priorityDot}
-              />
+            <div className="flex flex-col gap-4">
+              <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+                <StatusMetric
+                  label="Status"
+                  value={statusText}
+                  valueDot={statusDot}
+                />
+                <StatusMetric
+                  label="Prioritet"
+                  value={priorityText}
+                  valueDot={priorityDot}
+                />
+              </div>
               <StatusMetric label="Tildelt" value={assignedName} />
               <StatusMetric label="Dato" value={started} />
             </div>

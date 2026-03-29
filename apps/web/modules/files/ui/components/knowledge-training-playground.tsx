@@ -4,6 +4,7 @@ import { useOrganization } from "@clerk/nextjs";
 import { useQuery } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
 import { getWidgetPreviewUrl } from "@/lib/widget-preview-url";
+import { DashboardAccentButton } from "@/modules/dashboard/ui/components/dashboard-accent";
 import { Button } from "@workspace/ui/components/button";
 import {
   Select,
@@ -223,16 +224,15 @@ export function KnowledgeTrainingPlayground({
             <span className="text-[13px] font-medium text-foreground">
               Sammenlign AI-modeller
             </span>
-            <Button
-              className="h-8 shrink-0 rounded-lg px-3 text-[12px] font-medium"
+            <DashboardAccentButton
+              className="h-8 shrink-0 px-3 text-[12px] font-medium"
               onClick={() =>
                 toast.info("Modellsammenligning kommer i en senere versjon.")
               }
               type="button"
-              variant="outline"
             >
               Sammenlign
-            </Button>
+            </DashboardAccentButton>
           </div>
         </PlaygroundSection>
 

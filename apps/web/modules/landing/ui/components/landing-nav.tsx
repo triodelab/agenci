@@ -161,7 +161,7 @@ export function LandingNav({ variant = "dark" }: LandingNavProps) {
             >
               <AuthAwareLink
                 href={LANDING_AUTH_PATHS.signUp}
-                loggedInHref={LANDING_AUTH_PATHS.appHome}
+                loggedInHref={LANDING_AUTH_PATHS.marketingLoggedInCta}
               >
                 Opprett konto
               </AuthAwareLink>
@@ -235,7 +235,7 @@ export function LandingNav({ variant = "dark" }: LandingNavProps) {
                 >
                   <AuthAwareLink
                     href={LANDING_AUTH_PATHS.signUp}
-                    loggedInHref={LANDING_AUTH_PATHS.appHome}
+                    loggedInHref={LANDING_AUTH_PATHS.marketingLoggedInCta}
                   >
                     Opprett konto
                   </AuthAwareLink>

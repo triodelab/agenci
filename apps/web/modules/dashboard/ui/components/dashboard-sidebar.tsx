@@ -4,6 +4,7 @@ import { OrganizationSwitcher, UserButton } from "@clerk/nextjs";
 import {
   BotIcon,
   CreditCardIcon,
+  GlobeIcon,
   HomeIcon,
   InboxIcon,
   LayoutDashboardIcon,
@@ -56,10 +57,20 @@ const accountItems = [
 
 function navButtonClass(active: boolean) {
   return cn(
-    "relative h-9 w-full rounded-lg text-[13px] font-medium transition-colors duration-150",
+    "relative h-9 w-full min-w-0 rounded-lg px-3 text-[13px] font-medium transition-colors duration-150",
+    // Samme fylte primær som øvrige dashboard-knapper (lys: svart, mørk: lys flate)
     active
-      ? "bg-primary text-primary-foreground"
-      : "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground",
+      ? [
+          "!border-transparent !bg-primary !text-primary-foreground shadow-sm",
+          "hover:!bg-primary/90 hover:!text-primary-foreground",
+          "data-[active=true]:!bg-primary data-[active=true]:!text-primary-foreground",
+          "[&_svg]:!text-primary-foreground",
+        ]
+      : [
+          "border-transparent text-sidebar-foreground/85",
+          "hover:bg-muted/80 hover:text-foreground",
+          "[&_svg]:opacity-90",
+        ],
   );
 }
 
@@ -163,9 +174,9 @@ export const DashboardSidebar = () => {
         </SidebarMenu>
       </SidebarHeader>
 
-      <SidebarContent className="gap-4 px-2.5 py-4">
-        <SidebarGroup className="rounded-xl border border-sidebar-border/70 bg-muted/25 p-2 dark:bg-muted/10">
-          <SidebarGroupLabel className="mb-2 px-2 text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.14em]">
+      <SidebarContent className="gap-4 px-2 py-4">
+        <SidebarGroup className="overflow-hidden rounded-xl border border-sidebar-border/70 bg-muted/25 pb-2 dark:bg-muted/10">
+          <SidebarGroupLabel className="mb-2 px-3 pt-2 text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.14em]">
             Kundestøtte
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -192,8 +203,8 @@ export const DashboardSidebar = () => {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <SidebarGroup className="rounded-xl border border-sidebar-border/70 bg-muted/25 p-2 dark:bg-muted/10">
-          <SidebarGroupLabel className="mb-2 px-2 text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.14em]">
+        <SidebarGroup className="overflow-hidden rounded-xl border border-sidebar-border/70 bg-muted/25 pb-2 dark:bg-muted/10">
+          <SidebarGroupLabel className="mb-2 px-3 pt-2 text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.14em]">
             Tilpasning
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -220,8 +231,8 @@ export const DashboardSidebar = () => {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <SidebarGroup className="rounded-xl border border-sidebar-border/70 bg-muted/25 p-2 dark:bg-muted/10">
-          <SidebarGroupLabel className="mb-2 px-2 text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.14em]">
+        <SidebarGroup className="overflow-hidden rounded-xl border border-sidebar-border/70 bg-muted/25 pb-2 dark:bg-muted/10">
+          <SidebarGroupLabel className="mb-2 px-3 pt-2 text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.14em]">
             Konto
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -249,12 +260,27 @@ export const DashboardSidebar = () => {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="border-sidebar-border/80 border-t bg-muted/15 px-2 py-3 dark:bg-muted/5">
+      <SidebarFooter className="border-sidebar-border/80 border-t bg-muted/15 px-2 py-3 dark:bg-muted/5 [&_[data-sidebar=menu-button]]:px-3">
         <SidebarMenu>
           <SidebarMenuItem>
             <div className="flex w-full items-center px-1 py-0.5">
               <SidebarThemeToggle />
             </div>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              className={navButtonClass(false)}
+              tooltip="Åpne markedsføringssiden (du forblir innlogget)"
+            >
+              <Link href="/?from=marketing">
+                <GlobeIcon
+                  className="size-[15px] opacity-95"
+                  strokeWidth={1.75}
+                />
+                <span>Til forsiden</span>
+              </Link>
+            </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
             <UserButton

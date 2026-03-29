@@ -13,6 +13,7 @@ import {
   WrenchIcon,
 } from "lucide-react";
 import Link from "next/link";
+import { DashboardAccentButton } from "@/modules/dashboard/ui/components/dashboard-accent";
 import {
   DashboardPageHeader,
   DashboardPagePanel,
@@ -67,12 +68,12 @@ export function AgentsView() {
               på fagspørsmål, og tilby menneskelig hjelp når den ikke finner svar.
             </p>
             <div className="flex flex-wrap gap-2">
-              <Button asChild className="rounded-xl" size="sm" variant="default">
+              <DashboardAccentButton asChild size="sm">
                 <Link href="/files">
                   <LibraryBigIcon className="size-4" />
                   Kunnskapsbase
                 </Link>
-              </Button>
+              </DashboardAccentButton>
               <Button asChild className="rounded-xl" size="sm" variant="outline">
                 <Link href="/customization">
                   <PaletteIcon className="size-4" />

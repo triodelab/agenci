@@ -346,7 +346,7 @@ export const WIDGET_COLOR_PRESETS: WidgetColorPreset[] = [
       inputBorderColor: "#0f766e",
       inputBackgroundColor: "#134e4a",
       inputTextColor: "#f0fdfa",
-      inputPlaceholderColor: "#2dd4bf",
+      inputPlaceholderColor: "#5eead4",
     }),
   },
 

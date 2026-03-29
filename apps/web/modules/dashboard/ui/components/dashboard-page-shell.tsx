@@ -32,7 +32,7 @@ export function DashboardPageShell({
   return (
     <div
       className={cn(
-        "flex min-h-0 flex-1 flex-col overflow-auto bg-transparent text-foreground antialiased",
+        "flex min-h-0 flex-1 flex-col overflow-auto scroll-smooth bg-transparent text-foreground antialiased",
         className,
       )}
     >

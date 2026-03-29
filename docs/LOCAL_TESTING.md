@@ -32,7 +32,9 @@ Uten gyldig webhook-secret feiler verifisering i `convex/http.ts`; uten `subscri
 
 `NEXT_PUBLIC_DEV_BYPASS_PREMIUM` i **web** styrer bare ProPlanGate i Next.js — **Convex sjekker ikke den**.
 
-For org-en din må det finnes en rad i **`subscriptions`** med `organizationId` = Clerk `org_…` og **`status: "active"`**. Ellers:
+**Utviklere uten global bypass:** sett `NEXT_PUBLIC_TEAM_DEVELOPER_EMAILS` (web) og `CONVEX_DEV_TEAM_EMAILS` (Convex) til samme kommaseparerte liste — da får disse brukerne Pro i UI og backend-tilgang som ved aktivt abonnement, mens øvrige kunder følger vanlig abonnement.
+
+For org-en din må det finnes en rad i **`subscriptions`** med `organizationId` = Clerk `org_…` og **`status: "active"`**, **med mindre** du bruker dev-bypass eller team-e-post over. Ellers:
 
 - widgeten lagrer bare brukermeldinger (ingen agent-kall),
 - knowledge base-upload sier «Missing subscription»,
@@ -46,10 +48,12 @@ JWT / `orgId`: se [packages/backend/docs/CONVEX_CLERK_JWT.md](../packages/backen
 
 - JWT-mal **`convex`** med `orgId` (eller tilsvarende) slik at private queries får organisasjon.
 - Innlogget bruker med **valgt organisasjon** for dashboard.
+- **Billing (Beta):** For `/billing` med `PricingTable` og organisasjonsfaktura må **Clerk Billing** være aktivert i [Clerk Dashboard → Billing](https://dashboard.clerk.com/last-active?path=billing/settings) for appen (Development eller Production). Følg veiviseren (Stripe, planer). Dette er ikke en ekstra nøkkel i `.env` — det er produktinnstillinger i Clerk. Uten aktivert billing viser appen en forklaring i stedet for å krasje.
 
 ## 3. Web (`apps/web`)
 
 - `.env` med `NEXT_PUBLIC_CONVEX_URL`, Clerk-nøkler, ev. `NEXT_PUBLIC_DEV_BYPASS_PREMIUM` for utvikling (kun UI-gate, ikke Convex-logikk).
+- **Billing / faktura:** på `/billing` vises `OrganizationProfile` og `PricingTable` som standard. Valgfritt: `NEXT_PUBLIC_HIDE_CLERK_BILLING_UI=true` viser plassholder for brukere som ikke står i `NEXT_PUBLIC_TEAM_DEVELOPER_EMAILS` (f.eks. miljø uten Clerk Billing). `NEXT_PUBLIC_DEV_BYPASS_PREMIUM` styrer kun ProPlanGate, ikke billing-siden.
 
 ## 4. Widget (`apps/widget`)
 

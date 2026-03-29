@@ -4,6 +4,7 @@ import { BotIcon, PhoneIcon, SettingsIcon, UnplugIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { DashboardAccentButton } from "@/modules/dashboard/ui/components/dashboard-accent";
 import { Button } from "@workspace/ui/components/button";
 import {
   Card,
@@ -70,12 +71,12 @@ export const VapiConnectedView = ({ onDisconnect }: VapiConnectedViewProps) => {
                 </CardDescription>
               </div>
             </div>
-            <Button asChild>
+            <DashboardAccentButton asChild>
               <Link href="/customization">
                 <SettingsIcon />
                 Configure
               </Link>
-            </Button>
+            </DashboardAccentButton>
           </div>
         </CardHeader>
       </Card>

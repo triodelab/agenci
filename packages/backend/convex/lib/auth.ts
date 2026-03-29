@@ -23,3 +23,15 @@ export async function getOrgIdOrNull(ctx: AuthCtx): Promise<string | null> {
   }
   return null;
 }
+
+/** E-post fra Clerk JWT (Convex identity), brukes bl.a. til dev team-tilgang for abonnement. */
+export async function getUserEmailOrNull(ctx: AuthCtx): Promise<string | null> {
+  const identity = await ctx.auth.getUserIdentity();
+  if (!identity) return null;
+  const record = identity as unknown as Record<string, unknown>;
+  const email = record.email;
+  if (typeof email === "string" && email.includes("@")) {
+    return email.trim().toLowerCase();
+  }
+  return null;
+}

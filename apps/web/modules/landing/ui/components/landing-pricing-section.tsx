@@ -9,6 +9,7 @@ import {
   LANDING_ACCENT_CTA_BG,
   LANDING_AUTH_PATHS,
   LANDING_SECTION_IDS,
+  landingSectionHref,
 } from "@/modules/landing/constants";
 import { cn } from "@workspace/ui/lib/utils";
 
@@ -32,7 +33,7 @@ const plans = [
       "Roller og innsikt for teamet",
     ],
     cta: "Book en demo",
-    href: `/#${LANDING_SECTION_IDS.contact}`,
+    href: landingSectionHref("contact"),
     featured: true,
   },
   {
@@ -40,7 +41,7 @@ const plans = [
     blurb: "Tilpasset drift, sikkerhet og volum.",
     bullets: ["Dedikert oppfølging", "SLA og avtaler", "Skreddersydde integrasjoner"],
     cta: "Snakk med oss",
-    href: `/#${LANDING_SECTION_IDS.contact}`,
+    href: landingSectionHref("contact"),
     featured: false,
   },
 ] as const;
@@ -112,7 +113,7 @@ export function LandingPricingSection() {
                 ))}
               </ul>
               <div className="mt-8">
-                {plan.href.startsWith("/#") ? (
+                {plan.href !== LANDING_AUTH_PATHS.signUp ? (
                   <Button
                     className={cn(
                       "h-11 w-full rounded-full font-semibold",
@@ -138,7 +139,7 @@ export function LandingPricingSection() {
                     variant={plan.featured ? "default" : "outline"}
                     asChild
                   >
-                    <AuthAwareLink href={plan.href} loggedInHref={LANDING_AUTH_PATHS.appHome}>
+                    <AuthAwareLink href={plan.href} loggedInHref={LANDING_AUTH_PATHS.marketingLoggedInCta}>
                       {plan.cta}
                     </AuthAwareLink>
                   </Button>

@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { MarketingPageLayout } from "@/modules/landing/ui/components/marketing-page-layout";
+import { MarketingSignupCtaLink } from "@/modules/landing/ui/components/marketing-signup-cta-link";
 import { MarketingSubpageCta } from "@/modules/landing/ui/components/marketing-subpage-cta";
 import { Button } from "@workspace/ui/components/button";
-import { LANDING_AUTH_PATHS, LANDING_MARKETING_EYEBROW_CLASS } from "@/modules/landing/constants";
+import {
+  LANDING_MARKETING_EYEBROW_CLASS,
+  landingSectionHref,
+} from "@/modules/landing/constants";
 import { cn } from "@workspace/ui/lib/utils";
 import {
   BookOpen,
@@ -72,7 +76,7 @@ export default function ProduktPage() {
               size="lg"
               className="rounded-2xl bg-[#2DD4BF] font-semibold text-neutral-950 shadow-[0_14px_36px_-14px_rgba(45,212,191,0.35)] hover:bg-[#2DD4BF]/90"
             >
-              <Link href={LANDING_AUTH_PATHS.signUp}>Kom i gang</Link>
+              <MarketingSignupCtaLink loggedInBehavior="app">Kom i gang</MarketingSignupCtaLink>
             </Button>
             <Button
               asChild
@@ -80,7 +84,7 @@ export default function ProduktPage() {
               size="lg"
               className="rounded-2xl border-[#2DD4BF]/45 hover:bg-[#2DD4BF]/10"
             >
-              <Link href="/#product">Se oversikt på forsiden</Link>
+              <Link href={landingSectionHref("product")}>Se oversikt på forsiden</Link>
             </Button>
           </div>
         </div>

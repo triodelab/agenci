@@ -13,6 +13,7 @@ import {
   LANDING_HERO_WORKFLOW_LEAD,
   LANDING_NAV_TONE_BOUNDARY_ID,
   LANDING_SECTION_IDS,
+  landingSectionHref,
 } from "@/modules/landing/constants";
 import { cn } from "@workspace/ui/lib/utils";
 
@@ -154,7 +155,7 @@ export function LandingHeroSection() {
 
       <div className="relative z-10 mx-auto flex max-w-3xl flex-col items-center px-5 pt-10 text-center sm:px-6 md:max-w-4xl md:pt-14 lg:pt-16">
         <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-teal-300/75 md:text-xs">
-          Hvorfor Agenci
+          AI-drevet kundeservice
         </p>
         <h1
           id="landing-hero-heading"
@@ -175,7 +176,7 @@ export function LandingHeroSection() {
           >
             <AuthAwareLink
               href={LANDING_AUTH_PATHS.signUp}
-              loggedInHref={LANDING_AUTH_PATHS.appHome}
+              loggedInHref={LANDING_AUTH_PATHS.marketingLoggedInCta}
             >
               Opprett konto
             </AuthAwareLink>
@@ -233,7 +234,7 @@ export function LandingHeroSection() {
             style={ctaStyle}
             asChild
           >
-            <Link href={`/#${LANDING_SECTION_IDS.contact}`}>Book en demo</Link>
+            <Link href={landingSectionHref("contact")}>Book en demo</Link>
           </Button>
         </div>
       </div>

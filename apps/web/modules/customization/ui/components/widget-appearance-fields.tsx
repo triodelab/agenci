@@ -42,9 +42,6 @@ import type { FormSchema } from "../../types";
 const labelUi =
   "text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground";
 
-const sliderDark =
-  "[&_[data-slot=slider-range]]:!bg-foreground [&_[data-slot=slider-thumb]]:!border-foreground [&_[data-slot=slider-thumb]]:!bg-background";
-
 const POSITIONS = [
   ["center", AlignCenterHorizontal, "Sentrert"],
   ["bottom-right", CornerDownRight, "Høyre"],
@@ -113,9 +110,9 @@ function applyFullDesign(
 }
 
 const pillActive =
-  "border-transparent bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 hover:text-primary-foreground";
+  "border-transparent bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 [&_svg]:text-primary-foreground";
 const pillIdle =
-  "border-border/80 bg-background text-muted-foreground hover:bg-muted/70 hover:text-foreground";
+  "border-border/80 bg-background text-muted-foreground hover:bg-muted/70 hover:text-foreground dark:border-border/60 dark:bg-card/60";
 
 /** Justering i forhåndsvisnings-canvas (ikke «tilpasset» — den har egen sandkasse). */
 const PREVIEW_CANVAS_BY_POSITION: Record<
@@ -396,13 +393,13 @@ export const WidgetAppearanceFields = () => {
           <div className="shrink-0 px-3 pt-3 lg:px-4">
             <TabsList className="grid h-10 w-full grid-cols-2 gap-1 rounded-xl border border-border/50 bg-muted/45 p-1">
               <TabsTrigger
-                className="rounded-lg text-[12px] font-medium data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-none"
+                className="rounded-lg text-[12px] font-medium text-muted-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm data-[state=active]:hover:bg-primary/90"
                 value="layout"
               >
                 Oppsett
               </TabsTrigger>
               <TabsTrigger
-                className="rounded-lg text-[12px] font-medium data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-none"
+                className="rounded-lg text-[12px] font-medium text-muted-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm data-[state=active]:hover:bg-primary/90"
                 value="colors"
               >
                 Farger
@@ -471,7 +468,7 @@ export const WidgetAppearanceFields = () => {
                     <span className="tabular-nums">{appearance.width}px</span>
                   </div>
                   <Slider
-                    className={cn("mt-1.5", sliderDark)}
+                    className="mt-1.5"
                     max={560}
                     min={280}
                     onValueChange={([v]) => {
@@ -489,7 +486,7 @@ export const WidgetAppearanceFields = () => {
                     <span className="tabular-nums">{appearance.height}px</span>
                   </div>
                   <Slider
-                    className={cn("mt-1.5", sliderDark)}
+                    className="mt-1.5"
                     max={800}
                     min={360}
                     onValueChange={([v]) => {
@@ -509,7 +506,7 @@ export const WidgetAppearanceFields = () => {
                     </span>
                   </div>
                   <Slider
-                    className={cn("mt-1.5", sliderDark)}
+                    className="mt-1.5"
                     max={32}
                     min={0}
                     onValueChange={([v]) => {

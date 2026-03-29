@@ -20,6 +20,10 @@ import { DashboardOverviewCalendar } from "@/modules/dashboard/ui/components/das
 import { DashboardOverviewHeroAside } from "@/modules/dashboard/ui/components/dashboard-overview-hero-aside";
 import { DashboardOverviewSpotlight } from "@/modules/dashboard/ui/components/dashboard-overview-spotlight";
 import { DashboardPageShell } from "@/modules/dashboard/ui/components/dashboard-page-shell";
+import {
+  dashboardShortcutArrowClassName,
+  dashboardShortcutCtaClassName,
+} from "@/modules/dashboard/ui/components/dashboard-accent";
 import { cn } from "@workspace/ui/lib/utils";
 
 type Shortcut = {
@@ -276,9 +280,15 @@ export function DashboardOverviewView() {
                     <item.icon className="size-[18px] text-foreground/90" strokeWidth={1.65} />
                   </span>
                 </div>
-                <span className="mt-3 inline-flex items-center gap-1 text-[12px] font-medium text-primary">
+                <span className={dashboardShortcutCtaClassName}>
                   Åpne
-                  <ArrowRightIcon className="size-3.5 transition-transform group-hover:translate-x-0.5" />
+                  <ArrowRightIcon
+                    className={cn(
+                      dashboardShortcutArrowClassName,
+                      "transition-transform group-hover:translate-x-0.5",
+                    )}
+                    strokeWidth={2.25}
+                  />
                 </span>
               </Link>
             ))}

@@ -8,7 +8,7 @@ import {
   vEntryId,
 } from "@convex-dev/rag";
 import { action, mutation, query, QueryCtx } from "../_generated/server";
-import { getOrgIdOrNull } from "../lib/auth";
+import { getOrgIdOrNull, getUserEmailOrNull } from "../lib/auth";
 import { hasActiveSubscriptionAccess } from "../lib/subscriptionAccess";
 import { extractHtmlTitle, htmlToPlainText } from "../lib/htmlToPlainText";
 import { assertPublicHttpUrl } from "../lib/publicHttpUrl";
@@ -106,7 +106,9 @@ export const addFile = action({
       },
     );
 
-    if (!hasActiveSubscriptionAccess(orgId, subscription)) {
+    const userEmail = await getUserEmailOrNull(ctx);
+
+    if (!hasActiveSubscriptionAccess(orgId, subscription, { userEmail })) {
       throw new ConvexError({
         code: "BAD_REQUEST",
         message: "Missing subscription"
@@ -181,7 +183,9 @@ export const addWebpage = action({
       },
     );
 
-    if (!hasActiveSubscriptionAccess(orgId, subscription)) {
+    const userEmail = await getUserEmailOrNull(ctx);
+
+    if (!hasActiveSubscriptionAccess(orgId, subscription, { userEmail })) {
       throw new ConvexError({
         code: "BAD_REQUEST",
         message: "Missing subscription",

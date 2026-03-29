@@ -1,6 +1,10 @@
 /**
  * Landing — én sannhetskilde for navigasjon, anker og lenker.
- * Seksjons-ID-er brukes når innhold bygges på forsiden (`/#pricing` osv.).
+ * Seksjons-ID-er brukes når innhold bygges på forsiden.
+ *
+ * **Viktig:** `middleware.ts` omdirigerer innloggede brukere med org fra `/` til `/dashboard`,
+ * unntatt `/?from=marketing` (se «Til forsiden» i dashboard). Alle lenker til forsiden med anker
+ * må derfor bruke `/?from=marketing#…`, ellers ender brukeren på dashboard.
  */
 
 export const LANDING_SECTION_IDS = {
@@ -28,7 +32,11 @@ export const LANDING_SECTION_IDS = {
 /** Egen side med kontaktskjema — forsiden har også skjema under `#contact` */
 export const LANDING_CONTACT_PAGE_PATH = "/kontakt" as const;
 
-const hash = (id: string) => `/#${id}`;
+/** Forside med anker — alltid med `from=marketing` så middleware ikke sender til dashboard */
+const hash = (id: string) => `/?from=marketing#${id}`;
+
+/** Bare forsiden (uten anker), for «Hjem» i nav */
+export const LANDING_HOME_MARKETING_HREF = "/?from=marketing" as const;
 
 /** Lenke til anker på forsiden (typed keys) */
 export function landingSectionHref(key: keyof typeof LANDING_SECTION_IDS): string {
@@ -37,7 +45,7 @@ export function landingSectionHref(key: keyof typeof LANDING_SECTION_IDS): strin
 
 /** Hovedmeny (sentrert i header) — matcher ny landing-struktur */
 export const LANDING_NAV_PRIMARY_LINKS = [
-  { name: "Hjem", href: "/" },
+  { name: "Hjem", href: LANDING_HOME_MARKETING_HREF },
   { name: "Hvorfor Agenci", href: hash(LANDING_SECTION_IDS.workflow) },
   { name: "Priser", href: hash(LANDING_SECTION_IDS.pricing) },
   { name: "Slik det fungerer", href: "/hvordan-det-virker" },
@@ -101,6 +109,13 @@ export const LANDING_AUTH_PATHS = {
   signIn: "/sign-in",
   signUp: "/sign-up",
   appHome: "/conversations",
+  /** App-oversikt når innlogget bruker forventes å gå videre inn i produktet (ikke markedsføring). */
+  appOverview: "/dashboard",
+  /**
+   * Innlogget bruker som klikker «Opprett konto» / «Kom i gang» på landing — ikke send til innboks;
+   * behold kontekst på markedsføringssider (AuthAwareLink `loggedInHref`).
+   */
+  marketingLoggedInCta: "/produkt",
 } as const;
 
 /** Primær CTA — mint/teal (referansedesign) */

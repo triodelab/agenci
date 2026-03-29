@@ -38,7 +38,7 @@ function FolderGlyph({ active }: { active?: boolean }) {
       className={cn(
         "flex size-8 shrink-0 items-center justify-center rounded-[7px] border text-muted-foreground",
         active
-          ? "border-foreground/15 bg-muted/70 text-foreground"
+          ? "border-primary-foreground/25 bg-primary-foreground/12 text-primary-foreground"
           : "border-border/50 bg-[var(--dash-knowledge-folder)]",
       )}
       aria-hidden
@@ -62,7 +62,7 @@ function KnowledgeSourceRow({
       className={cn(
         "flex w-full items-center gap-3 rounded-[10px] px-2.5 py-2 text-left text-[13px] font-medium transition-[background-color,color,box-shadow] duration-150",
         active
-          ? "border-l-[3px] border-l-foreground bg-[var(--dash-nav-active-bg)] pl-[calc(0.625rem-3px)] text-foreground"
+          ? "bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 [&_svg]:text-primary-foreground"
           : "text-foreground/88 hover:bg-muted/60 hover:text-foreground",
       )}
       onClick={onClick}
@@ -276,7 +276,7 @@ function FilesViewInner() {
                   className={cn(
                     "flex min-w-0 flex-1 items-center gap-3 rounded-[9px] px-2 py-2 text-left text-[13px] font-medium transition-colors",
                     dataset === "general"
-                      ? "border-l-[3px] border-l-foreground bg-[var(--dash-nav-active-bg)] pl-[calc(0.5rem-3px)] text-foreground"
+                      ? "bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 [&_svg]:text-primary-foreground"
                       : "text-foreground/88 hover:bg-muted/50 hover:text-foreground",
                   )}
                   onClick={() => setDatasetAndUrl("general")}
@@ -293,7 +293,7 @@ function FilesViewInner() {
                       className={cn(
                         "size-8 shrink-0",
                         dataset === "general"
-                          ? "text-foreground hover:bg-muted/50"
+                          ? "text-primary-foreground hover:bg-primary-foreground/15"
                           : "text-muted-foreground hover:text-foreground",
                       )}
                       size="sm"

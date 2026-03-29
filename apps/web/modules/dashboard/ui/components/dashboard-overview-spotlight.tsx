@@ -7,34 +7,41 @@ import { cn } from "@workspace/ui/lib/utils";
 const ROTATE_MS = 3000;
 
 /** Vekselvis svart og hvit (dark → light → dark → light), uavhengig av app-tema */
-const SLIDES = [
+type SlideVariant = "dark" | "light" | "accent";
+
+const SLIDES: {
+  kicker: string;
+  title: string;
+  body: string;
+  variant: SlideVariant;
+}[] = [
   {
     kicker: "Om Agenci",
     title: "Svar fra deres egne kilder",
     body:
       "Chat som er forankret i innholdet dere legger inn — med mulighet til å ta over samtalen når det trengs.",
-    variant: "dark" as const,
+    variant: "dark",
   },
   {
     kicker: "Tips",
     title: "Sterkere treff i samtaler",
     body:
       "Oppdater kunnskapsbasen med FAQ og produkttekster. Jo tydeligere kilder, jo bedre svar.",
-    variant: "light" as const,
+    variant: "light",
   },
   {
     kicker: "Widget",
     title: "Tilpass utseendet",
     body:
       "Farger, velkomsttekst og forslag finner dere under Widget-tilpasning — samme uttrykk som på nettsiden.",
-    variant: "dark" as const,
+    variant: "accent",
   },
   {
     kicker: "Veien videre",
     title: "Mer i dashboardet",
     body:
       "Vi bygger videre på innsikt, integrasjoner og rapporter. Tilbakemeldinger hjelper oss å prioritere.",
-    variant: "light" as const,
+    variant: "light",
   },
 ];
 
@@ -89,6 +96,13 @@ export function DashboardOverviewSpotlight() {
             "border-zinc-200/90 bg-white text-zinc-950",
             "shadow-[0_24px_56px_-32px_rgba(0,0,0,0.14),inset_0_1px_0_rgba(255,255,255,0.95)]",
             "before:pointer-events-none before:absolute before:inset-0 before:z-0 before:content-[''] before:bg-[radial-gradient(ellipse_85%_55%_at_100%_0%,rgba(0,0,0,0.04),transparent_55%)]",
+            /* Mørk modus: ikke hvit plakk — samme familie som resten av dashboard */
+            "dark:border-zinc-700/80 dark:bg-zinc-900/95 dark:text-zinc-50 dark:shadow-[0_24px_56px_-32px_rgba(0,0,0,0.45)] dark:before:bg-[radial-gradient(ellipse_85%_55%_at_100%_0%,rgba(255,255,255,0.06),transparent_55%)]",
+          ],
+          slide.variant === "accent" && [
+            "border-white/12 bg-zinc-950 text-zinc-50",
+            "shadow-[0_28px_64px_-28px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.08)]",
+            "before:pointer-events-none before:absolute before:inset-0 before:z-0 before:content-[''] before:bg-[radial-gradient(ellipse_90%_55%_at_100%_-10%,rgba(255,255,255,0.1),transparent_55%)]",
           ],
         )}
       >
@@ -98,7 +112,9 @@ export function DashboardOverviewSpotlight() {
               "inline-flex w-fit max-w-full rounded-full border px-3 py-1.5 text-[10px] font-semibold tracking-[0.22em] uppercase",
               slide.variant === "dark"
                 ? "border-white/20 bg-white/[0.08] text-white/85"
-                : "border-zinc-200 bg-zinc-100/90 text-zinc-600",
+                : slide.variant === "accent"
+                  ? "border-white/18 bg-white/[0.08] text-white/85"
+                  : "border-zinc-200 bg-zinc-100/90 text-zinc-600 dark:border-zinc-600 dark:bg-zinc-800/90 dark:text-zinc-300",
             )}
           >
             {slide.kicker}
@@ -106,7 +122,11 @@ export function DashboardOverviewSpotlight() {
           <p
             className={cn(
               "mt-5 text-[1.35rem] font-semibold leading-[1.2] tracking-[-0.025em] sm:text-[1.5rem] sm:leading-[1.15]",
-              slide.variant === "dark" ? "text-zinc-50" : "text-zinc-950",
+              slide.variant === "dark"
+                ? "text-zinc-50"
+                : slide.variant === "accent"
+                  ? "text-zinc-50"
+                  : "text-zinc-950 dark:text-zinc-50",
             )}
           >
             {slide.title}
@@ -116,7 +136,9 @@ export function DashboardOverviewSpotlight() {
               "mt-4 max-w-[22rem] text-[15px] leading-[1.65] sm:text-[15.5px]",
               slide.variant === "dark"
                 ? "text-white/[0.82]"
-                : "text-zinc-600",
+                : slide.variant === "accent"
+                  ? "text-white/[0.82]"
+                  : "text-zinc-600 dark:text-zinc-400",
             )}
           >
             {slide.body}
@@ -134,9 +156,13 @@ export function DashboardOverviewSpotlight() {
                   ? i === index
                     ? "w-10 bg-white"
                     : "w-2 bg-white/30 hover:bg-white/45"
-                  : i === index
-                    ? "w-10 bg-zinc-900"
-                    : "w-2 bg-zinc-300 hover:bg-zinc-400",
+                  : slide.variant === "accent"
+                    ? i === index
+                      ? "w-10 bg-white"
+                      : "w-2 bg-white/30 hover:bg-white/45"
+                    : i === index
+                      ? "w-10 bg-zinc-900 dark:bg-zinc-100"
+                      : "w-2 bg-zinc-300 hover:bg-zinc-400 dark:bg-zinc-600 dark:hover:bg-zinc-500",
               )}
               key={i}
               onClick={() => setIndex(i)}

@@ -7,6 +7,7 @@ import {
   LANDING_ACCENT_CTA_BG,
   LANDING_AUTH_PATHS,
   LANDING_SECTION_IDS,
+  landingSectionHref,
 } from "@/modules/landing/constants";
 
 const ctaStyle = { backgroundColor: LANDING_ACCENT_CTA_BG } as const;
@@ -46,7 +47,7 @@ export function LandingFinalCtaSection() {
             style={ctaStyle}
             asChild
           >
-            <Link href={`/#${LANDING_SECTION_IDS.contact}`}>Book en demo</Link>
+            <Link href={landingSectionHref("contact")}>Book en demo</Link>
           </Button>
           <Button
             size="lg"
@@ -54,7 +55,7 @@ export function LandingFinalCtaSection() {
             className="h-12 rounded-full px-8 text-[15px] font-medium text-zinc-300 hover:bg-white/[0.08] hover:text-white"
             asChild
           >
-            <AuthAwareLink href={LANDING_AUTH_PATHS.signUp} loggedInHref={LANDING_AUTH_PATHS.appHome}>
+            <AuthAwareLink href={LANDING_AUTH_PATHS.signUp} loggedInHref={LANDING_AUTH_PATHS.marketingLoggedInCta}>
               Opprett konto
             </AuthAwareLink>
           </Button>

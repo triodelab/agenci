@@ -49,7 +49,7 @@ export const DeleteFileDialog = ({
 
   return (
     <Dialog onOpenChange={onOpenChange} open={open}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="dashboard-app-shell rounded-2xl border border-border/80 bg-card text-card-foreground shadow-2xl sm:max-w-md">
         <DialogHeader>
           <DialogTitle>
             Delete File
