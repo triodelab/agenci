@@ -121,15 +121,14 @@ function FilesViewInner() {
   const [presetFile, setPresetFile] = useState<File | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<PublicFile | null>(null);
+  /** Standardvisning: Knowledge training. `?kb=general` for kilder / opplasting. */
   const [dataset, setDataset] = useState<DatasetKey>(() =>
-    searchParams.get("kb") === "training" ? "training" : "general",
+    searchParams.get("kb") === "general" ? "general" : "training",
   );
   const [webUrl, setWebUrl] = useState("");
 
   useEffect(() => {
-    if (searchParams.get("kb") === "training") {
-      setDataset("training");
-    }
+    setDataset(searchParams.get("kb") === "general" ? "general" : "training");
   }, [searchParams]);
 
   const setDatasetAndUrl = useCallback(
@@ -139,9 +138,9 @@ function FilesViewInner() {
         return;
       }
       if (next === "training") {
-        window.history.replaceState(null, "", `${pathname}?kb=training`);
-      } else {
         window.history.replaceState(null, "", pathname);
+      } else {
+        window.history.replaceState(null, "", `${pathname}?kb=general`);
       }
     },
     [pathname],

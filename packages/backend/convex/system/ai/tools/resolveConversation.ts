@@ -29,14 +29,17 @@ export const resolveConversation = createTool({
       threadId: ctx.threadId,
     });
 
+    const avslutningTilKunde =
+      "Takk for at du skrev til oss — bare ta kontakt igjen om du lurer på noe mer. Ha en fin dag!";
+
     await supportAgent.saveMessage(ctx, {
       threadId: ctx.threadId,
       message: {
         role: "assistant",
-        content: "Conversation resolved.",
+        content: avslutningTilKunde,
       },
     });
 
-    return "Conversation resolved";
+    return avslutningTilKunde;
   },
 });
