@@ -2,14 +2,21 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { MarketingPageLayout } from "@/modules/landing/ui/components/marketing-page-layout";
 import { MarketingSubpageCta } from "@/modules/landing/ui/components/marketing-subpage-cta";
-import { LANDING_MARKETING_EYEBROW_CLASS } from "@/modules/landing/constants";
+import {
+  LANDING_MARKETING_EYEBROW_CLASS,
+  LANDING_MARKETING_FEATURE_CARD_CLASS,
+  LANDING_MARKETING_H1_CLASS,
+  LANDING_MARKETING_ICON_TILE_CLASS,
+  LANDING_MARKETING_LEAD_CLASS,
+  LANDING_MARKETING_PILL_CLASS,
+} from "@/modules/landing/constants";
 import { cn } from "@workspace/ui/lib/utils";
 import { BookOpen, LayoutDashboard, Sparkles } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Slik fungerer det",
   description:
-    "Se hvordan Agenci henger sammen: oversikt i dashboard, samtaler i én kø, og oppsett — med ekte skjermbilder fra produktet.",
+    "Fra chat på nettsiden til dashboard: se hvordan Agenci samler innsikt, samtaler og oppsett — med skjermbilder fra produktet.",
 };
 
 const IMG_SIZES = "(max-width: 1024px) min(96vw, 720px), min(50vw, 560px)";
@@ -88,10 +95,10 @@ export default function HvordanDetVirkerPage() {
         <div className="landing-section-mesh">
           <div className="mx-auto max-w-3xl px-4 pb-12 pt-14 text-center md:px-6 md:pb-16 md:pt-20">
             <p className={cn("text-sm", LANDING_MARKETING_EYEBROW_CLASS)}>Slik fungerer det</p>
-            <h1 className="mt-3 text-balance text-3xl font-semibold tracking-tight text-foreground md:text-[2.25rem] md:leading-[1.15]">
+            <h1 className={cn("mt-3", LANDING_MARKETING_H1_CLASS)}>
               Fra widget på nettsiden til full kontroll i dashboardet
             </h1>
-            <p className="mx-auto mt-5 max-w-2xl text-pretty text-lg leading-relaxed text-muted-foreground">
+            <p className={cn("mx-auto mt-5 max-w-2xl", LANDING_MARKETING_LEAD_CLASS)}>
               Agenci er bygget som en sammenhengende flyt: kunden møter dere på nettsiden, assistenten
               svarer ut fra deres kunnskap, og teamet styrer kvalitet og volum i samme produkt. Under
               ser du tre kjernedeler — slik de faktisk ser ut i løsningen.
@@ -101,11 +108,7 @@ export default function HvordanDetVirkerPage() {
               className="mx-auto mt-10 flex max-w-xl flex-wrap items-center justify-center gap-2 text-sm"
             >
               {visualSections.map((s) => (
-                <a
-                  key={s.id}
-                  href={`#${s.id}`}
-                  className="rounded-full border border-[#2DD4BF]/30 bg-[#2DD4BF]/[0.06] px-3.5 py-1.5 font-medium text-[#0f766e] transition-colors hover:border-[#2DD4BF]/50 hover:bg-[#2DD4BF]/12"
-                >
+                <a key={s.id} href={`#${s.id}`} className={LANDING_MARKETING_PILL_CLASS}>
                   {s.badge.split("·")[1]?.trim() ?? s.title}
                 </a>
               ))}
@@ -125,10 +128,10 @@ export default function HvordanDetVirkerPage() {
           <div className="mx-auto max-w-5xl px-4 py-16 md:px-6 md:py-24">
             <div className="mx-auto max-w-2xl text-center">
               <p className={cn("text-sm", LANDING_MARKETING_EYEBROW_CLASS)}>I praksis</p>
-              <h2 className="mt-3 text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
+              <h2 className="mt-3 text-balance text-2xl font-semibold tracking-[-0.03em] text-foreground md:text-3xl">
                 Tre steg — fra tom side til levende assistent
               </h2>
-              <p className="mt-4 text-muted-foreground">
+              <p className="mt-4 text-pretty text-muted-foreground">
                 Skjermbildene over viser hvordan det ser ut når dere er i gang. Her er den enkle
                 rekkefølgen for å komme dit.
               </p>
@@ -137,11 +140,16 @@ export default function HvordanDetVirkerPage() {
               {practicalSteps.map((s) => (
                 <li
                   key={s.n}
-                  className="relative flex flex-col rounded-2xl border border-border/60 bg-card/80 p-6 shadow-sm ring-1 ring-black/[0.03] transition-shadow hover:shadow-md"
+                  className={cn(
+                    LANDING_MARKETING_FEATURE_CARD_CLASS,
+                    "relative flex flex-col bg-card/80 ring-1 ring-black/[0.03] dark:ring-white/[0.06]",
+                  )}
                 >
                   <div className="flex items-start justify-between gap-3">
-                    <span className="text-xs font-bold tabular-nums text-[#2DD4BF]">{s.n}</span>
-                    <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#2DD4BF]/12 text-[#0f766e]">
+                    <span className="text-xs font-bold tabular-nums text-[#2DD4BF] dark:text-teal-400">
+                      {s.n}
+                    </span>
+                    <div className={LANDING_MARKETING_ICON_TILE_CLASS}>
                       <s.icon className="size-5" strokeWidth={2} aria-hidden />
                     </div>
                   </div>

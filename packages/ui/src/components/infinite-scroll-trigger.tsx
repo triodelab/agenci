@@ -24,9 +24,10 @@ export const InfiniteScrollTrigger = ({
   if (!canLoadMore && !isLoadingMore) {
     return (
       <div
-        aria-hidden
+        aria-label={noMoreText}
         className={cn("h-1 w-full shrink-0", className)}
         ref={ref}
+        role="status"
       />
     );
   }

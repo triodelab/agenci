@@ -1,6 +1,14 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
+  "globalEnv": [
+    "NODE_ENV",
+    "VERCEL_URL",
+    "RESEND_API_KEY",
+    "RESEND_FROM_EMAIL",
+    "NOTIFY_TO_EMAIL",
+    "SENTRY_AUTH_TOKEN"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
@@ -8,7 +16,15 @@
       "outputs": [".next/**", "!.next/cache/**", "dist/**"]
     },
     "lint": {
-      "dependsOn": ["^lint"]
+      "dependsOn": ["^lint"],
+      "env": [
+        "NODE_ENV",
+        "VERCEL_URL",
+        "RESEND_API_KEY",
+        "RESEND_FROM_EMAIL",
+        "NOTIFY_TO_EMAIL",
+        "SENTRY_AUTH_TOKEN"
+      ]
     },
     "check-types": {
       "dependsOn": ["^check-types"]

@@ -104,10 +104,29 @@ export const create = mutation({
       });
     }
 
+    let operatorLabel: string | undefined;
+    if (identity) {
+      const claims = identity as unknown as Record<string, unknown>;
+      const given =
+        typeof claims.given_name === "string"
+          ? claims.given_name
+          : typeof claims.givenName === "string"
+            ? claims.givenName
+            : "";
+      const family =
+        typeof claims.family_name === "string"
+          ? claims.family_name
+          : typeof claims.familyName === "string"
+            ? claims.familyName
+            : "";
+      operatorLabel =
+        [given, family].filter(Boolean).join(" ").trim() ||
+        (typeof claims.name === "string" ? claims.name : undefined);
+    }
+
     await saveMessage(ctx, components.agent, {
       threadId: conversation.threadId,
-      // TODO: Check if "agentName" is needed or not
-      agentName: identity?.familyName,
+      ...(operatorLabel ? { agentName: operatorLabel } : {}),
       message: {
         role: "assistant",
         content: args.prompt,

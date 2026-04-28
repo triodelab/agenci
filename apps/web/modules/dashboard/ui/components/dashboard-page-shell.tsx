@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { cn } from "@workspace/ui/lib/utils";
 
 export type DashboardPagePanelVariant =
@@ -52,11 +53,31 @@ export function DashboardPageHeader({
   kicker,
   title,
   description,
+  /** Valgfri rad til høyre (f.eks. primærknapp) — beholder én `dash-page-header-accent`-stripe */
+  actions,
 }: {
   kicker?: string;
   title: string;
   description?: string;
+  actions?: ReactNode;
 }) {
+  if (actions) {
+    return (
+      <header className="dash-page-header-accent">
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between sm:gap-8">
+          <div className="min-w-0 space-y-3 sm:space-y-3.5">
+            {kicker ? <p className="dash-page-kicker">{kicker}</p> : null}
+            <h1 className="dash-page-title">{title}</h1>
+            {description ? <p className="dash-page-desc">{description}</p> : null}
+          </div>
+          <div className="flex w-full shrink-0 flex-wrap items-center gap-2 sm:w-auto sm:justify-end">
+            {actions}
+          </div>
+        </div>
+      </header>
+    );
+  }
+
   return (
     <header className="dash-page-header-accent space-y-3 sm:space-y-3.5">
       {kicker ? <p className="dash-page-kicker">{kicker}</p> : null}

@@ -7,10 +7,10 @@ import {
   GlobeIcon,
   HomeIcon,
   InboxIcon,
-  LayoutDashboardIcon,
   LibraryBigIcon,
   Mic,
   PaletteIcon,
+  PlugIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -46,7 +46,7 @@ const customerSupportItems = [
 
 const configurationItems = [
   { title: "Widget-tilpasning", url: "/customization", icon: PaletteIcon },
-  { title: "Integrasjoner", url: "/integrations", icon: LayoutDashboardIcon },
+  { title: "Integrasjoner", url: "/integrations", icon: PlugIcon },
   { title: "Stemmeassistent", url: "/plugins/vapi", icon: Mic },
 ];
 

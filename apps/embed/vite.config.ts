@@ -5,7 +5,7 @@ export default defineConfig({
   build: {
     lib: {
       entry: resolve(__dirname, "embed.ts"),
-      name: "EchoWidget",
+      name: "AgenciWidget",
       fileName: "widget",
       formats: ["iife"],
     },

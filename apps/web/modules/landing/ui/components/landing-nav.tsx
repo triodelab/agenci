@@ -9,17 +9,13 @@ import { cn } from "@workspace/ui/lib/utils";
 import { AgenciNavWordmark } from "@/components/logo";
 import { AuthAwareLink } from "@/components/auth-aware-link";
 import {
-  LANDING_ACCENT_CTA_BG,
   LANDING_AUTH_PATHS,
+  LANDING_MARKETING_PRIMARY_CTA_SURFACE_CLASS,
   LANDING_NAV_PRIMARY_LINKS,
   LANDING_NAV_SURFACE_ATTR,
   LANDING_NAV_TONE_BOUNDARY_ID,
   LANDING_SECTION_IDS,
 } from "@/modules/landing/constants";
-
-const ctaStyle = {
-  backgroundColor: LANDING_ACCENT_CTA_BG,
-} as const;
 
 /** Høyde på fixed header — må matche `h-[4.25rem]` (scroll-terskel for tone) */
 const NAV_HEIGHT_PX = 68;
@@ -155,8 +151,10 @@ export function LandingNav({ variant = "dark" }: LandingNavProps) {
           {isLoaded && !user ? (
             <Button
               size="sm"
-              className="hidden rounded-full px-5 font-semibold text-neutral-950 shadow-[0_8px_24px_-6px_rgba(45,212,191,0.45)] hover:opacity-95 sm:inline-flex"
-              style={ctaStyle}
+              className={cn(
+                LANDING_MARKETING_PRIMARY_CTA_SURFACE_CLASS,
+                "hidden rounded-full px-5 shadow-[0_8px_24px_-6px_rgba(45,212,191,0.45)] hover:opacity-95 sm:inline-flex",
+              )}
               asChild
             >
               <AuthAwareLink
@@ -229,8 +227,7 @@ export function LandingNav({ variant = "dark" }: LandingNavProps) {
                   <Link href={LANDING_AUTH_PATHS.signIn}>Logg inn</Link>
                 </Button>
                 <Button
-                  className="w-full rounded-full font-semibold text-neutral-950"
-                  style={ctaStyle}
+                  className={cn(LANDING_MARKETING_PRIMARY_CTA_SURFACE_CLASS, "w-full rounded-full")}
                   asChild
                 >
                   <AuthAwareLink

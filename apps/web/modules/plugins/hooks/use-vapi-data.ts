@@ -34,7 +34,7 @@ export const useVapiAssistants = (): {
           return;
         }
         setError(error as Error);
-        toast.error("Failed to fetch assistants");
+        toast.error("Kunne ikke hente assistenter fra Vapi.");
       } finally {
         if (!cancelled) {
           setIsLoading(false);

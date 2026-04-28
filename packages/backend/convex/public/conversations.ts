@@ -25,7 +25,9 @@ async function createNewConversation(
     threadId,
     message: {
       role: "assistant",
-      content: widgetSettings?.greetMessage || "Hello, how can I help you today?",
+      content:
+        widgetSettings?.greetMessage ||
+        "Hei! Hvordan kan jeg hjelpe deg i dag?",
     },
   });
 

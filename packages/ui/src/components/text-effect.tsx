@@ -32,8 +32,6 @@ export function TextEffect({
   className,
   children,
   delay = 0,
-  per: _per,
-  preset: _preset,
   speedSegment = 0.3,
 }: TextEffectProps) {
   const reduceMotion = useReducedMotion();

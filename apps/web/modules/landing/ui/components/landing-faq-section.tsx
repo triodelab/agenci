@@ -11,24 +11,28 @@ import { cn } from "@workspace/ui/lib/utils";
 
 const faqs = [
   {
+    q: "Hva er Agenci?",
+    a: "Agenci er en KI-drevet chat som dere legger på nettsiden. Den svarer ut fra innholdet dere gir (FAQ, dokumenter, produkttekster), viser samtaler i et dashboard, og lar mennesker ta over når saken krever det. Målet er færre henvendelser som stopper i e-post, og flere fornøyde kunder uten at dere må skalere support lineært.",
+  },
+  {
     q: "Hvor raskt kan vi være live?",
-    a: "Mange team er oppe i løpet av dager, ikke uker. Oppsett av widget og grunnleggende svar kan gjøres steg for steg — vi hjelper dere å prioritere det som gir mest effekt først.",
+    a: "Mange kommer i gang på kort tid: widget inn, kunnskap inn, test med ekte spørsmål. Vi anbefaler en enkel pilot først — så skalerer dere når flyten sitter.",
   },
   {
     q: "Hva skjer med data og personvern?",
-    a: "Dere beholder kontroll over kundedata i tråd med avtale og gjeldende regler. Vi bygger for tydelige roller, innsyn og sporbarhet slik at compliance-teamet kan jobbe trygt.",
+    a: "Dere beholder kontroll over kundedata i tråd med avtale og gjeldende regler. Roller, innsyn og sporbarhet er bygget inn slik at dere kan dokumentere hvordan data brukes.",
   },
   {
-    q: "Kan Agenci snakke med våre systemer?",
-    a: "Ja — koble til kilder dere allerede bruker (CRM, e-post, nettbutikk med mer). Målet er én samtaleflate uten at teamet må hoppe mellom faner.",
+    q: "Kan Agenci kobles til CRM, e-post og andre systemer?",
+    a: "Ja. Poenget er at samtalen ikke skal leve isolert: koble der det gir mening for dere, så leads og saker havner der teamet allerede jobber.",
   },
   {
-    q: "Hvordan håndterer dere eskalering til mennesker?",
-    a: "Når en henvendelse trenger menneskelig vurdering, kan den routes til riktig team eller kø med tydelig kontekst — så ingenting stopper opp i en svart boks.",
+    q: "Hva skjer når kunden må snakke med et menneske?",
+    a: "Samtalen kan overtas eller sendes videre med historikk og kontekst, slik at kunden slipper å gjenta seg og saken ikke forsvinner.",
   },
   {
     q: "Finnes det bindingstid?",
-    a: "Avhengig av avtale. Snakk med oss om volum, SLA og eventuelle forpliktelser — vi legger opp løsningen sammen med dere.",
+    a: "Det avhenger av avtale og nivå. Ta kontakt om volum, SLA og eventuelle forpliktelser — vi legger opp det som passer dere.",
   },
 ] as const;
 
@@ -61,7 +65,7 @@ export function LandingFaqSection() {
             Det dere ofte lurer på
           </h2>
           <p className="mt-4 text-[15px] leading-relaxed text-zinc-500 md:text-base">
-            Kort fortalt — ta kontakt om dere vil dykke dypere i deres use case.
+            Finner dere ikke svaret? Send en kort melding — vi hjelper med konkret oppsett for deres bransje.
           </p>
         </div>
 

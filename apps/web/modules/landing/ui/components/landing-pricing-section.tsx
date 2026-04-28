@@ -6,31 +6,33 @@ import { motion, useReducedMotion } from "motion/react";
 import { Button } from "@workspace/ui/components/button";
 import { AuthAwareLink } from "@/components/auth-aware-link";
 import {
-  LANDING_ACCENT_CTA_BG,
   LANDING_AUTH_PATHS,
+  LANDING_MARKETING_PRIMARY_CTA_SURFACE_CLASS,
   LANDING_SECTION_IDS,
   landingSectionHref,
 } from "@/modules/landing/constants";
 import { cn } from "@workspace/ui/lib/utils";
 
-const ctaStyle = { backgroundColor: LANDING_ACCENT_CTA_BG } as const;
-
 const plans = [
   {
     name: "Start",
-    blurb: "For team som vil i gang raskt.",
-    bullets: ["Widget på nettsiden", "Grunnleggende dashboard", "E-postvarsler"],
+    blurb: "Kom i gang med chat på nettsiden og grunnleggende styring.",
+    bullets: [
+      "Chat-widget og enkel tilpasning",
+      "Kunnskapsgrunnlag og standard dashboard",
+      "Varsler når kunder trenger svar",
+    ],
     cta: "Kom i gang",
     href: LANDING_AUTH_PATHS.signUp,
     featured: false,
   },
   {
     name: "Pro",
-    blurb: "Når dere trenger mer kontroll og volum.",
+    blurb: "For team som håndterer mer volum og vil styre samtalene tettere.",
     bullets: [
       "Alt i Start",
-      "Avanserte flyter og tagger",
-      "Roller og innsikt for teamet",
+      "Mer avansert samtaleflyt og merking",
+      "Roller, innsikt og oppfølging for teamet",
     ],
     cta: "Book en demo",
     href: landingSectionHref("contact"),
@@ -38,8 +40,8 @@ const plans = [
   },
   {
     name: "Enterprise",
-    blurb: "Tilpasset drift, sikkerhet og volum.",
-    bullets: ["Dedikert oppfølging", "SLA og avtaler", "Skreddersydde integrasjoner"],
+    blurb: "Større organisasjoner med krav til drift, volum og integrasjoner.",
+    bullets: ["Dedikert oppfølging og avtaler", "SLA etter behov", "Integrasjoner mot deres systemer"],
     cta: "Snakk med oss",
     href: landingSectionHref("contact"),
     featured: false,
@@ -70,11 +72,11 @@ export function LandingPricingSection() {
             id="pricing-heading"
             className="mt-3 text-balance text-2xl font-semibold tracking-[-0.03em] text-zinc-950 sm:text-3xl md:text-[2.1rem] md:leading-[1.15]"
           >
-            Velg nivå — oppgrader når dere er klare
+            Tre nivåer — samme kjerneprodukt, mer kraft når dere vokser
           </h2>
           <p className="mt-4 text-[15px] leading-relaxed text-zinc-600 md:text-base">
-            Konkrete priser avhenger av volum og behov. Under ser du hva som typisk følger med — ta kontakt
-            for pristilbud.
+            Pris avhenger av volum og hvilke tillegg dere trenger. Tabellen viser hva som ofte følger med på
+            hvert nivå — ta kontakt for konkret tilbud.
           </p>
         </div>
 
@@ -94,7 +96,12 @@ export function LandingPricingSection() {
               )}
             >
               {plan.featured ? (
-                <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-[#2DD4BF] px-3 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-neutral-950">
+                <span
+                  className={cn(
+                    LANDING_MARKETING_PRIMARY_CTA_SURFACE_CLASS,
+                    "absolute -top-3 left-1/2 -translate-x-1/2 rounded-full px-3 py-0.5 text-[11px] uppercase tracking-wider",
+                  )}
+                >
                   Mest valgt
                 </span>
               ) : null}
@@ -118,10 +125,12 @@ export function LandingPricingSection() {
                     className={cn(
                       "h-11 w-full rounded-full font-semibold",
                       plan.featured &&
-                        "text-neutral-950 shadow-[0_8px_28px_-10px_rgba(45,212,191,0.35)]",
+                        cn(
+                          LANDING_MARKETING_PRIMARY_CTA_SURFACE_CLASS,
+                          "shadow-[0_8px_28px_-10px_rgba(45,212,191,0.35)]",
+                        ),
                       !plan.featured && "border-zinc-200 bg-white hover:bg-zinc-50",
                     )}
-                    style={plan.featured ? ctaStyle : undefined}
                     variant={plan.featured ? "default" : "outline"}
                     asChild
                   >
@@ -132,10 +141,12 @@ export function LandingPricingSection() {
                     className={cn(
                       "h-11 w-full rounded-full font-semibold",
                       plan.featured &&
-                        "text-neutral-950 shadow-[0_8px_28px_-10px_rgba(45,212,191,0.35)]",
+                        cn(
+                          LANDING_MARKETING_PRIMARY_CTA_SURFACE_CLASS,
+                          "shadow-[0_8px_28px_-10px_rgba(45,212,191,0.35)]",
+                        ),
                       !plan.featured && "border-zinc-200 bg-white hover:bg-zinc-50",
                     )}
-                    style={plan.featured ? ctaStyle : undefined}
                     variant={plan.featured ? "default" : "outline"}
                     asChild
                   >

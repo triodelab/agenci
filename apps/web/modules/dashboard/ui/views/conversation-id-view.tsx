@@ -40,7 +40,7 @@ import { toast } from "sonner";
 import { Tabs, TabsList, TabsTrigger } from "@workspace/ui/components/tabs";
 
 const formSchema = z.object({
-  message: z.string().min(1, "Message is required"),
+  message: z.string().min(1, "Skriv en melding"),
 });
 
 function findPreviousUserContent(
@@ -100,7 +100,7 @@ export const ConversationIdView = ({
 
       form.setValue("message", response);
     } catch (error) {
-      toast.error("Something went wrong");
+      toast.error("Noe gikk galt. Prøv igjen.");
       console.error(error);
     } finally {
       setIsEnhancing(false);

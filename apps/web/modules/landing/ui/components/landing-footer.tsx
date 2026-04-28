@@ -12,8 +12,10 @@ import {
   LANDING_AUTH_PATHS,
   LANDING_FOOTER_NAV_GROUPS,
   LANDING_LEGAL_LINKS,
+  LANDING_MARKETING_PRIMARY_CTA_SURFACE_CLASS,
   LANDING_SECTION_IDS,
 } from "@/modules/landing/constants";
+import { cn } from "@workspace/ui/lib/utils";
 
 const guestAccountLinks = [
   { href: LANDING_AUTH_PATHS.signIn, label: "Logg inn" },
@@ -76,7 +78,8 @@ export function LandingFooter() {
               <Logo className="brightness-0 invert" />
             </Link>
             <p className="text-sm leading-relaxed text-zinc-400">
-              AI-drevet kundeservice — widget, dashboard og kontroll i én plattform.
+              KI-chat for nettsiden deres: svar fra deres kunnskap, samtaler i dashboard, og mennesker i
+              loop når det trengs.
             </p>
           </div>
         </div>
@@ -132,6 +135,7 @@ export function LandingFooter() {
               onSubmit={handleNewsletterSubmit}
               className="mt-5 w-full max-w-sm"
               aria-label="Nyhetsbrev"
+              aria-busy={newsletterLoading}
             >
               <Label className="sr-only" htmlFor="footer-newsletter-email">
                 E-post
@@ -149,8 +153,12 @@ export function LandingFooter() {
               />
               <Button
                 type="submit"
-                className="mt-3 w-full rounded-xl bg-[#2DD4BF] font-semibold text-neutral-950 hover:bg-[#2DD4BF]/90"
+                className={cn(
+                  LANDING_MARKETING_PRIMARY_CTA_SURFACE_CLASS,
+                  "mt-3 w-full rounded-xl shadow-[0_8px_24px_-6px_rgba(45,212,191,0.35)]",
+                )}
                 disabled={newsletterLoading || newsletterSuccess}
+                aria-busy={newsletterLoading}
               >
                 {newsletterLoading
                   ? "Sender..."

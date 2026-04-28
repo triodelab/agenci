@@ -47,10 +47,21 @@ export const search = createTool({
       limit: 5,
     });
 
+    const trainingBlock: string = await ctx.runQuery(
+      internal.private.answerTraining.listRecentForAgent,
+      {
+        organizationId: orgId,
+      },
+    );
+
     const contextText = `Found results in ${searchResult.entries
-      .map((e) => e.title || null)
-      .filter((t) => t !== null)
+      .map((e: { title?: string | null }) => e.title || null)
+      .filter((t: string | null): t is string => t !== null)
       .join(", ")}. Here is the context:\n\n${searchResult.text}`;
+
+    const trainingSection = trainingBlock
+      ? `\n\nOperatør-godkjente eksempler (bruk tone og formulering når det passer spørsmålet; ved motstrid med søkeresultatene gjelder søkeresultatene for fakta):\n\n${trainingBlock}\n`
+      : "";
 
     const response = await generateText({
       messages: [
@@ -60,7 +71,7 @@ export const search = createTool({
         },
         {
           role: "user",
-          content: `User asked: "${query}"\n\nSearch results: ${contextText}`,
+          content: `User asked: "${query}"${trainingSection}\n\nSearch results: ${contextText}`,
         },
       ],
       model: openai.chat("gpt-4o-mini"),

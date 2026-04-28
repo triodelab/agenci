@@ -9,7 +9,7 @@
 
 export const LANDING_SECTION_IDS = {
   /**
-   * Hvit «Hvorfor Agenci» / produkt-seksjon under hero.
+   * Hvit «Hva Agenci er» / produkt-seksjon under hero.
    * Én DOM-anker: `product` (tidligere `workflow` — gamle `/#workflow`-bokmerker bør oppdateres).
    */
   workflow: "product",
@@ -46,7 +46,7 @@ export function landingSectionHref(key: keyof typeof LANDING_SECTION_IDS): strin
 /** Hovedmeny (sentrert i header) — matcher ny landing-struktur */
 export const LANDING_NAV_PRIMARY_LINKS = [
   { name: "Hjem", href: LANDING_HOME_MARKETING_HREF },
-  { name: "Hvorfor Agenci", href: hash(LANDING_SECTION_IDS.workflow) },
+  { name: "Produktet", href: hash(LANDING_SECTION_IDS.workflow) },
   { name: "Priser", href: hash(LANDING_SECTION_IDS.pricing) },
   { name: "Slik det fungerer", href: "/hvordan-det-virker" },
   { name: "Kontakt", href: LANDING_CONTACT_PAGE_PATH },
@@ -128,6 +128,53 @@ export const LANDING_ACCENT_CTA_BG = "#2DD4BF" as const;
 export const LANDING_MARKETING_EYEBROW_CLASS =
   "font-medium text-[#0f766e] dark:text-teal-400" as const;
 
+/** H1 på /produkt, /kontakt, /integrasjoner m.fl. — samme rytme som landing */
+export const LANDING_MARKETING_H1_CLASS =
+  "text-balance text-3xl font-semibold tracking-[-0.035em] text-foreground md:text-4xl md:leading-[1.12]" as const;
+
+/** Ingress under H1 på markedsføringssider */
+export const LANDING_MARKETING_LEAD_CLASS =
+  "text-pretty text-lg leading-relaxed text-muted-foreground" as const;
+
+/** Tekstlenker i brødtekst (lys/mørk) */
+export const LANDING_MARKETING_INLINE_LINK_CLASS =
+  "font-medium text-[#0f766e] underline-offset-4 transition-colors hover:text-[#0d9488] hover:underline dark:text-teal-400 dark:hover:text-teal-300" as const;
+
+/** Feature-kort (produkt m.fl.) — teal hover, matcher landing-seksjoner */
+export const LANDING_MARKETING_FEATURE_CARD_CLASS =
+  "group rounded-2xl border border-border/60 bg-card/60 p-6 shadow-sm backdrop-blur-sm transition-[border-color,box-shadow] duration-200 hover:border-[#2DD4BF]/35 hover:shadow-[0_12px_40px_-24px_rgba(45,212,191,0.18)] dark:bg-card/40" as const;
+
+/** Skjemaramme på lys markedsføringsbakgrunn */
+export const LANDING_MARKETING_FORM_PANEL_CLASS =
+  "rounded-2xl border border-border/60 bg-card/50 p-6 shadow-sm backdrop-blur-md md:p-8 dark:bg-card/30" as const;
+
+/**
+ * Primær CTA — bakgrunn, tekst og hover (uten radius/skygge).
+ * Bruk på hero (pill), nav, footer, prising m.m. sammen med egne `rounded-*` og `shadow-*`.
+ */
+export const LANDING_MARKETING_PRIMARY_CTA_SURFACE_CLASS =
+  "bg-[#2DD4BF] font-semibold text-neutral-950 hover:bg-[#2DD4BF]/90" as const;
+
+/** Standard skygge for primær CTA på lys flate (markedsføringssider, skjema) */
+export const LANDING_MARKETING_PRIMARY_CTA_SHADOW_CLASS =
+  "shadow-[0_14px_36px_-14px_rgba(45,212,191,0.35)]" as const;
+
+/** Primær knapp (markedsføring) — avrundet 2xl + standard skygge */
+export const LANDING_MARKETING_PRIMARY_CTA_CLASS =
+  `rounded-2xl ${LANDING_MARKETING_PRIMARY_CTA_SURFACE_CLASS} ${LANDING_MARKETING_PRIMARY_CTA_SHADOW_CLASS}` as const;
+
+/** Sekundær outline (markedsføring) */
+export const LANDING_MARKETING_OUTLINE_CTA_CLASS =
+  "rounded-2xl border-[#2DD4BF]/45 bg-background/90 text-foreground hover:bg-[#2DD4BF]/10 dark:bg-background/40" as const;
+
+/** Ikonflate i feature-kort */
+export const LANDING_MARKETING_ICON_TILE_CLASS =
+  "flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#2DD4BF]/12 text-[#0f766e] dark:text-teal-400" as const;
+
+/** Nav-piller (f.eks. hopp til seksjon) */
+export const LANDING_MARKETING_PILL_CLASS =
+  "rounded-full border border-[#2DD4BF]/30 bg-[#2DD4BF]/[0.06] px-3.5 py-1.5 font-medium text-[#0f766e] transition-colors hover:border-[#2DD4BF]/50 hover:bg-[#2DD4BF]/12 dark:text-teal-400 dark:hover:text-teal-300" as const;
+
 /**
  * Første hvite blokk under dashboard i hero — brukes av `LandingNav variant="auto"`
  * til å bytte lys/mørk nav-tone ved scroll (lys seksjon vs. mørk hero/footer).
@@ -142,4 +189,4 @@ export const LANDING_NAV_SURFACE_ATTR = "data-landing-nav-surface" as const;
 
 /** Undertekst rett under hero-podium (hvit sone) */
 export const LANDING_HERO_WORKFLOW_LEAD =
-  "Koble widget, kunnskap og mennesker i én flate — mindre friksjon for kundene og mer flyt for teamet." as const;
+  "Agenci er en chat på nettsiden deres som svarer ut fra deres egne tekster og dokumenter — og sender kunden videre til et menneske når saken krever det. Alt styres fra samme dashboard." as const;

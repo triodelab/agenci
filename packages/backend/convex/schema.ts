@@ -99,6 +99,19 @@ export default defineSchema({
     email: v.string(),
     clerk_id: v.string(),
   }).index("by_clerk_id", ["clerk_id"]),
+  agents: defineTable({
+    organizationId: v.string(),
+    name: v.string(),
+    description: v.optional(v.string()),
+    slug: v.string(),
+    isBuiltIn: v.boolean(),
+    modelLabel: v.optional(v.string()),
+    isActive: v.boolean(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_organization_id", ["organizationId"])
+    .index("by_organization_and_slug", ["organizationId", "slug"]),
   /** Operatør «forventet svar» fra Playground (Chatbase-lignende forbedring av AI-svar). */
   answerTrainingExamples: defineTable({
     organizationId: v.string(),

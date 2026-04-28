@@ -28,14 +28,17 @@ export const escalateConversation = createTool({
       threadId: ctx.threadId,
     });
 
+    const tilKunde =
+      "Jeg har satt over samtalen til et menneske på teamet vårt. Du vil bli fulgt opp derfra.";
+
     await supportAgent.saveMessage(ctx, {
       threadId: ctx.threadId,
       message: {
         role: "assistant",
-        content: "Conversation escalated to a human operator.",
+        content: tilKunde,
       },
     });
 
-    return "Conversation escalated to a human operator";
+    return tilKunde;
   },
 });

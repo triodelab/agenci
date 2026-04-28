@@ -17,6 +17,7 @@ import type * as lib_publicHttpUrl from "../lib/publicHttpUrl.js";
 import type * as lib_secrets from "../lib/secrets.js";
 import type * as lib_subscriptionAccess from "../lib/subscriptionAccess.js";
 import type * as playground from "../playground.js";
+import type * as private_agents from "../private/agents.js";
 import type * as private_answerTraining from "../private/answerTraining.js";
 import type * as private_contactSessions from "../private/contactSessions.js";
 import type * as private_conversations from "../private/conversations.js";
@@ -63,6 +64,7 @@ declare const fullApi: ApiFromModules<{
   "lib/secrets": typeof lib_secrets;
   "lib/subscriptionAccess": typeof lib_subscriptionAccess;
   playground: typeof playground;
+  "private/agents": typeof private_agents;
   "private/answerTraining": typeof private_answerTraining;
   "private/contactSessions": typeof private_contactSessions;
   "private/conversations": typeof private_conversations;

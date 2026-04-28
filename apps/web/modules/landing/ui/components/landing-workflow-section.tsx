@@ -1,28 +1,30 @@
 "use client";
 
-import { Layers, Sparkles, TrendingUp } from "lucide-react";
+import { BookOpen, MessageSquare, Users } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 import { LANDING_ACCENT_CTA_BG, LANDING_SECTION_IDS } from "@/modules/landing/constants";
 
 const features = [
   {
     n: "01",
-    title: "Sømløs automatisering",
+    title: "Chat på nettsiden",
     body:
-      "AI og arbeidsflyter som spiller sammen — mindre manuelt, mer som faktisk flyter.",
-    icon: Sparkles,
+      "En widget besøkende kjenner igjen: spørsmål om ordre, produkt, åpningstider og mer besvares der og da. Mer krevende saker kan eskaléres med full kontekst.",
+    icon: MessageSquare,
   },
   {
     n: "02",
-    title: "Klar fra dag én",
-    body: "Kom i gang uten tunge prosjekter. Oppsett som føles lett, ikke som et nytt system å temme.",
-    icon: Layers,
+    title: "Kunnskap dere eier",
+    body:
+      "Last opp eller lim inn innhold assistenten skal bruke — ikke svar som ignorerer kildene deres. Dere bestemmer tone, tema og grenser.",
+    icon: BookOpen,
   },
   {
     n: "03",
-    title: "Vokser med dere",
-    body: "Samme kontroll når volumet øker — fra små team til store samtaler uten at kvaliteten sprekker.",
-    icon: TrendingUp,
+    title: "Mennesker i loop",
+    body:
+      "Samtaler, kø og roller i ett dashboard. Når en kunde trenger et menneske, stopper ikke saken i en svart boks.",
+    icon: Users,
   },
 ] as const;
 
@@ -76,17 +78,17 @@ export function LandingWorkflowSection() {
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
         >
           <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-teal-700/85 md:text-xs">
-            Hvorfor Agenci
+            Hva Agenci er
           </p>
           <h2
             id="workflow-heading"
             className="mt-4 text-balance text-3xl font-semibold tracking-[-0.04em] text-zinc-950 sm:text-4xl md:text-[2.35rem] md:leading-[1.12]"
           >
-            En plattform. Ingen unødvendig friksjon.
+            Kundedialog på nettsiden — med KI, kunnskap og team i samme løsning
           </h2>
           <p className="mx-auto mt-5 max-w-lg text-pretty text-[15px] leading-relaxed text-zinc-600 md:mt-6 md:text-lg md:leading-relaxed">
-            Kontroll, klarhet og tempo — samlet på ett sted, slik at teamet kan bruke energien der det
-            lønner seg.
+            Ikke bare «en chatbot». Agenci kobler nettsiden deres med svar som bygger på det dere faktisk
+            har publisert og lastet opp — og gir dere verktøyene for å følge opp på ordentlig.
           </p>
         </motion.div>
 

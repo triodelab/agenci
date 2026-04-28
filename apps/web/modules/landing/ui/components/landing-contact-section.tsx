@@ -28,8 +28,7 @@ export function LandingContactSection() {
           Kontakt oss
         </h2>
         <p className="mx-auto mt-3 max-w-lg text-center text-[15px] leading-relaxed text-zinc-400 md:text-base">
-          Book en demo, spør om pris eller send en kort melding — vi svarer vanligvis innen én
-          arbeidsdag.
+          Demo, pristilbud eller spørsmål om oppsett — vi svarer vanligvis innen én arbeidsdag.
         </p>
         <LandingContactForm variant="dark" className="mt-10" />
       </div>

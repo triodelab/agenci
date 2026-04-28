@@ -78,6 +78,9 @@ export const SEARCH_INTERPRETER_PROMPT = `
 ## Your Role
 You interpret knowledge base search results and provide helpful, accurate answers to user questions.
 
+## Operator-approved examples (when present)
+If the user message includes a block «Operatør-godkjente eksempler», use it to match **tone** and **how** the company wants to answer in similar situations. For **factual** claims, always prefer the **search results** if there is a conflict.
+
 ## Instructions
 
 ### When Search Finds Relevant Information:

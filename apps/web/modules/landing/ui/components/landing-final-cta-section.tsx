@@ -4,13 +4,12 @@ import Link from "next/link";
 import { Button } from "@workspace/ui/components/button";
 import { AuthAwareLink } from "@/components/auth-aware-link";
 import {
-  LANDING_ACCENT_CTA_BG,
   LANDING_AUTH_PATHS,
+  LANDING_MARKETING_PRIMARY_CTA_SURFACE_CLASS,
   LANDING_SECTION_IDS,
   landingSectionHref,
 } from "@/modules/landing/constants";
-
-const ctaStyle = { backgroundColor: LANDING_ACCENT_CTA_BG } as const;
+import { cn } from "@workspace/ui/lib/utils";
 
 export function LandingFinalCtaSection() {
   return (
@@ -34,17 +33,19 @@ export function LandingFinalCtaSection() {
           id="final-cta-heading"
           className="text-balance text-2xl font-semibold tracking-[-0.03em] text-white sm:text-3xl md:text-[2.15rem] md:leading-[1.15]"
         >
-          Klar for en roligere kundereise?
+          Vil dere at nettsiden skal svare kundene — før de rekker å sende e-post?
         </h2>
         <p className="mx-auto mt-4 max-w-xl text-pretty text-[15px] leading-relaxed text-zinc-400 md:text-lg">
-          Book en kort gjennomgang, eller opprett konto og utforsk i eget tempo — vi er her når dere vil
-          sparre.
+          Book en gjennomgang av Agenci, eller opprett konto og prøv widget og dashboard selv. Vi hjelper
+          dere å komme trygt i gang.
         </p>
         <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
           <Button
             size="lg"
-            className="h-12 min-w-[11rem] rounded-full px-8 text-[15px] font-semibold text-neutral-950 shadow-[0_0_40px_-12px_rgba(45,212,191,0.35)]"
-            style={ctaStyle}
+            className={cn(
+              LANDING_MARKETING_PRIMARY_CTA_SURFACE_CLASS,
+              "h-12 min-w-[11rem] rounded-full px-8 text-[15px] shadow-[0_0_40px_-12px_rgba(45,212,191,0.35)]",
+            )}
             asChild
           >
             <Link href={landingSectionHref("contact")}>Book en demo</Link>

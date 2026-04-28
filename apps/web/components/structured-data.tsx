@@ -18,21 +18,15 @@ export function StructuredData() {
     name: "Agenci",
     applicationCategory: "BusinessApplication",
     operatingSystem: "Web",
-    offers: { "@type": "Offer", price: "0", priceCurrency: "NOK" },
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: "4.8",
-      ratingCount: "1",
-    },
     description:
-      "AI-basert chatbotplattform som automatiserer kundeservice og salg med 24/7 support, dashboard for kontroll og voice-assistent (premium).",
+      "Agenci er en KI-drevet chat for nettsiden som svarer ut fra bedriftens eget innhold, samler samtaler i et dashboard og lar teamet overta når det trengs. Valgfri taleutvidelse på høyere nivåer.",
     featureList: [
-      "AI Chatbot Widget",
-      "Dashboard med innsikt",
-      "Human takeover",
-      "Voice assistant (Premium)",
-      "Integrasjoner",
-      "GDPR-kompatibel",
+      "Chat-widget på nettsiden",
+      "Kunnskapsbase (filer og nettsider) med vektorsøk",
+      "Dashboard for samtaler",
+      "Eskalering til menneske",
+      "Valgfri tale (Vapi / Pro)",
+      "Widget-innbygging for vanlige rammeverk",
     ],
   };
 
@@ -43,7 +37,7 @@ export function StructuredData() {
     url: base,
     logo: `${base}${AGENCI_LOGO_SRC}`,
     description:
-      "AI-basert chatbotplattform for å automatisere kundeservice og salg",
+      "Plattform for KI-drevet kundedialog på nett med widget, kunnskapsgrunnlag og dashboard.",
     sameAs: [] as string[],
   };
 

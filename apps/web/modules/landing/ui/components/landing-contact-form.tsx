@@ -7,6 +7,10 @@ import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
 import { Textarea } from "@workspace/ui/components/textarea";
 import { cn } from "@workspace/ui/lib/utils";
+import {
+  LANDING_MARKETING_PRIMARY_CTA_SHADOW_CLASS,
+  LANDING_MARKETING_PRIMARY_CTA_SURFACE_CLASS,
+} from "@/modules/landing/constants";
 import { Loader2 } from "lucide-react";
 
 type LandingContactFormProps = {
@@ -60,6 +64,12 @@ export function LandingContactForm({
         }),
       });
       const data = (await res.json()) as { error?: string };
+      if (res.status === 429) {
+        throw new Error(
+          data.error ??
+            "For mange innsendinger. Vent et øyeblikk og prøv igjen.",
+        );
+      }
       if (!res.ok) throw new Error(data.error ?? "Kunne ikke sende");
       toast.success("Takk — vi tar kontakt så snart vi kan.");
       form.reset();
@@ -75,6 +85,8 @@ export function LandingContactForm({
       onSubmit={handleSubmit}
       className={cn("relative space-y-5", className)}
       aria-label="Kontaktskjema"
+      aria-busy={loading}
+      aria-describedby="contact-consent-hint"
       noValidate
     >
       {/* Honeypot — skjult for mennesker */}
@@ -167,11 +179,19 @@ export function LandingContactForm({
         />
       </div>
 
-      <p className={cn("text-xs", isDark ? "text-zinc-500" : "text-muted-foreground")}>
+      <p
+        id="contact-consent-hint"
+        className={cn("text-xs", isDark ? "text-zinc-500" : "text-muted-foreground")}
+      >
         Ved å sende inn samtykker du til at vi lagrer opplysningene for å besvare henvendelsen. Les mer i{" "}
         <a
           href="/personvern"
-          className="font-medium text-[#0f766e] underline decoration-[#2DD4BF]/40 underline-offset-4 hover:text-[#0d9488]"
+          className={cn(
+            "font-medium underline underline-offset-4 transition-colors",
+            isDark
+              ? "text-teal-300/90 decoration-teal-400/35 hover:text-teal-200"
+              : "text-[#0f766e] decoration-[#2DD4BF]/40 hover:text-[#0d9488]",
+          )}
         >
           personvernerklæringen
         </a>
@@ -181,9 +201,11 @@ export function LandingContactForm({
       <Button
         type="submit"
         disabled={loading}
+        aria-busy={loading}
         className={cn(
-          "h-11 w-full rounded-xl bg-[#2DD4BF] font-semibold text-neutral-950 hover:bg-[#2DD4BF]/90 sm:w-auto sm:min-w-[10rem]",
-          !isDark && "shadow-[0_14px_36px_-14px_rgba(45,212,191,0.28)]",
+          LANDING_MARKETING_PRIMARY_CTA_SURFACE_CLASS,
+          "h-11 w-full rounded-xl sm:w-auto sm:min-w-[10rem]",
+          !isDark && LANDING_MARKETING_PRIMARY_CTA_SHADOW_CLASS,
         )}
       >
         {loading ? (

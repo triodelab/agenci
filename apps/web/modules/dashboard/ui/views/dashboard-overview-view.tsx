@@ -5,6 +5,7 @@ import { useQuery } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
 import {
   ArrowRightIcon,
+  BotIcon,
   CreditCardIcon,
   InboxIcon,
   LibraryBigIcon,
@@ -13,7 +14,6 @@ import {
   PaletteIcon,
   PlugIcon,
   SparklesIcon,
-  WrenchIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { DashboardOverviewCalendar } from "@/modules/dashboard/ui/components/dashboard-overview-calendar";
@@ -69,9 +69,9 @@ const SHORTCUTS: Shortcut[] = [
   },
   {
     title: "Agenter",
-    description: "Modell og verktøy.",
+    description: "Alle agenter for organisasjonen.",
     href: "/agents",
-    icon: WrenchIcon,
+    icon: BotIcon,
   },
   {
     title: "Plan og faktura",

@@ -6,6 +6,12 @@ import { MarketingSubpageCta } from "@/modules/landing/ui/components/marketing-s
 import { Button } from "@workspace/ui/components/button";
 import {
   LANDING_MARKETING_EYEBROW_CLASS,
+  LANDING_MARKETING_FEATURE_CARD_CLASS,
+  LANDING_MARKETING_H1_CLASS,
+  LANDING_MARKETING_ICON_TILE_CLASS,
+  LANDING_MARKETING_LEAD_CLASS,
+  LANDING_MARKETING_OUTLINE_CTA_CLASS,
+  LANDING_MARKETING_PRIMARY_CTA_CLASS,
   landingSectionHref,
 } from "@/modules/landing/constants";
 import { cn } from "@workspace/ui/lib/utils";
@@ -21,7 +27,7 @@ import {
 export const metadata: Metadata = {
   title: "Produkt",
   description:
-    "Agenci: AI-widget på nettsiden, kunnskapsbase, samtaler og dashboard — bygget for norsk kundeservice.",
+    "Agenci: KI-chat på nettsiden som bygger på deres innhold, samtaler og dashboard i én løsning — med menneskelig overtagelse når det trengs.",
 };
 
 const bullets = [
@@ -63,27 +69,18 @@ export default function ProduktPage() {
       <article className="landing-section-mesh border-b border-border/40">
         <div className="mx-auto max-w-3xl px-4 py-14 md:py-20 md:px-6">
           <p className={cn("text-sm", LANDING_MARKETING_EYEBROW_CLASS)}>Produkt</p>
-          <h1 className="mt-3 text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
-            Alt dere trenger for AI-drevet kundeservice
+          <h1 className={cn("mt-3", LANDING_MARKETING_H1_CLASS)}>
+            Alt i én løsning: chat på nettsiden, kunnskap og kontroll for teamet
           </h1>
-          <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
-            Agenci kobler nettsiden deres med en assistent som svarer presist, følger retningslinjene
-            deres, og gir teamet full oversikt — uten at kunden merker friksjon.
+          <p className={cn("mt-5", LANDING_MARKETING_LEAD_CLASS)}>
+            Besøkende får svar i chatvinduet. Assistenten bruker det dere har publisert og lastet opp — ikke
+            generiske fraser. Alt dere trenger for å følge opp ligger i samme dashboard.
           </p>
           <div className="mt-10 flex flex-wrap gap-3">
-            <Button
-              asChild
-              size="lg"
-              className="rounded-2xl bg-[#2DD4BF] font-semibold text-neutral-950 shadow-[0_14px_36px_-14px_rgba(45,212,191,0.35)] hover:bg-[#2DD4BF]/90"
-            >
+            <Button asChild size="lg" className={LANDING_MARKETING_PRIMARY_CTA_CLASS}>
               <MarketingSignupCtaLink loggedInBehavior="app">Kom i gang</MarketingSignupCtaLink>
             </Button>
-            <Button
-              asChild
-              variant="outline"
-              size="lg"
-              className="rounded-2xl border-[#2DD4BF]/45 hover:bg-[#2DD4BF]/10"
-            >
+            <Button asChild variant="outline" size="lg" className={LANDING_MARKETING_OUTLINE_CTA_CLASS}>
               <Link href={landingSectionHref("product")}>Se oversikt på forsiden</Link>
             </Button>
           </div>
@@ -91,11 +88,8 @@ export default function ProduktPage() {
         <div className="mx-auto max-w-5xl px-4 pb-20 md:px-6">
           <ul className="grid gap-6 sm:grid-cols-2">
             {bullets.map(({ icon: Icon, title, text }) => (
-              <li
-                key={title}
-                className="rounded-2xl border border-border/60 bg-card/60 p-6 shadow-sm backdrop-blur-sm dark:bg-card/40"
-              >
-                <div className="flex size-10 items-center justify-center rounded-xl bg-[#2DD4BF]/12 text-[#0f766e]">
+              <li key={title} className={LANDING_MARKETING_FEATURE_CARD_CLASS}>
+                <div className={LANDING_MARKETING_ICON_TILE_CLASS}>
                   <Icon className="size-5" strokeWidth={2} />
                 </div>
                 <h2 className="mt-4 text-lg font-semibold text-foreground">{title}</h2>

@@ -55,13 +55,14 @@ export function LandingIntegrationsSection() {
             id="integrations-heading"
             className="mt-8 text-balance text-[2rem] font-semibold leading-[1.08] tracking-[-0.045em] text-white sm:text-5xl md:text-[3.25rem] md:leading-[1.05]"
           >
-            <span className="block">Alt i samme</span>
+            <span className="block">Koble chatten til</span>
             <span className="mt-1 block bg-gradient-to-r from-white via-teal-100/90 to-teal-400/80 bg-clip-text text-transparent">
-              strøm
+              systemene dere allerede bruker
             </span>
           </h2>
           <p className="mx-auto mt-8 max-w-xl text-pretty text-[15px] leading-relaxed text-zinc-400 md:text-lg md:leading-relaxed">
-            Verktøyene deres snakker sammen — ikke teamet. Én samtaleflate, data der folk faktisk jobber.
+            Start med widget på nettsiden. Når dere er klare, kobler dere til CRM, e-post, nettbutikk og
+            mer — slik at samtalen og dataene ikke blir værende i en støvete innboks.
           </p>
         </motion.div>
 

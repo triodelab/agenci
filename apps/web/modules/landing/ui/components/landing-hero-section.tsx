@@ -8,23 +8,21 @@ import { useReducedMotion } from "motion/react";
 import { Button } from "@workspace/ui/components/button";
 import { AuthAwareLink } from "@/components/auth-aware-link";
 import {
-  LANDING_ACCENT_CTA_BG,
   LANDING_AUTH_PATHS,
   LANDING_HERO_WORKFLOW_LEAD,
+  LANDING_MARKETING_PRIMARY_CTA_SURFACE_CLASS,
   LANDING_NAV_TONE_BOUNDARY_ID,
   LANDING_SECTION_IDS,
   landingSectionHref,
 } from "@/modules/landing/constants";
 import { cn } from "@workspace/ui/lib/utils";
 
-const ctaStyle = { backgroundColor: LANDING_ACCENT_CTA_BG } as const;
-
 const HERO_ROTATE_MS = 2000;
 
 const HERO_DASHBOARD_SLIDES = [
-  { src: "/screenshot1.png", label: "Oversikt og statistikk" },
-  { src: "/screenshot2.png", label: "Samtaler og køer" },
-  { src: "/screenshot3.png", label: "Oppsett og snarveier" },
+  { src: "/screenshot1.png", label: "Innsikt: volum, trender og status" },
+  { src: "/screenshot2.png", label: "Samtaler: kø, historikk og overtagelse" },
+  { src: "/screenshot3.png", label: "Oppsett: widget, utseende og snarveier" },
 ] as const;
 
 function HeroDashboardRotator({
@@ -155,23 +153,26 @@ export function LandingHeroSection() {
 
       <div className="relative z-10 mx-auto flex max-w-3xl flex-col items-center px-5 pt-10 text-center sm:px-6 md:max-w-4xl md:pt-14 lg:pt-16">
         <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-teal-300/75 md:text-xs">
-          AI-drevet kundeservice
+          KI-chat for nettsiden deres
         </p>
         <h1
           id="landing-hero-heading"
           className="mt-4 text-balance text-[2rem] font-semibold leading-[1.12] tracking-[-0.035em] text-white sm:text-4xl md:mt-5 md:text-5xl md:leading-[1.08] lg:text-[3.125rem]"
         >
-          Effektiviser, skaler og lykkes med Agenci
+          Svar kundene på nettsiden — døgnet rundt — uten ekstra ansatte
         </h1>
         <p className="mt-5 max-w-[34rem] text-pretty text-[15px] leading-[1.65] text-zinc-400/95 md:mt-6 md:text-lg md:leading-relaxed">
-          Kundeservice som jobber for deg døgnet rundt — presise svar, full kontroll og et dashboard som
-          teamet faktisk bruker.
+          Agenci er en innebygd chat som bruker kunnskapen deres (FAQ, dokumenter, produkttekster) til å
+          svare presist. Besøkende får hjelp med én gang; teamet ser alt i dashboardet og kan ta over når
+          det trengs.
         </p>
         <div className="mt-8 flex flex-col items-center gap-3 sm:mt-10 sm:flex-row sm:gap-4">
           <Button
             size="lg"
-            className="h-12 min-w-[11rem] rounded-full px-8 text-[15px] font-semibold text-neutral-950 shadow-[0_0_48px_-14px_rgba(45,212,191,0.28),0_18px_40px_-18px_rgba(45,212,191,0.18)]"
-            style={ctaStyle}
+            className={cn(
+              LANDING_MARKETING_PRIMARY_CTA_SURFACE_CLASS,
+              "h-12 min-w-[11rem] rounded-full px-8 text-[15px] shadow-[0_0_48px_-14px_rgba(45,212,191,0.28),0_18px_40px_-18px_rgba(45,212,191,0.18)]",
+            )}
             asChild
           >
             <AuthAwareLink
@@ -230,8 +231,10 @@ export function LandingHeroSection() {
         <div className="mt-6 flex justify-center md:mt-8">
           <Button
             size="lg"
-            className="h-12 min-w-[10.5rem] rounded-full px-8 text-[15px] font-semibold text-neutral-950 shadow-[0_14px_36px_-14px_rgba(45,212,191,0.22)]"
-            style={ctaStyle}
+            className={cn(
+              LANDING_MARKETING_PRIMARY_CTA_SURFACE_CLASS,
+              "h-12 min-w-[10.5rem] rounded-full px-8 text-[15px] shadow-[0_14px_36px_-14px_rgba(45,212,191,0.22)]",
+            )}
             asChild
           >
             <Link href={landingSectionHref("contact")}>Book en demo</Link>

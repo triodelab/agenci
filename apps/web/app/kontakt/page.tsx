@@ -3,7 +3,14 @@ import Link from "next/link";
 import { MarketingPageLayout } from "@/modules/landing/ui/components/marketing-page-layout";
 import { LandingContactForm } from "@/modules/landing/ui/components/landing-contact-form";
 import { MarketingSubpageCta } from "@/modules/landing/ui/components/marketing-subpage-cta";
-import { landingSectionHref, LANDING_MARKETING_EYEBROW_CLASS } from "@/modules/landing/constants";
+import {
+  landingSectionHref,
+  LANDING_MARKETING_EYEBROW_CLASS,
+  LANDING_MARKETING_FORM_PANEL_CLASS,
+  LANDING_MARKETING_H1_CLASS,
+  LANDING_MARKETING_INLINE_LINK_CLASS,
+  LANDING_MARKETING_LEAD_CLASS,
+} from "@/modules/landing/constants";
 import { cn } from "@workspace/ui/lib/utils";
 
 export const metadata: Metadata = {
@@ -19,20 +26,17 @@ export default function KontaktPage() {
       <article className="landing-section-mesh border-b border-border/40">
         <div className="mx-auto max-w-2xl px-4 py-14 md:px-6 md:py-20">
           <p className={cn("text-sm", LANDING_MARKETING_EYEBROW_CLASS)}>Kontakt</p>
-          <h1 className="mt-3 text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
-            Snakk med oss
-          </h1>
-          <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
+          <h1 className={cn("mt-3", LANDING_MARKETING_H1_CLASS)}>Snakk med oss</h1>
+          <p className={cn("mt-5", LANDING_MARKETING_LEAD_CLASS)}>
             Fyll ut skjemaet — eller gå til{" "}
-            <Link
-              href={landingSectionHref("contact")}
-              className="font-medium text-foreground underline-offset-4 hover:underline"
-            >
+            <Link href={landingSectionHref("contact")} className={LANDING_MARKETING_INLINE_LINK_CLASS}>
               kontaktseksjonen på forsiden
             </Link>{" "}
             om du allerede er der.
           </p>
-          <LandingContactForm variant="light" className="mt-10" />
+          <div className={cn("mt-10", LANDING_MARKETING_FORM_PANEL_CLASS)}>
+            <LandingContactForm variant="light" />
+          </div>
         </div>
         <MarketingSubpageCta omitContactButton />
       </article>

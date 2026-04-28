@@ -7,6 +7,12 @@ import { cn } from "@workspace/ui/lib/utils";
 import {
   LANDING_AUTH_PATHS,
   LANDING_MARKETING_EYEBROW_CLASS,
+  LANDING_MARKETING_FEATURE_CARD_CLASS,
+  LANDING_MARKETING_H1_CLASS,
+  LANDING_MARKETING_ICON_TILE_CLASS,
+  LANDING_MARKETING_LEAD_CLASS,
+  LANDING_MARKETING_OUTLINE_CTA_CLASS,
+  LANDING_MARKETING_PRIMARY_CTA_CLASS,
   landingSectionHref,
 } from "@/modules/landing/constants";
 import { AuthAwareLink } from "@/components/auth-aware-link";
@@ -15,7 +21,7 @@ import { Plug, Webhook, Database, ArrowRight } from "lucide-react";
 export const metadata: Metadata = {
   title: "Integrasjoner",
   description:
-    "Koble Agenci til nettside, kunnskapskilder og arbeidsflyt. Les om integrasjoner og åpne integrasjonspanel i appen.",
+    "Koble Agenci-chatten til nettside, kunnskapskilder og CRM/e-post slik at samtaler og leads havner der teamet jobber.",
 };
 
 const items = [
@@ -42,12 +48,13 @@ export default function IntegrasjonerMarketingPage() {
       <article className="landing-section-mesh border-b border-border/40">
         <div className="mx-auto max-w-3xl px-4 py-14 md:py-20 md:px-6">
           <p className={cn("text-sm", LANDING_MARKETING_EYEBROW_CLASS)}>Integrasjoner</p>
-          <h1 className="mt-3 text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
-            Koble Agenci til deres stack
+          <h1 className={cn("mt-3", LANDING_MARKETING_H1_CLASS)}>
+            La chatten snakke med systemene dere allerede bruker
           </h1>
-          <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
-            Start enkelt på nettsiden, bygg ut med kunnskap og — når dere er klare — bruk
-            integrasjonspanelet i appen for å gå dypere.
+          <p className={cn("mt-5", LANDING_MARKETING_LEAD_CLASS)}>
+            Start med widget og kunnskap på nettsiden. Når dere er klare, kobler dere Agenci til CRM,
+            e-post og andre verktøy via integrasjonspanelet i appen — uten at hver samtale blir en manuell
+            copy-paste-jobb.
           </p>
           <div className="mt-10 flex flex-wrap gap-3">
             <AuthAwareLink
@@ -55,18 +62,14 @@ export default function IntegrasjonerMarketingPage() {
               loggedInHref="/integrations"
               className={cn(
                 buttonVariants({ size: "lg" }),
-                "inline-flex items-center gap-2 rounded-2xl border-0 bg-[#2DD4BF] font-semibold text-neutral-950 shadow-[0_14px_36px_-14px_rgba(45,212,191,0.35)] hover:bg-[#2DD4BF]/90",
+                "inline-flex items-center gap-2 border-0",
+                LANDING_MARKETING_PRIMARY_CTA_CLASS,
               )}
             >
               Åpne integrasjoner
               <ArrowRight className="size-4" />
             </AuthAwareLink>
-            <Button
-              asChild
-              variant="outline"
-              size="lg"
-              className="rounded-2xl border-[#2DD4BF]/45 hover:bg-[#2DD4BF]/10"
-            >
+            <Button asChild variant="outline" size="lg" className={LANDING_MARKETING_OUTLINE_CTA_CLASS}>
               <Link href={landingSectionHref("integrations")}>
                 Se partnerlogoer på forsiden
               </Link>
@@ -77,9 +80,9 @@ export default function IntegrasjonerMarketingPage() {
           {items.map(({ icon: Icon, title, text }) => (
             <div
               key={title}
-              className="flex gap-4 rounded-2xl border border-border/60 bg-card/60 p-6 dark:bg-card/40"
+              className={cn("flex items-start gap-4 md:gap-5", LANDING_MARKETING_FEATURE_CARD_CLASS)}
             >
-              <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-[#2DD4BF]/12 text-[#0f766e]">
+              <div className={cn(LANDING_MARKETING_ICON_TILE_CLASS, "size-11")}>
                 <Icon className="size-5" strokeWidth={2} />
               </div>
               <div>

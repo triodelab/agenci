@@ -31,7 +31,7 @@ import { chatBubbleIcon, closeIcon } from './icons';
   
   // Exit if no organization ID
   if (!organizationId) {
-    console.error('Echo Widget: data-organization-id attribute is required');
+    console.error('Agenci: data-organization-id er påkrevd på script-taggen');
     return;
   }
   
@@ -209,13 +209,10 @@ import { chatBubbleIcon, closeIcon } from './icons';
     init();
   }
   
-  // Expose API to global scope
-  (window as any).EchoWidget = {
-    init: reinit,
-    show,
-    hide,
-    destroy
-  };
+  const api = { init: reinit, show, hide, destroy };
+  (window as any).AgenciWidget = api;
+  /** @deprecated Bruk window.AgenciWidget */
+  (window as any).EchoWidget = api;
   
   // Auto-initialize
   init();

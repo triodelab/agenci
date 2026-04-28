@@ -2,13 +2,13 @@ import type { Metadata } from "next";
 import { LandingPageView } from "@/modules/landing";
 
 export const metadata: Metadata = {
-  title: "Automatiser kundeservice og salg med AI",
+  title: "Agenci — KI-chat på nettsiden med kunnskap dere styrer",
   description:
-    "Agenci er en AI-basert chatbotplattform som svarer raskt og riktig 24/7, reduserer supportkostnader, øker konvertering og gir deg full kontroll via dashboard.",
+    "Chat-widget som svarer ut fra deres innhold (filer og nettsider), samtaler i dashboard og overtagelse til mennesker når det trengs.",
   openGraph: {
-    title: "Agenci - Automatiser kundeservice og salg med AI",
+    title: "Agenci — KI-chat på nettsiden",
     description:
-      "Agenci er en AI-basert chatbotplattform som svarer raskt og riktig 24/7, reduserer supportkostnader, øker konvertering og gir deg full kontroll via dashboard.",
+      "Svar kunder i chat fra egen kunnskapsbase. Dashboard for teamet. Eskalering til menneske når saken krever det.",
     url: "/",
   },
   alternates: { canonical: "/" },

@@ -33,7 +33,7 @@ export const BillingView = () => {
       <DashboardPageHeader
         description="Administrer abonnement, betalingsmåte og fakturaer. Velg plan under om dere skal oppgradere."
         kicker="Konto"
-        title="Plans & Billing"
+        title="Abonnement og betaling"
       />
 
       <section className="mt-8 space-y-3">
