@@ -3,6 +3,7 @@
 import { Protect, useUser } from "@clerk/nextjs";
 import { hasUiPremiumBypass } from "@/lib/dev-bypass";
 import { PremiumFeatureOverlay } from "./premium-feature-overlay";
+import { CardGridSkeleton } from "@/modules/dashboard/ui/components/dashboard-skeleton";
 
 export function ProPlanGate({ children }: { children: React.ReactNode }) {
   const { user, isLoaded } = useUser();
@@ -13,13 +14,7 @@ export function ProPlanGate({ children }: { children: React.ReactNode }) {
   }
 
   if (!isLoaded) {
-    return (
-      <div
-        className="min-h-[12rem] animate-pulse rounded-xl bg-muted/40"
-        aria-busy="true"
-        aria-label="Laster tilgang"
-      />
-    );
+    return <CardGridSkeleton count={3} />;
   }
 
   return (

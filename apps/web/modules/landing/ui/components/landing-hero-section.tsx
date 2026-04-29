@@ -153,18 +153,17 @@ export function LandingHeroSection() {
 
       <div className="relative z-10 mx-auto flex max-w-3xl flex-col items-center px-5 pt-10 text-center sm:px-6 md:max-w-4xl md:pt-14 lg:pt-16">
         <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-teal-300/75 md:text-xs">
-          KI-chat for nettsiden deres
+          KI-chat for nettsiden din
         </p>
         <h1
           id="landing-hero-heading"
           className="mt-4 text-balance text-[2rem] font-semibold leading-[1.12] tracking-[-0.035em] text-white sm:text-4xl md:mt-5 md:text-5xl md:leading-[1.08] lg:text-[3.125rem]"
         >
-          Svar kundene på nettsiden — døgnet rundt — uten ekstra ansatte
+          Kunder som ikke får svar, kjøper et annet sted
         </h1>
         <p className="mt-5 max-w-[34rem] text-pretty text-[15px] leading-[1.65] text-zinc-400/95 md:mt-6 md:text-lg md:leading-relaxed">
-          Agenci er en innebygd chat som bruker kunnskapen deres (FAQ, dokumenter, produkttekster) til å
-          svare presist. Besøkende får hjelp med én gang; teamet ser alt i dashboardet og kan ta over når
-          det trengs.
+          Agenci er en chat på nettsiden din som svarer med dine egne ord — FAQ, produktsider, retningslinjer.
+          Kunden får svar der og da. Du slipper å svare de samme spørsmålene om og om igjen.
         </p>
         <div className="mt-8 flex flex-col items-center gap-3 sm:mt-10 sm:flex-row sm:gap-4">
           <Button

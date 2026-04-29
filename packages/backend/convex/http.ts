@@ -37,9 +37,10 @@ http.route({
       case "subscription.updated": {
         const subscription = event.data as {
           status: string;
+          trial_end_at?: number | null;
           payer?: {
             organization_id: string;
-          }
+          };
         };
 
         const organizationId = subscription.payer?.organization_id;
@@ -48,7 +49,8 @@ http.route({
           return new Response("Missing Organization ID", { status: 400 });
         }
 
-        const newMaxAllowedMemberships = subscription.status === "active" ? 5 : 1;
+        const isPro = subscription.status === "active" || subscription.status === "trialing";
+        const newMaxAllowedMemberships = isPro ? 5 : 1;
 
         await clerkClient.organizations.updateOrganization(organizationId, {
           maxAllowedMemberships: newMaxAllowedMemberships,
@@ -57,6 +59,7 @@ http.route({
         await ctx.runMutation(internal.system.subscriptions.upsert, {
           organizationId,
           status: subscription.status,
+          trialEndsAt: subscription.trial_end_at ?? undefined,
         });
 
         break;

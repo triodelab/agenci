@@ -1,8 +1,6 @@
 "use client";
 
-import {
-  BotIcon,
-} from "lucide-react";
+import { BotIcon } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -21,15 +19,9 @@ export const VapiAssistantsTab = () => {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="px-6 py-4">
-              Assistant
-            </TableHead>
-            <TableHead className="px-6 py-4">
-              Model
-            </TableHead>
-            <TableHead className="px-6 py-4">
-              First Message
-            </TableHead>
+            <TableHead className="px-6 py-4">Assistent</TableHead>
+            <TableHead className="px-6 py-4">Modell</TableHead>
+            <TableHead className="px-6 py-4">Velkomstmelding</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -37,27 +29,21 @@ export const VapiAssistantsTab = () => {
             if (isLoading) {
               return (
                 <TableRow>
-                  <TableCell
-                    colSpan={3}
-                    className="px-6 py-8 text-center text-muted-foreground"
-                  >
-                    Loading assistants...
+                  <TableCell colSpan={3} className="px-6 py-8 text-center text-muted-foreground">
+                    Laster assistenter…
                   </TableCell>
                 </TableRow>
-              )
+              );
             }
 
             if (assistants.length === 0) {
               return (
                 <TableRow>
-                  <TableCell
-                    colSpan={3}
-                    className="px-6 py-8 text-center text-muted-foreground"
-                  >
-                    No assistants configured
+                  <TableCell colSpan={3} className="px-6 py-8 text-center text-muted-foreground">
+                    Ingen assistenter konfigurert
                   </TableCell>
                 </TableRow>
-              )
+              );
             }
 
             return assistants.map((assistant) => (
@@ -65,23 +51,19 @@ export const VapiAssistantsTab = () => {
                 <TableCell className="px-6 py-4">
                   <div className="flex items-center gap-3">
                     <BotIcon className="size-4 text-muted-foreground" />
-                    <span>
-                      {assistant.name || "Unnamed Assistant"}
-                    </span>
+                    <span>{assistant.name || "Uten navn"}</span>
                   </div>
                 </TableCell>
                 <TableCell className="px-6 py-4">
-                  <span className="text-sm">
-                    {assistant.model?.model || "Not configured"}
-                  </span>
+                  <span className="text-sm">{assistant.model?.model || "Ikke konfigurert"}</span>
                 </TableCell>
                 <TableCell className="max-w-xs px-6 py-4">
-                  <p className="truncate text-muted-foreground text-sm">
-                    {assistant.firstMessage || "No greeting configured"}
+                  <p className="truncate text-sm text-muted-foreground">
+                    {assistant.firstMessage || "Ingen velkomstmelding"}
                   </p>
                 </TableCell>
               </TableRow>
-            ))
+            ));
           })()}
         </TableBody>
       </Table>

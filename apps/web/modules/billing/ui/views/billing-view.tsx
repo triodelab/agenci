@@ -17,9 +17,14 @@ import { PricingTable } from "../components/pricing-table";
 const clerkBillingAppearance = {
   elements: {
     rootBox: "w-full",
-    card: "shadow-none! border! rounded-2xl! border-border/80! bg-card/95! backdrop-blur-sm!",
-    navbar: "border-b border-border/60 bg-transparent",
-    navbarButtons: "gap-1",
+    cardBox: "w-full max-w-none!",
+    card: "w-full! max-w-none! shadow-none! border-0! bg-transparent!",
+    navbar: "bg-muted/40! border-r! border-border/60! min-w-[11rem]!",
+    navbarButtons: "gap-0.5! px-2!",
+    navbarButton: "rounded-lg! w-full! justify-start! px-3! py-2! text-[13px]! font-medium! text-muted-foreground! hover:bg-muted! hover:text-foreground!",
+    navbarButtonIcon: "shrink-0! opacity-70!",
+    navbarButtonLabel: "block! opacity-100! visible! truncate!",
+    scrollBox: "flex-1!",
   },
 } as const;
 
@@ -29,7 +34,7 @@ export const BillingView = () => {
   const orgBillingMode = getBillingUiMode(isLoaded, email);
 
   return (
-    <DashboardPageShell contentClassName="max-w-5xl">
+    <DashboardPageShell>
       <DashboardPageHeader
         description="Administrer abonnement, betalingsmåte og fakturaer. Velg plan under om dere skal oppgradere."
         kicker="Konto"
@@ -42,7 +47,7 @@ export const BillingView = () => {
           Her finner dere Clerk sitt organisasjonsoppsett med fane for faktura og betaling når Clerk Billing er
           aktivert.
         </p>
-        <DashboardPagePanel className="mt-2 overflow-hidden" variant="lattice">
+        <DashboardPagePanel className="mt-2 overflow-hidden !p-0" variant="lattice">
           {orgBillingMode === "loading" ? (
             <BillingClerkLoadingSkeleton />
           ) : orgBillingMode === "placeholder" ? (

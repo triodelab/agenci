@@ -45,23 +45,23 @@ import { VapiConnectedView } from "../components/vapi-connected-view";
 const vapiFeatures: Feature[] = [
   {
     icon: GlobeIcon,
-    label: "Web voice calls",
-    description: "Voice chat directly in your app",
+    label: "Stemme i nettleser",
+    description: "Talesamtale direkte i widget og app",
   },
   {
     icon: PhoneIcon,
-    label: "Phone numbers",
-    description: "Get dedicated business lines",
+    label: "Telefonnumre",
+    description: "Egne bedriftslinjer for innkommende anrop",
   },
   {
     icon: PhoneCallIcon,
-    label: "Outbound calls",
-    description: "Automated customer outreach",
+    label: "Utgående anrop",
+    description: "Automatisert kundekontakt via telefon",
   },
   {
     icon: WorkflowIcon,
-    label: "Workflows",
-    description: "Custom conversation flows",
+    label: "Samtaleflyter",
+    description: "Egendefinerte samtaleløp og handlinger",
   },
 ];
 

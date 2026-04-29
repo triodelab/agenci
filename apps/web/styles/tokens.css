@@ -314,45 +314,49 @@
 .dashboard-app-shell {
   /* Lister (konversasjon, knowledge, …): diskret valgt */
   --dash-nav-active-bg: oklch(0.94 0 0);
+  --dash-nav-active-surface: oklch(0.94 0 0);
   --dash-nav-active-border: oklch(0.15 0 0);
   --dash-inbox-active: var(--dash-nav-active-bg);
   --dash-inbox-active-border: var(--dash-nav-active-border);
   --dash-knowledge-active: var(--dash-nav-active-bg);
   --dash-knowledge-folder: oklch(0.97 0 0);
-  --background: oklch(0.985 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  /* Overflater — ren hvit bakgrunn (matcher screenshot) */
+  --background: oklch(0.965 0.003 264);   /* Lys grå canvas */
+  --foreground: oklch(0.13 0 0);
+  --card: oklch(1 0 0);                    /* Hvite kort */
+  --card-foreground: oklch(0.13 0 0);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  /* Primær = svart (Chatbase / shadcn clean) */
-  --primary: oklch(0.15 0 0);
+  --popover-foreground: oklch(0.13 0 0);
+  --primary: oklch(0.13 0 0);             /* Svart primær */
   --primary-foreground: oklch(0.99 0 0);
-  --secondary: oklch(0.97 0.005 264);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.965 0.005 264);
-  --muted-foreground: oklch(0.48 0.02 264);
-  --accent: oklch(0.96 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.96 0.003 264);
+  --secondary-foreground: oklch(0.18 0 0);
+  --muted: oklch(0.955 0.004 264);
+  --muted-foreground: oklch(0.50 0.015 264);
+  --accent: oklch(0.955 0 0);
+  --accent-foreground: oklch(0.18 0 0);
   --destructive: oklch(0.58 0.22 27);
-  --border: oklch(0.91 0.005 264);
-  --input: oklch(0.91 0.005 264);
+  --border: oklch(0.895 0.005 264);
+  --input: oklch(0.895 0.005 264);
   --ring: oklch(0.45 0.02 264);
   --radius: 0.625rem;
-  /* Sidebar: nøytral off-white, tydelig fra canvas */
-  --sidebar: oklch(0.97 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.15 0 0);
+  /* Sidebar: hvit (som i screenshot) */
+  --sidebar: oklch(1 0 0);
+  --sidebar-foreground: oklch(0.13 0 0);
+  --sidebar-primary: oklch(0.13 0 0);
   --sidebar-primary-foreground: oklch(0.99 0 0);
-  --sidebar-accent: oklch(0.94 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.9 0.006 264);
+  --sidebar-accent: oklch(0.955 0 0);
+  --sidebar-accent-foreground: oklch(0.18 0 0);
+  --sidebar-border: oklch(0.895 0.005 264);
   --sidebar-ring: oklch(0.45 0.02 264);
 }
 
 .dark .dashboard-app-shell {
+  --brand: #2dd4bf;
+  --brand-muted: color-mix(in oklch, #2dd4bf 12%, transparent);
   /* Canvas #09090b + kort #121214 — samme par som widget-referansen (zinc-950 / mørk charcoal) */
   --dash-nav-active-bg: color-mix(in oklch, var(--foreground) 12%, transparent);
+  --dash-nav-active-surface: color-mix(in oklch, #2dd4bf 12%, var(--card));
   --dash-nav-active-border: oklch(0.92 0 0);
   --background: #09090b;
   --foreground: #fafafa;
@@ -758,6 +762,46 @@
   .dash-stat-board {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+}
+
+/* Top navigation bar (full bredde, over sidebar + main) */
+.dash-topnav {
+  position: relative;
+  z-index: 30;
+  flex-shrink: 0;
+}
+
+/*
+ * Sidebar: fix fixed inset-y-0 overlapping the 60px top-nav.
+ * The shadcn Sidebar uses position:fixed + inset-y-0 (top:0, bottom:0).
+ * We push it down and clip it so it sits strictly below the header.
+ */
+.dashboard-app-shell [data-slot="sidebar-container"] {
+  top: 60px !important;
+  height: calc(100svh - 60px) !important;
+}
+
+/*
+ * Sidebar nav: aktiv state — shadcn setter data-[active=true]:bg-sidebar-accent
+ * som vil vise grå bakgrunn. Vi overstyrer til svart for å matche referansedesignet.
+ */
+.dashboard-app-shell [data-sidebar="menu-button"][data-active="true"] {
+  background-color: var(--foreground) !important;
+  color: var(--background) !important;
+}
+
+.dashboard-app-shell [data-sidebar="menu-button"][data-active="true"] svg {
+  color: var(--background) !important;
+  opacity: 1 !important;
+}
+
+.dashboard-app-shell [data-sidebar="menu-button"][data-active="true"]:hover {
+  background-color: color-mix(in oklch, var(--foreground) 90%, transparent) !important;
+}
+
+.dark .dashboard-app-shell [data-sidebar="menu-button"][data-active="true"] {
+  background-color: var(--foreground) !important;
+  color: var(--background) !important;
 }
 
 /* Hovedflate — synlig «workspace»-canvas (mesh, ikke flat grå) */

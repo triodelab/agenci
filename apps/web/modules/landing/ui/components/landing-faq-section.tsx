@@ -11,28 +11,28 @@ import { cn } from "@workspace/ui/lib/utils";
 
 const faqs = [
   {
-    q: "Hva er Agenci?",
-    a: "Agenci er en KI-drevet chat som dere legger på nettsiden. Den svarer ut fra innholdet dere gir (FAQ, dokumenter, produkttekster), viser samtaler i et dashboard, og lar mennesker ta over når saken krever det. Målet er færre henvendelser som stopper i e-post, og flere fornøyde kunder uten at dere må skalere support lineært.",
+    q: "Er dette ikke bare en vanlig chatbot?",
+    a: "Nei. Vanlige chatboter gir deg forhåndsdefinerte svar på forhåndsdefinerte spørsmål — og mislykkes med alt annet. Agenci leser innholdet ditt og svarer fritt ut fra det, akkurat som om du hadde skrevet svaret selv. Stiller kunden et spørsmål du ikke har dekket, sier den fra — og kunden kan kontakte deg direkte.",
   },
   {
-    q: "Hvor raskt kan vi være live?",
-    a: "Mange kommer i gang på kort tid: widget inn, kunnskap inn, test med ekte spørsmål. Vi anbefaler en enkel pilot først — så skalerer dere når flyten sitter.",
+    q: "Hvor lang tid tar det å sette opp?",
+    a: "Under 10 minutter for det grunnleggende. Du limer inn én linje kode på nettsiden, laster opp FAQ-en din eller kopierer inn tekst, og er i gang. Du trenger ikke utvikler, og du trenger ikke gjøre noe om igjen. Vil du finjustere utseende og tone etterpå, gjør du det i dashboardet.",
   },
   {
-    q: "Hva skjer med data og personvern?",
-    a: "Dere beholder kontroll over kundedata i tråd med avtale og gjeldende regler. Roller, innsyn og sporbarhet er bygget inn slik at dere kan dokumentere hvordan data brukes.",
+    q: "Hva skjer hvis assistenten svarer feil?",
+    a: "Du ser alle samtaler i dashboardet og kan rette opp underveis. Hvis assistenten er usikker, vil den si fra til kunden i stedet for å gjette. Du kan også legge inn instrukser for hva den aldri skal svare på — det styrer du helt selv.",
   },
   {
-    q: "Kan Agenci kobles til CRM, e-post og andre systemer?",
-    a: "Ja. Poenget er at samtalen ikke skal leve isolert: koble der det gir mening for dere, så leads og saker havner der teamet allerede jobber.",
+    q: "Hva med GDPR og personvern?",
+    a: "Kundedata lagres i henhold til GDPR. Du eier dataene. Vi lagrer ikke samtaler til treningsformål uten avtale. Du kan slette alt til enhver tid.",
   },
   {
-    q: "Hva skjer når kunden må snakke med et menneske?",
-    a: "Samtalen kan overtas eller sendes videre med historikk og kontekst, slik at kunden slipper å gjenta seg og saken ikke forsvinner.",
+    q: "Hva skjer når en kunde trenger å snakke med et menneske?",
+    a: "Du ser samtalen live i dashboardet og kan ta over når som helst. Kunden slipper å forklare alt på nytt — all historikk er der. Du kan også sette opp at visse spørsmål alltid går rett til deg.",
   },
   {
-    q: "Finnes det bindingstid?",
-    a: "Det avhenger av avtale og nivå. Ta kontakt om volum, SLA og eventuelle forpliktelser — vi legger opp det som passer dere.",
+    q: "Hva koster det etter prøveperioden?",
+    a: "Pro-planen koster 50 dollar i måneden. Ingen bindingstid — du kan si opp når som helst. Gratis-planen forblir gratis, men uten AI-assistenten. Bruker du mer enn du forventet? Ta kontakt, så finner vi noe som passer.",
   },
 ] as const;
 
@@ -62,10 +62,10 @@ export function LandingFaqSection() {
             id="faq-heading"
             className="mt-3 text-balance text-2xl font-semibold tracking-[-0.03em] text-white sm:text-3xl"
           >
-            Det dere ofte lurer på
+            Spørsmål vi får ofte
           </h2>
           <p className="mt-4 text-[15px] leading-relaxed text-zinc-500 md:text-base">
-            Finner dere ikke svaret? Send en kort melding — vi hjelper med konkret oppsett for deres bransje.
+            Finner du ikke svaret? Send oss en melding — vi svarer innen én arbeidsdag.
           </p>
         </div>
 

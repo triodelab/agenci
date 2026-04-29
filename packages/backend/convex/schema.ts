@@ -5,12 +5,14 @@ export default defineSchema({
   subscriptions: defineTable({
     organizationId: v.string(),
     status: v.string(),
+    trialEndsAt: v.optional(v.number()),
   })
     .index("by_organization_id", ["organizationId"]),
   widgetSettings: defineTable({
     organizationId: v.string(),
     /** Vises i widget-header (f.eks. «Agenci»). */
     widgetTitle: v.optional(v.string()),
+    agentId: v.optional(v.id("agents")),
     greetMessage: v.string(),
     defaultSuggestions: v.object({
       suggestion1: v.optional(v.string()),
@@ -59,6 +61,7 @@ export default defineSchema({
     .index("by_organization_id", ["organizationId"])
     .index("by_organization_id_and_service", ["organizationId", "service"]),
   conversations: defineTable({
+    agentId: v.optional(v.id("agents")),
     threadId: v.string(),
     organizationId: v.string(),
     contactSessionId: v.id("contactSessions"),
@@ -71,7 +74,9 @@ export default defineSchema({
     .index("by_organization_id", ["organizationId"])
     .index("by_contact_session_id", ["contactSessionId"])
     .index("by_thread_id", ["threadId"])
-    .index("by_status_and_organization_id", ["status", "organizationId"]),
+    .index("by_status_and_organization_id", ["status", "organizationId"])
+    .index("by_agent_id", ["agentId"])
+    .index("by_agent_id_and_status", ["agentId", "status"]),
   contactSessions: defineTable({
     name: v.string(),
     email: v.string(),

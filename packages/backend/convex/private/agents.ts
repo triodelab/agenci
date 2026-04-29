@@ -1,10 +1,8 @@
 import { ConvexError, v } from "convex/values";
-import { mutation, query, type MutationCtx } from "../_generated/server";
-import { internal } from "../_generated/api";
-import { getOrgIdOrNull, getUserEmailOrNull } from "../lib/auth";
-import { hasActiveSubscriptionAccess } from "../lib/subscriptionAccess";
+import { mutation, query } from "../_generated/server";
+import { getOrgIdOrNull } from "../lib/auth";
 
-const BUILT_IN_SLUG = "support";
+const MAX_AGENTS = 5;
 
 function slugifyName(name: string): string {
   const lower = name
@@ -18,45 +16,16 @@ function slugifyName(name: string): string {
   const slug = lower
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
-  if (!slug) {
-    return "agent";
-  }
-  if (slug === BUILT_IN_SLUG) {
-    return "agent";
-  }
+  if (!slug) return "agent";
   return slug;
 }
 
-async function requireSubscription(ctx: MutationCtx): Promise<string> {
-  const orgId = await getOrgIdOrNull(ctx);
-  if (!orgId) {
-    throw new ConvexError({
-      code: "BAD_REQUEST",
-      message:
-        "No organization in session. Select an organization in Clerk (JWT template must include orgId).",
-    });
-  }
-  const subscription = await ctx.runQuery(
-    internal.system.subscriptions.getByOrganizationId,
-    { organizationId: orgId },
-  );
-  const userEmail = await getUserEmailOrNull(ctx);
-  if (!hasActiveSubscriptionAccess(orgId, subscription, { userEmail })) {
-    throw new ConvexError({
-      code: "BAD_REQUEST",
-      message: "Missing subscription",
-    });
-  }
-  return orgId;
-}
 
 export const list = query({
   args: {},
   handler: async (ctx) => {
     const orgId = await getOrgIdOrNull(ctx);
-    if (!orgId) {
-      return null;
-    }
+    if (!orgId) return null;
     const rows = await ctx.db
       .query("agents")
       .withIndex("by_organization_id", (q) => q.eq("organizationId", orgId))
@@ -65,38 +34,58 @@ export const list = query({
   },
 });
 
-export const seedDefaults = mutation({
+export const getOne = query({
+  args: { agentId: v.id("agents") },
+  handler: async (ctx, args) => {
+    const orgId = await getOrgIdOrNull(ctx);
+    if (!orgId) return null;
+    const agent = await ctx.db.get(args.agentId);
+    if (!agent || agent.organizationId !== orgId) return null;
+    return agent;
+  },
+});
+
+/** Returns all agents with their open conversation count (for home page cards). */
+export const listWithCounts = query({
   args: {},
   handler: async (ctx) => {
     const orgId = await getOrgIdOrNull(ctx);
-    if (!orgId) {
-      throw new ConvexError({
-        code: "BAD_REQUEST",
-        message:
-          "No organization in session. Select an organization in Clerk (JWT template must include orgId).",
-      });
-    }
-    const existing = await ctx.db
+    if (!orgId) return null;
+
+    const agents = await ctx.db
       .query("agents")
       .withIndex("by_organization_id", (q) => q.eq("organizationId", orgId))
       .collect();
-    if (existing.length > 0) {
-      return { seeded: false as const };
-    }
-    const now = Date.now();
-    await ctx.db.insert("agents", {
-      organizationId: orgId,
-      name: "Standard støtte-agent",
-      description:
-        "Innebygd assistent koblet til kunnskapsbase, med søk, eskalering og avslutning av samtaler.",
-      slug: BUILT_IN_SLUG,
-      isBuiltIn: true,
-      modelLabel: "gpt-4o-mini",
-      isActive: true,
-      createdAt: now,
-      updatedAt: now,
-    });
-    return { seeded: true as const };
+
+    const agentsWithCounts = await Promise.all(
+      agents.map(async (agent) => {
+        const openConvs = await ctx.db
+          .query("conversations")
+          .withIndex("by_agent_id", (q) => q.eq("agentId", agent._id))
+          .filter((q) =>
+            q.and(
+              q.eq(q.field("organizationId"), orgId),
+              q.neq(q.field("status"), "resolved"),
+            ),
+          )
+          .take(100);
+
+        return {
+          ...agent,
+          openConversationCount: openConvs.length,
+        };
+      }),
+    );
+
+    return agentsWithCounts.sort((a, b) => a.createdAt - b.createdAt);
+  },
+});
+
+/** Kept for API compatibility — no longer auto-creates any agent. */
+export const seedDefaults = mutation({
+  args: {},
+  handler: async () => {
+    return { seeded: false as const };
   },
 });
 
@@ -114,9 +103,7 @@ async function nextAvailableSlug(
         q.eq("organizationId", organizationId).eq("slug", candidate),
       )
       .unique();
-    if (!hit) {
-      return candidate;
-    }
+    if (!hit) return candidate;
     candidate = `${base}-${n}`;
     n += 1;
   }
@@ -128,11 +115,30 @@ export const create = mutation({
     description: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const orgId = await requireSubscription(ctx);
+    const orgId = await getOrgIdOrNull(ctx);
+    if (!orgId) {
+      throw new ConvexError({
+        code: "BAD_REQUEST",
+        message: "No organization in session.",
+      });
+    }
+
+    const existing = await ctx.db
+      .query("agents")
+      .withIndex("by_organization_id", (q) => q.eq("organizationId", orgId))
+      .collect();
+
+    if (existing.length >= MAX_AGENTS) {
+      throw new ConvexError({
+        code: "BAD_REQUEST",
+        message: `Du har nådd maks ${MAX_AGENTS} agenter. Slett en eksisterende for å opprette ny.`,
+      });
+    }
+
     const base = slugifyName(args.name);
     const slug = await nextAvailableSlug(ctx, orgId, base);
     const now = Date.now();
-    await ctx.db.insert("agents", {
+    const agentId = await ctx.db.insert("agents", {
       organizationId: orgId,
       name: args.name.trim(),
       description: args.description?.trim() || undefined,
@@ -143,7 +149,7 @@ export const create = mutation({
       createdAt: now,
       updatedAt: now,
     });
-    return { slug };
+    return { slug, agentId };
   },
 });
 
@@ -155,69 +161,38 @@ export const update = mutation({
     isActive: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
-    const orgId = await requireSubscription(ctx);
+    const orgId = await getOrgIdOrNull(ctx);
+    if (!orgId) {
+      throw new ConvexError({ code: "BAD_REQUEST", message: "No organization in session." });
+    }
     const doc = await ctx.db.get(args.agentId);
     if (!doc || doc.organizationId !== orgId) {
-      throw new ConvexError({
-        code: "NOT_FOUND",
-        message: "Agent not found",
-      });
-    }
-    if (doc.isBuiltIn) {
-      if (args.name !== undefined) {
-        throw new ConvexError({
-          code: "BAD_REQUEST",
-          message: "Cannot rename built-in agent",
-        });
-      }
-      if (args.isActive === false) {
-        throw new ConvexError({
-          code: "BAD_REQUEST",
-          message: "Cannot deactivate built-in agent",
-        });
-      }
+      throw new ConvexError({ code: "NOT_FOUND", message: "Agent not found" });
     }
     if (args.name === undefined && args.description === undefined && args.isActive === undefined) {
       return;
     }
     const now = Date.now();
-    const patch: {
-      name?: string;
-      description?: string;
-      isActive?: boolean;
-      updatedAt: number;
-    } = { updatedAt: now };
-    if (args.name !== undefined) {
-      patch.name = args.name.trim();
-    }
-    if (args.description !== undefined) {
-      patch.description = args.description.trim() || undefined;
-    }
-    if (args.isActive !== undefined) {
-      patch.isActive = args.isActive;
-    }
+    const patch: { name?: string; description?: string; isActive?: boolean; updatedAt: number } = {
+      updatedAt: now,
+    };
+    if (args.name !== undefined) patch.name = args.name.trim();
+    if (args.description !== undefined) patch.description = args.description.trim() || undefined;
+    if (args.isActive !== undefined) patch.isActive = args.isActive;
     await ctx.db.patch(args.agentId, patch);
   },
 });
 
 export const remove = mutation({
-  args: {
-    agentId: v.id("agents"),
-  },
+  args: { agentId: v.id("agents") },
   handler: async (ctx, args) => {
-    const orgId = await requireSubscription(ctx);
+    const orgId = await getOrgIdOrNull(ctx);
+    if (!orgId) {
+      throw new ConvexError({ code: "BAD_REQUEST", message: "No organization in session." });
+    }
     const doc = await ctx.db.get(args.agentId);
     if (!doc || doc.organizationId !== orgId) {
-      throw new ConvexError({
-        code: "NOT_FOUND",
-        message: "Agent not found",
-      });
-    }
-    if (doc.isBuiltIn) {
-      throw new ConvexError({
-        code: "BAD_REQUEST",
-        message: "Cannot delete built-in agent",
-      });
+      throw new ConvexError({ code: "NOT_FOUND", message: "Agent not found" });
     }
     await ctx.db.delete(args.agentId);
   },

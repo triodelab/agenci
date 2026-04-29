@@ -1,6 +1,8 @@
 import { query, QueryCtx } from "../_generated/server";
+import { v } from "convex/values";
 import { getOrgIdOrNull } from "../lib/auth";
 import rag from "../system/ai/rag";
+import { Id } from "../_generated/dataModel";
 
 const CONV_COUNT_CAP = 500;
 
@@ -19,14 +21,28 @@ async function conversationCountByStatus(
   return { count: capped ? CONV_COUNT_CAP : rows.length, capped };
 }
 
-/** Felles oversikt for dashboard: status på kundesamtaler, grovt antall kilder, modul-status */
+async function agentConversationCountByStatus(
+  ctx: QueryCtx,
+  agentId: Id<"agents">,
+  organizationId: string,
+  status: "unresolved" | "escalated" | "resolved",
+): Promise<number> {
+  const rows = await ctx.db
+    .query("conversations")
+    .withIndex("by_agent_id_and_status", (q) =>
+      q.eq("agentId", agentId).eq("status", status),
+    )
+    .filter((q) => q.eq(q.field("organizationId"), organizationId))
+    .take(CONV_COUNT_CAP + 1);
+  return Math.min(rows.length, CONV_COUNT_CAP);
+}
+
+/** Org-wide overview (sidebar badge + agents home usage). */
 export const getOverview = query({
   args: {},
   handler: async (ctx) => {
     const orgId = await getOrgIdOrNull(ctx);
-    if (!orgId) {
-      return null;
-    }
+    if (!orgId) return null;
 
     const [unresolved, escalated, resolved] = await Promise.all([
       conversationCountByStatus(ctx, orgId, "unresolved"),
@@ -46,12 +62,8 @@ export const getOverview = query({
       });
       knowledgeCount = list.page.length;
       knowledgeHasMore = !list.isDone;
-
       for (const entry of list.page) {
-        const e = entry as {
-          replacedAt?: number;
-          text?: string;
-        };
+        const e = entry as { replacedAt?: number; text?: string };
         if (typeof e.replacedAt === "number") {
           knowledgeLastIndexedAt =
             knowledgeLastIndexedAt === null
@@ -59,9 +71,7 @@ export const getOverview = query({
               : Math.max(knowledgeLastIndexedAt, e.replacedAt);
         }
         if (typeof e.text === "string" && e.text.length > 0) {
-          knowledgeApproxKb += Math.ceil(
-            new TextEncoder().encode(e.text).length / 1024,
-          );
+          knowledgeApproxKb += Math.ceil(new TextEncoder().encode(e.text).length / 1024);
         }
       }
       if (knowledgeApproxKb === 0 && knowledgeCount > 0) {
@@ -91,6 +101,55 @@ export const getOverview = query({
       },
       hasWidgetSettings: Boolean(widgetSettings),
       vapiConnected: Boolean(vapiPlugin),
+    };
+  },
+});
+
+/** Per-agent overview for the agent detail page. */
+export const getAgentOverview = query({
+  args: { agentId: v.id("agents") },
+  handler: async (ctx, args) => {
+    const orgId = await getOrgIdOrNull(ctx);
+    if (!orgId) return null;
+
+    const agent = await ctx.db.get(args.agentId);
+    if (!agent || agent.organizationId !== orgId) return null;
+
+    const [unresolved, escalated, resolved] = await Promise.all([
+      agentConversationCountByStatus(ctx, args.agentId, orgId, "unresolved"),
+      agentConversationCountByStatus(ctx, args.agentId, orgId, "escalated"),
+      agentConversationCountByStatus(ctx, args.agentId, orgId, "resolved"),
+    ]);
+
+    // Per-agent RAG namespace
+    const namespace = `${orgId}:${args.agentId}`;
+    const ns = await rag.getNamespace(ctx, { namespace });
+    let fileCount = 0;
+    let lastIndexedAt: number | null = null;
+    if (ns) {
+      const list = await rag.list(ctx, {
+        namespaceId: ns.namespaceId,
+        paginationOpts: { numItems: 250, cursor: null },
+      });
+      fileCount = list.page.length;
+      for (const entry of list.page) {
+        const e = entry as { replacedAt?: number };
+        if (typeof e.replacedAt === "number") {
+          lastIndexedAt =
+            lastIndexedAt === null ? e.replacedAt : Math.max(lastIndexedAt, e.replacedAt);
+        }
+      }
+    }
+
+    return {
+      conversations: {
+        unresolved,
+        escalated,
+        resolved,
+        total: unresolved + escalated + resolved,
+      },
+      fileCount,
+      lastIndexedAt,
     };
   },
 });

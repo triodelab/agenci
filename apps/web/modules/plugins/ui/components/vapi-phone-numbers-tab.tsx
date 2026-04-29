@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  CheckCircleIcon,
-  PhoneIcon,
-  XCircleIcon,
-} from "lucide-react";
+import { CheckCircleIcon, PhoneIcon, XCircleIcon } from "lucide-react";
 import { Badge } from "@workspace/ui/components/badge";
 import {
   Table,
@@ -24,15 +20,9 @@ export const VapiPhoneNumbersTab = () => {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="px-6 py-4">
-              Phone Number
-            </TableHead>
-            <TableHead className="px-6 py-4">
-              Name
-            </TableHead>
-            <TableHead className="px-6 py-4">
-              Status
-            </TableHead>
+            <TableHead className="px-6 py-4">Telefonnummer</TableHead>
+            <TableHead className="px-6 py-4">Navn</TableHead>
+            <TableHead className="px-6 py-4">Status</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -40,27 +30,21 @@ export const VapiPhoneNumbersTab = () => {
             if (isLoading) {
               return (
                 <TableRow>
-                  <TableCell
-                    colSpan={3}
-                    className="px-6 py-8 text-center text-muted-foreground"
-                  >
-                    Loading phone numbers...
+                  <TableCell colSpan={3} className="px-6 py-8 text-center text-muted-foreground">
+                    Laster telefonnumre…
                   </TableCell>
                 </TableRow>
-              )
+              );
             }
 
             if (phoneNumbers.length === 0) {
               return (
                 <TableRow>
-                  <TableCell
-                    colSpan={3}
-                    className="px-6 py-8 text-center text-muted-foreground"
-                  >
-                    No phone numbers configured
+                  <TableCell colSpan={3} className="px-6 py-8 text-center text-muted-foreground">
+                    Ingen telefonnumre konfigurert
                   </TableCell>
                 </TableRow>
-              )
+              );
             }
 
             return phoneNumbers.map((phone) => (
@@ -68,32 +52,24 @@ export const VapiPhoneNumbersTab = () => {
                 <TableCell className="px-6 py-4">
                   <div className="flex items-center gap-3">
                     <PhoneIcon className="size-4 text-muted-foreground" />
-                    <span className="font-mono">
-                      {phone.number || "Not configured"}
-                    </span>
+                    <span className="font-mono">{phone.number || "Ikke konfigurert"}</span>
                   </div>
                 </TableCell>
                 <TableCell className="px-6 py-4">
-                    {phone.name || "Unnamed"}
+                  {phone.name || "Uten navn"}
                 </TableCell>
                 <TableCell className="px-6 py-4">
-                    <Badge
-                      className="capitalize"
-                      variant={
-                        phone.status === "active" ? "default" : "destructive"
-                      }
-                    >
-                      {phone.status === "active" && (
-                        <CheckCircleIcon className="mr-1 size-3" />
-                      )}
-                      {phone.status !== "active" && (
-                        <XCircleIcon className="mr-1 size-3" />
-                      )}
-                      {phone.status || "Unknown"}
-                    </Badge>
+                  <Badge variant={phone.status === "active" ? "default" : "destructive"}>
+                    {phone.status === "active" ? (
+                      <CheckCircleIcon className="mr-1 size-3" />
+                    ) : (
+                      <XCircleIcon className="mr-1 size-3" />
+                    )}
+                    {phone.status === "active" ? "Aktiv" : (phone.status ?? "Ukjent")}
+                  </Badge>
                 </TableCell>
               </TableRow>
-            ))
+            ));
           })()}
         </TableBody>
       </Table>

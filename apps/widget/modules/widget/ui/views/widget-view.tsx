@@ -45,12 +45,7 @@ export const WidgetView = ({ organizationId }: Props) => {
 
   return (
     <main
-      className={cn(
-        "flex h-full min-h-0 w-full flex-col overflow-hidden",
-        embedPlayground
-          ? "rounded-none border-0 shadow-none ring-0"
-          : "border border-border/70 shadow-[var(--shadow-lift)] ring-1 ring-black/[0.04] dark:ring-white/[0.06]",
-      )}
+      className="flex h-full min-h-0 w-full flex-col overflow-hidden"
       style={rootStyle}
     >
       {screenComponents[screen]}

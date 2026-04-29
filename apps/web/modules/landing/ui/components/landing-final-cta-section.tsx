@@ -33,11 +33,11 @@ export function LandingFinalCtaSection() {
           id="final-cta-heading"
           className="text-balance text-2xl font-semibold tracking-[-0.03em] text-white sm:text-3xl md:text-[2.15rem] md:leading-[1.15]"
         >
-          Vil dere at nettsiden skal svare kundene — før de rekker å sende e-post?
+          Prøv det gratis — se selv om det funker for deg
         </h2>
         <p className="mx-auto mt-4 max-w-xl text-pretty text-[15px] leading-relaxed text-zinc-400 md:text-lg">
-          Book en gjennomgang av Agenci, eller opprett konto og prøv widget og dashboard selv. Vi hjelper
-          dere å komme trygt i gang.
+          Opprett konto og ha widgeten live på nettsiden din i dag. Ingen kortinfo, ingen binding.
+          Ser du ikke verdien innen 14 dager, koster det deg ingenting.
         </p>
         <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
           <Button
@@ -48,7 +48,9 @@ export function LandingFinalCtaSection() {
             )}
             asChild
           >
-            <Link href={landingSectionHref("contact")}>Book en demo</Link>
+            <AuthAwareLink href={LANDING_AUTH_PATHS.signUp} loggedInHref={LANDING_AUTH_PATHS.marketingLoggedInCta}>
+              Start gratis i dag
+            </AuthAwareLink>
           </Button>
           <Button
             size="lg"
@@ -56,9 +58,9 @@ export function LandingFinalCtaSection() {
             className="h-12 rounded-full px-8 text-[15px] font-medium text-zinc-300 hover:bg-white/[0.08] hover:text-white"
             asChild
           >
-            <AuthAwareLink href={LANDING_AUTH_PATHS.signUp} loggedInHref={LANDING_AUTH_PATHS.marketingLoggedInCta}>
-              Opprett konto
-            </AuthAwareLink>
+            <Link href={landingSectionHref("contact")}>
+              Book en demo
+            </Link>
           </Button>
         </div>
       </div>

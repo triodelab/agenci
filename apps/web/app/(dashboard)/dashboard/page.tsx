@@ -1,7 +1,5 @@
-"use client";
-
-import { DashboardOverviewView } from "@/modules/dashboard/ui/views/dashboard-overview-view";
+import { redirect } from "next/navigation";
 
 export default function Page() {
-  return <DashboardOverviewView />;
+  redirect("/agents");
 }

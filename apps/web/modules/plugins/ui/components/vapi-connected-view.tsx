@@ -23,7 +23,7 @@ import { VapiAssistantsTab } from "./vapi-assistants-tab";
 
 interface VapiConnectedViewProps {
   onDisconnect: () => void;
-};
+}
 
 export const VapiConnectedView = ({ onDisconnect }: VapiConnectedViewProps) => {
   const [activeTab, setActiveTab] = useState("phone-numbers");
@@ -42,16 +42,16 @@ export const VapiConnectedView = ({ onDisconnect }: VapiConnectedViewProps) => {
                 src="/vapi.jpg"
               />
               <div>
-                <CardTitle>Vapi Integration</CardTitle>
+                <CardTitle>Vapi-integrasjon</CardTitle>
                 <CardDescription>
-                  Manage your phone numbers and AI assistants
+                  Administrer telefonnumre og AI-assistenter
                 </CardDescription>
               </div>
             </div>
 
             <Button onClick={onDisconnect} size="sm" variant="destructive">
               <UnplugIcon />
-              Disconnect
+              Frakoble
             </Button>
           </div>
         </CardHeader>
@@ -65,16 +65,16 @@ export const VapiConnectedView = ({ onDisconnect }: VapiConnectedViewProps) => {
                 <SettingsIcon className="size-6 text-muted-foreground" />
               </div>
               <div>
-                <CardTitle>Widget Configuration</CardTitle>
+                <CardTitle>Widget-konfigurasjon</CardTitle>
                 <CardDescription>
-                  Set up voice calls for your chat widget
+                  Sett opp taleanrop for chat-widgeten din
                 </CardDescription>
               </div>
             </div>
             <DashboardAccentButton asChild>
               <Link href="/customization">
                 <SettingsIcon />
-                Configure
+                Konfigurer
               </Link>
             </DashboardAccentButton>
           </div>
@@ -91,11 +91,11 @@ export const VapiConnectedView = ({ onDisconnect }: VapiConnectedViewProps) => {
           <TabsList className="grid h-12 w-full grid-cols-2 p-0">
             <TabsTrigger className="h-full rounded-none" value="phone-numbers">
               <PhoneIcon />
-              Phone Numbers
+              Telefonnumre
             </TabsTrigger>
             <TabsTrigger className="h-full rounded-none" value="assistants">
               <BotIcon />
-              AI Assistants
+              AI-assistenter
             </TabsTrigger>
           </TabsList>
           <TabsContent value="phone-numbers">

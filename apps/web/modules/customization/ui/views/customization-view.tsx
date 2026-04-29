@@ -3,12 +3,13 @@
 import { api } from "@workspace/backend/_generated/api";
 import { useQuery } from "convex/react";
 import {
+  BotIcon,
   ListTreeIcon,
-  Loader2Icon,
   MessageSquareIcon,
   MicIcon,
   PaletteIcon,
 } from "lucide-react";
+import { TwoColumnFormSkeleton } from "@/modules/dashboard/ui/components/dashboard-skeleton";
 import { useEffect, useState } from "react";
 import { cn } from "@workspace/ui/lib/utils";
 import { ScrollArea } from "@workspace/ui/components/scroll-area";
@@ -69,6 +70,11 @@ const SECTION_COPY: Record<
   WidgetCustomizationSection,
   { title: string; description: string }
 > = {
+  agent: {
+    title: "Agent",
+    description:
+      "Velg hvilken agent som skal svare besøkende i chat-widgeten på nettsiden din.",
+  },
   messages: {
     title: "Åpningsmelding",
     description:
@@ -94,9 +100,10 @@ const SECTION_COPY: Record<
 export const CustomizationView = () => {
   const widgetSettings = useQuery(api.private.widgetSettings.getOne);
   const vapiPlugin = useQuery(api.private.plugins.getOne, { service: "vapi" });
+  const agents = useQuery(api.private.agents.list);
 
   const hasVapi = !!vapiPlugin;
-  const [section, setSection] = useState<WidgetCustomizationSection>("messages");
+  const [section, setSection] = useState<WidgetCustomizationSection>("agent");
 
   useEffect(() => {
     if (!hasVapi && section === "voice") {
@@ -104,17 +111,10 @@ export const CustomizationView = () => {
     }
   }, [hasVapi, section]);
 
-  const isLoading = widgetSettings === undefined || vapiPlugin === undefined;
+  const isLoading = widgetSettings === undefined || vapiPlugin === undefined || agents === undefined;
 
   if (isLoading) {
-    return (
-      <div className="flex h-full min-h-[50vh] flex-1 flex-col items-center justify-center gap-4 bg-transparent">
-        <Loader2Icon className="size-9 animate-spin text-muted-foreground" />
-        <p className="text-[13px] text-muted-foreground">
-          Laster widget-innstillinger…
-        </p>
-      </div>
-    );
+    return <TwoColumnFormSkeleton />;
   }
 
   const meta = SECTION_COPY[section];
@@ -138,6 +138,17 @@ export const CustomizationView = () => {
             aria-label="Widget-innstillinger"
             className="flex flex-col gap-px px-2 py-3"
           >
+            <NavRow
+              active={section === "agent"}
+              onClick={() => setSection("agent")}
+            >
+              <NavGlyph active={section === "agent"}>
+                <BotIcon className="size-[15px]" strokeWidth={1.65} />
+              </NavGlyph>
+              <span className="min-w-0 flex-1 truncate leading-snug">
+                Agent
+              </span>
+            </NavRow>
             <NavRow
               active={section === "messages"}
               onClick={() => setSection("messages")}
@@ -220,6 +231,7 @@ export const CustomizationView = () => {
             activeSection={section}
             hasVapiPlugin={hasVapi}
             initialData={widgetSettings}
+            agents={agents ?? []}
           />
         </div>
       </div>

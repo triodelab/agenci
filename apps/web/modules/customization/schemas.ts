@@ -21,6 +21,7 @@ export const widgetAppearanceSchema = z.object({
 });
 
 export const widgetSettingsSchema = z.object({
+  agentId: z.string().optional(),
   widgetTitle: z
     .string()
     .min(1, "Tittel er påkrevd")

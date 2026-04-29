@@ -17,6 +17,21 @@ async function createNewConversation(
     )
     .unique();
 
+  // Use the agent pinned in widget settings, otherwise fall back to first active agent
+  let widgetAgent = widgetSettings?.agentId
+    ? await ctx.db.get(widgetSettings.agentId)
+    : null;
+  if (!widgetAgent || !widgetAgent.isActive) {
+    widgetAgent = await ctx.db
+      .query("agents")
+      .withIndex("by_organization_id", (q) =>
+        q.eq("organizationId", args.organizationId),
+      )
+      .filter((q) => q.eq(q.field("isActive"), true))
+      .first();
+  }
+  const builtInAgent = widgetAgent;
+
   const { threadId } = await supportAgent.createThread(ctx, {
     userId: args.organizationId,
   });
@@ -36,6 +51,7 @@ async function createNewConversation(
     status: "unresolved",
     organizationId: args.organizationId,
     threadId,
+    agentId: builtInAgent?._id,
   });
 }
 

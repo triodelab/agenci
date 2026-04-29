@@ -52,7 +52,7 @@ export const PluginCard = ({
         </div>
 
         <p className="mb-8 text-left text-[1.35rem] font-semibold tracking-tight text-foreground md:text-[1.5rem]">
-          Connect your {serviceName} account
+          Koble til {serviceName}
         </p>
 
         <ul className="space-y-5">
@@ -87,7 +87,7 @@ export const PluginCard = ({
           onClick={onSubmit}
           type="button"
         >
-          Connect
+          Koble til
           <PlugIcon className="size-4" />
         </DashboardAccentButton>
       </div>

@@ -15,34 +15,39 @@ import { cn } from "@workspace/ui/lib/utils";
 
 const plans = [
   {
-    name: "Start",
-    blurb: "Kom i gang med chat på nettsiden og grunnleggende styring.",
+    name: "Gratis",
+    blurb: "Prøv Agenci uten å legge inn kortinfo. Ingen skjulte kostnader.",
     bullets: [
-      "Chat-widget og enkel tilpasning",
-      "Kunnskapsgrunnlag og standard dashboard",
-      "Varsler når kunder trenger svar",
+      "Chat-widget på nettsiden din",
+      "Se alle innkommende samtaler",
+      "Manuell oppfølging fra dashboard",
     ],
-    cta: "Kom i gang",
+    cta: "Start gratis",
     href: LANDING_AUTH_PATHS.signUp,
     featured: false,
   },
   {
     name: "Pro",
-    blurb: "For team som håndterer mer volum og vil styre samtalene tettere.",
+    blurb: "Alt du trenger for å la AI-en jobbe for deg. 14 dager gratis — ingen kortinfo.",
     bullets: [
-      "Alt i Start",
-      "Mer avansert samtaleflyt og merking",
-      "Roller, innsikt og oppfølging for teamet",
+      "AI-assistent som svarer automatisk",
+      "Last opp FAQ, dokumenter og produktsider",
+      "Tilpass utseende og tone helt selv",
+      "Opptil 5 i teamet",
     ],
-    cta: "Book en demo",
-    href: landingSectionHref("contact"),
+    cta: "Prøv 14 dager gratis",
+    href: LANDING_AUTH_PATHS.signUp,
     featured: true,
   },
   {
     name: "Enterprise",
-    blurb: "Større organisasjoner med krav til drift, volum og integrasjoner.",
-    bullets: ["Dedikert oppfølging og avtaler", "SLA etter behov", "Integrasjoner mot deres systemer"],
-    cta: "Snakk med oss",
+    blurb: "Tilpasset oppsett for større team med spesifikke krav.",
+    bullets: [
+      "Dedikert onboarding og støtte",
+      "SLA og egne integrasjoner",
+      "Volumpriser og skreddersydd avtale",
+    ],
+    cta: "Ta kontakt",
     href: landingSectionHref("contact"),
     featured: false,
   },
@@ -72,11 +77,10 @@ export function LandingPricingSection() {
             id="pricing-heading"
             className="mt-3 text-balance text-2xl font-semibold tracking-[-0.03em] text-zinc-950 sm:text-3xl md:text-[2.1rem] md:leading-[1.15]"
           >
-            Tre nivåer — samme kjerneprodukt, mer kraft når dere vokser
+            Start gratis. Betal bare når du ser verdien.
           </h2>
           <p className="mt-4 text-[15px] leading-relaxed text-zinc-600 md:text-base">
-            Pris avhenger av volum og hvilke tillegg dere trenger. Tabellen viser hva som ofte følger med på
-            hvert nivå — ta kontakt for konkret tilbud.
+            Gratis konto for å komme i gang. Pro-planen gir deg AI-assistenten og alt annet — med 14 dagers gratis prøveperiode. Ingen kortinfo kreves.
           </p>
         </div>
 
@@ -102,7 +106,7 @@ export function LandingPricingSection() {
                     "absolute -top-3 left-1/2 -translate-x-1/2 rounded-full px-3 py-0.5 text-[11px] uppercase tracking-wider",
                   )}
                 >
-                  Mest valgt
+                  14 dager gratis
                 </span>
               ) : null}
               <h3 className="text-lg font-semibold tracking-tight text-zinc-950 md:text-xl">{plan.name}</h3>

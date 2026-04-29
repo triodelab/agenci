@@ -1,5 +1,5 @@
 import { ConvexError, v } from "convex/values";
-import { 
+import {
   contentHashFromArrayBuffer,
   Entry,
   EntryId,
@@ -24,15 +24,17 @@ function guessMimeType(filename: string, bytes: ArrayBuffer): string {
     guessMimeTypeFromContents(bytes) ||
     "application/octet-stream"
   );
-};
+}
+
+/** Per-agent namespace: orgId:agentId. Falls back to orgId for legacy files. */
+function agentNamespace(orgId: string, agentId?: Id<"agents"> | null): string {
+  return agentId ? `${orgId}:${agentId}` : orgId;
+}
 
 export const deleteFile = mutation({
-  args: {
-    entryId: vEntryId,
-  },
+  args: { entryId: vEntryId },
   handler: async (ctx, args) => {
     const orgId = await getOrgIdOrNull(ctx);
-
     if (!orgId) {
       throw new ConvexError({
         code: "BAD_REQUEST",
@@ -41,33 +43,12 @@ export const deleteFile = mutation({
       });
     }
 
-    const namespace = await rag.getNamespace(ctx, {
-      namespace: orgId,
-    });
-
-    if (!namespace) {
-      throw new ConvexError({
-        code: "UNAUTHORIZED",
-        message: "Invalid namespace",
-      });
-    }
-
-    const entry = await rag.getEntry(ctx, {
-      entryId: args.entryId,
-    });
-
+    const entry = await rag.getEntry(ctx, { entryId: args.entryId });
     if (!entry) {
-      throw new ConvexError({
-        code: "NOT_FOUND",
-        message: "Entry not found",
-      });
+      throw new ConvexError({ code: "NOT_FOUND", message: "Entry not found" });
     }
-
     if (entry.metadata?.uploadedBy !== orgId) {
-      throw new ConvexError({
-        code: "UNAUTHORIZED",
-        message: "Invalid Organization ID",
-      });
+      throw new ConvexError({ code: "UNAUTHORIZED", message: "Invalid Organization ID" });
     }
 
     const meta = entry.metadata as EntryMetadata | undefined;
@@ -75,9 +56,7 @@ export const deleteFile = mutation({
       await ctx.storage.delete(meta.storageId as Id<"_storage">);
     }
 
-    await rag.deleteAsync(ctx, {
-      entryId: args.entryId
-    });
+    await rag.deleteAsync(ctx, { entryId: args.entryId });
   },
 });
 
@@ -87,10 +66,10 @@ export const addFile = action({
     mimeType: v.string(),
     bytes: v.bytes(),
     category: v.optional(v.string()),
+    agentId: v.optional(v.id("agents")),
   },
   handler: async (ctx, args) => {
     const orgId = await getOrgIdOrNull(ctx);
-
     if (!orgId) {
       throw new ConvexError({
         code: "BAD_REQUEST",
@@ -101,59 +80,42 @@ export const addFile = action({
 
     const subscription = await ctx.runQuery(
       internal.system.subscriptions.getByOrganizationId,
-      {
-        organizationId: orgId,
-      },
+      { organizationId: orgId },
     );
-
     const userEmail = await getUserEmailOrNull(ctx);
-
     if (!hasActiveSubscriptionAccess(orgId, subscription, { userEmail })) {
-      throw new ConvexError({
-        code: "BAD_REQUEST",
-        message: "Missing subscription"
-      });
+      throw new ConvexError({ code: "BAD_REQUEST", message: "Missing subscription" });
     }
 
     const { bytes, filename, category } = args;
-
     const mimeType = args.mimeType || guessMimeType(filename, bytes);
     const blob = new Blob([bytes], { type: mimeType });
-
     const storageId = await ctx.storage.store(blob);
 
-    const text = await extractTextContent(ctx, {
-      storageId,
-      filename,
-      bytes,
-      mimeType,
-    });
+    const text = await extractTextContent(ctx, { storageId, filename, bytes, mimeType });
+
+    const namespace = agentNamespace(orgId, args.agentId);
 
     const { entryId, created } = await rag.add(ctx, {
-      // SUPER IMPORTANT: What search space to add this to. You cannot search across namespaces,
-      // If not added, it will be considered global (we do not want this)
-      namespace: orgId,
+      namespace,
       text,
       key: filename,
       title: filename,
       metadata: {
-        storageId, // Important for file deletion
-        uploadedBy: orgId, // Important for deletion
+        storageId,
+        uploadedBy: orgId,
         filename,
         category: category ?? null,
+        agentId: args.agentId ?? null,
       } as EntryMetadata,
-      contentHash: await contentHashFromArrayBuffer(bytes) // To avoid re-inserting if the file content hasn't changed
+      contentHash: await contentHashFromArrayBuffer(bytes),
     });
 
     if (!created) {
-      console.debug("entry already exists, skipping upload metadata");
       await ctx.storage.delete(storageId);
     }
 
-    return {
-      url: await ctx.storage.getUrl(storageId),
-      entryId,
-    };
+    return { url: await ctx.storage.getUrl(storageId), entryId };
   },
 });
 
@@ -164,10 +126,10 @@ export const addWebpage = action({
   args: {
     url: v.string(),
     category: v.optional(v.string()),
+    agentId: v.optional(v.id("agents")),
   },
   handler: async (ctx, args) => {
     const orgId = await getOrgIdOrNull(ctx);
-
     if (!orgId) {
       throw new ConvexError({
         code: "BAD_REQUEST",
@@ -178,18 +140,11 @@ export const addWebpage = action({
 
     const subscription = await ctx.runQuery(
       internal.system.subscriptions.getByOrganizationId,
-      {
-        organizationId: orgId,
-      },
+      { organizationId: orgId },
     );
-
     const userEmail = await getUserEmailOrNull(ctx);
-
     if (!hasActiveSubscriptionAccess(orgId, subscription, { userEmail })) {
-      throw new ConvexError({
-        code: "BAD_REQUEST",
-        message: "Missing subscription",
-      });
+      throw new ConvexError({ code: "BAD_REQUEST", message: "Missing subscription" });
     }
 
     const publicUrl = assertPublicHttpUrl(args.url);
@@ -211,10 +166,7 @@ export const addWebpage = action({
       });
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
-      throw new ConvexError({
-        code: "BAD_REQUEST",
-        message: `Kunne ikke hente siden: ${msg}`,
-      });
+      throw new ConvexError({ code: "BAD_REQUEST", message: `Kunne ikke hente siden: ${msg}` });
     } finally {
       clearTimeout(timeoutId);
     }
@@ -241,9 +193,7 @@ export const addWebpage = action({
       });
     }
 
-    if (html.length > MAX_WEB_HTML_CHARS) {
-      html = html.slice(0, MAX_WEB_HTML_CHARS);
-    }
+    if (html.length > MAX_WEB_HTML_CHARS) html = html.slice(0, MAX_WEB_HTML_CHARS);
 
     const plain = htmlToPlainText(html);
     if (plain.length < MIN_WEB_TEXT_CHARS) {
@@ -255,13 +205,13 @@ export const addWebpage = action({
     }
 
     const titleFromPage = extractHtmlTitle(html);
-    const displayName =
-      titleFromPage ?? `${publicUrl.hostname}${publicUrl.pathname}`;
-
+    const displayName = titleFromPage ?? `${publicUrl.hostname}${publicUrl.pathname}`;
     const textBytes = new TextEncoder().encode(plain);
 
+    const namespace = agentNamespace(orgId, args.agentId);
+
     const { entryId, created } = await rag.add(ctx, {
-      namespace: orgId,
+      namespace,
       text: plain,
       key: normalizedUrl,
       title: displayName,
@@ -271,6 +221,7 @@ export const addWebpage = action({
         category: args.category ?? null,
         sourceType: "webpage",
         sourceUrl: normalizedUrl,
+        agentId: args.agentId ?? null,
       } as EntryMetadata,
       contentHash: await contentHashFromArrayBuffer(textBytes.buffer),
     });
@@ -287,29 +238,23 @@ export const list = query({
   args: {
     category: v.optional(v.string()),
     paginationOpts: paginationOptsValidator,
+    agentId: v.optional(v.id("agents")),
   },
   handler: async (ctx, args) => {
     const orgId = await getOrgIdOrNull(ctx);
+    if (!orgId) return { page: [], isDone: true, continueCursor: "" };
 
-    if (!orgId) {
-      return { page: [], isDone: true, continueCursor: "" };
-    }
-
-    const namespace = await rag.getNamespace(ctx, {
-      namespace: orgId,
-    });
-
-    if (!namespace) {
-      return { page: [], isDone: true, continueCursor: "" };
-    }
+    const namespace = agentNamespace(orgId, args.agentId);
+    const ns = await rag.getNamespace(ctx, { namespace });
+    if (!ns) return { page: [], isDone: true, continueCursor: "" };
 
     const results = await rag.list(ctx, {
-      namespaceId: namespace.namespaceId,
+      namespaceId: ns.namespaceId,
       paginationOpts: args.paginationOpts,
     });
 
     const files = await Promise.all(
-      results.page.map((entry) => convertEntryToPublicFile(ctx, entry))
+      results.page.map((entry) => convertEntryToPublicFile(ctx, entry)),
     );
 
     const filteredFiles = args.category
@@ -325,14 +270,13 @@ export const list = query({
 });
 
 export type PublicFile = {
-  id: EntryId,
+  id: EntryId;
   name: string;
   type: string;
   size: string;
   status: "ready" | "processing" | "error";
   url: string | null;
   category?: string;
-  /** Ekstern lenke når kilden er importert nettside */
   sourceUrl?: string;
 };
 
@@ -343,45 +287,32 @@ type EntryMetadata = {
   category: string | null;
   sourceType?: "file" | "webpage";
   sourceUrl?: string;
+  agentId?: string | null;
 };
 
-async function convertEntryToPublicFile(
-  ctx: QueryCtx,
-  entry: Entry,
-): Promise<PublicFile> {
+async function convertEntryToPublicFile(ctx: QueryCtx, entry: Entry): Promise<PublicFile> {
   const metadata = entry.metadata as EntryMetadata | undefined;
   const storageId = metadata?.storageId;
 
   let fileSize = "unknown";
-
   if (metadata?.sourceType === "webpage") {
     fileSize = "Nettside";
   } else if (storageId) {
     try {
       const storageMetadata = await ctx.db.system.get(storageId);
-      if (storageMetadata) {
-        fileSize = formatFileSize(storageMetadata.size);
-      }
+      if (storageMetadata) fileSize = formatFileSize(storageMetadata.size);
     } catch (error) {
       console.error("Failed to get storage metadata: ", error);
     }
   }
 
   const isWeb = metadata?.sourceType === "webpage";
-  const filename =
-    isWeb && metadata?.filename
-      ? metadata.filename
-      : entry.key || "Unknown";
-  const extension = isWeb
-    ? "web"
-    : filename.split(".").pop()?.toLowerCase() || "txt";
+  const filename = isWeb && metadata?.filename ? metadata.filename : entry.key || "Unknown";
+  const extension = isWeb ? "web" : filename.split(".").pop()?.toLowerCase() || "txt";
 
   let status: "ready" | "processing" | "error" = "error";
-  if (entry.status === "ready") {
-    status = "ready"
-  } else if (entry.status === "pending") {
-    status = "processing"
-  }
+  if (entry.status === "ready") status = "ready";
+  else if (entry.status === "pending") status = "processing";
 
   const url = storageId
     ? await ctx.storage.getUrl(storageId)
@@ -399,16 +330,12 @@ async function convertEntryToPublicFile(
     category: metadata?.category || undefined,
     sourceUrl: isWeb ? metadata?.sourceUrl : undefined,
   };
-};
+}
 
 function formatFileSize(bytes: number): string {
-  if (bytes === 0) {
-    return "0 B";
-  }
-
+  if (bytes === 0) return "0 B";
   const k = 1024;
   const sizes = ["B", "KB", "MB", "GB"];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-
   return `${Number.parseFloat((bytes / k ** i).toFixed(1))} ${sizes[i]}`;
-};
+}

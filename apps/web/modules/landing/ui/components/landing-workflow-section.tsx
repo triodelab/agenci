@@ -7,23 +7,23 @@ import { LANDING_ACCENT_CTA_BG, LANDING_SECTION_IDS } from "@/modules/landing/co
 const features = [
   {
     n: "01",
-    title: "Chat på nettsiden",
+    title: "Svar på sekunder, ikke timer",
     body:
-      "En widget besøkende kjenner igjen: spørsmål om ordre, produkt, åpningstider og mer besvares der og da. Mer krevende saker kan eskaléres med full kontekst.",
+      "Besøkende spør — assistenten svarer umiddelbart. Pris, leveringstid, returpolicy, åpningstider. Ingen ventetid, ingen tapte kunder fordi ingen var tilgjengelig.",
     icon: MessageSquare,
   },
   {
     n: "02",
-    title: "Kunnskap dere eier",
+    title: "Dine svar, ikke generelle fraser",
     body:
-      "Last opp eller lim inn innhold assistenten skal bruke — ikke svar som ignorerer kildene deres. Dere bestemmer tone, tema og grenser.",
+      "Du laster opp det du allerede har — FAQ, produktbeskrivelser, retningslinjer. Assistenten svarer bare ut fra dette. Ingen hallusinasjoner, ingen svar som skader merkevaren din.",
     icon: BookOpen,
   },
   {
     n: "03",
-    title: "Mennesker i loop",
+    title: "Et menneske når det trengs",
     body:
-      "Samtaler, kø og roller i ett dashboard. Når en kunde trenger et menneske, stopper ikke saken i en svart boks.",
+      "Noen spørsmål trenger deg. Du ser alle samtaler i dashboardet, kan ta over når som helst, og kunden slipper å forklare alt på nytt — historikken er der.",
     icon: Users,
   },
 ] as const;
@@ -78,17 +78,17 @@ export function LandingWorkflowSection() {
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
         >
           <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-teal-700/85 md:text-xs">
-            Hva Agenci er
+            Slik fungerer det
           </p>
           <h2
             id="workflow-heading"
             className="mt-4 text-balance text-3xl font-semibold tracking-[-0.04em] text-zinc-950 sm:text-4xl md:text-[2.35rem] md:leading-[1.12]"
           >
-            Kundedialog på nettsiden — med KI, kunnskap og team i samme løsning
+            Ikke en generisk chatbot. En assistent som faktisk kan bedriften din.
           </h2>
           <p className="mx-auto mt-5 max-w-lg text-pretty text-[15px] leading-relaxed text-zinc-600 md:mt-6 md:text-lg md:leading-relaxed">
-            Ikke bare «en chatbot». Agenci kobler nettsiden deres med svar som bygger på det dere faktisk
-            har publisert og lastet opp — og gir dere verktøyene for å følge opp på ordentlig.
+            De fleste chatboter svarer med generelle fraser. Agenci svarer med det du har skrevet —
+            og hjelper deg å aldri miste en kunde fordi ingen var tilgjengelig.
           </p>
         </motion.div>
 

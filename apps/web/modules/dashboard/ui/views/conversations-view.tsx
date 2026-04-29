@@ -24,8 +24,8 @@ export const ConversationsView = () => {
             Velg en samtale
           </h2>
           <p className="text-muted-foreground mt-3 max-w-md text-[14px] leading-relaxed">
-            Samtaler fra widget og kanaler ligger i listen til venstre. Velg en
-            rad for å åpne tråden, svare og forbedre AI-svar.
+            Velg en samtale fra listen for å lese tråden, svare på kunden og
+            gi tilbakemelding på AI-svar.
           </p>
         </div>
       </div>

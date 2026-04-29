@@ -40,7 +40,7 @@ export function hasActiveSubscriptionAccess(
   subscription: { status: string } | null | undefined,
   options?: { userEmail?: string | null },
 ): boolean {
-  if (subscription?.status === "active") {
+  if (subscription?.status === "active" || subscription?.status === "trialing") {
     return true;
   }
   if (isDevSubscriptionBypassEnabled()) {

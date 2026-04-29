@@ -12,9 +12,6 @@ interface Props {
   }>;
 }
 
-const centeredShell =
-  "box-border flex min-h-screen w-full items-start justify-center bg-[var(--hero-bg)] p-3 sm:items-center sm:p-4 dark:bg-background";
-
 const Page = ({ searchParams }: Props) => {
   const params = use(searchParams);
   const organizationId = params.organizationId?.trim() ?? null;
@@ -23,7 +20,7 @@ const Page = ({ searchParams }: Props) => {
 
   if (!organizationId) {
     return (
-      <div className={centeredShell}>
+      <div className="box-border flex min-h-screen w-full items-center justify-center bg-background p-4">
         <WidgetMissingOrg />
       </div>
     );
@@ -37,8 +34,9 @@ const Page = ({ searchParams }: Props) => {
     );
   }
 
+  // Embedded in iframe — fill the full frame, let the container handle clipping
   return (
-    <div className={centeredShell}>
+    <div className="h-screen w-screen overflow-hidden bg-background">
       <WidgetView organizationId={organizationId} />
     </div>
   );

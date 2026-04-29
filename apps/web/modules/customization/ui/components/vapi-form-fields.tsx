@@ -40,7 +40,7 @@ export const VapiFormFields = ({
         name="vapiSettings.assistantId"
         render={({ field }) => (
           <FormItem className="space-y-2">
-            <FormLabel className={labelClassName}>Voice Assistant</FormLabel>
+            <FormLabel className={labelClassName}>Stemmeassistent</FormLabel>
             <Select
               disabled={assistantsLoading || disabled}
               onValueChange={field.onChange}
@@ -51,24 +51,24 @@ export const VapiFormFields = ({
                   <SelectValue
                     placeholder={
                       assistantsLoading
-                        ? "Loading assistants..."
-                        : "Select an assistant"
+                        ? "Laster assistenter…"
+                        : "Velg en assistent"
                     }
                   />
                 </SelectTrigger>
               </FormControl>
               <SelectContent>
-                <SelectItem value="none">None</SelectItem>
+                <SelectItem value="none">Ingen</SelectItem>
                 {assistants.map((assistant) => (
                   <SelectItem key={assistant.id} value={assistant.id}>
-                    {assistant.name || "Unnamed Assistant"} -{" "}
-                    {assistant.model?.model || "Unknown model"}
+                    {assistant.name || "Uten navn"} —{" "}
+                    {assistant.model?.model || "Ukjent modell"}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
             <FormDescription>
-              The Vapi assistant to use for voice calls
+              Vapi-assistenten som brukes til taleanrop i widgeten.
             </FormDescription>
             <FormMessage />
           </FormItem>
@@ -79,7 +79,7 @@ export const VapiFormFields = ({
         name="vapiSettings.phoneNumber"
         render={({ field }) => (
           <FormItem className="space-y-2">
-            <FormLabel className={labelClassName}>Display Phone Number</FormLabel>
+            <FormLabel className={labelClassName}>Visningstlfnummer</FormLabel>
             <Select
               disabled={phoneNumbersLoading || disabled}
               onValueChange={field.onChange}
@@ -90,24 +90,24 @@ export const VapiFormFields = ({
                   <SelectValue
                     placeholder={
                       phoneNumbersLoading
-                        ? "Loading phone numbers..."
-                        : "Select a phone number"
+                        ? "Laster telefonnumre…"
+                        : "Velg et telefonnummer"
                     }
                   />
                 </SelectTrigger>
               </FormControl>
               <SelectContent>
-                <SelectItem value="none">None</SelectItem>
+                <SelectItem value="none">Ingen</SelectItem>
                 {phoneNumbers.map((phone) => (
                   <SelectItem key={phone.id} value={phone.number || phone.id}>
-                    {phone.number || "Unknown"} -{" "}
-                    {phone.name || "Unnamed"}
+                    {phone.number || "Ukjent"} —{" "}
+                    {phone.name || "Uten navn"}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
             <FormDescription>
-              Phone number to display in the widget
+              Telefonnummeret som vises i widgeten.
             </FormDescription>
             <FormMessage />
           </FormItem>

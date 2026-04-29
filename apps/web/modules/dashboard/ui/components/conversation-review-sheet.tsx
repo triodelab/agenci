@@ -105,8 +105,7 @@ export function ConversationReviewSheet({
             Review
           </SheetTitle>
           <SheetDescription className="text-[13px] leading-relaxed text-muted-foreground">
-            Samme mønster som Chatbase: se kundens melding, dagens svar, og skriv
-            hvordan assistenten burde svart. Brukes til kvalitet og opplæring.
+            Se kundens melding og assistentens svar — skriv det korrekte svaret for å forbedre AI-kvaliteten over tid.
           </SheetDescription>
         </SheetHeader>
 
@@ -146,10 +145,6 @@ export function ConversationReviewSheet({
                   </span>
                 </div>
               ) : null}
-              <div className="flex justify-between gap-4">
-                <span className="text-muted-foreground">Stemning</span>
-                <span className="text-muted-foreground italic">Ikke analysert</span>
-              </div>
             </div>
           </section>
 

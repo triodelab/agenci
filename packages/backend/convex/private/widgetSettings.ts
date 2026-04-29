@@ -33,6 +33,7 @@ const appearanceArgs = v.optional(
 
 export const upsert = mutation({
   args: {
+    agentId: v.optional(v.id("agents")),
     widgetTitle: v.string(),
     greetMessage: v.string(),
     defaultSuggestions: v.object({
@@ -62,23 +63,19 @@ export const upsert = mutation({
       .withIndex("by_organization_id", (q) => q.eq("organizationId", orgId))
       .unique();
 
+    const patch = {
+      agentId: args.agentId,
+      widgetTitle: args.widgetTitle,
+      greetMessage: args.greetMessage,
+      defaultSuggestions: args.defaultSuggestions,
+      vapiSettings: args.vapiSettings,
+      ...(args.appearance !== undefined ? { appearance: args.appearance } : {}),
+    };
+
     if (existingWidgetSettings) {
-      await ctx.db.patch(existingWidgetSettings._id, {
-        widgetTitle: args.widgetTitle,
-        greetMessage: args.greetMessage,
-        defaultSuggestions: args.defaultSuggestions,
-        vapiSettings: args.vapiSettings,
-        ...(args.appearance !== undefined ? { appearance: args.appearance } : {}),
-      });
+      await ctx.db.patch(existingWidgetSettings._id, patch);
     } else {
-      await ctx.db.insert("widgetSettings", {
-        organizationId: orgId,
-        widgetTitle: args.widgetTitle,
-        greetMessage: args.greetMessage,
-        defaultSuggestions: args.defaultSuggestions,
-        vapiSettings: args.vapiSettings,
-        ...(args.appearance !== undefined ? { appearance: args.appearance } : {}),
-      });
+      await ctx.db.insert("widgetSettings", { organizationId: orgId, ...patch });
     }
   },
 });

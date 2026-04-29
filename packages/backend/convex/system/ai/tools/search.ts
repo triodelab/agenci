@@ -41,8 +41,13 @@ export const search = createTool({
 
     const orgId = conversation.organizationId;
 
+    // Use per-agent namespace when conversation is linked to an agent
+    const namespace = conversation.agentId
+      ? `${orgId}:${conversation.agentId}`
+      : orgId;
+
     const searchResult = await rag.search(ctx, {
-      namespace: orgId,
+      namespace,
       query,
       limit: 5,
     });

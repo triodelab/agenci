@@ -178,6 +178,8 @@ export const WidgetLoadingScreen = ({ organizationId }: { organizationId: string
     setStep,
   ]);
 
+  const vapiSecrets = useAtomValue(vapiSecretsAtom);
+
   useEffect(() => {
     if (step !== "done") {
       return;
@@ -195,10 +197,20 @@ export const WidgetLoadingScreen = ({ organizationId }: { organizationId: string
       return;
     }
 
+    // Only show selection screen if VAPI voice/phone options are configured
+    const hasVapiOptions = Boolean(
+      vapiSecrets &&
+        (widgetSettings?.vapiSettings?.assistantId ||
+          widgetSettings?.vapiSettings?.phoneNumber),
+    );
+
     if (!playgroundEmbed) {
       if (!savedConversationId) {
-        setScreen("selection");
-        return;
+        if (hasVapiOptions) {
+          setScreen("selection");
+          return;
+        }
+        // No VAPI — create a new conversation and go straight to chat
       }
 
       let cancelled = false;
@@ -207,7 +219,7 @@ export const WidgetLoadingScreen = ({ organizationId }: { organizationId: string
           const conversationId = await resumeOrCreateConversation({
             contactSessionId,
             organizationId,
-            resumeConversationId: savedConversationId,
+            resumeConversationId: savedConversationId ?? undefined,
           });
           if (!cancelled) {
             setConversationId(conversationId);
@@ -254,6 +266,8 @@ export const WidgetLoadingScreen = ({ organizationId }: { organizationId: string
     sessionValid,
     organizationId,
     savedConversationId,
+    vapiSecrets,
+    widgetSettings,
     resumeOrCreateConversation,
     setConversationId,
     setScreen,

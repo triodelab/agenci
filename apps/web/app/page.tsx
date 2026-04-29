@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { LandingPageView } from "@/modules/landing";
 
 export const metadata: Metadata = {
@@ -15,5 +16,17 @@ export const metadata: Metadata = {
 };
 
 export default function HomePage() {
-  return <LandingPageView />;
+  const orgId = process.env.NEXT_PUBLIC_WIDGET_ORG_ID;
+  return (
+    <>
+      <LandingPageView />
+      {orgId && (
+        <Script
+          src="/widget.iife.js"
+          data-organization-id={orgId}
+          strategy="afterInteractive"
+        />
+      )}
+    </>
+  );
 }

@@ -31,8 +31,8 @@ interface UploadDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onFileUploaded?: () => void;
-  /** Når dialog åpnes (f.eks. etter drag-and-drop), forhåndsvelg fil. */
   presetFile?: File | null;
+  agentId?: import("@workspace/backend/_generated/dataModel").Id<"agents">;
 }
 
 export const UploadDialog = ({
@@ -40,6 +40,7 @@ export const UploadDialog = ({
   onOpenChange,
   onFileUploaded,
   presetFile = null,
+  agentId,
 }: UploadDialogProps) => {
   const addFile = useAction(api.private.files.addFile);
 
@@ -89,6 +90,7 @@ export const UploadDialog = ({
         filename,
         mimeType: blob.type || "text/plain",
         category: uploadForm.category,
+        agentId,
       });
 
       onFileUploaded?.();

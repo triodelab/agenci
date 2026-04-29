@@ -58,10 +58,8 @@ export const WidgetAuthScreen = () => {
 
   const createContactSession = useMutation(api.public.contactSessions.create);
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    if (!organizationId) {
-      return;
-    }
+  const startSession = async (name: string, email: string) => {
+    if (!organizationId) return;
 
     const metadata: Doc<"contactSessions">["metadata"] = {
       userAgent: navigator.userAgent,
@@ -81,7 +79,8 @@ export const WidgetAuthScreen = () => {
     setConversationId(null);
 
     const contactSessionId = await createContactSession({
-      ...values,
+      name,
+      email,
       organizationId,
       metadata,
     });
@@ -98,6 +97,15 @@ export const WidgetAuthScreen = () => {
     } else {
       setScreen("selection");
     }
+  };
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    await startSession(values.name, values.email);
+  };
+
+  const onSkip = async () => {
+    const anonId = Math.random().toString(36).slice(2, 10);
+    await startSession("Anonym", `anon_${anonId}@widget.local`);
   };
 
   return (
@@ -155,12 +163,21 @@ export const WidgetAuthScreen = () => {
             )}
           />
           <Button
+            className="bg-black hover:bg-black/85 border-0 text-white"
             disabled={form.formState.isSubmitting}
             size="lg"
             type="submit"
           >
             Fortsett
           </Button>
+          <button
+            type="button"
+            onClick={() => void onSkip()}
+            disabled={form.formState.isSubmitting}
+            className="text-center text-[13px] text-muted-foreground hover:text-foreground transition-colors underline-offset-2 hover:underline"
+          >
+            Hopp over — chat anonymt
+          </button>
         </form>
       </Form>
     </>

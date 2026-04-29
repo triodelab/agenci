@@ -26,6 +26,7 @@ import type * as private_files from "../private/files.js";
 import type * as private_messages from "../private/messages.js";
 import type * as private_plugins from "../private/plugins.js";
 import type * as private_secrets from "../private/secrets.js";
+import type * as private_subscription from "../private/subscription.js";
 import type * as private_vapi from "../private/vapi.js";
 import type * as private_widgetSettings from "../private/widgetSettings.js";
 import type * as public_contactSessions from "../public/contactSessions.js";
@@ -73,6 +74,7 @@ declare const fullApi: ApiFromModules<{
   "private/messages": typeof private_messages;
   "private/plugins": typeof private_plugins;
   "private/secrets": typeof private_secrets;
+  "private/subscription": typeof private_subscription;
   "private/vapi": typeof private_vapi;
   "private/widgetSettings": typeof private_widgetSettings;
   "public/contactSessions": typeof public_contactSessions;

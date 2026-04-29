@@ -4,8 +4,7 @@ import { useOrganization } from "@clerk/nextjs";
 import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
-import { Badge } from "@workspace/ui/components/badge";
-import { CopyIcon, ExternalLinkIcon, LockIcon } from "lucide-react";
+import { CopyIcon, ExternalLinkIcon } from "lucide-react";
 import { getWidgetPreviewUrl } from "@/lib/widget-preview-url";
 import { toast } from "sonner";
 import { DashboardAccentButton } from "@/modules/dashboard/ui/components/dashboard-accent";
@@ -162,42 +161,6 @@ export const IntegrationsView = () => {
             </div>
           </div>
 
-          <div className="dash-panel-glass space-y-6 p-7 md:p-8 xl:col-span-12">
-            <div className="space-y-1">
-              <p className="dash-page-kicker">Veikart</p>
-              <h2 className="text-[17px] font-semibold tracking-tight text-foreground sm:text-lg">
-                Flere datakilder
-              </h2>
-              <p className="max-w-3xl text-[13px] leading-relaxed text-muted-foreground">
-                Typiske kilder fra e-post, netthandel og CRM. Ikke aktive ennå — her er
-                retningen slik at produktet føles komplett og gjennomtenkt.
-              </p>
-            </div>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-              {(
-                [
-                  { name: "Gmail", hint: "Vedlegg og tråder som kunnskap" },
-                  { name: "Shopify", hint: "Produkt- og ordredata" },
-                  { name: "Stripe", hint: "Faktura og kundestatus" },
-                  { name: "HubSpot", hint: "CRM-synk" },
-                ] as const
-              ).map((row) => (
-                <div
-                  className="flex min-h-[5.5rem] items-center justify-between gap-3 rounded-xl border border-border/60 bg-muted/15 px-4 py-3"
-                  key={row.name}
-                >
-                  <div className="min-w-0 text-left">
-                    <p className="font-medium text-[14px] text-foreground">{row.name}</p>
-                    <p className="mt-0.5 text-[12px] text-muted-foreground">{row.hint}</p>
-                  </div>
-                  <Badge className="shrink-0 gap-1 text-[10px]" variant="secondary">
-                    <LockIcon className="size-3" />
-                    Kommer
-                  </Badge>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
       </DashboardPageShell>
     </>

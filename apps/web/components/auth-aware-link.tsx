@@ -9,7 +9,7 @@ import { useAuth } from "@clerk/nextjs";
  */
 export function AuthAwareLink({
   href = "/sign-in",
-  loggedInHref = "/conversations",
+  loggedInHref = "/agents",
   children,
   ...props
 }: Omit<ComponentProps<typeof Link>, "href"> & {

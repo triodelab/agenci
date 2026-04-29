@@ -7,22 +7,12 @@ import { formatDistanceToNow } from "date-fns";
 import { api } from "@workspace/backend/_generated/api";
 import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@workspace/ui/components/select";
 import { cn } from "@workspace/ui/lib/utils";
 import { usePaginatedQuery } from "convex/react";
 import {
-  ArrowRightIcon,
-  ArrowUpIcon,
   CheckIcon,
   DownloadIcon,
   InboxIcon,
-  ListIcon,
   MessageSquareIcon,
   RefreshCwIcon,
   SearchIcon,
@@ -35,9 +25,10 @@ import {
   type ConversationListFilter,
   statusFilterAtom,
 } from "../../atoms";
+import { useParams } from "next/navigation";
+import type { Id } from "@workspace/backend/_generated/dataModel";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import { useMemo, useState } from "react";
-import { EmptyState } from "./legacy-ui";
 import { ContactAvatar } from "./contact-avatar";
 
 type LastMessageDoc = {
@@ -46,10 +37,24 @@ type LastMessageDoc = {
   message?: { role?: string };
 };
 
+const FILTERS: { value: ConversationListFilter; label: string }[] = [
+  { value: "inbox",      label: "Innboks" },
+  { value: "unresolved", label: "Uavklart" },
+  { value: "escalated",  label: "Eskalert" },
+  { value: "resolved",   label: "Løst" },
+  { value: "all",        label: "Alle" },
+];
+
 export const ConversationsPanel = () => {
   const pathname = usePathname();
   const router = useRouter();
+  const params = useParams();
   const { isLoaded: authLoaded, orgId: clerkOrgId } = useAuth();
+
+  const agentId =
+    typeof params?.agentId === "string"
+      ? (params.agentId as Id<"agents">)
+      : undefined;
 
   const statusFilter = useAtomValue(statusFilterAtom);
   const setStatusFilter = useSetAtom(statusFilterAtom);
@@ -59,13 +64,11 @@ export const ConversationsPanel = () => {
     api.private.conversations.getMany,
     !authLoaded || !clerkOrgId
       ? "skip"
-      : {
-          status: statusFilter,
-        },
-    {
-      initialNumItems: 10,
-    },
+      : { status: statusFilter, agentId },
+    { initialNumItems: 10 },
   );
+
+  const convBasePath = agentId ? `/agents/${agentId}/conversations` : "/conversations";
 
   const {
     topElementRef,
@@ -82,9 +85,7 @@ export const ConversationsPanel = () => {
   const filtered = useMemo(() => {
     const rows = conversations.results;
     const q = searchQuery.trim().toLowerCase();
-    if (!q) {
-      return rows;
-    }
+    if (!q) return rows;
     return rows.filter((c) => {
       const name = c.contactSession.name?.toLowerCase() ?? "";
       const email = c.contactSession.email?.toLowerCase() ?? "";
@@ -105,9 +106,7 @@ export const ConversationsPanel = () => {
         ].join(","),
       ),
     ];
-    const blob = new Blob([lines.join("\n")], {
-      type: "text/csv;charset=utf-8",
-    });
+    const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -117,224 +116,204 @@ export const ConversationsPanel = () => {
   };
 
   return (
-    <div className="flex h-full min-h-0 w-full flex-col bg-muted/15 text-foreground dark:bg-transparent">
-      <header className="border-border/60 border-b bg-card/90 px-4 py-4 backdrop-blur-sm">
-        <div className="mb-3 flex items-baseline justify-between gap-2">
-          <div className="flex items-center gap-2">
+    <div className="flex h-full min-h-0 w-full flex-col text-foreground">
+
+      {/* ── Header ── */}
+      <header className="shrink-0 border-b border-border/60 bg-card px-4 pb-3 pt-4">
+
+        {/* Row 1: title + actions */}
+        <div className="mb-3 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2.5">
             <span
               className="grid size-8 place-items-center rounded-lg border border-border/80 bg-background text-foreground shadow-sm"
               aria-hidden
             >
               <MessageSquareIcon className="size-4" strokeWidth={1.75} />
             </span>
-            <div className="min-w-0">
-              <h2 className="text-[15px] font-semibold tracking-tight text-foreground">
-                Chat logs
+            <div>
+              <h2 className="text-[15px] font-semibold tracking-tight text-foreground leading-none">
+                Konversasjoner
               </h2>
-              <p className="text-[11px] text-muted-foreground">Samtaler</p>
+              {!isLoadingFirstPage && (
+                <p className="mt-0.5 text-[11px] text-muted-foreground tabular-nums">
+                  {searchQuery.trim()
+                    ? `${filtered.length} av ${conversations.results.length}`
+                    : `${conversations.results.length} totalt`}
+                </p>
+              )}
             </div>
           </div>
-          <span className="rounded-full border border-border/50 bg-muted/50 px-2 py-0.5 text-[11px] text-muted-foreground tabular-nums">
-            {filtered.length} av {conversations.results.length}
-          </span>
-        </div>
-        <div className="flex flex-col gap-3">
           <div className="flex items-center gap-1">
             <Button
               aria-label="Oppdater"
-              className="size-8 shrink-0"
+              className="size-7 rounded-lg text-muted-foreground hover:text-foreground"
               onClick={() => router.refresh()}
               size="icon"
               type="button"
               variant="ghost"
             >
-              <RefreshCwIcon className="size-4" />
+              <RefreshCwIcon className="size-3.5" />
             </Button>
             <Button
               aria-label="Last ned CSV"
-              className="size-8 shrink-0"
+              className="size-7 rounded-lg text-muted-foreground hover:text-foreground"
               onClick={handleExport}
               size="icon"
               type="button"
               variant="ghost"
             >
-              <DownloadIcon className="size-4" />
+              <DownloadIcon className="size-3.5" />
             </Button>
-            <div className="relative min-w-0 flex-1">
-              <SearchIcon
-                aria-hidden
-                className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground"
-              />
-              <Input
-                aria-label="Søk i konversasjoner"
-                className="h-9 rounded-lg border-border/70 bg-background pl-8 text-sm"
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Søk navn, e-post eller melding…"
-                type="search"
-                value={searchQuery}
-              />
-            </div>
           </div>
-          <Select
-            onValueChange={(value) =>
-              setStatusFilter(value as ConversationListFilter)
-            }
-            value={statusFilter}
-          >
-            <SelectTrigger className="h-9 w-full rounded-lg border-border/70 bg-background text-sm">
-              <SelectValue placeholder="Filter status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="inbox">
-                <div className="flex items-center gap-2">
-                  <InboxIcon className="size-4" />
-                  <span>Innboks</span>
-                </div>
-              </SelectItem>
-              <SelectItem value="unresolved">
-                <div className="flex items-center gap-2">
-                  <ArrowRightIcon className="size-4" />
-                  <span>Uavklart</span>
-                </div>
-              </SelectItem>
-              <SelectItem value="escalated">
-                <div className="flex items-center gap-2">
-                  <ArrowUpIcon className="size-4" />
-                  <span>Eskalert</span>
-                </div>
-              </SelectItem>
-              <SelectItem value="resolved">
-                <div className="flex items-center gap-2">
-                  <CheckIcon className="size-4" />
-                  <span>Løst</span>
-                </div>
-              </SelectItem>
-              <SelectItem value="all">
-                <div className="flex items-center gap-2">
-                  <ListIcon className="size-4" />
-                  <span>Alle</span>
-                </div>
-              </SelectItem>
-            </SelectContent>
-          </Select>
+        </div>
+
+        {/* Row 2: search */}
+        <div className="relative mb-3">
+          <SearchIcon
+            aria-hidden
+            className="pointer-events-none absolute left-3 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground"
+          />
+          <Input
+            aria-label="Søk i konversasjoner"
+            className="h-9 rounded-xl border-border/70 bg-muted/30 pl-[2.125rem] text-[13px] placeholder:text-muted-foreground/60 focus-visible:bg-background"
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Søk navn, e-post eller melding…"
+            type="search"
+            value={searchQuery}
+          />
+        </div>
+
+        {/* Row 3: filter pills */}
+        <div className="flex gap-1 overflow-x-auto pb-0.5 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+          {FILTERS.map((f) => (
+            <button
+              key={f.value}
+              onClick={() => setStatusFilter(f.value)}
+              type="button"
+              className={cn(
+                "shrink-0 rounded-full px-3 py-1 text-[12px] font-medium transition-all duration-150 outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                statusFilter === f.value
+                  ? "bg-foreground text-background shadow-sm"
+                  : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground",
+              )}
+            >
+              {f.label}
+            </button>
+          ))}
         </div>
       </header>
 
+      {/* ── List ── */}
       {isLoadingFirstPage ? (
         <SkeletonConversations />
       ) : filtered.length === 0 ? (
-        <EmptyState
-          description={
-            searchQuery.trim()
-              ? "Prøv et annet søk eller fjern filter."
-              : statusFilter === "inbox"
-                ? "Ingen åpne samtaler akkurat nå — enten er alt løst, eller det har ikke kommet inn noe ennå."
+        <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-3 px-5 py-10 text-center">
+          <div className="flex size-12 items-center justify-center rounded-2xl border border-border/50 bg-muted/30">
+            <MessageSquareIcon className="size-5 text-muted-foreground/50" strokeWidth={1.5} />
+          </div>
+          <div>
+            <p className="text-[14px] font-semibold text-foreground">
+              {searchQuery.trim()
+                ? "Ingen treff"
+                : statusFilter === "inbox"
+                  ? "Innboksen er tom"
+                  : "Ingen samtaler"}
+            </p>
+            <p className="mt-1 max-w-[200px] text-[12px] leading-relaxed text-muted-foreground">
+              {searchQuery.trim()
+                ? "Prøv et annet søk eller velg et annet filter."
                 : statusFilter === "resolved"
                   ? "Ingen samtaler er merket som løst ennå."
-                  : "Nye samtaler vises her."
-          }
-          icon={<MessageSquareIcon className="size-10 stroke-[1.25]" />}
-          title={
-            searchQuery.trim()
-              ? "Ingen treff"
-              : statusFilter === "inbox"
-                ? "Innboksen er tom"
-                : "Ingen samtaler funnet"
-          }
-        />
+                  : "Når kunder chatter via widgeten, vises de her."}
+            </p>
+          </div>
+          {!searchQuery.trim() && statusFilter === "inbox" && (
+            <Link
+              href="/integrations"
+              className="mt-1 flex items-center gap-1.5 rounded-xl border border-border/60 bg-muted/40 px-3 py-2 text-[12px] font-medium text-foreground transition-colors hover:bg-muted"
+            >
+              Sett opp widget →
+            </Link>
+          )}
+          {searchQuery.trim() && (
+            <button
+              onClick={() => setSearchQuery("")}
+              className="mt-1 rounded-xl border border-border/60 bg-muted/40 px-3 py-2 text-[12px] font-medium text-foreground transition-colors hover:bg-muted"
+              type="button"
+            >
+              Tøm søk
+            </button>
+          )}
+        </div>
       ) : (
         <div className="min-h-0 flex-1 overflow-y-auto">
           <nav
             aria-label="Liste over samtaler"
-            className="divide-y divide-border/50"
+            className="divide-y divide-border/40"
           >
             {filtered.map((conversation) => {
               const last = conversation.lastMessage as LastMessageDoc | null;
-              const lastAt =
-                last?._creationTime ?? conversation._creationTime;
+              const lastAt = last?._creationTime ?? conversation._creationTime;
               const lastRole = last?.message?.role;
               const preview = last?.text ?? "Ingen melding ennå";
-              const previewLabel =
-                lastRole === "user" ? "Kunde" : "Siste svar";
-
-              const selected = pathname === `/conversations/${conversation._id}`;
+              const previewLabel = lastRole === "user" ? "Kunde" : "Siste svar";
+              const convPath = `${convBasePath}/${conversation._id}`;
+              const selected = pathname === convPath;
               const displayName = conversation.contactSession.name?.trim() || "Uten navn";
 
               return (
                 <Link
                   className={cn(
-                    "block px-4 py-3 text-left transition-colors duration-150",
+                    "block px-4 py-3.5 text-left transition-colors duration-100",
                     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset",
                     selected
-                      ? "bg-primary text-primary-foreground shadow-sm hover:bg-primary/90"
-                      : "hover:bg-muted/40",
+                      ? "bg-foreground text-background hover:bg-foreground/92"
+                      : "hover:bg-muted/30",
                   )}
-                  href={`/conversations/${conversation._id}`}
+                  href={convPath}
                   key={conversation._id}
                 >
                   <div className="flex gap-3">
-                    <ContactAvatar name={displayName} size={40} />
+                    <ContactAvatar name={displayName} size={38} />
                     <div className="min-w-0 flex-1">
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0 flex-1">
-                          <p
-                            className={cn(
-                              "truncate text-[14px] font-semibold leading-tight",
-                              selected
-                                ? "text-primary-foreground"
-                                : "text-foreground",
-                            )}
-                          >
+                          <p className={cn(
+                            "truncate text-[13px] font-semibold leading-tight",
+                            selected ? "text-background" : "text-foreground",
+                          )}>
                             {displayName}
                           </p>
                           {conversation.contactSession.email ? (
-                            <p
-                              className={cn(
-                                "mt-0.5 truncate text-[11px] leading-snug",
-                                selected
-                                  ? "text-primary-foreground/75"
-                                  : "text-muted-foreground",
-                              )}
-                            >
+                            <p className={cn(
+                              "mt-0.5 truncate text-[11px] leading-snug",
+                              selected ? "text-background/70" : "text-muted-foreground",
+                            )}>
                               {conversation.contactSession.email}
                             </p>
                           ) : null}
                         </div>
                         <div className="flex shrink-0 flex-col items-end gap-1">
-                          <ConversationStatusIcon
-                            status={conversation.status}
-                          />
+                          <ConversationStatusIcon status={conversation.status} />
                           <span
                             className={cn(
-                              "text-[11px] tabular-nums",
-                              selected
-                                ? "text-primary-foreground/70"
-                                : "text-muted-foreground",
+                              "text-[10px] tabular-nums",
+                              selected ? "text-background/60" : "text-muted-foreground/70",
                             )}
                             suppressHydrationWarning
                           >
-                            {formatDistanceToNow(lastAt, {
-                              addSuffix: true,
-                            })}
+                            {formatDistanceToNow(lastAt, { addSuffix: true })}
                           </span>
                         </div>
                       </div>
-                      <p
-                        className={cn(
-                          "mt-2 line-clamp-2 text-[12px] leading-snug",
-                          selected
-                            ? "text-primary-foreground/80"
-                            : "text-muted-foreground",
-                        )}
-                      >
-                        <span
-                          className={cn(
-                            "font-medium",
-                            selected
-                              ? "text-primary-foreground"
-                              : "text-foreground/70",
-                          )}
-                        >
+                      <p className={cn(
+                        "mt-2 line-clamp-2 text-[12px] leading-snug",
+                        selected ? "text-background/75" : "text-muted-foreground",
+                      )}>
+                        <span className={cn(
+                          "font-medium",
+                          selected ? "text-background/90" : "text-foreground/65",
+                        )}>
                           {previewLabel}:{" "}
                         </span>
                         {preview}
@@ -362,16 +341,16 @@ export const SkeletonConversations = () => {
     <div className="flex min-h-0 flex-1 flex-col gap-0 overflow-auto">
       {Array.from({ length: 8 }).map((_, index) => (
         <div
-          className="flex gap-3 border-border/50 border-b px-4 py-3.5"
+          className="flex gap-3 border-b border-border/40 px-4 py-3.5"
           key={index}
         >
-          <Skeleton className="size-10 shrink-0 rounded-full" />
-          <div className="min-w-0 flex-1 space-y-2">
+          <Skeleton className="size-[2.375rem] shrink-0 rounded-full" />
+          <div className="min-w-0 flex-1 space-y-2 pt-0.5">
             <div className="flex items-start justify-between gap-2">
-              <Skeleton className="h-4 w-32" />
-              <Skeleton className="h-3 w-16 shrink-0" />
+              <Skeleton className="h-3.5 w-28" />
+              <Skeleton className="h-3 w-14 shrink-0" />
             </div>
-            <Skeleton className="h-3 w-48" />
+            <Skeleton className="h-3 w-40" />
             <Skeleton className="h-3 w-full" />
           </div>
         </div>

@@ -189,4 +189,4 @@ export const LANDING_NAV_SURFACE_ATTR = "data-landing-nav-surface" as const;
 
 /** Undertekst rett under hero-podium (hvit sone) */
 export const LANDING_HERO_WORKFLOW_LEAD =
-  "Agenci er en chat på nettsiden deres som svarer ut fra deres egne tekster og dokumenter — og sender kunden videre til et menneske når saken krever det. Alt styres fra samme dashboard." as const;
+  "Du svarer sannsynligvis de samme spørsmålene hver eneste dag. Åpningstider, priser, leveringstid, returpolicy. Agenci gjør det for deg — på nettsiden, hele døgnet — med svarene du selv har skrevet." as const;

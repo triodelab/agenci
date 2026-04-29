@@ -17,6 +17,14 @@ import { Doc } from "@workspace/backend/_generated/dataModel";
 import { useMutation } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
 import { mergeWidgetAppearance } from "@workspace/ui/lib/widget-appearance";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@workspace/ui/components/select";
+import { BotIcon } from "lucide-react";
 import { VapiFormFields } from "./vapi-form-fields";
 import { WidgetAppearanceFields } from "./widget-appearance-fields";
 import type { FormSchema, WidgetCustomizationSection } from "../../types";
@@ -34,18 +42,21 @@ interface CustomizationFormProps {
   initialData?: WidgetSettings | null;
   hasVapiPlugin: boolean;
   activeSection: WidgetCustomizationSection;
+  agents: { _id: string; name: string; isActive: boolean }[];
 }
 
 export const CustomizationForm = ({
   initialData,
   hasVapiPlugin,
   activeSection,
+  agents,
 }: CustomizationFormProps) => {
   const upsertWidgetSettings = useMutation(api.private.widgetSettings.upsert);
 
   const form = useForm<FormSchema>({
     resolver: zodResolver(widgetSettingsSchema),
     defaultValues: {
+      agentId: initialData?.agentId ?? "",
       widgetTitle:
         initialData?.widgetTitle?.trim() || "Agenci",
       greetMessage:
@@ -77,6 +88,7 @@ export const CustomizationForm = ({
       };
 
       await upsertWidgetSettings({
+        agentId: values.agentId as import("@workspace/backend/_generated/dataModel").Id<"agents"> | undefined || undefined,
         widgetTitle: values.widgetTitle.trim(),
         greetMessage: values.greetMessage,
         defaultSuggestions: values.defaultSuggestions,
@@ -111,6 +123,56 @@ export const CustomizationForm = ({
               : "flex-1 px-8 py-8",
           )}
         >
+          {/* Agent selector */}
+          <div
+            className={cn(activeSection !== "agent" && "hidden")}
+            id="widget-section-agent"
+          >
+            <FormField
+              control={form.control}
+              name="agentId"
+              render={({ field }) => (
+                <FormItem className="space-y-2">
+                  <FormLabel className={labelUi}>Aktiv agent for widget</FormLabel>
+                  <FormControl>
+                    <Select
+                      value={field.value ?? ""}
+                      onValueChange={field.onChange}
+                    >
+                      <SelectTrigger className={cn(inputUi, "h-10 w-full px-3")}>
+                        <SelectValue placeholder="Velg agent…" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {agents.length === 0 ? (
+                          <div className="flex items-center gap-2 px-3 py-2 text-[13px] text-muted-foreground">
+                            <BotIcon className="size-4" strokeWidth={1.5} />
+                            Ingen agenter opprettet ennå
+                          </div>
+                        ) : (
+                          agents.map((agent) => (
+                            <SelectItem key={agent._id} value={agent._id} disabled={!agent.isActive}>
+                              <span className="flex items-center gap-2">
+                                <BotIcon className="size-3.5 shrink-0" strokeWidth={1.5} />
+                                {agent.name}
+                                {!agent.isActive && (
+                                  <span className="text-[11px] text-muted-foreground">(inaktiv)</span>
+                                )}
+                              </span>
+                            </SelectItem>
+                          ))
+                        )}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormDescription className="text-[12px] leading-relaxed">
+                    Samtaler fra widget-chatten på nettsiden din kobles til denne agenten og dens kunnskapsbase.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
           <div
             className={cn(activeSection !== "messages" && "hidden")}
             id="widget-section-messages"
@@ -120,20 +182,20 @@ export const CustomizationForm = ({
               name="greetMessage"
               render={({ field }) => (
                 <FormItem className="space-y-2">
-                  <FormLabel className={labelUi}>Greeting message</FormLabel>
+                  <FormLabel className={labelUi}>Velkomstmelding</FormLabel>
                   <FormControl>
                     <Textarea
                       className={cn(
                         inputUi,
                         "min-h-[120px] resize-y px-3 py-3 leading-relaxed",
                       )}
-                      placeholder="Welcome message shown when chat opens"
+                      placeholder="Hei! Hva kan jeg hjelpe deg med i dag?"
                       rows={4}
                       {...field}
                     />
                   </FormControl>
                   <FormDescription className="text-[12px] leading-relaxed">
-                    The first message customers see when they open the chat.
+                    Den første meldingen kundene ser når de åpner chatten.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -147,8 +209,7 @@ export const CustomizationForm = ({
           >
             <div className="space-y-6">
               <p className="text-[12px] leading-relaxed text-muted-foreground">
-                Quick reply suggestions shown to customers to guide the
-                conversation. Leave blank to hide a chip.
+                Hurtigsvarsforslag som vises til kunden for å guide samtalen. La stå tom for å skjule et forslag.
               </p>
               <div className="space-y-5">
                 <FormField
@@ -156,11 +217,11 @@ export const CustomizationForm = ({
                   name="defaultSuggestions.suggestion1"
                   render={({ field }) => (
                     <FormItem className="space-y-2">
-                      <FormLabel className={labelUi}>Suggestion 1</FormLabel>
+                      <FormLabel className={labelUi}>Forslag 1</FormLabel>
                       <FormControl>
                         <Input
                           className={cn(inputUi, "h-10 px-3")}
-                          placeholder="e.g., How do I get started?"
+                          placeholder="F.eks. Hvordan kommer jeg i gang?"
                           {...field}
                         />
                       </FormControl>
@@ -173,11 +234,11 @@ export const CustomizationForm = ({
                   name="defaultSuggestions.suggestion2"
                   render={({ field }) => (
                     <FormItem className="space-y-2">
-                      <FormLabel className={labelUi}>Suggestion 2</FormLabel>
+                      <FormLabel className={labelUi}>Forslag 2</FormLabel>
                       <FormControl>
                         <Input
                           className={cn(inputUi, "h-10 px-3")}
-                          placeholder="e.g., What are your pricing plans?"
+                          placeholder="F.eks. Hva koster det?"
                           {...field}
                         />
                       </FormControl>
@@ -190,11 +251,11 @@ export const CustomizationForm = ({
                   name="defaultSuggestions.suggestion3"
                   render={({ field }) => (
                     <FormItem className="space-y-2">
-                      <FormLabel className={labelUi}>Suggestion 3</FormLabel>
+                      <FormLabel className={labelUi}>Forslag 3</FormLabel>
                       <FormControl>
                         <Input
                           className={cn(inputUi, "h-10 px-3")}
-                          placeholder="e.g., I need help with my account"
+                          placeholder="F.eks. Jeg trenger hjelp med kontoen min"
                           {...field}
                         />
                       </FormControl>

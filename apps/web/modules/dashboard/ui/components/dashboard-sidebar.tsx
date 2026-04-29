@@ -1,21 +1,24 @@
 "use client";
 
-import { OrganizationSwitcher, UserButton } from "@clerk/nextjs";
 import {
+  ArrowLeftIcon,
   BotIcon,
   CreditCardIcon,
-  GlobeIcon,
   HomeIcon,
   InboxIcon,
   LibraryBigIcon,
   Mic,
   PaletteIcon,
   PlugIcon,
+  ZapIcon,
+  ChevronLeftIcon,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
+import { useQuery } from "convex/react";
+import { api } from "@workspace/backend/_generated/api";
+import type { Id } from "@workspace/backend/_generated/dataModel";
 
-import { LogoIcon } from "@/components/logo";
 import {
   Sidebar,
   SidebarContent,
@@ -23,7 +26,6 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
-  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -36,271 +38,283 @@ import {
   TooltipTrigger,
 } from "@workspace/ui/components/tooltip";
 import { cn } from "@workspace/ui/lib/utils";
-import { ModeToggle } from "@/components/mode-toggle";
 
-const customerSupportItems = [
-  { title: "Oversikt", url: "/dashboard", icon: HomeIcon },
-  { title: "Konversasjoner", url: "/conversations", icon: InboxIcon },
-  { title: "Kunnskapsbase", url: "/files", icon: LibraryBigIcon },
-];
+// ─── Nav items ────────────────────────────────────────────────────────────────
 
-const configurationItems = [
-  { title: "Widget-tilpasning", url: "/customization", icon: PaletteIcon },
-  { title: "Integrasjoner", url: "/integrations", icon: PlugIcon },
-  { title: "Stemmeassistent", url: "/plugins/vapi", icon: Mic },
-];
-
-const accountItems = [
-  { title: "Plan og faktura", url: "/billing", icon: CreditCardIcon },
-  { title: "Agenter", url: "/agents", icon: BotIcon },
-];
-
-function navButtonClass(active: boolean) {
-  return cn(
-    "relative h-9 w-full min-w-0 rounded-lg px-3 text-[13px] font-medium transition-colors duration-150",
-    // Samme fylte primær som øvrige dashboard-knapper (lys: svart, mørk: lys flate)
-    active
-      ? [
-          "!border-transparent !bg-primary !text-primary-foreground shadow-sm",
-          "hover:!bg-primary/90 hover:!text-primary-foreground",
-          "data-[active=true]:!bg-primary data-[active=true]:!text-primary-foreground",
-          "[&_svg]:!text-primary-foreground",
-        ]
-      : [
-          "border-transparent text-sidebar-foreground/85",
-          "hover:bg-muted/80 hover:text-foreground",
-          "[&_svg]:opacity-90",
-        ],
-  );
+function agentNavItems(agentId: string) {
+  return [
+    { title: "Oversikt", url: `/agents/${agentId}`, icon: HomeIcon, badge: false, exact: true },
+    { title: "Samtaler", url: `/agents/${agentId}/conversations`, icon: InboxIcon, badge: true, exact: false },
+    { title: "Kunnskapsbase", url: `/agents/${agentId}/files`, icon: LibraryBigIcon, badge: false, exact: false },
+    { title: "Widget-tilpasning", url: `/agents/${agentId}/customization`, icon: PaletteIcon, badge: false, exact: false },
+    { title: "Integrasjoner", url: `/agents/${agentId}/integrations`, icon: PlugIcon, badge: false, exact: false },
+    { title: "Stemmeassistent", url: `/agents/${agentId}/plugins/vapi`, icon: Mic, badge: false, exact: false },
+    { title: "Plan og faktura", url: `/agents/${agentId}/billing`, icon: CreditCardIcon, badge: false, exact: false },
+  ] as const;
 }
 
-function SidebarThemeToggle() {
-  const { state, isMobile } = useSidebar();
-  const collapsed = state === "collapsed" && !isMobile;
+const globalNavItems = [
+  { title: "Agenter", url: "/agents", icon: BotIcon, badge: false, exact: true },
+] as const;
 
-  const triggerClassName = cn(
-    "shrink-0 rounded-lg border border-sidebar-border/90 bg-card/80 p-1.5 shadow-sm",
-    "hover:bg-sidebar-accent/80 hover:opacity-100",
-  );
+// ─── NavItem ─────────────────────────────────────────────────────────────────
 
-  const toggle = (
-    <ModeToggle
-      contentClassName="dashboard-app-shell min-w-[10rem]"
-      triggerClassName={triggerClassName}
-    />
-  );
+type AnyNavItem = {
+  title: string;
+  url: string;
+  icon: React.ComponentType<{ className?: string; strokeWidth?: number }>;
+  badge: boolean;
+  exact: boolean;
+};
 
-  if (!collapsed) {
-    return (
-      <div className="flex w-full min-w-0 items-center justify-between gap-2">
-        <span className="truncate text-[13px] font-medium text-sidebar-foreground group-data-[collapsible=icon]:sr-only">
-          Tema
+function NavItem({
+  item,
+  active,
+  collapsed,
+  badge,
+}: {
+  item: AnyNavItem;
+  active: boolean;
+  collapsed: boolean;
+  badge?: number;
+}) {
+  const showBadge = item.badge && (badge ?? 0) > 0;
+
+  const button = (
+    <SidebarMenuButton
+      asChild
+      isActive={active}
+      className={cn(
+        "h-9 w-full rounded-lg px-3 text-[13px] font-medium transition-all duration-150",
+        active
+          ? "bg-foreground text-background hover:bg-foreground/90 hover:text-background [&_svg]:text-background"
+          : "text-muted-foreground hover:bg-muted hover:text-foreground [&_svg]:text-muted-foreground",
+      )}
+      tooltip={item.title}
+    >
+      <Link href={item.url} className="flex items-center gap-2.5">
+        <item.icon className="size-4 shrink-0" strokeWidth={active ? 2 : 1.75} />
+        <span className="group-data-[collapsible=icon]:hidden min-w-0 flex-1 truncate">
+          {item.title}
         </span>
-        {toggle}
-      </div>
+        {showBadge && !collapsed && (
+          <span
+            className={cn(
+              "group-data-[collapsible=icon]:hidden ml-auto shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-bold tabular-nums leading-none",
+              active
+                ? "bg-background/20 text-background"
+                : "bg-amber-100 text-amber-700 dark:bg-amber-950/50 dark:text-amber-400",
+            )}
+          >
+            {(badge ?? 0) > 99 ? "99+" : badge}
+          </span>
+        )}
+      </Link>
+    </SidebarMenuButton>
+  );
+
+  if (collapsed) {
+    return (
+      <SidebarMenuItem>
+        <Tooltip>
+          <TooltipTrigger asChild>{button}</TooltipTrigger>
+          <TooltipContent side="right" align="center" className="dashboard-app-shell">
+            {showBadge ? `${item.title} (${badge})` : item.title}
+          </TooltipContent>
+        </Tooltip>
+      </SidebarMenuItem>
     );
   }
 
+  return <SidebarMenuItem>{button}</SidebarMenuItem>;
+}
+
+// ─── UpgradeCard ─────────────────────────────────────────────────────────────
+
+function UpgradeCard({ collapsed }: { collapsed: boolean }) {
+  if (collapsed) return null;
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <span className="inline-flex w-full justify-center">{toggle}</span>
-      </TooltipTrigger>
-      <TooltipContent side="right" align="center">
-        Tema (lys / mørk / system)
-      </TooltipContent>
-    </Tooltip>
+    <div className="mx-2 mb-1 overflow-hidden rounded-xl border border-border/60 bg-muted/40 p-4">
+      <div className="flex size-8 items-center justify-center rounded-lg border border-border/60 bg-card mb-3 shrink-0">
+        <ZapIcon className="size-3.5 text-foreground" strokeWidth={2} />
+      </div>
+      <p className="text-[13px] font-semibold text-foreground leading-snug">Prøv Pro gratis</p>
+      <p className="mt-1 text-[11px] text-muted-foreground leading-relaxed">
+        14 dager gratis — AI-agent, kunnskapsbase og tilpasning
+      </p>
+      <Link
+        href="/billing"
+        className="mt-3 inline-flex items-center gap-1 text-[12px] font-medium text-muted-foreground hover:text-foreground transition-colors"
+      >
+        Start prøveperiode <span aria-hidden>→</span>
+      </Link>
+    </div>
   );
 }
 
+// ─── DashboardSidebar ─────────────────────────────────────────────────────────
+
 export const DashboardSidebar = () => {
   const pathname = usePathname();
+  const params = useParams();
+  const { state, isMobile } = useSidebar();
+  const collapsed = state === "collapsed" && !isMobile;
 
-  const isActive = (url: string) => {
-    if (url === "/") return pathname === "/";
-    if (url === "/dashboard") return pathname === "/dashboard";
-    return pathname.startsWith(url);
-  };
+  const agentId =
+    typeof params?.agentId === "string" ? (params.agentId as Id<"agents">) : undefined;
+
+  const overview = useQuery(api.private.dashboard.getOverview);
+  const agentOverview = useQuery(
+    api.private.dashboard.getAgentOverview,
+    agentId ? { agentId } : "skip",
+  );
+  const agent = useQuery(
+    api.private.agents.getOne,
+    agentId ? { agentId } : "skip",
+  );
+
+  const orgInboxCount =
+    overview
+      ? (overview.conversations.unresolved.count ?? 0) +
+        (overview.conversations.escalated.count ?? 0)
+      : undefined;
+
+  const agentInboxCount = agentOverview
+    ? (agentOverview.conversations.unresolved ?? 0) +
+      (agentOverview.conversations.escalated ?? 0)
+    : undefined;
+
+  const isActive = (url: string, exact: boolean) =>
+    exact ? pathname === url : pathname.startsWith(url);
 
   return (
     <Sidebar
-      className={cn(
-        "group z-20 border-sidebar-border border-r bg-sidebar",
-      )}
+      className="group z-20 border-r border-sidebar-border bg-sidebar"
       collapsible="icon"
     >
-      <SidebarHeader className="gap-3 border-sidebar-border/80 border-b px-3 pb-4 pt-4">
-        <Link
-          className={cn(
-            "group/brand flex items-center gap-3 rounded-xl px-2 py-2 transition-colors",
-            "hover:bg-sidebar-accent",
-            "group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0",
-          )}
-          href="/dashboard"
-        >
-          <LogoIcon className="size-10 shrink-0 rounded-xl object-contain shadow-sm ring-1 ring-border/15 dark:brightness-0 dark:invert" />
-          <span className="min-w-0 flex-1 text-left group-data-[collapsible=icon]:hidden">
-            <span className="block truncate font-semibold text-[15px] text-sidebar-foreground tracking-tight">
-              Agenci
-            </span>
-            <span className="mt-0.5 block text-[11px] text-muted-foreground">
-              Arbeidsflate
-            </span>
-          </span>
-        </Link>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild className="h-11 rounded-xl" size="lg">
-              <OrganizationSwitcher
-                hidePersonal
-                skipInvitationScreen
-                appearance={{
-                  elements: {
-                    rootBox: "w-full! h-10!",
-                    avatarBox: "size-4! rounded-md!",
-                    organizationSwitcherTrigger:
-                      "w-full! justify-start! rounded-lg! border border-sidebar-border/90 bg-card/80 px-2.5! shadow-sm! hover:bg-sidebar-accent/80! group-data-[collapsible=icon]:size-10! group-data-[collapsible=icon]:p-2!",
-                    organizationPreview:
-                      "group-data-[collapsible=icon]:justify-center! gap-2!",
-                    organizationPreviewTextContainer:
-                      "group-data-[collapsible=icon]:hidden! text-[13px]! font-medium! text-sidebar-foreground!",
-                    organizationSwitcherTriggerIcon:
-                      "group-data-[collapsible=icon]:hidden! ml-auto! size-4! text-sidebar-foreground/55!",
-                  },
-                }}
-              />
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarHeader>
+      <SidebarContent className="px-2 pt-4 pb-2 gap-0">
+        {agentId ? (
+          <>
+            {/* Back to all agents */}
+            <SidebarGroup className="px-0 py-0 mb-2">
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  <SidebarMenuItem>
+                    {collapsed ? (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <SidebarMenuButton
+                            asChild
+                            className="h-9 w-full rounded-lg px-3 text-[13px] font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
+                          >
+                            <Link href="/agents">
+                              <ChevronLeftIcon className="size-4 shrink-0" strokeWidth={1.75} />
+                            </Link>
+                          </SidebarMenuButton>
+                        </TooltipTrigger>
+                        <TooltipContent side="right" className="dashboard-app-shell">
+                          Alle agenter
+                        </TooltipContent>
+                      </Tooltip>
+                    ) : (
+                      <SidebarMenuButton
+                        asChild
+                        className="h-9 w-full rounded-lg px-3 text-[13px] font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
+                      >
+                        <Link href="/agents" className="flex items-center gap-2">
+                          <ChevronLeftIcon className="size-4 shrink-0" strokeWidth={1.75} />
+                          <span className="group-data-[collapsible=icon]:hidden truncate">
+                            Alle agenter
+                          </span>
+                        </Link>
+                      </SidebarMenuButton>
+                    )}
+                  </SidebarMenuItem>
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
 
-      <SidebarContent className="gap-4 px-2 py-4">
-        <SidebarGroup className="overflow-hidden rounded-xl border border-sidebar-border/70 bg-muted/25 pb-2 dark:bg-muted/10">
-          <SidebarGroupLabel className="mb-2 px-3 pt-2 text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.14em]">
-            Kundestøtte
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu className="gap-0.5">
-              {customerSupportItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={isActive(item.url)}
-                    className={navButtonClass(isActive(item.url))}
-                    tooltip={item.title}
-                  >
-                    <Link href={item.url}>
-                      <item.icon
-                        className="size-[15px] opacity-95"
-                        strokeWidth={1.75}
-                      />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+            {/* Agent name label */}
+            {!collapsed && agent && (
+              <div className="mb-1.5 px-3">
+                <p className="truncate text-[12px] font-semibold text-foreground/70">
+                  {agent.name}
+                </p>
+              </div>
+            )}
 
-        <SidebarGroup className="overflow-hidden rounded-xl border border-sidebar-border/70 bg-muted/25 pb-2 dark:bg-muted/10">
-          <SidebarGroupLabel className="mb-2 px-3 pt-2 text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.14em]">
-            Tilpasning
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu className="gap-0.5">
-              {configurationItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={isActive(item.url)}
-                    className={navButtonClass(isActive(item.url))}
-                    tooltip={item.title}
-                  >
-                    <Link href={item.url}>
-                      <item.icon
-                        className="size-[15px] opacity-95"
-                        strokeWidth={1.75}
-                      />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+            {/* Per-agent nav */}
+            <SidebarGroup className="px-0 py-0">
+              <SidebarGroupContent>
+                <SidebarMenu className="gap-0.5">
+                  {agentNavItems(agentId).map((item) => (
+                    <NavItem
+                      key={item.url}
+                      item={item}
+                      active={isActive(item.url, item.exact)}
+                      collapsed={collapsed}
+                      badge={item.badge ? agentInboxCount : undefined}
+                    />
+                  ))}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          </>
+        ) : (
+          <>
+            {/* Global nav */}
+            <SidebarGroup className="px-0 py-0">
+              <SidebarGroupLabel className="mb-1.5 px-3 text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground/50 group-data-[collapsible=icon]:hidden">
+                Oversikt
+              </SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu className="gap-0.5">
+                  {globalNavItems.map((item) => (
+                    <NavItem
+                      key={item.url}
+                      item={item}
+                      active={isActive(item.url, item.exact)}
+                      collapsed={collapsed}
+                      badge={item.badge ? orgInboxCount : undefined}
+                    />
+                  ))}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
 
-        <SidebarGroup className="overflow-hidden rounded-xl border border-sidebar-border/70 bg-muted/25 pb-2 dark:bg-muted/10">
-          <SidebarGroupLabel className="mb-2 px-3 pt-2 text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.14em]">
-            Konto
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu className="gap-0.5">
-              {accountItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={isActive(item.url)}
-                    className={navButtonClass(isActive(item.url))}
-                    tooltip={item.title}
-                  >
-                    <Link href={item.url}>
-                      <item.icon
-                        className="size-[15px] opacity-95"
-                        strokeWidth={1.75}
-                      />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+          </>
+        )}
       </SidebarContent>
 
-      <SidebarFooter className="border-sidebar-border/80 border-t bg-muted/15 px-2 py-3 dark:bg-muted/5 [&_[data-sidebar=menu-button]]:px-3">
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <div className="flex w-full items-center px-1 py-0.5">
-              <SidebarThemeToggle />
-            </div>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
-              className={navButtonClass(false)}
-              tooltip="Åpne markedsføringssiden (du forblir innlogget)"
+      <SidebarFooter className="p-0 pb-2">
+        <UpgradeCard collapsed={collapsed} />
+        <div className="mx-2 mb-1">
+          {collapsed ? (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Link
+                  href="/?from=marketing"
+                  className="flex size-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                >
+                  <ArrowLeftIcon className="size-4" strokeWidth={1.75} />
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent side="right" align="center" className="dashboard-app-shell">
+                Tilbake til nettsiden
+              </TooltipContent>
+            </Tooltip>
+          ) : (
+            <Link
+              href="/?from=marketing"
+              className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-[12px] font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
             >
-              <Link href="/?from=marketing">
-                <GlobeIcon
-                  className="size-[15px] opacity-95"
-                  strokeWidth={1.75}
-                />
-                <span>Til forsiden</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <UserButton
-              showName
-              appearance={{
-                elements: {
-                  rootBox: "w-full! h-10!",
-                  userButtonTrigger:
-                    "w-full! rounded-xl! border border-sidebar-border/70 bg-card/60 p-2! shadow-sm hover:bg-sidebar-accent/90! group-data-[collapsible=icon]:size-10! group-data-[collapsible=icon]:p-2!",
-                  userButtonBox:
-                    "w-full! flex-row-reverse! justify-end! gap-2! group-data-[collapsible=icon]:justify-center! text-[13px] text-sidebar-foreground!",
-                  userButtonOuterIdentifier:
-                    "pl-0! group-data-[collapsible=icon]:hidden! text-sidebar-foreground/85!",
-                  avatarBox: "size-4! rounded-md!",
-                },
-              }}
-            />
-          </SidebarMenuItem>
-        </SidebarMenu>
+              <ArrowLeftIcon className="size-3.5 shrink-0" strokeWidth={1.75} />
+              Tilbake til nettsiden
+            </Link>
+          )}
+        </div>
       </SidebarFooter>
+
       <SidebarRail />
     </Sidebar>
   );

@@ -8,461 +8,268 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@workspace/ui/components/accordion";
-import { getCountryFlagUrl, getCountryFromTimezone } from "@/lib/country-utils";
+import { getCountryFromTimezone } from "@/lib/country-utils";
 import { api } from "@workspace/backend/_generated/api";
 import { Id } from "@workspace/backend/_generated/dataModel";
 import { Button } from "@workspace/ui/components/button";
 import { useQuery } from "convex/react";
 import {
+  CalendarIcon,
+  ChevronRightIcon,
   ClockIcon,
-  FileTextIcon,
   GlobeIcon,
   MailIcon,
-  MapPinIcon,
   MonitorIcon,
-  PhoneIcon,
   UserIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import { cn } from "@workspace/ui/lib/utils";
-import {
-  LegacyCollapsibleSection,
-  LegacyDetailRow,
-} from "./legacy-ui";
+import { ContactAvatar } from "./contact-avatar";
+import { format } from "date-fns";
+import { nb } from "date-fns/locale";
 
-type InfoItem = {
-  label: string;
-  value: string | React.ReactNode;
-  className?: string;
-};
+// ─── Status config ────────────────────────────────────────────────────────────
 
-type InfoSection = {
-  id: string;
-  icon: React.ComponentType<{ className?: string }>;
-  title: string;
-  items: InfoItem[];
-};
+const STATUS_CFG = {
+  unresolved: { label: "Åpen",         cls: "bg-amber-100 text-amber-700 dark:bg-amber-950/50 dark:text-amber-400" },
+  escalated:  { label: "Eskalert",     cls: "bg-red-100 text-red-700 dark:bg-red-950/50 dark:text-red-400" },
+  resolved:   { label: "Løst",         cls: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400" },
+} as const;
 
-type StatusDot = "amber" | "orange" | "slate" | null;
+// ─── Small info row ───────────────────────────────────────────────────────────
 
-function statusLabel(
-  status: "unresolved" | "escalated" | "resolved",
-): {
-  status: string;
-  priority: string;
-  statusDot: StatusDot;
-  priorityDot: StatusDot;
-} {
-  switch (status) {
-    case "unresolved":
-      return {
-        status: "Åpen",
-        priority: "—",
-        statusDot: null,
-        priorityDot: null,
-      };
-    case "escalated":
-      return {
-        status: "Under arbeid",
-        priority: "Haster",
-        statusDot: "amber",
-        priorityDot: "orange",
-      };
-    case "resolved":
-      return {
-        status: "Lukket",
-        priority: "—",
-        statusDot: "slate",
-        priorityDot: null,
-      };
-    default:
-      return { status: status, priority: "—", statusDot: null, priorityDot: null };
-  }
-}
-
-const dotClass: Record<NonNullable<StatusDot>, string> = {
-  amber: "bg-amber-400 dark:bg-amber-500",
-  orange: "bg-orange-500 dark:bg-orange-400",
-  slate: "bg-muted-foreground/45",
-};
-
-function StatusMetric({
+function InfoRow({
+  icon: Icon,
   label,
   value,
-  valueDot,
+  href,
 }: {
+  icon: typeof MailIcon;
   label: string;
   value: React.ReactNode;
-  valueDot?: StatusDot;
+  href?: string;
 }) {
   return (
-    <div className="min-w-0">
-      <p className="text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
-        {label}
-      </p>
-      <div className="mt-1.5 flex min-h-[1.25rem] items-start gap-2 text-sm font-semibold text-foreground">
-        {valueDot ? (
-          <span
-            aria-hidden
-            className={cn("mt-1.5 size-2 shrink-0 rounded-full", dotClass[valueDot])}
-          />
-        ) : null}
-        <span className="min-w-0 break-normal leading-snug">{value}</span>
+    <div className="flex items-start gap-3 py-2.5">
+      <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-md border border-border/50 bg-muted/40 text-muted-foreground">
+        <Icon className="size-3" strokeWidth={1.75} />
+      </span>
+      <div className="min-w-0 flex-1">
+        <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground/70 leading-none">
+          {label}
+        </p>
+        {href ? (
+          <a
+            href={href}
+            className="mt-0.5 block truncate text-[12px] text-foreground hover:underline underline-offset-2"
+          >
+            {value}
+          </a>
+        ) : (
+          <p className="mt-0.5 truncate text-[12px] text-foreground">{value}</p>
+        )}
       </div>
     </div>
   );
 }
+
+// ─── Section card ─────────────────────────────────────────────────────────────
+
+function PanelCard({
+  title,
+  children,
+  className,
+}: {
+  title: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className={cn("overflow-hidden rounded-2xl border border-border/60 bg-card shadow-sm", className)}>
+      <div className="border-b border-border/50 px-4 py-3">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground/70">{title}</p>
+      </div>
+      <div className="divide-y divide-border/40 px-4">{children}</div>
+    </div>
+  );
+}
+
+// ─── Main ─────────────────────────────────────────────────────────────────────
 
 export const ContactPanel = () => {
   const params = useParams();
   const conversationId = params.conversationId as Id<"conversations"> | undefined;
   const { user } = useUser();
 
-  const [infoOpen, setInfoOpen] = useState(true);
-  const [contactOpen, setContactOpen] = useState(true);
-  const [threadOpen, setThreadOpen] = useState(true);
-  const [techOpen, setTechOpen] = useState(false);
-
   const detail = useQuery(
     api.private.conversations.getOne,
     conversationId ? { conversationId } : "skip",
   );
 
-  const sessionMeta = detail?.contactSession;
-
   const parseUserAgent = useMemo(() => {
     return (userAgent?: string) => {
-      if (!userAgent) {
-        return { browser: "Unknown", os: "Unknown", device: "Unknown" };
-      }
-
+      if (!userAgent) return { browser: "—", os: "—", device: "—" };
       const browser = Bowser.getParser(userAgent);
-      const result = browser.getResult();
-
+      const r = browser.getResult();
       return {
-        browser: result.browser.name || "Unknown",
-        browserVersion: result.browser.version || "",
-        os: result.os.name || "Unknown",
-        osVersion: result.os.version || "",
-        device: result.platform.type || "desktop",
-        deviceVendor: result.platform.vendor || "",
-        deviceModel: result.platform.model || "",
+        browser: [r.browser.name, r.browser.version].filter(Boolean).join(" ") || "—",
+        os:      [r.os.name, r.os.version].filter(Boolean).join(" ") || "—",
+        device:  r.platform.type || "desktop",
       };
     };
   }, []);
 
-  const userAgentInfo = useMemo(
-    () => parseUserAgent(sessionMeta?.metadata?.userAgent),
-    [sessionMeta?.metadata?.userAgent, parseUserAgent],
+  const uaInfo = useMemo(
+    () => parseUserAgent(detail?.contactSession?.metadata?.userAgent),
+    [detail?.contactSession?.metadata?.userAgent, parseUserAgent],
   );
 
-  const countryInfo = useMemo(() => {
-    return getCountryFromTimezone(sessionMeta?.metadata?.timezone);
-  }, [sessionMeta?.metadata?.timezone]);
+  const countryInfo = useMemo(
+    () => getCountryFromTimezone(detail?.contactSession?.metadata?.timezone),
+    [detail?.contactSession?.metadata?.timezone],
+  );
 
-  const accordionSections = useMemo<InfoSection[]>(() => {
-    if (!sessionMeta?.metadata) {
-      return [];
-    }
-
-    return [
-      {
-        id: "device-info",
-        icon: MonitorIcon,
-        title: "Enhet",
-        items: [
-          {
-            label: "Nettleser",
-            value:
-              userAgentInfo.browser +
-              (userAgentInfo.browserVersion
-                ? ` ${userAgentInfo.browserVersion}`
-                : ""),
-          },
-          {
-            label: "OS",
-            value:
-              userAgentInfo.os +
-              (userAgentInfo.osVersion ? ` ${userAgentInfo.osVersion}` : ""),
-          },
-          {
-            label: "Enhet",
-            value:
-              userAgentInfo.device +
-              (userAgentInfo.deviceModel ? ` – ${userAgentInfo.deviceModel}` : ""),
-            className: "capitalize",
-          },
-          {
-            label: "Skjerm",
-            value: sessionMeta.metadata.screenResolution,
-          },
-          {
-            label: "Viewport",
-            value: sessionMeta.metadata.viewportSize,
-          },
-          {
-            label: "Informasjonskapsler",
-            value: sessionMeta.metadata.cookieEnabled ? "På" : "Av",
-          },
-        ],
-      },
-      {
-        id: "location-info",
-        icon: GlobeIcon,
-        title: "Språk og sted",
-        items: [
-          ...(countryInfo
-            ? [
-                {
-                  label: "Land",
-                  value: <span>{countryInfo.name}</span>,
-                },
-              ]
-            : []),
-          {
-            label: "Språk",
-            value: sessionMeta.metadata.language,
-          },
-          {
-            label: "Tidssone",
-            value: sessionMeta.metadata.timezone,
-          },
-          {
-            label: "UTC",
-            value: String(sessionMeta.metadata.timezoneOffset),
-          },
-        ],
-      },
-      {
-        id: "section-details",
-        title: "Økt",
-        icon: ClockIcon,
-        items: [
-          {
-            label: "Startet",
-            value: new Date(sessionMeta._creationTime).toLocaleString(),
-          },
-        ],
-      },
-    ];
-  }, [sessionMeta, userAgentInfo, countryInfo]);
-
-  if (!conversationId) {
-    return null;
-  }
+  if (!conversationId) return null;
 
   if (detail === undefined) {
     return (
-      <aside className="flex h-full min-h-0 flex-col overflow-hidden bg-muted/15 lg:bg-transparent">
-        <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4">
-          <Skeleton className="app-dashboard-panel h-28 w-full rounded-2xl" />
-          <Skeleton className="app-dashboard-panel h-36 w-full rounded-2xl" />
+      <aside className="flex h-full min-h-0 flex-col overflow-hidden">
+        <div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-4">
+          <Skeleton className="h-24 w-full rounded-2xl" />
+          <Skeleton className="h-32 w-full rounded-2xl" />
+          <Skeleton className="h-28 w-full rounded-2xl" />
         </div>
       </aside>
     );
   }
 
-  if (detail === null) {
+  if (!detail || !detail.contactSession) {
     return (
-      <aside className="flex h-full min-h-0 flex-col p-4 text-[13px] text-muted-foreground lg:bg-transparent">
-        <div className="app-dashboard-panel rounded-2xl px-4 py-5">
-          Fant ikke samtalen.
+      <aside className="flex h-full min-h-0 flex-col p-4 text-[13px] text-muted-foreground">
+        <div className="rounded-2xl border border-border/60 bg-card px-4 py-5 text-[13px] text-muted-foreground">
+          {!detail ? "Fant ikke samtalen." : "Ingen kontakt koblet til denne samtalen."}
         </div>
       </aside>
     );
   }
 
-  if (!detail.contactSession) {
-    return (
-      <aside className="flex h-full min-h-0 flex-col p-4 text-[13px] text-muted-foreground lg:bg-transparent">
-        <div className="app-dashboard-panel rounded-2xl px-4 py-5">
-          Ingen kontakt koblet til denne samtalen.
-        </div>
-      </aside>
-    );
-  }
-
-  const contactSession = detail.contactSession;
-
-  const {
-    status: statusText,
-    priority: priorityText,
-    statusDot,
-    priorityDot,
-  } = statusLabel(detail.status);
-  const assignedName =
-    user?.fullName || user?.primaryEmailAddress?.emailAddress || "—";
-  const started = new Date(detail._creationTime).toLocaleDateString(undefined, {
-    month: "short",
-    day: "numeric",
-  });
+  const contact = detail.contactSession;
+  const { label: statusLabel, cls: statusCls } = STATUS_CFG[detail.status];
+  const assignedName = user?.fullName || user?.primaryEmailAddress?.emailAddress || "Ikke tildelt";
+  const startedAt = new Date(detail._creationTime);
+  const displayName = contact.name?.trim() || "Uten navn";
 
   return (
     <aside
       aria-label="Samtaledetaljer"
-      className="flex h-full min-h-0 w-full flex-col overflow-hidden bg-muted/15 lg:bg-transparent"
+      className="flex h-full min-h-0 w-full flex-col overflow-hidden"
     >
-      <h2 className="sr-only">Detaljer</h2>
+      <h2 className="sr-only">Samtaledetaljer</h2>
 
-      <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-4 py-4 lg:py-5">
-        <LegacyCollapsibleSection
-          onOpenChange={setInfoOpen}
-          open={infoOpen}
-          title="Status"
-        >
-          <div className="p-4 pt-3">
-            <div className="flex flex-col gap-4">
-              <div className="grid grid-cols-2 gap-x-4 gap-y-1">
-                <StatusMetric
-                  label="Status"
-                  value={statusText}
-                  valueDot={statusDot}
-                />
-                <StatusMetric
-                  label="Prioritet"
-                  value={priorityText}
-                  valueDot={priorityDot}
-                />
-              </div>
-              <StatusMetric label="Tildelt" value={assignedName} />
-              <StatusMetric label="Dato" value={started} />
-            </div>
-          </div>
-        </LegacyCollapsibleSection>
+      <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-4">
 
-        <LegacyCollapsibleSection
-          onOpenChange={setContactOpen}
-          open={contactOpen}
-          title="Kunde"
-        >
-          <div className="space-y-3 p-4 pt-3">
-            <LegacyDetailRow
-              icon={<UserIcon className="size-4" />}
-              label="Navn"
-              value={contactSession.name}
-            />
-            <LegacyDetailRow
-              icon={<MailIcon className="size-4" />}
-              label="E-post"
-              value={
+        {/* ── Contact header card ── */}
+        <div className="overflow-hidden rounded-2xl border border-border/60 bg-card shadow-sm">
+          <div className="flex items-center gap-3 p-4">
+            <ContactAvatar name={displayName} size={44} />
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-[14px] font-semibold text-foreground leading-tight">{displayName}</p>
+              {contact.email ? (
                 <a
-                  className="text-primary hover:underline"
-                  href={`mailto:${contactSession.email}`}
+                  href={`mailto:${contact.email}`}
+                  className="mt-0.5 block truncate text-[12px] text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  {contactSession.email}
+                  {contact.email}
                 </a>
-              }
-            />
-            <LegacyDetailRow
-              icon={<PhoneIcon className="size-4" />}
-              label="Telefon"
-              value="Ikke oppgitt"
-            />
-            <LegacyDetailRow
-              icon={<MapPinIcon className="size-4" />}
-              label="Adresse"
-              value="Ikke oppgitt"
-            />
-            <Button
-              asChild
-              className="mt-1 w-full"
-              size="sm"
-              variant="outline"
-            >
-              <Link href={`mailto:${contactSession.email}`}>
-                <MailIcon className="mr-2 size-4" />
-                Send e-post
-              </Link>
-            </Button>
-          </div>
-        </LegacyCollapsibleSection>
-
-        <LegacyCollapsibleSection
-          onOpenChange={setThreadOpen}
-          open={threadOpen}
-          title="Samtale"
-        >
-          <div className="space-y-3 p-4 pt-3">
-            <div>
-              <p className="mb-1.5 text-xs font-medium text-muted-foreground">
-                Emne
-              </p>
-              <span className="rounded-md bg-foreground/10 px-2 py-0.5 text-xs font-medium">
-                Chat · {contactSession.name}
-              </span>
+              ) : (
+                <p className="mt-0.5 text-[12px] text-muted-foreground">Ingen e-post</p>
+              )}
             </div>
-            <LegacyDetailRow
-              icon={<FileTextIcon className="size-4" />}
-              label="Oppsummering"
-              value={
-                contactSession.metadata?.referrer
-                  ? String(contactSession.metadata.referrer)
-                  : "Samtale med besøkende"
-              }
-            />
-            <LegacyDetailRow
-              icon={<GlobeIcon className="size-4" />}
-              label="Språk"
-              value={contactSession.metadata?.language ?? "—"}
-            />
           </div>
-        </LegacyCollapsibleSection>
-
-        {contactSession.metadata ? (
-          <LegacyCollapsibleSection
-            onOpenChange={setTechOpen}
-            open={techOpen}
-            title="Teknisk"
-          >
-            <div className="px-2 pb-2">
-              <Accordion
-                className="border-0"
-                collapsible
-                type="single"
-              >
-                {accordionSections.map((section) => (
-                  <AccordionItem
-                    className="border-border/50 border-b px-2 last:border-b-0"
-                    key={section.id}
-                    value={section.id}
-                  >
-                    <AccordionTrigger className="py-3 text-left text-[12px] font-medium hover:no-underline">
-                      <div className="flex items-center gap-2">
-                        <section.icon className="size-3.5 text-muted-foreground" />
-                        {section.title}
-                      </div>
-                    </AccordionTrigger>
-                    <AccordionContent className="pb-3">
-                      <div className="space-y-3 border-border/40 border-t pt-3 text-[12px]">
-                        {section.items.map((item) => (
-                          <div
-                            className="grid gap-1 sm:grid-cols-[minmax(0,6.5rem)_1fr] sm:gap-x-4 sm:gap-y-0"
-                            key={`${section.id}-${item.label}`}
-                          >
-                            <span className="shrink-0 text-muted-foreground">
-                              {item.label}
-                            </span>
-                            <span
-                              className={cn(
-                                "min-w-0 break-words text-foreground",
-                                item.className,
-                              )}
-                            >
-                              {item.value}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                ))}
-              </Accordion>
+          {contact.email && (
+            <div className="border-t border-border/50 px-4 pb-4 pt-3">
+              <Button asChild className="h-8 w-full gap-2 rounded-xl text-[12px]" size="sm" variant="outline">
+                <Link href={`mailto:${contact.email}`}>
+                  <MailIcon className="size-3.5" />
+                  Send e-post
+                </Link>
+              </Button>
             </div>
-          </LegacyCollapsibleSection>
-        ) : null}
+          )}
+        </div>
+
+        {/* ── Status card ── */}
+        <PanelCard title="Status">
+          <div className="flex items-center justify-between gap-3 py-3">
+            <span className="text-[12px] text-muted-foreground">Samtalestatus</span>
+            <span className={cn("inline-flex items-center rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide", statusCls)}>
+              {statusLabel}
+            </span>
+          </div>
+          <div className="flex items-center justify-between gap-3 py-3">
+            <span className="text-[12px] text-muted-foreground">Tildelt</span>
+            <span className="text-[12px] font-medium text-foreground truncate max-w-[60%] text-right">{assignedName}</span>
+          </div>
+          <div className="flex items-center justify-between gap-3 py-3">
+            <span className="text-[12px] text-muted-foreground">Startet</span>
+            <span className="text-[12px] font-medium text-foreground" suppressHydrationWarning>
+              {format(startedAt, "d. MMM yyyy, HH:mm", { locale: nb })}
+            </span>
+          </div>
+        </PanelCard>
+
+        {/* ── Session metadata card ── */}
+        {contact.metadata && (
+          <PanelCard title="Økt">
+            {countryInfo && (
+              <InfoRow icon={GlobeIcon} label="Land" value={countryInfo.name} />
+            )}
+            {contact.metadata.language && (
+              <InfoRow icon={GlobeIcon} label="Språk" value={contact.metadata.language} />
+            )}
+            {contact.metadata.timezone && (
+              <InfoRow icon={ClockIcon} label="Tidssone" value={contact.metadata.timezone} />
+            )}
+            {contact.metadata.referrer && (
+              <InfoRow
+                icon={ChevronRightIcon}
+                label="Kom fra"
+                value={contact.metadata.referrer as string}
+              />
+            )}
+          </PanelCard>
+        )}
+
+        {/* ── Technical details (collapsible) ── */}
+        {contact.metadata && (
+          <div className="overflow-hidden rounded-2xl border border-border/60 bg-card shadow-sm">
+            <Accordion collapsible type="single">
+              <AccordionItem className="border-0" value="tech">
+                <AccordionTrigger className="px-4 py-3 text-left hover:no-underline hover:bg-muted/20 rounded-2xl transition-colors [&[data-state=open]]:rounded-b-none">
+                  <div className="flex items-center gap-2">
+                    <MonitorIcon className="size-3.5 text-muted-foreground" strokeWidth={1.75} />
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground/70">
+                      Teknisk
+                    </p>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="px-0 pb-0">
+                  <div className="divide-y divide-border/40 border-t border-border/50 px-4">
+                    <InfoRow icon={MonitorIcon} label="Nettleser" value={uaInfo.browser} />
+                    <InfoRow icon={MonitorIcon} label="OS" value={uaInfo.os} />
+                    <InfoRow icon={MonitorIcon} label="Enhet" value={uaInfo.device} />
+                    {contact.metadata.screenResolution && (
+                      <InfoRow icon={MonitorIcon} label="Skjerm" value={contact.metadata.screenResolution} />
+                    )}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </div>
+        )}
       </div>
     </aside>
   );
