@@ -7,12 +7,12 @@ export async function notifyTeamEmail(params: {
   text: string;
 }): Promise<{ sent: boolean; skippedReason?: string }> {
   const apiKey = process.env.RESEND_API_KEY?.trim();
-  const to = process.env.NOTIFY_TO_EMAIL?.trim();
+  const to = process.env.NOTIFY_TO_EMAIL?.trim() ?? "post@triodelab.no";
   const from =
     process.env.RESEND_FROM_EMAIL?.trim() ??
     "Agenci <onboarding@resend.dev>";
 
-  if (!apiKey || !to) {
+  if (!apiKey) {
     if (process.env.NODE_ENV === "development") {
       console.info(
         "[notify-team-email] Hopper over (mangler RESEND_API_KEY eller NOTIFY_TO_EMAIL)",

@@ -70,7 +70,7 @@ export const LANDING_FORSIDE_SECTION_LINKS = [
 ] as const;
 
 export const LANDING_APP_NAV_LINKS = [
-  { name: "Samtaler", href: "/sign-in", loggedInHref: "/conversations" },
+  { name: "Agenter", href: "/sign-in", loggedInHref: "/agents" },
   { name: "Widget", href: "/sign-in", loggedInHref: "/customization" },
   { name: "Systemer", href: "/sign-in", loggedInHref: "/integrations" },
 ] as const;
@@ -108,7 +108,7 @@ export const LANDING_FOOTER_NAV_GROUPS = [
 export const LANDING_AUTH_PATHS = {
   signIn: "/sign-in",
   signUp: "/sign-up",
-  appHome: "/conversations",
+  appHome: "/agents",
   /** App-oversikt når innlogget bruker forventes å gå videre inn i produktet (ikke markedsføring). */
   appOverview: "/dashboard",
   /**
