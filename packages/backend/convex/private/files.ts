@@ -166,7 +166,13 @@ export const addWebpage = action({
       });
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
-      throw new ConvexError({ code: "BAD_REQUEST", message: `Kunne ikke hente siden: ${msg}` });
+      const isRedirectLoop = msg.toLowerCase().includes("too many redirects") || msg.toLowerCase().includes("redirect");
+      throw new ConvexError({
+        code: "BAD_REQUEST",
+        message: isRedirectLoop
+          ? "Nettsiden har for mange omdirigeringer og kan ikke hentes. Prøv en mer direkte URL (f.eks. uten www, eller bruk https:// direkte), eller last opp innholdet som en fil i stedet."
+          : `Kunne ikke hente siden: ${msg}`,
+      });
     } finally {
       clearTimeout(timeoutId);
     }
