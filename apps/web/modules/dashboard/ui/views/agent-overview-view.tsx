@@ -19,19 +19,15 @@ import { cn } from "@workspace/ui/lib/utils";
 import { useMutation, usePaginatedQuery, useQuery } from "convex/react";
 import {
   ArrowRightIcon,
-  BookOpenIcon,
   BotIcon,
-  CheckCircle2Icon,
-  CircleIcon,
+  CheckIcon,
   CreditCardIcon,
   InboxIcon,
   LibraryBigIcon,
   Loader2Icon,
-  MessageCircleIcon,
   PaletteIcon,
-  PencilLineIcon,
+  PencilIcon,
   PlugIcon,
-  AlertCircleIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useState } from "react";
@@ -51,67 +47,69 @@ function formatMutationError(err: unknown, fallback: string): string {
   return fallback;
 }
 
-function StatBlock({
+// ─── Status config ─────────────────────────────────────────────────────────
+
+const STATUS_CFG = {
+  unresolved: { label: "Åpen",     dot: "bg-amber-400" },
+  escalated:  { label: "Eskalert", dot: "bg-rose-500"  },
+  resolved:   { label: "Løst",     dot: "bg-emerald-500" },
+} as const;
+
+// ─── Stat number block ─────────────────────────────────────────────────────
+
+function Stat({
   label,
   value,
-  sublabel,
-  colorClass,
+  accent,
   href,
 }: {
   label: string;
   value: number | string;
-  sublabel?: string;
-  colorClass?: string;
+  accent?: boolean;
   href?: string;
 }) {
   const inner = (
-    <div className={cn(
-      "flex flex-col gap-1 rounded-2xl border border-border/60 bg-card p-5 transition-all",
-      href && "hover:shadow-md hover:-translate-y-px cursor-pointer"
-    )}>
-      <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-        {label}
-      </p>
+    <div className="flex flex-col gap-1.5">
+      <p className="text-[11px] font-medium text-muted-foreground/70">{label}</p>
       <p className={cn(
-        "text-[2.5rem] font-bold tracking-tight leading-none tabular-nums",
-        colorClass ?? "text-foreground"
+        "text-[2.25rem] font-semibold leading-none tracking-tight tabular-nums",
+        accent ? "text-rose-500" : "text-foreground",
       )}>
         {value}
       </p>
-      {sublabel && (
-        <p className="text-[11px] text-muted-foreground mt-0.5">{sublabel}</p>
-      )}
     </div>
   );
-  if (href) return <Link href={href}>{inner}</Link>;
+  if (href) {
+    return (
+      <Link href={href} className="block transition-opacity hover:opacity-70">
+        {inner}
+      </Link>
+    );
+  }
   return inner;
 }
 
-const STATUS_CFG = {
-  unresolved: { label: "Åpen",     cls: "bg-amber-100 text-amber-700" },
-  escalated:  { label: "Eskalert", cls: "bg-red-100 text-red-700" },
-  resolved:   { label: "Løst",     cls: "bg-emerald-100 text-emerald-700" },
-} as const;
+// ─── Main view ─────────────────────────────────────────────────────────────
 
 export function AgentOverviewView({ agentId }: { agentId: Id<"agents"> }) {
-  const agent = useQuery(api.private.agents.getOne, { agentId });
-  const overview = useQuery(api.private.dashboard.getAgentOverview, { agentId });
-  const widgetSettings = useQuery(api.public.widgetSettings.getByOrganizationId,
-    agent?.organizationId ? { organizationId: agent.organizationId } : "skip"
+  const agent        = useQuery(api.private.agents.getOne, { agentId });
+  const overview     = useQuery(api.private.dashboard.getAgentOverview, { agentId });
+  const widgetSettings = useQuery(
+    api.public.widgetSettings.getByOrganizationId,
+    agent?.organizationId ? { organizationId: agent.organizationId } : "skip",
   );
-  const updateAgent = useMutation(api.private.agents.update);
-
-  const recentConvs = usePaginatedQuery(
+  const updateAgent  = useMutation(api.private.agents.update);
+  const recentConvs  = usePaginatedQuery(
     api.private.conversations.getMany,
     { agentId, status: "all" },
-    { initialNumItems: 5 },
+    { initialNumItems: 8 },
   );
 
-  const [editOpen, setEditOpen] = useState(false);
-  const [editName, setEditName] = useState("");
+  const [editOpen, setEditOpen]               = useState(false);
+  const [editName, setEditName]               = useState("");
   const [editDescription, setEditDescription] = useState("");
-  const [editActive, setEditActive] = useState(true);
-  const [editBusy, setEditBusy] = useState(false);
+  const [editActive, setEditActive]           = useState(true);
+  const [editBusy, setEditBusy]               = useState(false);
 
   const openEdit = useCallback(() => {
     if (!agent) return;
@@ -142,21 +140,24 @@ export function AgentOverviewView({ agentId }: { agentId: Id<"agents"> }) {
     }
   };
 
+  // ── Skeleton ────────────────────────────────────────────────────────────
   if (agent === undefined || overview === undefined) {
     return (
-      <DashboardPageShell contentClassName="max-w-4xl">
-        <div className="space-y-6">
-          <div className="flex items-start gap-4">
-            <div className="size-14 animate-pulse rounded-2xl bg-muted/50" />
-            <div className="space-y-2 pt-1 flex-1">
-              <div className="h-6 w-48 animate-pulse rounded-lg bg-muted/50" />
-              <div className="h-4 w-32 animate-pulse rounded-lg bg-muted/40" />
-            </div>
+      <DashboardPageShell>
+        <div className="space-y-10">
+          <div className="space-y-3">
+            <div className="h-7 w-40 animate-pulse rounded-lg bg-muted/50" />
+            <div className="h-4 w-64 animate-pulse rounded-lg bg-muted/40" />
           </div>
-          <div className="grid grid-cols-3 gap-4">
-            {[0, 1, 2].map((i) => (
-              <div key={i} className="h-28 animate-pulse rounded-2xl bg-muted/40" />
-            ))}
+          <div className="grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-border/60 sm:grid-cols-4">
+            {[0,1,2,3].map((i) => <div key={i} className="h-24 animate-pulse bg-muted/30" />)}
+          </div>
+          <div className="grid gap-8 lg:grid-cols-[1fr_280px]">
+            <div className="h-80 animate-pulse rounded-xl bg-muted/30" />
+            <div className="space-y-4">
+              <div className="h-48 animate-pulse rounded-xl bg-muted/30" />
+              <div className="h-32 animate-pulse rounded-xl bg-muted/30" />
+            </div>
           </div>
         </div>
       </DashboardPageShell>
@@ -165,11 +166,11 @@ export function AgentOverviewView({ agentId }: { agentId: Id<"agents"> }) {
 
   if (agent === null) {
     return (
-      <DashboardPageShell contentClassName="max-w-4xl">
-        <div className="flex flex-col items-center justify-center py-20 text-center">
-          <BotIcon className="size-12 text-muted-foreground/30 mb-4" strokeWidth={1} />
-          <p className="text-[14px] font-semibold text-foreground">Agent ikke funnet</p>
-          <Button asChild className="mt-4 rounded-xl" size="sm" variant="outline">
+      <DashboardPageShell>
+        <div className="flex flex-col items-center justify-center py-24 text-center">
+          <BotIcon className="mb-4 size-10 text-muted-foreground/30" strokeWidth={1.5} />
+          <p className="text-[15px] font-medium text-foreground">Agent ikke funnet</p>
+          <Button asChild className="mt-4 rounded-lg" size="sm" variant="outline">
             <Link href="/agents">← Alle agenter</Link>
           </Button>
         </div>
@@ -177,166 +178,171 @@ export function AgentOverviewView({ agentId }: { agentId: Id<"agents"> }) {
     );
   }
 
-  const openCount = (overview?.conversations.unresolved ?? 0) + (overview?.conversations.escalated ?? 0);
+  const openCount      = (overview?.conversations.unresolved ?? 0) + (overview?.conversations.escalated ?? 0);
   const escalatedCount = overview?.conversations.escalated ?? 0;
-  const resolvedCount = overview?.conversations.resolved ?? 0;
+  const resolvedCount  = overview?.conversations.resolved ?? 0;
+  const totalCount     = overview?.conversations.total ?? 0;
 
   const setupItems = [
     {
-      label: "Kunnskapskilder lagt til",
+      label: "Kunnskapskilder",
       detail: "Last opp filer eller nettsider",
       ok: (overview?.fileCount ?? 0) > 0,
       href: `/agents/${agentId}/files`,
-      icon: LibraryBigIcon,
     },
     {
       label: "Widget konfigurert",
       detail: "Tilpass utseende og tekster",
       ok: !!widgetSettings,
       href: `/agents/${agentId}/customization`,
-      icon: PaletteIcon,
     },
     {
       label: "Integrasjon satt opp",
       detail: "Legg widget-koden på nettsiden",
       ok: false,
       href: `/agents/${agentId}/integrations`,
-      icon: PlugIcon,
     },
   ];
   const setupDone = setupItems.filter((i) => i.ok).length;
 
   return (
-    <DashboardPageShell contentClassName="max-w-4xl">
+    <DashboardPageShell>
 
-      {/* Agent header */}
-      <div className="mb-8 flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
-        <div className="flex items-start gap-4">
-          <div className="grid size-14 shrink-0 place-items-center rounded-2xl border border-border/60 bg-muted/40 text-muted-foreground">
-            <BotIcon className="size-7" strokeWidth={1.5} />
+      {/* ── Header ──────────────────────────────────────────────────────── */}
+      <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex items-start gap-3.5">
+          <div className="mt-0.5 grid size-10 shrink-0 place-items-center rounded-xl border border-border/70 bg-muted/40 text-muted-foreground">
+            <BotIcon className="size-5" strokeWidth={1.5} />
           </div>
-          <div className="min-w-0 pt-1">
-            <h1 className="text-[22px] font-bold tracking-tight text-foreground leading-snug">
-              {agent.name}
-            </h1>
-            <div className="mt-1.5 flex flex-wrap items-center gap-3">
-              <span className="flex items-center gap-1.5">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2.5">
+              <h1 className="text-[20px] font-semibold tracking-tight text-foreground">
+                {agent.name}
+              </h1>
+              <span className={cn(
+                "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] font-medium",
+                agent.isActive
+                  ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                  : "border-border/60 bg-muted/30 text-muted-foreground",
+              )}>
                 <span className={cn("size-1.5 rounded-full", agent.isActive ? "bg-emerald-500" : "bg-zinc-400")} />
-                <span className={cn("text-[12px] font-medium", agent.isActive ? "text-emerald-600" : "text-muted-foreground")}>
-                  {agent.isActive ? "Aktiv" : "Inaktiv"}
-                </span>
+                {agent.isActive ? "Aktiv" : "Inaktiv"}
               </span>
-              <span className="font-mono text-[11px] text-muted-foreground/60">slug: {agent.slug}</span>
             </div>
-            {agent.description && (
-              <p className="mt-2 text-[13px] text-muted-foreground leading-relaxed max-w-md">
+            {agent.description ? (
+              <p className="mt-1 text-[13px] leading-relaxed text-muted-foreground">
                 {agent.description}
+              </p>
+            ) : (
+              <p className="mt-1 text-[13px] italic text-muted-foreground/40">
+                Ingen beskrivelse
               </p>
             )}
           </div>
         </div>
         <Button
-          className="shrink-0 gap-2 rounded-xl w-full sm:w-auto"
+          className="shrink-0 gap-1.5 rounded-lg"
           onClick={openEdit}
           size="sm"
           type="button"
           variant="outline"
         >
-          <PencilLineIcon className="size-3.5" />
+          <PencilIcon className="size-3.5" />
           Rediger
         </Button>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 mb-8">
-        <StatBlock
-          label="Åpne samtaler"
-          value={openCount}
-          sublabel={openCount > 0 ? "Venter på svar" : "Ingen åpne"}
-          colorClass="text-amber-600"
-          href={`/agents/${agentId}/conversations`}
-        />
-        <StatBlock
-          label="Eskalerte"
-          value={escalatedCount}
-          sublabel={escalatedCount > 0 ? "Trenger oppfølging" : "Ingen eskalert"}
-          colorClass={escalatedCount > 0 ? "text-red-600" : "text-foreground"}
-          href={`/agents/${agentId}/conversations`}
-        />
-        <StatBlock
-          label="Løste samtaler"
-          value={resolvedCount}
-          sublabel="Totalt avsluttet"
-          colorClass="text-emerald-600"
-          href={`/agents/${agentId}/conversations`}
-        />
-        <StatBlock
-          label="Kunnskapskilder"
-          value={overview?.fileCount ?? 0}
-          sublabel={overview?.lastIndexedAt ? "Indeks klar" : "Ingen filer ennå"}
-          href={`/agents/${agentId}/files`}
-        />
+      {/* ── Stats ───────────────────────────────────────────────────────── */}
+      {/* Inspired by Vercel's analytics / Linear's metrics row */}
+      <div className="mb-10 grid grid-cols-2 overflow-hidden rounded-xl border border-border/60 sm:grid-cols-4">
+        {[
+          { label: "Åpne samtaler",   value: openCount,      accent: false, href: `/agents/${agentId}/conversations` },
+          { label: "Eskalerte",       value: escalatedCount, accent: escalatedCount > 0, href: `/agents/${agentId}/conversations` },
+          { label: "Løste",           value: resolvedCount,  accent: false, href: `/agents/${agentId}/conversations` },
+          { label: "Kunnskapskilder", value: overview?.fileCount ?? 0, accent: false, href: `/agents/${agentId}/files` },
+        ].map((s, i, arr) => (
+          <div
+            key={s.label}
+            className={cn(
+              "bg-card px-5 py-5",
+              i < arr.length - 1 && "border-r border-border/60",
+              // second row on mobile
+              i >= 2 && "border-t border-border/60 sm:border-t-0",
+            )}
+          >
+            <Stat {...s} />
+          </div>
+        ))}
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_280px]">
+      {/* ── Two-column grid ─────────────────────────────────────────────── */}
+      <div className="grid gap-8 lg:grid-cols-[1fr_268px]">
 
-        {/* Siste samtaler */}
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-[15px] font-semibold text-foreground">Siste samtaler</h2>
+        {/* Left: conversations */}
+        <div className="min-w-0">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-[14px] font-semibold text-foreground">Siste samtaler</h2>
             <Link
               href={`/agents/${agentId}/conversations`}
-              className="group flex items-center gap-1 text-[12px] font-medium text-muted-foreground hover:text-foreground transition-colors"
+              className="group flex items-center gap-1 text-[12px] text-muted-foreground transition-colors hover:text-foreground"
             >
               Se alle
-              <ArrowRightIcon className="size-3.5 transition-transform group-hover:translate-x-0.5" strokeWidth={2.5} />
+              <ArrowRightIcon className="size-3 transition-transform group-hover:translate-x-0.5" strokeWidth={2.5} />
             </Link>
           </div>
 
           {recentConvs.status === "LoadingFirstPage" ? (
-            <div className="space-y-2">
-              {[1,2,3].map((i) => <div key={i} className="h-16 animate-pulse rounded-2xl bg-muted/40" />)}
+            <div className="space-y-px overflow-hidden rounded-xl border border-border/60">
+              {[1,2,3,4].map((i) => (
+                <div key={i} className="h-[62px] animate-pulse bg-muted/30" />
+              ))}
             </div>
           ) : recentConvs.results.length === 0 ? (
-            <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-border/60 py-16 text-center">
-              <InboxIcon className="size-8 text-muted-foreground/30" strokeWidth={1.5} />
+            <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border/60 py-16 text-center">
+              <InboxIcon className="size-8 text-muted-foreground/25" strokeWidth={1.5} />
               <div>
-                <p className="text-[14px] font-semibold text-foreground">Ingen samtaler ennå</p>
+                <p className="text-[13px] font-medium text-foreground">Ingen samtaler ennå</p>
                 <p className="mt-1 text-[12px] text-muted-foreground">
                   Samtaler fra widget-en vises her.
                 </p>
               </div>
             </div>
           ) : (
-            <div className="space-y-2">
-              {recentConvs.results.map((conv) => {
-                const status = conv.status as keyof typeof STATUS_CFG;
-                const cfg = STATUS_CFG[status] ?? STATUS_CFG.unresolved;
-                const displayName = conv.contactSession?.name?.trim() || "Uten navn";
-                const lastAt = conv.lastMessage?._creationTime ?? conv._creationTime;
+            <div className="overflow-hidden rounded-xl border border-border/60">
+              {recentConvs.results.map((conv, idx) => {
+                const status  = conv.status as keyof typeof STATUS_CFG;
+                const cfg     = STATUS_CFG[status] ?? STATUS_CFG.unresolved;
+                const name    = conv.contactSession?.name?.trim() || "Uten navn";
+                const lastAt  = conv.lastMessage?._creationTime ?? conv._creationTime;
                 const preview = conv.lastMessage?.text;
+
                 return (
                   <Link
                     key={conv._id}
                     href={`/agents/${agentId}/conversations/${conv._id}`}
-                    className="group flex items-center gap-3 rounded-2xl border border-border/60 bg-card px-4 py-3.5 transition-all hover:shadow-md hover:-translate-y-px"
+                    className={cn(
+                      "group flex min-w-0 items-center gap-3 bg-card px-4 py-3.5 transition-colors hover:bg-muted/30",
+                      idx > 0 && "border-t border-border/50",
+                    )}
                   >
-                    <ContactAvatar name={displayName} size={36} />
+                    {/* status dot */}
+                    <span className={cn("size-1.5 shrink-0 rounded-full", cfg.dot)} />
+
+                    <ContactAvatar name={name} size={30} className="shrink-0" />
+
                     <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2">
-                        <p className="text-[13px] font-semibold text-foreground truncate">{displayName}</p>
-                        <span className={cn("shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide", cfg.cls)}>
-                          {cfg.label}
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-muted-foreground truncate mt-0.5">
-                        {preview ?? "Ingen melding ennå"}
+                      <p className="truncate text-[13px] font-medium text-foreground">{name}</p>
+                      <p className="truncate text-[11px] text-muted-foreground">
+                        {preview ?? "Ingen melding"}
                       </p>
                     </div>
-                    <span className="shrink-0 text-[10px] tabular-nums text-muted-foreground/50" suppressHydrationWarning>
-                      {formatDistanceToNow(lastAt, { addSuffix: true, locale: nb })}
-                    </span>
-                    <ArrowRightIcon className="size-3.5 shrink-0 text-muted-foreground/30 group-hover:text-muted-foreground transition-colors" strokeWidth={2.5} />
+
+                    <div className="flex shrink-0 flex-col items-end gap-1">
+                      <span className="text-[10px] tabular-nums text-muted-foreground/50" suppressHydrationWarning>
+                        {formatDistanceToNow(lastAt, { addSuffix: false, locale: nb })}
+                      </span>
+                      <span className="text-[10px] font-medium text-muted-foreground/50">{cfg.label}</span>
+                    </div>
                   </Link>
                 );
               })}
@@ -344,64 +350,96 @@ export function AgentOverviewView({ agentId }: { agentId: Id<"agents"> }) {
           )}
         </div>
 
-        {/* Høyre: oppsett + snarveier */}
-        <div className="flex flex-col gap-4">
+        {/* Right: sidebar */}
+        <div className="flex flex-col gap-5">
 
-          {/* Setup checklist */}
-          <div className="flex flex-col overflow-hidden rounded-2xl border border-border/60 bg-card shadow-sm">
-            <div className="border-b border-border/60 px-4 py-3.5">
+          {/* Setup checklist — inspired by GitHub repo setup steps */}
+          <div className="overflow-hidden rounded-xl border border-border/60 bg-card">
+            <div className="border-b border-border/50 px-4 py-3.5">
               <div className="flex items-center justify-between">
-                <h3 className="text-[13px] font-semibold text-foreground">Oppsett</h3>
-                <span className="rounded-full border border-border/60 bg-muted/40 px-2 py-0.5 text-[10px] font-semibold tabular-nums text-muted-foreground">
-                  {setupDone}/{setupItems.length}
+                <p className="text-[13px] font-semibold text-foreground">Kom i gang</p>
+                <span className="text-[11px] tabular-nums text-muted-foreground">
+                  {setupDone} / {setupItems.length}
                 </span>
               </div>
-              <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted/50">
+              <div className="mt-2.5 h-1 w-full overflow-hidden rounded-full bg-muted/50">
                 <div
-                  className="h-full rounded-full bg-emerald-500 transition-all duration-700"
+                  className="h-full rounded-full bg-foreground/80 transition-all duration-700"
                   style={{ width: `${Math.round((setupDone / setupItems.length) * 100)}%` }}
                 />
               </div>
             </div>
-            <div className="divide-y divide-border/40">
-              {setupItems.map(({ label, detail, ok, href, icon: Icon }) => (
+            <div>
+              {setupItems.map(({ label, detail, ok, href }, i) => (
                 <Link
                   key={label}
                   href={href}
-                  className="group flex items-start gap-3 px-4 py-3 transition-colors hover:bg-muted/20"
+                  className={cn(
+                    "group flex items-start gap-3 px-4 py-3.5 transition-colors hover:bg-muted/20",
+                    i > 0 && "border-t border-border/40",
+                  )}
                 >
                   <div className="mt-0.5 shrink-0">
-                    {ok
-                      ? <CheckCircle2Icon className="size-4 text-emerald-500" strokeWidth={2} />
-                      : <CircleIcon className="size-4 text-border" strokeWidth={2} />
-                    }
+                    {ok ? (
+                      <div className="flex size-4 items-center justify-center rounded-full bg-foreground">
+                        <CheckIcon className="size-2.5 text-background" strokeWidth={3} />
+                      </div>
+                    ) : (
+                      <div className="size-4 rounded-full border-2 border-border/60 bg-transparent" />
+                    )}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className={cn("text-[12px] font-medium leading-tight", ok ? "text-muted-foreground line-through" : "text-foreground")}>
+                    <p className={cn(
+                      "text-[12px] font-medium",
+                      ok ? "text-muted-foreground line-through decoration-muted-foreground/40" : "text-foreground",
+                    )}>
                       {label}
                     </p>
-                    {!ok && <p className="mt-0.5 text-[11px] text-muted-foreground">{detail}</p>}
+                    {!ok && (
+                      <p className="mt-0.5 text-[11px] text-muted-foreground">{detail}</p>
+                    )}
                   </div>
-                  {!ok && <ArrowRightIcon className="mt-0.5 size-3 shrink-0 text-muted-foreground/30 group-hover:text-muted-foreground/70 transition-colors" strokeWidth={2.5} />}
+                  {!ok && (
+                    <ArrowRightIcon className="mt-0.5 size-3.5 shrink-0 text-muted-foreground/20 transition-colors group-hover:text-muted-foreground/60" strokeWidth={2.5} />
+                  )}
                 </Link>
               ))}
             </div>
           </div>
 
-          {/* Snarveier */}
-          <div className="rounded-2xl border border-border/60 bg-card p-4 shadow-sm">
-            <p className="mb-3 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Snarveier</p>
-            <div className="flex flex-col gap-1.5">
+          {/* Summary numbers */}
+          {totalCount > 0 && (
+            <div className="rounded-xl border border-border/60 bg-card px-4 py-4">
+              <p className="mb-3 text-[11px] font-semibold text-muted-foreground">Sammendrag</p>
+              <div className="divide-y divide-border/40">
+                {[
+                  { label: "Totalt",          value: totalCount },
+                  { label: "Løsningsgrad",    value: totalCount > 0 ? `${Math.round((resolvedCount / totalCount) * 100)}%` : "—" },
+                  { label: "Åpne / eskalert", value: `${openCount} / ${escalatedCount}` },
+                ].map(({ label, value }) => (
+                  <div key={label} className="flex items-center justify-between gap-2 py-2">
+                    <span className="text-[12px] text-muted-foreground">{label}</span>
+                    <span className="text-[13px] font-semibold tabular-nums text-foreground">{value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Quick links */}
+          <div className="rounded-xl border border-border/60 bg-card px-4 py-4">
+            <p className="mb-3 text-[11px] font-semibold text-muted-foreground">Hurtigtilgang</p>
+            <div className="space-y-1">
               {[
-                { href: `/agents/${agentId}/customization`, label: "Widget", icon: PaletteIcon },
-                { href: `/agents/${agentId}/integrations`, label: "Integrer", icon: PlugIcon },
-                { href: `/agents/${agentId}/files`, label: "Kunnskapsbase", icon: LibraryBigIcon },
-                { href: `/agents/${agentId}/billing`, label: "Faktura", icon: CreditCardIcon },
+                { href: `/agents/${agentId}/customization`, label: "Widget-tilpasning", icon: PaletteIcon    },
+                { href: `/agents/${agentId}/integrations`,  label: "Integrasjoner",     icon: PlugIcon       },
+                { href: `/agents/${agentId}/files`,         label: "Kunnskapsbase",     icon: LibraryBigIcon },
+                { href: `/agents/${agentId}/billing`,       label: "Plan og faktura",   icon: CreditCardIcon },
               ].map(({ href, label, icon: Icon }) => (
                 <Link
                   key={href}
                   href={href}
-                  className="flex items-center gap-2.5 rounded-xl border border-border/60 bg-muted/30 px-3 py-2 text-[12px] font-medium text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
+                  className="flex items-center gap-2.5 rounded-lg px-2 py-2 text-[12px] text-muted-foreground transition-colors hover:bg-muted/40 hover:text-foreground"
                 >
                   <Icon className="size-3.5 shrink-0" strokeWidth={1.75} />
                   {label}
@@ -413,7 +451,7 @@ export function AgentOverviewView({ agentId }: { agentId: Id<"agents"> }) {
         </div>
       </div>
 
-      {/* Edit dialog */}
+      {/* ── Edit dialog ─────────────────────────────────────────────────── */}
       <Dialog onOpenChange={(open) => { if (!open) setEditOpen(false); }} open={editOpen}>
         <DialogContent className="dashboard-app-shell sm:max-w-md">
           <DialogHeader>
@@ -424,25 +462,38 @@ export function AgentOverviewView({ agentId }: { agentId: Id<"agents"> }) {
             {!agent.isBuiltIn && (
               <div className="space-y-2">
                 <Label htmlFor="edit-name">Navn</Label>
-                <Input id="edit-name" onChange={(e) => setEditName(e.target.value)} value={editName} />
+                <Input
+                  id="edit-name"
+                  onChange={(e) => setEditName(e.target.value)}
+                  value={editName}
+                />
               </div>
             )}
             <div className="space-y-2">
               <Label htmlFor="edit-desc">Beskrivelse</Label>
-              <Textarea className="min-h-[80px] resize-y" id="edit-desc" onChange={(e) => setEditDescription(e.target.value)} value={editDescription} />
+              <Textarea
+                className="min-h-[80px] resize-y"
+                id="edit-desc"
+                onChange={(e) => setEditDescription(e.target.value)}
+                value={editDescription}
+              />
             </div>
             {!agent.isBuiltIn && (
               <div className="flex items-center justify-between gap-3 rounded-xl border border-border/70 px-4 py-3">
                 <div>
                   <p className="text-[13px] font-medium">Aktiv</p>
-                  <p className="text-[12px] text-muted-foreground">Inaktive agenter svarer ikke på nye henvendelser.</p>
+                  <p className="text-[12px] text-muted-foreground">
+                    Inaktive agenter svarer ikke på nye henvendelser.
+                  </p>
                 </div>
                 <Switch checked={editActive} onCheckedChange={setEditActive} />
               </div>
             )}
           </div>
           <DialogFooter>
-            <Button onClick={() => setEditOpen(false)} type="button" variant="outline">Avbryt</Button>
+            <Button onClick={() => setEditOpen(false)} type="button" variant="outline">
+              Avbryt
+            </Button>
             <Button disabled={editBusy} onClick={() => void onSaveEdit()} type="button">
               {editBusy ? <Loader2Icon className="size-4 animate-spin" /> : null}
               Lagre
@@ -450,6 +501,7 @@ export function AgentOverviewView({ agentId }: { agentId: Id<"agents"> }) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
     </DashboardPageShell>
   );
 }
