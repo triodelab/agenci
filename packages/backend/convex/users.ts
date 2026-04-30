@@ -2,15 +2,6 @@ import { UserJSON } from "@clerk/backend";
 import { ConvexError, v, Validator } from "convex/values";
 import { internalMutation, query, QueryCtx, mutation } from "./_generated/server";
 
-export const getMany = query({
-  args: {},
-  handler: async (ctx) => {
-    const users = await ctx.db.query("users").collect();
-
-    return users;
-  },
-});
-
 /** Synk innlogget Clerk-bruker til `users` (tabellen har ikke organizationId). */
 export const add = mutation({
   args: {},

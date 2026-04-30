@@ -1,5 +1,6 @@
 import { AuthGuard } from "@/modules/auth/ui/components/auth-guard";
 import { OrganizationGuard } from "@/modules/auth/ui/components/organization-guard";
+import { UserSync } from "@/modules/auth/ui/components/user-sync";
 import { DashboardMainArea } from "@/modules/dashboard/ui/components/dashboard-main-area";
 import { DashboardSidebar } from "@/modules/dashboard/ui/components/dashboard-sidebar";
 import { DashboardTopNav } from "@/modules/dashboard/ui/components/dashboard-top-nav";
@@ -25,6 +26,7 @@ export const DashboardLayout = async ({ children }: { children: React.ReactNode 
             className="dashboard-app-shell flex h-svh min-h-0 max-h-svh w-full flex-col overflow-hidden"
             defaultOpen={defaultOpen}
           >
+            <UserSync />
             <DashboardTopNav />
             <TrialBanner />
             <div className="flex min-h-0 flex-1 overflow-hidden">
