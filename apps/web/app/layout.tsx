@@ -32,7 +32,7 @@ export default function RootLayout({
   return (
     <html lang="no" suppressHydrationWarning data-scroll-behavior="smooth">
       <body
-        className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased `}
+        className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased overflow-x-hidden`}
       >
         <Providers>
           <Toaster />

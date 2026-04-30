@@ -26,7 +26,7 @@ export function LandingPageView() {
       <LandingNav variant="auto" />
       <main
         id="main-content"
-        className="min-h-svh bg-white font-sans antialiased [text-rendering:optimizeLegibility]"
+        className="min-h-svh overflow-x-hidden bg-white font-sans antialiased [text-rendering:optimizeLegibility]"
       >
         <LandingHeroSection />
         <LandingWorkflowSection />

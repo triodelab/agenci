@@ -111,7 +111,7 @@ function HeroDashboardRotator({
 export function LandingHeroSection() {
   return (
     <section
-      className="relative overflow-x-visible pt-[4.25rem]"
+      className="relative overflow-hidden pt-[4.25rem]"
       aria-labelledby="landing-hero-heading"
     >
       {/* Mørk sone — dyp nøytral base (ikke ren svart), linje for podium */}
