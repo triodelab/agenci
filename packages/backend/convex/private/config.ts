@@ -18,7 +18,7 @@ export const getPublicConfig = query({
     return {
       widgetPreviewUrl:
         process.env.WIDGET_PREVIEW_URL?.replace(/\/$/, "") ??
-        "http://localhost:3001",
+        "https://agenci-widget-vol22.vercel.app",
     };
   },
 });
