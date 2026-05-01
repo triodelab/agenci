@@ -28,7 +28,7 @@ export function DashboardTopNav() {
         </button>
 
         <Link href="/dashboard" className="flex items-center gap-2 shrink-0">
-          <LogoIcon className="size-7 rounded-lg dark:brightness-0 dark:invert" />
+          <LogoIcon className="size-7 rounded-lg brightness-0 dark:invert" />
           <span className="font-semibold text-[15px] tracking-tight text-foreground hidden sm:block">
             Agenci
           </span>

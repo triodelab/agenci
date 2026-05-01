@@ -43,12 +43,16 @@ export function ClerkThemeProvider({
      * bruker ofte `tabButton` / `segmentedControlButton`. Uten overstyr blir inaktiv tekst nesten usynlig.
      */
     const profileTabInactive = isDark
-      ? "!inline-flex !px-3 !py-2 !font-medium !text-zinc-300 !opacity-100 [&[aria-selected='true']]:!text-zinc-50 [&[data-state='active']]:!text-zinc-50"
-      : "!inline-flex !px-3 !py-2 !font-medium !text-zinc-600 !opacity-100 [&[aria-selected='true']]:!font-semibold [&[aria-selected='true']]:!text-zinc-950 [&[data-state='active']]:!font-semibold [&[data-state='active']]:!text-zinc-950";
+      ? "!inline-flex !items-center !px-3 !py-2 !font-medium !text-zinc-300 !opacity-100 hover:!text-zinc-100 [&[aria-selected='true']]:!font-semibold [&[aria-selected='true']]:!text-zinc-50 [&[data-state='active']]:!font-semibold [&[data-state='active']]:!text-zinc-50"
+      : "!inline-flex !items-center !px-3 !py-2 !font-medium !text-zinc-700 !opacity-100 hover:!text-zinc-900 [&[aria-selected='true']]:!font-semibold [&[aria-selected='true']]:!text-zinc-950 [&[data-state='active']]:!font-semibold [&[data-state='active']]:!text-zinc-950";
+
+    const navbarProfile = isDark
+      ? "!text-zinc-300 !opacity-100 hover:!bg-white/10 hover:!text-zinc-100 [&[data-active='true']]:!text-zinc-50 [&[aria-current='page']]:!text-zinc-50"
+      : "!text-zinc-700 !opacity-100 hover:!bg-muted hover:!text-zinc-900 [&[data-active='true']]:!text-zinc-950 [&[aria-current='page']]:!text-zinc-950";
 
     const segmentedProfile = isDark
-      ? "!font-medium !text-zinc-300 [&[data-state='checked']]:!text-zinc-50"
-      : "!font-medium !text-zinc-600 [&[data-state='checked']]:!text-zinc-950";
+      ? "!font-medium !text-zinc-300 !opacity-100 [&[data-state='checked']]:!text-zinc-50 [&[data-state='checked']]:!font-semibold"
+      : "!font-medium !text-zinc-700 !opacity-100 [&[data-state='checked']]:!text-zinc-950 [&[data-state='checked']]:!font-semibold";
 
     /**
      * Bruk nye variabelnavn (juli 2025+): colorForeground / colorMutedForeground / colorInput.
@@ -134,6 +138,8 @@ export function ClerkThemeProvider({
       },
       organizationProfile: {
         elements: {
+          navbarButton: navbarProfile,
+          navbarButtonIcon: isDark ? "!text-zinc-400 !opacity-100" : "!text-zinc-500 !opacity-100",
           tabButton: profileTabInactive,
           tabListContainer:
             "!flex !flex-wrap items-end gap-x-8 gap-y-2 border-b border-border/60",
