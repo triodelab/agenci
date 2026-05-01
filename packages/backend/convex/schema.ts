@@ -13,6 +13,8 @@ export default defineSchema({
     /** Vises i widget-header (f.eks. «Agenci»). */
     widgetTitle: v.optional(v.string()),
     agentId: v.optional(v.id("agents")),
+    /** Egendefinert systemprompt — overstyrer standardagentens instruksjoner. */
+    systemPrompt: v.optional(v.string()),
     greetMessage: v.string(),
     defaultSuggestions: v.object({
       suggestion1: v.optional(v.string()),

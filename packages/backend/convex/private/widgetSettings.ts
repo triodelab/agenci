@@ -1,5 +1,5 @@
 import { ConvexError, v } from "convex/values";
-import { mutation, query } from "../_generated/server";
+import { internalQuery, mutation, query } from "../_generated/server";
 import { getOrgIdOrNull } from "../lib/auth";
 
 const appearanceArgs = v.optional(
@@ -96,5 +96,47 @@ export const getOne = query({
       .unique();
 
     return widgetSettings;
+  },
+});
+
+export const saveSystemPrompt = mutation({
+  args: { systemPrompt: v.string() },
+  handler: async (ctx, args) => {
+    const orgId = await getOrgIdOrNull(ctx);
+    if (!orgId) {
+      throw new ConvexError({
+        code: "BAD_REQUEST",
+        message: "No organization in session.",
+      });
+    }
+
+    const existing = await ctx.db
+      .query("widgetSettings")
+      .withIndex("by_organization_id", (q) => q.eq("organizationId", orgId))
+      .unique();
+
+    if (existing) {
+      await ctx.db.patch(existing._id, { systemPrompt: args.systemPrompt });
+    } else {
+      await ctx.db.insert("widgetSettings", {
+        organizationId: orgId,
+        greetMessage: "Hei! Hvordan kan jeg hjelpe deg i dag?",
+        defaultSuggestions: {},
+        vapiSettings: {},
+        systemPrompt: args.systemPrompt,
+      });
+    }
+  },
+});
+
+export const getByOrganizationId = internalQuery({
+  args: { organizationId: v.string() },
+  handler: async (ctx, args) => {
+    return ctx.db
+      .query("widgetSettings")
+      .withIndex("by_organization_id", (q) =>
+        q.eq("organizationId", args.organizationId),
+      )
+      .unique();
   },
 });

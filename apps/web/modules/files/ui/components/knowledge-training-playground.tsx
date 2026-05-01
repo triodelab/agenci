@@ -1,7 +1,7 @@
 "use client";
 
 import { useOrganization } from "@clerk/nextjs";
-import { useQuery, useAction, usePaginatedQuery } from "convex/react";
+import { useQuery, useAction, useMutation, usePaginatedQuery } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
 import type { PublicFile } from "@workspace/backend/private/files";
 import { getWidgetPreviewUrl } from "@/lib/widget-preview-url";
@@ -25,6 +25,7 @@ import {
   PlusIcon,
   RefreshCwIcon,
   RotateCcwIcon,
+  SaveIcon,
   TrashIcon,
   UploadIcon,
   XIcon,
@@ -46,16 +47,10 @@ function isValidHttpUrl(url: string): boolean {
   }
 }
 
-const INSTRUCTIONS_STORAGE_PREFIX = "agenci-playground-instructions-draft";
+const DEFAULT_INSTRUCTIONS_PLACEHOLDER = `Beskriv bedriften, tjenestene og tonen du ønsker.
 
-const DEFAULT_INSTRUCTIONS = `### Bedriftskontekst
-Beskriv kort selskapet, målgruppe og tone (du/De).
-
-### Prioriteringer
-Hva skal assistenten alltid sjekke i kunnskapsbasen før den svarer?
-
----
-Merk: Produksjonsinstruks for assistenten er konfigurert i backend. Dette feltet er et **utkast** som lagres lokalt i nettleseren din (for planlegging og notater).`;
+Eksempel:
+Vi er Agenci, en AI-plattform for norske bedrifter. Svar alltid vennlig og direkte på norsk. Fokuser på å hjelpe kunden raskt — hold svarene korte og presise.`;
 
 const SUPPORT_CHAT_MODEL_LABEL = "GPT-4o mini";
 
@@ -161,6 +156,8 @@ export function KnowledgeTrainingPlayground({
     api.private.dashboard.getAgentOverview,
     agentId ? { agentId } : "skip",
   );
+  const widgetSettings = useQuery(api.private.widgetSettings.getOne, {});
+  const saveSystemPromptMutation = useMutation(api.private.widgetSettings.saveSystemPrompt);
 
   // File management
   const files = usePaginatedQuery(
@@ -178,8 +175,8 @@ export function KnowledgeTrainingPlayground({
 
   // Playground
   const [iframeKey, setIframeKey] = useState(0);
-  const [instructionPreset, setInstructionPreset] = useState("base");
-  const [instructions, setInstructions] = useState(DEFAULT_INSTRUCTIONS);
+  const [instructions, setInstructions] = useState("");
+  const [isSavingPrompt, setIsSavingPrompt] = useState(false);
   const [showCapacityBanner, setShowCapacityBanner] = useState(true);
 
   const widgetUrl = useMemo(
@@ -190,34 +187,38 @@ export function KnowledgeTrainingPlayground({
     [organization?.id],
   );
 
+  // Load system prompt from Convex when settings arrive
   useEffect(() => {
-    if (!organization?.id) return;
-    const key = `${INSTRUCTIONS_STORAGE_PREFIX}:${organization.id}`;
-    const saved = typeof window !== "undefined" ? localStorage.getItem(key) : null;
-    if (saved) {
-      setInstructions(saved);
-    } else {
-      setInstructions(DEFAULT_INSTRUCTIONS);
-    }
-  }, [organization?.id]);
-
-  const persistInstructions = useCallback(
-    (value: string) => {
-      if (!organization?.id) return;
-      localStorage.setItem(`${INSTRUCTIONS_STORAGE_PREFIX}:${organization.id}`, value);
-    },
-    [organization?.id],
-  );
+    if (widgetSettings === undefined) return;
+    setInstructions(widgetSettings?.systemPrompt ?? "");
+  }, [widgetSettings]);
 
   const reloadWidget = useCallback(() => setIframeKey((k) => k + 1), []);
 
-  const resetInstructions = useCallback(() => {
-    setInstructions(DEFAULT_INSTRUCTIONS);
-    setInstructionPreset("base");
-    if (organization?.id) {
-      localStorage.removeItem(`${INSTRUCTIONS_STORAGE_PREFIX}:${organization.id}`);
+  const handleSavePrompt = useCallback(async () => {
+    setIsSavingPrompt(true);
+    try {
+      await saveSystemPromptMutation({ systemPrompt: instructions });
+      toast.success("Instruksjoner lagret — gjelder for nye samtaler.");
+    } catch {
+      toast.error("Kunne ikke lagre instruksjoner.");
+    } finally {
+      setIsSavingPrompt(false);
     }
-  }, [organization?.id]);
+  }, [instructions, saveSystemPromptMutation]);
+
+  const resetInstructions = useCallback(async () => {
+    setInstructions("");
+    setIsSavingPrompt(true);
+    try {
+      await saveSystemPromptMutation({ systemPrompt: "" });
+      toast.success("Instruksjoner tilbakestilt til standard.");
+    } catch {
+      toast.error("Kunne ikke tilbakestille.");
+    } finally {
+      setIsSavingPrompt(false);
+    }
+  }, [saveSystemPromptMutation]);
 
   const canAddWebpage = isValidHttpUrl(webUrl) && !isImportingWebpage;
 
@@ -261,7 +262,7 @@ export function KnowledgeTrainingPlayground({
     return parts.join(" · ");
   }, [indexed, lastIndexedAt, approxKb, hasMore]);
 
-  const statsLoading = agentId ? agentOverview === undefined : overview === undefined;
+  const statsLoading = agentId ? agentOverview === undefined : overview === undefined || widgetSettings === undefined;
   if (statsLoading || !orgLoaded) {
     return (
       <div className="flex h-full min-h-0 flex-1 flex-col lg:flex-row">
@@ -503,42 +504,42 @@ export function KnowledgeTrainingPlayground({
               title="Instruksjoner (systemprompt)"
               headerRight={
                 <div className="flex items-center gap-2">
-                  <Select
-                    onValueChange={(v) => {
-                      setInstructionPreset(v);
-                      if (v === "base") resetInstructions();
-                    }}
-                    value={instructionPreset}
-                  >
-                    <SelectTrigger className="h-7 w-[10rem] rounded-lg text-[11px]">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="base">Basisinstruks</SelectItem>
-                      <SelectItem value="custom" disabled>
-                        Egendefinert (snart)
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
                   <Button
                     className="size-7 shrink-0 rounded-lg"
-                    onClick={resetInstructions}
+                    onClick={() => void resetInstructions()}
                     size="icon"
+                    title="Tilbakestill til standard"
                     type="button"
                     variant="outline"
+                    disabled={isSavingPrompt}
                   >
                     <RotateCcwIcon className="size-3.5" />
+                  </Button>
+                  <Button
+                    className="h-7 gap-1.5 rounded-lg px-2.5 text-[11px] font-semibold"
+                    onClick={() => void handleSavePrompt()}
+                    size="sm"
+                    type="button"
+                    variant="default"
+                    disabled={isSavingPrompt}
+                  >
+                    {isSavingPrompt ? (
+                      <RefreshCwIcon className="size-3 animate-spin" />
+                    ) : (
+                      <SaveIcon className="size-3" strokeWidth={2.5} />
+                    )}
+                    Lagre
                   </Button>
                 </div>
               }
             >
               <p className="text-[11px] leading-relaxed text-muted-foreground">
-                Utkast lagres i denne nettleseren. Produksjonsoppførsel styres av backend-agenten.
+                Overstyrer standardoppførselen til assistenten. Tom = standard. Gjelder for nye samtaler etter lagring.
               </p>
               <Textarea
                 className="min-h-[180px] resize-y rounded-xl border-border/80 bg-background/90 text-[13px] leading-relaxed"
-                onBlur={() => persistInstructions(instructions)}
                 onChange={(e) => setInstructions(e.target.value)}
+                placeholder={DEFAULT_INSTRUCTIONS_PLACEHOLDER}
                 spellCheck
                 value={instructions}
               />

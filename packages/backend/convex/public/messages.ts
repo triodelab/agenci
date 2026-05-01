@@ -71,16 +71,22 @@ export const create = action({
       );
 
     if (shouldTriggerAgent) {
+      const widgetSettings = await ctx.runQuery(
+        internal.private.widgetSettings.getByOrganizationId,
+        { organizationId: conversation.organizationId },
+      );
+
       await supportAgent.generateText(
         ctx,
         { threadId: args.threadId },
         {
           prompt: args.prompt,
+          system: widgetSettings?.systemPrompt || undefined,
           tools: {
             escalateConversationTool: escalateConversation,
             resolveConversationTool: resolveConversation,
             searchTool: search,
-          }
+          },
         },
       )
     } else {
