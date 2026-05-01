@@ -1,17 +1,17 @@
-(function(){"use strict";const o={WIDGET_URL:"https://agenci-widget-vol22.vercel.app",DEFAULT_POSITION:"bottom-right"},u=`<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+(function(){"use strict";const s={WIDGET_URL:"http://localhost:3001",DEFAULT_POSITION:"bottom-right"},g=`<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-</svg>`,b=`<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+</svg>`,E=`<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <line x1="18" y1="6" x2="6" y2="18"></line>
   <line x1="6" y1="6" x2="18" y2="18"></line>
-</svg>`;(function(){let n=null,t=null,e=null,d=!1,r=null,a=o.DEFAULT_POSITION;const c=document.currentScript;if(c)r=c.getAttribute("data-organization-id"),a=c.getAttribute("data-position")||o.DEFAULT_POSITION;else{const i=document.querySelectorAll('script[src*="embed"]'),s=Array.from(i).find(l=>l.hasAttribute("data-organization-id"));s&&(r=s.getAttribute("data-organization-id"),a=s.getAttribute("data-position")||o.DEFAULT_POSITION)}if(!r){console.error("Agenci: data-organization-id er påkrevd på script-taggen");return}function g(){document.readyState==="loading"?document.addEventListener("DOMContentLoaded",h):h()}function h(){e=document.createElement("button"),e.id="echo-widget-button",e.innerHTML=u,e.style.cssText=`
+</svg>`;(function(){let n=null,e=null,t=null,c=!1,p="#0f172a",u="#ffffff",r=60,a=null,l=s.DEFAULT_POSITION;const f=document.currentScript;if(f)a=f.getAttribute("data-organization-id"),l=f.getAttribute("data-position")||s.DEFAULT_POSITION;else{const i=document.querySelectorAll('script[src*="embed"]'),d=Array.from(i).find(o=>o.hasAttribute("data-organization-id"));d&&(a=d.getAttribute("data-organization-id"),l=d.getAttribute("data-position")||s.DEFAULT_POSITION)}if(!a){console.error("Agenci: data-organization-id er påkrevd på script-taggen");return}function b(){document.readyState==="loading"?document.addEventListener("DOMContentLoaded",m):m()}function m(){t=document.createElement("button"),t.id="echo-widget-button",t.innerHTML=g,t.style.cssText=`
       position: fixed;
-      ${a==="bottom-right"?"right: 20px;":"left: 20px;"}
+      ${l==="bottom-right"?"right: 20px;":"left: 20px;"}
       bottom: 20px;
-      width: 60px;
-      height: 60px;
+      width: ${r}px;
+      height: ${r}px;
       border-radius: 50%;
-      background: #0f172a;
-      color: white;
+      background: ${p};
+      color: ${u};
       border: none;
       cursor: pointer;
       z-index: 999999;
@@ -20,9 +20,9 @@
       justify-content: center;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
       transition: all 0.2s ease;
-    `,e.addEventListener("click",v),e.addEventListener("mouseenter",()=>{e&&(e.style.transform="scale(1.05)")}),e.addEventListener("mouseleave",()=>{e&&(e.style.transform="scale(1)")}),document.body.appendChild(e),t=document.createElement("div"),t.id="echo-widget-container",t.style.cssText=`
+    `,t.addEventListener("click",L),t.addEventListener("mouseenter",()=>{t&&(t.style.transform="scale(1.05)")}),t.addEventListener("mouseleave",()=>{t&&(t.style.transform="scale(1)")}),document.body.appendChild(t),e=document.createElement("div"),e.id="echo-widget-container",e.style.cssText=`
       position: fixed;
-      ${a==="bottom-right"?"right: 20px;":"left: 20px;"}
+      ${l==="bottom-right"?"right: 20px;":"left: 20px;"}
       bottom: 90px;
       width: 400px;
       height: 600px;
@@ -36,8 +36,8 @@
       opacity: 0;
       transform: translateY(10px);
       transition: all 0.3s ease;
-    `,n=document.createElement("iframe"),n.src=y(),n.style.cssText=`
+    `,n=document.createElement("iframe"),n.src=I(),n.style.cssText=`
       width: 100%;
       height: 100%;
       border: none;
-    `,n.allow="microphone; clipboard-read; clipboard-write",t.appendChild(n),document.body.appendChild(t),window.addEventListener("message",f)}function y(){const i=new URLSearchParams;return i.append("organizationId",r),`${o.WIDGET_URL}?${i.toString()}`}function f(i){if(i.origin!==new URL(o.WIDGET_URL).origin)return;const{type:s,payload:l}=i.data;switch(s){case"close":p();break;case"resize":l.height&&t&&(t.style.height=`${l.height}px`);break}}function v(){d?p():m()}function m(){t&&e&&(d=!0,t.style.display="block",setTimeout(()=>{t&&(t.style.opacity="1",t.style.transform="translateY(0)")},10),e.innerHTML=b)}function p(){t&&e&&(d=!1,t.style.opacity="0",t.style.transform="translateY(10px)",setTimeout(()=>{t&&(t.style.display="none")},300),e.innerHTML=u,e.style.background="#0f172a")}function x(){window.removeEventListener("message",f),t&&(t.remove(),t=null,n=null),e&&(e.remove(),e=null),d=!1}function E(i){x(),i.organizationId&&(r=i.organizationId),i.position&&(a=i.position),g()}const w={init:E,show:m,hide:p,destroy:x};window.AgenciWidget=w,window.EchoWidget=w,g()})()})();
+    `,n.allow="microphone; clipboard-read; clipboard-write",e.appendChild(n),document.body.appendChild(e),window.addEventListener("message",x)}function I(){const i=new URLSearchParams;return i.append("organizationId",a),`${s.WIDGET_URL}?${i.toString()}`}function x(i){if(i.origin!==new URL(s.WIDGET_URL).origin)return;const{type:d,payload:o}=i.data;switch(d){case"close":h();break;case"resize":o.height&&e&&(e.style.height=`${o.height}px`);break;case"bubble-config":o&&t&&(o.color&&(p=o.color,t.style.background=p),o.iconColor&&(u=o.iconColor,t.style.color=u),o.size&&(r=o.size,t.style.width=`${r}px`,t.style.height=`${r}px`,e&&(e.style.bottom=`${r+20}px`)));break}}function L(){c?h():y()}function y(){e&&t&&(c=!0,e.style.display="block",setTimeout(()=>{e&&(e.style.opacity="1",e.style.transform="translateY(0)")},10),t.innerHTML=E)}function h(){e&&t&&(c=!1,e.style.opacity="0",e.style.transform="translateY(10px)",setTimeout(()=>{e&&(e.style.display="none")},300),t.innerHTML=g,t.style.background=p,t.style.color=u)}function w(){window.removeEventListener("message",x),e&&(e.remove(),e=null,n=null),t&&(t.remove(),t=null),c=!1}function T(i){w(),i.organizationId&&(a=i.organizationId),i.position&&(l=i.position),b()}const v={init:T,show:y,hide:h,destroy:w};window.AgenciWidget=v,window.EchoWidget=v,b()})()})();

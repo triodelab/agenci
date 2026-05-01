@@ -28,6 +28,9 @@ const appearanceArgs = v.optional(
     inputBackgroundColor: v.optional(v.string()),
     inputTextColor: v.optional(v.string()),
     inputPlaceholderColor: v.optional(v.string()),
+    bubbleButtonColor: v.optional(v.string()),
+    bubbleButtonIconColor: v.optional(v.string()),
+    bubbleButtonSize: v.optional(v.number()),
   }),
 );
 

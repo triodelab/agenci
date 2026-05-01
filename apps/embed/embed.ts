@@ -6,7 +6,11 @@ import { chatBubbleIcon, closeIcon } from './icons';
   let container: HTMLDivElement | null = null;
   let button: HTMLButtonElement | null = null;
   let isOpen = false;
-  
+
+  let bubbleColor = '#0f172a';
+  let bubbleIconColor = '#ffffff';
+  let bubbleSize = 60;
+
   // Get configuration from script tag
   let organizationId: string | null = null;
   let position: 'bottom-right' | 'bottom-left' = EMBED_CONFIG.DEFAULT_POSITION;
@@ -52,11 +56,11 @@ import { chatBubbleIcon, closeIcon } from './icons';
       position: fixed;
       ${position === 'bottom-right' ? 'right: 20px;' : 'left: 20px;'}
       bottom: 20px;
-      width: 60px;
-      height: 60px;
+      width: ${bubbleSize}px;
+      height: ${bubbleSize}px;
       border-radius: 50%;
-      background: #0f172a;
-      color: white;
+      background: ${bubbleColor};
+      color: ${bubbleIconColor};
       border: none;
       cursor: pointer;
       z-index: 999999;
@@ -136,6 +140,26 @@ import { chatBubbleIcon, closeIcon } from './icons';
           container.style.height = `${payload.height}px`;
         }
         break;
+      case 'bubble-config':
+        if (payload && button) {
+          if (payload.color) {
+            bubbleColor = payload.color;
+            button.style.background = bubbleColor;
+          }
+          if (payload.iconColor) {
+            bubbleIconColor = payload.iconColor;
+            button.style.color = bubbleIconColor;
+          }
+          if (payload.size) {
+            bubbleSize = payload.size;
+            button.style.width = `${bubbleSize}px`;
+            button.style.height = `${bubbleSize}px`;
+            if (container) {
+              container.style.bottom = `${bubbleSize + 20}px`;
+            }
+          }
+        }
+        break;
     }
   }
   
@@ -174,7 +198,8 @@ import { chatBubbleIcon, closeIcon } from './icons';
       }, 300);
       // Change button icon back to chat
       button.innerHTML = chatBubbleIcon;
-      button.style.background = '#0f172a';
+      button.style.background = bubbleColor;
+      button.style.color = bubbleIconColor;
     }
   }
   

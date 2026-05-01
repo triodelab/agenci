@@ -2,6 +2,7 @@
 
 import { useAtomValue } from "jotai";
 import { useSearchParams } from "next/navigation";
+import { useEffect } from "react";
 import { cn } from "@workspace/ui/lib/utils";
 import {
   mergeWidgetAppearance,
@@ -31,6 +32,21 @@ export const WidgetView = ({ organizationId }: Props) => {
   const widgetSettings = useAtomValue(widgetSettingsAtom);
   const appearance = mergeWidgetAppearance(widgetSettings?.appearance ?? undefined);
   const rootStyle = widgetAppearanceToRootStyle(appearance);
+
+  useEffect(() => {
+    if (!widgetSettings || window.parent === window) return;
+    window.parent.postMessage(
+      {
+        type: "bubble-config",
+        payload: {
+          color: appearance.bubbleButtonColor,
+          iconColor: appearance.bubbleButtonIconColor,
+          size: appearance.bubbleButtonSize,
+        },
+      },
+      "*",
+    );
+  }, [widgetSettings]);
 
   const screenComponents = {
     loading: <WidgetLoadingScreen organizationId={organizationId} />,

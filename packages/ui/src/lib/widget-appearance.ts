@@ -25,6 +25,10 @@ export interface WidgetAppearance {
   inputBackgroundColor: string;
   inputTextColor: string;
   inputPlaceholderColor: string;
+  /** Floating trigger button on the host page */
+  bubbleButtonColor: string;
+  bubbleButtonIconColor: string;
+  bubbleButtonSize: number;
 }
 
 /** Typisk innebygd chat (bredde × høyde) — nær vanlige widget-rammer. */
@@ -46,6 +50,9 @@ export const DEFAULT_WIDGET_APPEARANCE_LIGHT: WidgetAppearance = {
   inputBackgroundColor: "#ffffff",
   inputTextColor: "#18181b",
   inputPlaceholderColor: "#71717a",
+  bubbleButtonColor: "#0f172a",
+  bubbleButtonIconColor: "#ffffff",
+  bubbleButtonSize: 60,
 };
 
 export const DEFAULT_WIDGET_APPEARANCE_DARK: WidgetAppearance = {
@@ -66,6 +73,9 @@ export const DEFAULT_WIDGET_APPEARANCE_DARK: WidgetAppearance = {
   inputBackgroundColor: "#18181b",
   inputTextColor: "#fafafa",
   inputPlaceholderColor: "#a1a1aa",
+  bubbleButtonColor: "#fafafa",
+  bubbleButtonIconColor: "#0f172a",
+  bubbleButtonSize: 60,
 };
 
 export function mergeWidgetAppearance(

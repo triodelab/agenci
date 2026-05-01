@@ -27,6 +27,7 @@ import {
   CornerDownLeft,
   CornerDownRight,
   GripHorizontal,
+  MessageCircle,
   Moon,
   Palette,
   Sun,
@@ -391,7 +392,7 @@ export const WidgetAppearanceFields = () => {
 
         <Tabs className="flex min-h-0 flex-1 flex-col gap-0" defaultValue="layout">
           <div className="shrink-0 px-3 pt-3 lg:px-4">
-            <TabsList className="grid h-10 w-full grid-cols-2 gap-1 rounded-xl border border-border/50 bg-muted/45 p-1">
+            <TabsList className="grid h-10 w-full grid-cols-3 gap-1 rounded-xl border border-border/50 bg-muted/45 p-1">
               <TabsTrigger
                 className="rounded-lg text-[12px] font-medium text-muted-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm data-[state=active]:hover:bg-primary/90"
                 value="layout"
@@ -403,6 +404,12 @@ export const WidgetAppearanceFields = () => {
                 value="colors"
               >
                 Farger
+              </TabsTrigger>
+              <TabsTrigger
+                className="rounded-lg text-[12px] font-medium text-muted-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm data-[state=active]:hover:bg-primary/90"
+                value="bubble"
+              >
+                Boble
               </TabsTrigger>
             </TabsList>
           </div>
@@ -636,6 +643,99 @@ export const WidgetAppearanceFields = () => {
               </div>
             </div>
           </TabsContent>
+
+          <TabsContent
+            className="mt-0 min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-6 pt-4 lg:px-5"
+            value="bubble"
+          >
+            <div className="space-y-5">
+              <p className="text-[11px] leading-snug text-muted-foreground">
+                Tilpass den flytende chat-knappen som vises på nettsiden din.
+              </p>
+
+              <div className="space-y-2">
+                <Label className={labelUi}>Farger</Label>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between gap-2 rounded-lg border border-border/50 bg-background/50 px-2 py-1.5">
+                    <span className="min-w-0 flex-1 truncate text-[11px] text-muted-foreground">
+                      Bakgrunnsfarge
+                    </span>
+                    <input
+                      aria-label="Boble bakgrunnsfarge"
+                      className="size-7 cursor-pointer rounded border border-border bg-transparent p-0.5"
+                      onChange={(e) =>
+                        setValue("appearance.bubbleButtonColor", e.target.value, {
+                          shouldDirty: true,
+                        })
+                      }
+                      type="color"
+                      value={appearance.bubbleButtonColor ?? "#0f172a"}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between gap-2 rounded-lg border border-border/50 bg-background/50 px-2 py-1.5">
+                    <span className="min-w-0 flex-1 truncate text-[11px] text-muted-foreground">
+                      Ikonfarge
+                    </span>
+                    <input
+                      aria-label="Boble ikonfarge"
+                      className="size-7 cursor-pointer rounded border border-border bg-transparent p-0.5"
+                      onChange={(e) =>
+                        setValue("appearance.bubbleButtonIconColor", e.target.value, {
+                          shouldDirty: true,
+                        })
+                      }
+                      type="color"
+                      value={appearance.bubbleButtonIconColor ?? "#ffffff"}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label className={labelUi}>Størrelse</Label>
+                <div>
+                  <div className="flex justify-between text-[11px] text-muted-foreground">
+                    <span>Diameter</span>
+                    <span className="tabular-nums">{appearance.bubbleButtonSize ?? 60}px</span>
+                  </div>
+                  <Slider
+                    className="mt-1.5"
+                    max={80}
+                    min={40}
+                    onValueChange={([v]) => {
+                      if (v !== undefined) {
+                        setValue("appearance.bubbleButtonSize", v, { shouldDirty: true });
+                      }
+                    }}
+                    step={4}
+                    value={[appearance.bubbleButtonSize ?? 60]}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label className={labelUi}>Forhåndsvisning</Label>
+                <div className="flex items-center justify-center rounded-xl border border-dashed border-border/70 bg-muted/25 py-8">
+                  <div
+                    className="flex items-center justify-center rounded-full shadow-lg"
+                    style={{
+                      width: appearance.bubbleButtonSize ?? 60,
+                      height: appearance.bubbleButtonSize ?? 60,
+                      backgroundColor: appearance.bubbleButtonColor ?? "#0f172a",
+                      color: appearance.bubbleButtonIconColor ?? "#ffffff",
+                    }}
+                  >
+                    <MessageCircle
+                      style={{
+                        width: Math.round((appearance.bubbleButtonSize ?? 60) * 0.4),
+                        height: Math.round((appearance.bubbleButtonSize ?? 60) * 0.4),
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </TabsContent>
         </Tabs>
       </div>
 
@@ -659,7 +759,28 @@ export const WidgetAppearanceFields = () => {
             title={widgetTitle}
           />
         ) : (
-          <WidgetChatPreview appearance={appearance} title={widgetTitle} />
+          <>
+            <WidgetChatPreview appearance={appearance} title={widgetTitle} />
+            {/* Floating bubble button indicator */}
+            <div
+              aria-hidden
+              className="absolute bottom-5 flex items-center justify-center rounded-full shadow-lg"
+              style={{
+                [appearance.position === "bottom-left" ? "left" : "right"]: "20px",
+                width: appearance.bubbleButtonSize ?? 60,
+                height: appearance.bubbleButtonSize ?? 60,
+                backgroundColor: appearance.bubbleButtonColor ?? "#0f172a",
+                color: appearance.bubbleButtonIconColor ?? "#ffffff",
+              }}
+            >
+              <MessageCircle
+                style={{
+                  width: Math.round((appearance.bubbleButtonSize ?? 60) * 0.4),
+                  height: Math.round((appearance.bubbleButtonSize ?? 60) * 0.4),
+                }}
+              />
+            </div>
+          </>
         )}
       </div>
     </div>
