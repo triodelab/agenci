@@ -10,7 +10,7 @@ export function getWidgetPreviewUrl(
 ): string {
   const origin =
     process.env.NEXT_PUBLIC_WIDGET_PREVIEW_ORIGIN?.replace(/\/$/, "") ||
-    "http://localhost:3001";
+    "https://agenci-widget-vol22.vercel.app";
   const u = new URL(`${origin}/`);
   u.searchParams.set("organizationId", organizationId);
   if (options?.playground) {
