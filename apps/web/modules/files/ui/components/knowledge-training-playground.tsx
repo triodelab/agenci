@@ -4,7 +4,6 @@ import { useOrganization } from "@clerk/nextjs";
 import { useQuery, useAction, useMutation, usePaginatedQuery } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
 import type { PublicFile } from "@workspace/backend/private/files";
-import { getWidgetPreviewUrl } from "@/lib/widget-preview-url";
 import { DashboardAccentButton } from "@/modules/dashboard/ui/components/dashboard-accent";
 import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
@@ -157,6 +156,7 @@ export function KnowledgeTrainingPlayground({
     agentId ? { agentId } : "skip",
   );
   const widgetSettings = useQuery(api.private.widgetSettings.getOne, {});
+  const publicConfig = useQuery(api.private.config.getPublicConfig, {});
   const saveSystemPromptMutation = useMutation(api.private.widgetSettings.saveSystemPrompt);
 
   // File management
@@ -179,13 +179,14 @@ export function KnowledgeTrainingPlayground({
   const [isSavingPrompt, setIsSavingPrompt] = useState(false);
   const [showCapacityBanner, setShowCapacityBanner] = useState(true);
 
-  const widgetUrl = useMemo(
-    () =>
-      organization?.id
-        ? getWidgetPreviewUrl(organization.id, { playground: true })
-        : null,
-    [organization?.id],
-  );
+  const widgetUrl = useMemo(() => {
+    if (!organization?.id || !publicConfig?.widgetPreviewUrl) return null;
+    const origin = publicConfig.widgetPreviewUrl;
+    const u = new URL(`${origin}/`);
+    u.searchParams.set("organizationId", organization.id);
+    u.searchParams.set("playground", "1");
+    return u.toString();
+  }, [organization?.id, publicConfig?.widgetPreviewUrl]);
 
   // Load system prompt from Convex when settings arrive
   useEffect(() => {
@@ -262,7 +263,9 @@ export function KnowledgeTrainingPlayground({
     return parts.join(" · ");
   }, [indexed, lastIndexedAt, approxKb, hasMore]);
 
-  const statsLoading = agentId ? agentOverview === undefined : overview === undefined || widgetSettings === undefined;
+  const statsLoading = agentId
+    ? agentOverview === undefined
+    : overview === undefined || widgetSettings === undefined || publicConfig === undefined;
   if (statsLoading || !orgLoaded) {
     return (
       <div className="flex h-full min-h-0 flex-1 flex-col lg:flex-row">

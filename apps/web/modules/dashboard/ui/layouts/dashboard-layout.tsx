@@ -17,6 +17,8 @@ export const DashboardLayout = async ({ children }: { children: React.ReactNode 
     <AuthGuard>
       <OrganizationGuard>
         <Provider>
+          {/* Hide the landing-page widget bubble inside the dashboard */}
+          <style>{`#echo-widget-button,#echo-widget-container{display:none!important}`}</style>
           {/*
            * SidebarProvider wraps everything so useSidebar() works in DashboardTopNav.
            * flex-col: TopNav on top, sidebar+main below.
