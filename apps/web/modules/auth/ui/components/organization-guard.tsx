@@ -1,6 +1,7 @@
 "use client";
 
 import { useOrganization } from "@clerk/nextjs";
+import { Suspense } from "react";
 import { AuthLayout } from "@/modules/auth/ui/layouts/auth-layout";
 import { OrgSelectionView } from "@/modules/auth/ui/views/org-selection-view";
 import { DashboardFullSkeleton } from "@/modules/dashboard/ui/components/dashboard-skeleton";
@@ -16,7 +17,9 @@ export const OrganizationGuard = ({ children }: { children: React.ReactNode }) =
   if (!organization) {
     return (
       <AuthLayout>
-        <OrgSelectionView />
+        <Suspense>
+          <OrgSelectionView />
+        </Suspense>
       </AuthLayout>
     );
   }

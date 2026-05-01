@@ -1,6 +1,7 @@
 "use client";
 
 import { Authenticated, Unauthenticated, AuthLoading } from "convex/react";
+import { Suspense } from "react";
 import { AuthLayout } from "../layouts/auth-layout";
 import { SignInView } from "../views/sign-in-view";
 import { DashboardFullSkeleton } from "@/modules/dashboard/ui/components/dashboard-skeleton";
@@ -16,7 +17,9 @@ export const AuthGuard = ({ children }: { children: React.ReactNode }) => {
       </Authenticated>
       <Unauthenticated>
         <AuthLayout>
-          <SignInView />
+          <Suspense>
+            <SignInView />
+          </Suspense>
         </AuthLayout>
       </Unauthenticated>
     </>
