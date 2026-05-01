@@ -1,6 +1,7 @@
 "use client";
 
 import { OrganizationProfile, useUser } from "@clerk/nextjs";
+import { Suspense } from "react";
 import {
   DashboardPageHeader,
   DashboardPagePanel,
@@ -54,11 +55,13 @@ export const BillingView = () => {
             <DevBillingBypassPlaceholder />
           ) : (
             <ClerkBillingUnavailableBoundary>
-              <OrganizationProfile
-                routing="hash"
-                afterLeaveOrganizationUrl="/dashboard"
-                appearance={clerkBillingAppearance}
-              />
+              <Suspense fallback={<BillingClerkLoadingSkeleton />}>
+                <OrganizationProfile
+                  routing="hash"
+                  afterLeaveOrganizationUrl="/dashboard"
+                  appearance={clerkBillingAppearance}
+                />
+              </Suspense>
             </ClerkBillingUnavailableBoundary>
           )}
         </DashboardPagePanel>

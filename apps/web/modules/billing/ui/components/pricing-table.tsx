@@ -1,6 +1,7 @@
 "use client";
 
 import { PricingTable as ClerkPricingTable, useUser } from "@clerk/nextjs";
+import { Suspense } from "react";
 import { getBillingUiMode } from "@/lib/dev-bypass";
 import {
   BillingClerkLoadingSkeleton,
@@ -23,18 +24,20 @@ export const PricingTable = () => {
   return (
     <div className="flex flex-col items-center justify-center gap-y-4">
       <ClerkBillingUnavailableBoundary>
-        <ClerkPricingTable
-          forOrganizations
-          appearance={{
-            elements: {
-              pricingTableCard:
-                "shadow-none! border! rounded-2xl! border-border/80! bg-card/95! backdrop-blur-sm!",
-              pricingTableCardHeader: "bg-transparent!",
-              pricingTableCardBody: "bg-transparent!",
-              pricingTableCardFooter: "bg-transparent!",
-            },
-          }}
-        />
+        <Suspense>
+          <ClerkPricingTable
+            forOrganizations
+            appearance={{
+              elements: {
+                pricingTableCard:
+                  "shadow-none! border! rounded-2xl! border-border/80! bg-card/95! backdrop-blur-sm!",
+                pricingTableCardHeader: "bg-transparent!",
+                pricingTableCardBody: "bg-transparent!",
+                pricingTableCardFooter: "bg-transparent!",
+              },
+            }}
+          />
+        </Suspense>
       </ClerkBillingUnavailableBoundary>
     </div>
   );

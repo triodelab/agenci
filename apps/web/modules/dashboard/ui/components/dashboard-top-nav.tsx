@@ -3,6 +3,7 @@
 import { OrganizationSwitcher, UserButton } from "@clerk/nextjs";
 import { BellIcon, SidebarIcon } from "lucide-react";
 import Link from "next/link";
+import { Suspense } from "react";
 import { LogoIcon } from "@/components/logo";
 import { useSidebar } from "@workspace/ui/components/sidebar";
 import { ModeToggle } from "@/components/mode-toggle";
@@ -42,20 +43,22 @@ export function DashboardTopNav() {
           triggerClassName="size-8 rounded-lg border border-border/70 bg-transparent hover:bg-muted transition-colors flex items-center justify-center"
         />
 
-        <OrganizationSwitcher
-          hidePersonal
-          skipInvitationScreen
-          appearance={{
-            elements: {
-              rootBox: "h-8!",
-              avatarBox: "size-4! rounded-md!",
-              organizationSwitcherTrigger:
-                "h-8! rounded-lg! border border-border/70 bg-transparent px-2! text-[12px]! font-medium! hover:bg-muted! shadow-none!",
-              organizationPreviewTextContainer: "text-[12px]! font-medium! text-foreground!",
-              organizationSwitcherTriggerIcon: "ml-1! size-3.5! text-muted-foreground!",
-            },
-          }}
-        />
+        <Suspense fallback={<div className="h-8 w-32 animate-pulse rounded-lg bg-muted" />}>
+          <OrganizationSwitcher
+            hidePersonal
+            skipInvitationScreen
+            appearance={{
+              elements: {
+                rootBox: "h-8!",
+                avatarBox: "size-4! rounded-md!",
+                organizationSwitcherTrigger:
+                  "h-8! rounded-lg! border border-border/70 bg-transparent px-2! text-[12px]! font-medium! hover:bg-muted! shadow-none!",
+                organizationPreviewTextContainer: "text-[12px]! font-medium! text-foreground!",
+                organizationSwitcherTriggerIcon: "ml-1! size-3.5! text-muted-foreground!",
+              },
+            }}
+          />
+        </Suspense>
 
         <Popover>
           <PopoverTrigger asChild>
@@ -86,15 +89,17 @@ export function DashboardTopNav() {
           </PopoverContent>
         </Popover>
 
-        <UserButton
-          appearance={{
-            elements: {
-              rootBox: "h-8!",
-              userButtonTrigger: "h-8! rounded-lg! border border-border/70 bg-transparent p-1! hover:bg-muted!",
-              avatarBox: "size-6! rounded-md!",
-            },
-          }}
-        />
+        <Suspense fallback={<div className="size-8 animate-pulse rounded-lg bg-muted" />}>
+          <UserButton
+            appearance={{
+              elements: {
+                rootBox: "h-8!",
+                userButtonTrigger: "h-8! rounded-lg! border border-border/70 bg-transparent p-1! hover:bg-muted!",
+                avatarBox: "size-6! rounded-md!",
+              },
+            }}
+          />
+        </Suspense>
       </div>
     </header>
   );
