@@ -32,11 +32,13 @@ export default function RootLayout({
   return (
     <html lang="no" suppressHydrationWarning data-scroll-behavior="smooth">
       <body
-        className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased overflow-x-hidden`}
+        className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased`}
       >
         <Providers>
+          <div className="overflow-x-hidden">
+            {children}
+          </div>
           <Toaster />
-          {children}
         </Providers>
       </body>
     </html>
