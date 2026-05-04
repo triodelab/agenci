@@ -2,6 +2,27 @@ import { ConvexError, v } from "convex/values";
 import { internalMutation, internalQuery } from "../_generated/server";
 import { SESSION_DURATION_MS } from "../constants";
 
+export const purgeExpired = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const now = Date.now();
+    const expiredSessions = await ctx.db
+      .query("contactSessions")
+      .withIndex("by_expires_at", (q) => q.lt("expiresAt", now))
+      .collect();
+
+    for (const session of expiredSessions) {
+      await ctx.db.patch(session._id, {
+        name: "Slettet",
+        email: "slettet@agenci.local",
+        metadata: undefined,
+      });
+    }
+
+    return { anonymized: expiredSessions.length };
+  },
+});
+
 const AUTO_REFRESH_THRESHOLD_MS = 4 * 60 * 60 * 1000;
 
 export const refresh = internalMutation({

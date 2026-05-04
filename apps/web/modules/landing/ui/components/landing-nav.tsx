@@ -85,7 +85,7 @@ export function LandingNav({ variant = "dark" }: LandingNavProps) {
         "fixed inset-x-0 top-0 z-50 transition-[background-color,box-shadow,border-color] duration-300",
         effectiveIsDark
           ? scrolled
-            ? "border-b border-white/[0.06] bg-black shadow-[0_12px_40px_-12px_rgba(0,0,0,0.85)]"
+            ? "border-b border-[#23252a] bg-[#010102]/95 backdrop-blur-sm"
             : "border-b border-transparent bg-transparent"
           : "border-b border-border/60 bg-background shadow-sm",
       )}
@@ -111,7 +111,7 @@ export function LandingNav({ variant = "dark" }: LandingNavProps) {
                 className={cn(
                   "rounded-lg px-2.5 py-2 text-[13px] font-medium transition-colors xl:px-3.5",
                   effectiveIsDark
-                    ? "text-zinc-400 hover:bg-white/[0.07] hover:text-zinc-100"
+                    ? "text-[#8a8f98] hover:bg-white/[0.07] hover:text-[#f7f8f8]"
                     : "text-muted-foreground hover:bg-muted/80 hover:text-foreground",
                 )}
               >
@@ -128,7 +128,7 @@ export function LandingNav({ variant = "dark" }: LandingNavProps) {
               size="sm"
               className={cn(
                 "hidden sm:inline-flex text-[13px]",
-                effectiveIsDark && "text-zinc-300 hover:bg-white/[0.07] hover:text-white",
+                effectiveIsDark && "text-[#d0d6e0] hover:bg-white/[0.07] hover:text-[#f7f8f8]",
               )}
               asChild
             >
@@ -140,7 +140,7 @@ export function LandingNav({ variant = "dark" }: LandingNavProps) {
               size="sm"
               className={cn(
                 "hidden sm:inline-flex text-[13px]",
-                effectiveIsDark && "text-zinc-400 hover:bg-white/[0.07] hover:text-zinc-100",
+                effectiveIsDark && "text-[#8a8f98] hover:bg-white/[0.07] hover:text-[#f7f8f8]",
               )}
               asChild
             >
@@ -152,8 +152,10 @@ export function LandingNav({ variant = "dark" }: LandingNavProps) {
             <Button
               size="sm"
               className={cn(
-                LANDING_MARKETING_PRIMARY_CTA_SURFACE_CLASS,
-                "hidden rounded-full px-5 shadow-[0_8px_24px_-6px_rgba(45,212,191,0.45)] hover:opacity-95 sm:inline-flex",
+                "hidden rounded-[8px] px-[14px] text-[13px] font-medium sm:inline-flex",
+                effectiveIsDark
+                  ? "bg-[#f7f8f8] text-[#010102] hover:bg-white"
+                  : "bg-foreground text-background hover:bg-foreground/90",
               )}
               asChild
             >
@@ -188,7 +190,7 @@ export function LandingNav({ variant = "dark" }: LandingNavProps) {
         id="landing-nav-mobile"
         className={cn(
           "border-t lg:hidden",
-          effectiveIsDark ? "border-white/10 bg-black/90 backdrop-blur-xl" : "border-border bg-background",
+          effectiveIsDark ? "border-[#23252a] bg-[#010102]/95 backdrop-blur-xl" : "border-border bg-background",
           open ? "block" : "hidden",
         )}
       >
@@ -203,7 +205,7 @@ export function LandingNav({ variant = "dark" }: LandingNavProps) {
               className={cn(
                 "rounded-xl px-3 py-3 text-base font-medium",
                 effectiveIsDark
-                  ? "text-zinc-300 hover:bg-white/10 hover:text-white"
+                  ? "text-[#d0d6e0] hover:bg-white/[0.07] hover:text-[#f7f8f8]"
                   : "text-foreground hover:bg-muted",
               )}
               onClick={() => setOpen(false)}
@@ -214,7 +216,7 @@ export function LandingNav({ variant = "dark" }: LandingNavProps) {
           <div
             className={cn(
               "mt-3 flex flex-col gap-2 border-t pt-4",
-              effectiveIsDark ? "border-white/10" : "border-border",
+              effectiveIsDark ? "border-[#23252a]" : "border-border",
             )}
           >
             {isLoaded && user ? (
@@ -227,7 +229,7 @@ export function LandingNav({ variant = "dark" }: LandingNavProps) {
                   <Link href={LANDING_AUTH_PATHS.signIn}>Logg inn</Link>
                 </Button>
                 <Button
-                  className={cn(LANDING_MARKETING_PRIMARY_CTA_SURFACE_CLASS, "w-full rounded-full")}
+                  className="w-full rounded-[8px] bg-[#f7f8f8] text-[13px] font-medium text-[#010102] hover:bg-white"
                   asChild
                 >
                   <AuthAwareLink

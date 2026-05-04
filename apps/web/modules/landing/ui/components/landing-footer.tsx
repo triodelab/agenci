@@ -12,10 +12,8 @@ import {
   LANDING_AUTH_PATHS,
   LANDING_FOOTER_NAV_GROUPS,
   LANDING_LEGAL_LINKS,
-  LANDING_MARKETING_PRIMARY_CTA_SURFACE_CLASS,
-  LANDING_SECTION_IDS,
 } from "@/modules/landing/constants";
-import { cn } from "@workspace/ui/lib/utils";
+import { CookieSettingsButton } from "@/components/cookie-settings-button";
 
 const guestAccountLinks = [
   { href: LANDING_AUTH_PATHS.signIn, label: "Logg inn" },
@@ -69,36 +67,37 @@ export function LandingFooter() {
   return (
     <footer
       data-landing-nav-surface="dark"
-      className="scroll-mt-24 border-t border-white/10 bg-black px-4 py-16 text-zinc-300 md:px-8"
+      className="border-t border-[#23252a] bg-[#010102] px-6 py-14 xl:px-8"
     >
-      <div className="mx-auto max-w-6xl">
-        <div className="flex flex-wrap items-start justify-between gap-12 border-b border-white/10 pb-14">
-          <div className="max-w-sm space-y-4">
+      <div className="mx-auto max-w-[1200px]">
+        {/* Top: logo + tagline */}
+        <div className="flex flex-wrap items-start justify-between gap-10 border-b border-[#23252a] pb-12">
+          <div className="max-w-xs space-y-3">
             <Link href="/" aria-label="Agenci — forsiden" className="inline-block">
-              <Logo className="brightness-0 invert" />
+              <Logo className="brightness-0 invert opacity-70" />
             </Link>
-            <p className="text-sm leading-relaxed text-zinc-400">
-              KI-chat for nettsiden deres: svar fra deres kunnskap, samtaler i dashboard, og mennesker i
-              loop når det trengs.
+            <p className="text-[13px] leading-relaxed text-[#8a8f98]">
+              KI-chat for nettsiden din — svar fra din kunnskap, samtaler i dashboard, mennesker i loop.
             </p>
           </div>
         </div>
 
+        {/* Nav columns */}
         <nav
-          className="grid grid-cols-2 gap-10 py-14 sm:grid-cols-2 lg:grid-cols-4"
+          className="grid grid-cols-2 gap-10 py-12 sm:grid-cols-2 lg:grid-cols-4"
           aria-label="Footer"
         >
           {LANDING_FOOTER_NAV_GROUPS.map((group) => (
             <div key={group.name}>
-              <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
+              <h2 className="mb-4 text-[11px] font-medium uppercase tracking-[0.4px] text-[#62666d]">
                 {group.name}
               </h2>
-              <ul className="mt-5 space-y-3">
+              <ul className="space-y-2.5">
                 {group.links.map((link) => (
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className="text-sm text-zinc-300 transition-colors hover:text-[#2DD4BF]"
+                      className="text-[13px] text-[#8a8f98] transition-colors hover:text-[#f7f8f8]"
                     >
                       {link.label}
                     </Link>
@@ -108,15 +107,15 @@ export function LandingFooter() {
             </div>
           ))}
           <div>
-            <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
+            <h2 className="mb-4 text-[11px] font-medium uppercase tracking-[0.4px] text-[#62666d]">
               Konto
             </h2>
-            <ul className="mt-5 space-y-3">
+            <ul className="space-y-2.5">
               {accountLinksToShow.map((link) => (
                 <li key={`${link.label}-${link.href}`}>
                   <Link
                     href={link.href}
-                    className="text-sm text-zinc-300 transition-colors hover:text-[#2DD4BF]"
+                    className="text-[13px] text-[#8a8f98] transition-colors hover:text-[#f7f8f8]"
                   >
                     {link.label}
                   </Link>
@@ -125,15 +124,15 @@ export function LandingFooter() {
             </ul>
           </div>
           <div className="col-span-2 lg:col-span-1">
-            <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
+            <h2 className="mb-4 text-[11px] font-medium uppercase tracking-[0.4px] text-[#62666d]">
               Nyhetsbrev
             </h2>
-            <p className="mt-3 text-sm text-zinc-400">
+            <p className="text-[13px] text-[#8a8f98]">
               Produktnyheter — ca. én gang i måneden.
             </p>
             <form
               onSubmit={handleNewsletterSubmit}
-              className="mt-5 w-full max-w-sm"
+              className="mt-4 w-full max-w-sm"
               aria-label="Nyhetsbrev"
               aria-busy={newsletterLoading}
             >
@@ -142,7 +141,7 @@ export function LandingFooter() {
               </Label>
               <Input
                 id="footer-newsletter-email"
-                className="h-11 rounded-xl border-white/15 bg-white/5 text-white placeholder:text-zinc-500"
+                className="h-9 rounded-[8px] border-[#23252a] bg-[#0f1011] text-[#d0d6e0] placeholder:text-[#62666d] focus-visible:border-[#5e6ad2] focus-visible:ring-2 focus-visible:ring-[#5e6ad2]/50"
                 placeholder="din@epost.no"
                 type="email"
                 required
@@ -153,10 +152,7 @@ export function LandingFooter() {
               />
               <Button
                 type="submit"
-                className={cn(
-                  LANDING_MARKETING_PRIMARY_CTA_SURFACE_CLASS,
-                  "mt-3 w-full rounded-xl shadow-[0_8px_24px_-6px_rgba(45,212,191,0.35)]",
-                )}
+                className="mt-2 h-9 w-full rounded-[8px] bg-[#5e6ad2] text-[13px] font-medium text-white transition-colors hover:bg-[#828fff]"
                 disabled={newsletterLoading || newsletterSuccess}
                 aria-busy={newsletterLoading}
               >
@@ -170,22 +166,24 @@ export function LandingFooter() {
           </div>
         </nav>
 
-        <div className="flex flex-col items-center justify-between gap-6 border-t border-white/10 pt-10 text-sm text-zinc-500 sm:flex-row">
-          <div className="flex flex-col items-center gap-3 sm:items-start">
-            <span className="text-zinc-400">&copy; Agenci {new Date().getFullYear()}</span>
-            <nav aria-label="Juridisk" className="flex flex-wrap justify-center gap-x-5 gap-y-2 sm:justify-start">
-              {LANDING_LEGAL_LINKS.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="text-zinc-400 transition-colors hover:text-[#2DD4BF]"
-                >
-                  {link.label}
-                </Link>
-              ))}
-            </nav>
+        {/* Bottom bar */}
+        <div className="flex flex-col items-center justify-between gap-4 border-t border-[#23252a] pt-8 sm:flex-row">
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+            <span className="text-[12px] text-[#62666d]">&copy; Agenci {new Date().getFullYear()}</span>
+            {LANDING_LEGAL_LINKS.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="text-[12px] text-[#62666d] transition-colors hover:text-[#8a8f98]"
+              >
+                {link.label}
+              </Link>
+            ))}
           </div>
-          <span className="text-center sm:text-right">Alle rettigheter reservert</span>
+          <div className="flex items-center gap-4">
+            <CookieSettingsButton />
+            <span className="text-[12px] text-[#62666d]">Alle rettigheter reservert</span>
+          </div>
         </div>
       </div>
     </footer>

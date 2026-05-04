@@ -6,14 +6,15 @@ import { MarketingSubpageCta } from "@/modules/landing/ui/components/marketing-s
 import { LANDING_CONTACT_PAGE_PATH } from "@/modules/landing/constants";
 
 const accentLink =
-  "font-medium text-foreground underline decoration-[#2DD4BF]/45 underline-offset-2 hover:text-[#0f766e] hover:decoration-[#2DD4BF]";
+  "text-[#5e6ad2] underline-offset-2 decoration-[#5e6ad2]/30 hover:text-[#828fff] hover:underline transition-colors";
 
 const updated = new Date("2026-03-27");
 
-/** Erstatt via miljøvariabel når selskapsdata er klare */
 const COMPANY_LEGAL_LINE =
   process.env.NEXT_PUBLIC_COMPANY_LEGAL_LINE ??
-  "Agenci — [sett inn fullt selskapsnavn, organisasjonsnummer og forretningsadresse]";
+  "Hassan Triodelab DA, org.nr. 835 796 892, Gildevangen 16 B, 0585 Oslo";
+
+const PRIVACY_EMAIL = "post@triodelab.no";
 
 export const metadata: Metadata = {
   title: "Personvernerklæring",
@@ -39,23 +40,25 @@ const toc = [
 export default function PersonvernPage() {
   return (
     <MarketingPageLayout>
-      <article className="border-b border-border/40 bg-gradient-to-b from-background via-background to-muted/20">
-        <div className="mx-auto max-w-2xl px-4 py-12 md:px-6 md:py-16 lg:py-20">
-          <header className="border-b border-border/50 pb-10">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+      <div className="bg-[#010102]">
+        <div className="mx-auto max-w-[720px] px-6 py-20 md:py-24 xl:px-8">
+
+          {/* Header */}
+          <header className="border-b border-[#23252a] pb-10">
+            <p className="text-[13px] font-medium uppercase tracking-[0.4px] text-[#62666d]">
               Juridisk
             </p>
-            <h1 className="mt-3 text-3xl font-semibold tracking-tight text-foreground md:text-[2rem] md:leading-tight">
+            <h1 className="mt-5 text-[40px] font-semibold leading-[1.15] tracking-[-1px] text-[#f7f8f8]">
               Personvernerklæring
             </h1>
-            <p className="mt-4 text-sm text-muted-foreground">
+            <p className="mt-4 text-[15px] leading-[1.5] text-[#d0d6e0]">
               Gjelder bruk av nettside og tjenester levert av Agenci.
             </p>
-            <dl className="mt-6 flex flex-wrap gap-x-8 gap-y-2 text-sm text-muted-foreground">
+            <dl className="mt-6 flex flex-wrap gap-x-8 gap-y-2 text-[13px] text-[#62666d]">
               <div>
                 <dt className="sr-only">Sist oppdatert</dt>
                 <dd>
-                  <span className="font-medium text-foreground">Sist oppdatert:</span>{" "}
+                  Sist oppdatert:{" "}
                   {updated.toLocaleDateString("no-NO", {
                     year: "numeric",
                     month: "long",
@@ -65,24 +68,25 @@ export default function PersonvernPage() {
               </div>
               <div>
                 <dt className="sr-only">Versjon</dt>
-                <dd>
-                  <span className="font-medium text-foreground">Versjon:</span> 1.0
-                </dd>
+                <dd>Versjon: 1.0</dd>
               </div>
             </dl>
           </header>
 
+          {/* TOC */}
           <nav
             aria-label="Innhold i personvernerklæringen"
-            className="my-10 rounded-2xl border border-[#2DD4BF]/20 bg-card/90 p-5 shadow-sm ring-1 ring-[#2DD4BF]/10 backdrop-blur-sm"
+            className="my-10 rounded-[12px] border border-[#23252a] bg-[#0f1011] p-6"
           >
-            <p className="text-xs font-semibold uppercase tracking-wider text-[#0f766e]">Innhold</p>
-            <ol className="mt-4 list-decimal space-y-2 pl-5 text-[15px] leading-snug text-foreground marker:font-semibold marker:text-[#2DD4BF]">
+            <p className="text-[12px] font-medium uppercase tracking-[0.4px] text-[#62666d]">
+              Innhold
+            </p>
+            <ol className="mt-4 list-decimal space-y-2 pl-5 text-[14px] leading-[1.5] text-[#d0d6e0] marker:font-medium marker:text-[#5e6ad2]">
               {toc.map((item) => (
                 <li key={item.id}>
                   <a
                     href={`#${item.id}`}
-                    className="text-[15px] text-foreground underline-offset-2 hover:text-[#0f766e] hover:underline"
+                    className="transition-colors hover:text-[#f7f8f8]"
                   >
                     {item.label}
                   </a>
@@ -91,7 +95,8 @@ export default function PersonvernPage() {
             </ol>
           </nav>
 
-          <div className="space-y-14 text-[15px] leading-relaxed text-muted-foreground">
+          {/* Body */}
+          <div className="space-y-14">
             <LegalSection id="innledning" title="1. Innledning">
               <p>
                 Denne personvernerklæringen forklarer hvordan vi behandler personopplysninger når du
@@ -99,7 +104,7 @@ export default function PersonvernPage() {
                 dashboard, widget og relaterte funksjoner), eller kontakter oss. Vi følger
                 personopplysningsloven og EUs personvernforordning (GDPR).
               </p>
-              <p className="mt-4">
+              <p>
                 Ved å bruke tjenesten aksepterer du denne erklæringen i den utstrekning den gjelder for
                 ditt forhold til oss. Avtalevilkår og databehandleravtaler (DPA) med bedriftskunder kan
                 gi ytterligere detaljer der det er relevant.
@@ -108,102 +113,107 @@ export default function PersonvernPage() {
 
             <LegalSection id="behandlingsansvarlig" title="2. Behandlingsansvarlig">
               <p>
-                <strong className="font-medium text-foreground">{COMPANY_LEGAL_LINE}</strong> er
+                <strong className="font-medium text-[#d0d6e0]">{COMPANY_LEGAL_LINE}</strong> er
                 behandlingsansvarlig for personopplysninger som behandles i forbindelse med vår
-                markedsføring, kundekontakt og leveranse av tjenesten, med mindre annet følger av avtale
-                med din arbeidsgiver eller organisasjon.
+                markedsføring, kundekontakt og leveranse av tjenesten Agenci, med mindre annet følger av
+                avtale med din arbeidsgiver eller organisasjon.
               </p>
-              <p className="mt-4">
-                For henvendelser om personvern kan du bruke{" "}
+              <p>
+                For henvendelser om personvern kan du kontakte oss på{" "}
+                <a href={`mailto:${PRIVACY_EMAIL}`} className={accentLink}>
+                  {PRIVACY_EMAIL}
+                </a>{" "}
+                eller via{" "}
                 <Link href={LANDING_CONTACT_PAGE_PATH} className={accentLink}>
                   kontaktskjemaet
                 </Link>
-                . Merk e-posten med «Personvern».
+                . Merk henvendelsen med «Personvern».
               </p>
             </LegalSection>
 
             <LegalSection id="opplysninger" title="3. Hvilke opplysninger vi behandler">
               <p>Vi kan behandle følgende kategorier av opplysninger, avhengig av hvordan du bruker oss:</p>
-              <ul className="mt-4 list-disc space-y-2 pl-5 marker:text-[#2DD4BF]">
-                <li>
-                  <strong className="font-medium text-foreground">Konto og identitet:</strong> f.eks.
-                  navn, e-postadresse, telefonnummer og innloggingsidentifikatorer (f.eks. via
-                  innloggingsleverandør).
-                </li>
-                <li>
-                  <strong className="font-medium text-foreground">Drift og sikkerhet:</strong> f.eks.
-                  IP-adresse, enhets- og nettleserinformasjon, tidspunkt for henvendelser, logger som er
-                  nødvendige for feilsøking, misbruksforebygging og informasjonssikkerhet.
-                </li>
-                <li>
-                  <strong className="font-medium text-foreground">Innhold i tjenesten:</strong> tekst,
-                  filer og annet materiale du eller din organisasjon velger å laste inn i plattformen
-                  (f.eks. til kunnskapsgrunnlag for AI), samt samtale- og henvendelsesdata som genereres
-                  i tråd med produktets funksjon.
-                </li>
-                <li>
-                  <strong className="font-medium text-foreground">Kundeservice:</strong> opplysninger du
-                  gir når du kontakter oss (f.eks. i skjema, e-post eller chat).
-                </li>
-                <li>
-                  <strong className="font-medium text-foreground">Markedsføring:</strong> hvis du
-                  melder deg på nyhetsbrev eller samtykker til tilsvarende — typisk e-postadresse og
-                  preferanser.
-                </li>
+              <ul className="mt-2 space-y-2">
+                <ListItem label="Konto og identitet">
+                  f.eks. navn, e-postadresse, telefonnummer og innloggingsidentifikatorer (f.eks. via innloggingsleverandør).
+                </ListItem>
+                <ListItem label="Drift og sikkerhet">
+                  f.eks. IP-adresse, enhets- og nettleserinformasjon, tidspunkt for henvendelser, logger som er nødvendige for feilsøking, misbruksforebygging og informasjonssikkerhet.
+                </ListItem>
+                <ListItem label="Innhold i tjenesten">
+                  tekst, filer og annet materiale du eller din organisasjon velger å laste inn i plattformen, samt samtale- og henvendelsesdata som genereres i tråd med produktets funksjon.
+                </ListItem>
+                <ListItem label="Kundeservice">
+                  opplysninger du gir når du kontakter oss (f.eks. i skjema, e-post eller chat).
+                </ListItem>
+                <ListItem label="Markedsføring">
+                  hvis du melder deg på nyhetsbrev eller samtykker til tilsvarende — typisk e-postadresse og preferanser.
+                </ListItem>
               </ul>
             </LegalSection>
 
             <LegalSection id="formal-grunnlag" title="4. Formål og rettslig grunnlag">
               <p>Vi behandler personopplysninger for blant annet følgende formål:</p>
-              <ul className="mt-4 list-disc space-y-2 pl-5 marker:text-[#2DD4BF]">
-                <li>
-                  <strong className="font-medium text-foreground">Levere og forbedre tjenesten</strong>{" "}
-                  — utføre avtale med deg eller din organisasjon (GDPR art. 6 nr. 1 bokstav b).
-                </li>
-                <li>
-                  <strong className="font-medium text-foreground">Kundeservice og kommunikasjon</strong>{" "}
-                  — svare på henvendelser og administrere kundeforhold (avtale og berettiget interesse,
-                  jf. art. 6 nr. 1 bokstav b og f).
-                </li>
-                <li>
-                  <strong className="font-medium text-foreground">Sikkerhet og misbruksforebygging</strong>{" "}
-                  — berettiget interesse i å sikre stabile og trygge tjenester (art. 6 nr. 1 bokstav f).
-                </li>
-                <li>
-                  <strong className="font-medium text-foreground">Regnskaps- og rettslige krav</strong>{" "}
-                  — oppfylle lovpålagte plikter (art. 6 nr. 1 bokstav c).
-                </li>
-                <li>
-                  <strong className="font-medium text-foreground">Nyhetsbrev og markedsføring</strong>{" "}
-                  — der det kreves, innhentes samtykke særskilt (art. 6 nr. 1 bokstav a); du kan når som
-                  helst trekke samtykket tilbake.
-                </li>
+              <ul className="mt-2 space-y-2">
+                <ListItem label="Levere og forbedre tjenesten">
+                  utføre avtale med deg eller din organisasjon (GDPR art. 6 nr. 1 bokstav b).
+                </ListItem>
+                <ListItem label="Kundeservice og kommunikasjon">
+                  svare på henvendelser og administrere kundeforhold (avtale og berettiget interesse, jf. art. 6 nr. 1 bokstav b og f).
+                </ListItem>
+                <ListItem label="Sikkerhet og misbruksforebygging">
+                  berettiget interesse i å sikre stabile og trygge tjenester (art. 6 nr. 1 bokstav f).
+                </ListItem>
+                <ListItem label="Regnskaps- og rettslige krav">
+                  oppfylle lovpålagte plikter (art. 6 nr. 1 bokstav c).
+                </ListItem>
+                <ListItem label="Nyhetsbrev og markedsføring">
+                  der det kreves, innhentes samtykke særskilt (art. 6 nr. 1 bokstav a); du kan når som helst trekke samtykket tilbake.
+                </ListItem>
               </ul>
             </LegalSection>
 
             <LegalSection id="lagring" title="5. Lagring og sletting">
-              <p>
-                Vi lagrer personopplysninger så lenge det er nødvendig for formålene over, og så lenge vi
-                har et gyldig behandlingsgrunnlag. Opplysninger knyttet til kundeforhold oppbevares
-                typisk i avtaleperioden og en periode etter opphør, der det er påkrevd for dokumentasjon,
-                rettskrav eller bokføringsregler. Logger og sikkerhetsdata kan ha kortere eller lengre
-                oppbevaring avhengig av teknisk behov og lovkrav.
-              </p>
-              <p className="mt-4">
-                Når formålet faller bort og vi ikke lenger har grunnlag for lagring, slettes eller
-                anonymiseres opplysningene.
-              </p>
+              <p>Vi lagrer personopplysninger så lenge det er nødvendig for formålene:</p>
+              <ul className="mt-2 space-y-2">
+                <ListItem label="Widget-besøkende (navn, e-post, metadata)">
+                  Anonymiseres automatisk etter 24 timer (ekspirasjon av sesjonen). En daglig rutine erstatter navn og e-post med anonymiserte verdier og sletter enhetsdata.
+                </ListItem>
+                <ListItem label="Brukerkontoer (dashboard)">
+                  Slettes ved opphør av konto. Sletting i autentiseringssystemet trigges automatisk en sletting av tilknyttede data i vår database.
+                </ListItem>
+                <ListItem label="Samtalehistorikk">
+                  Oppbevares i avtaleperioden for å muliggjøre oppfølging. Kan slettes på forespørsel.
+                </ListItem>
+                <ListItem label="Kontaktskjema og nyhetsbrev">
+                  Kontaktskjema-data lagres ikke i vår database — det videresendes til vår e-postinnboks. Nyhetsbrev-adresser behandles frem til samtykke trekkes tilbake.
+                </ListItem>
+              </ul>
             </LegalSection>
 
             <LegalSection id="deling" title="6. Deling og underleverandører">
               <p>
                 Vi deler ikke personopplysninger med tredjeparter for deres egne markedsføringsformål.
-                Vi kan bruke databehandlere (underleverandører) som bistår med drift av tjenesten, for
-                eksempel sky-/hostingleverandør, autentisering, e-post, analyse og kundestøtteverktøy.
-                Slike leverandører behandler opplysninger etter våre instruksjoner og på grunnlag av
-                databehandleravtale der det er påkrevd.
+                Vi bruker følgende databehandlere (underleverandører) for å drifte tjenesten:
               </p>
-              <p className="mt-4">
+              <ul className="mt-2 space-y-2">
+                <ListItem label="Convex (USA/EU-west-1)">
+                  Primær databaseleverandør. Alle data lagres i EU (Irland, AWS eu-west-1).
+                </ListItem>
+                <ListItem label="Clerk (USA)">
+                  Autentisering og kontoadministrasjon. Dataoverføring skjer i henhold til EUs standardkontraktsklausuler (SCC).
+                </ListItem>
+                <ListItem label="OpenAI (USA)">
+                  Behandler samtaleinnhold for å generere AI-svar. Dataoverføring skjer i henhold til SCC. OpenAI beholder ikke data for trening av modeller via API.
+                </ListItem>
+                <ListItem label="Sentry / Functional Software (USA/EU)">
+                  Feilsporing og overvåking. Data lagres i Sentrys EU-region (Tyskland). Ingen video- eller sesjonsopptak er aktivert.
+                </ListItem>
+                <ListItem label="Resend (USA)">
+                  E-postformidling (kontaktskjema og nyhetsbrev). Kun brukt til å levere e-post; innhold lagres ikke permanent hos Resend.
+                </ListItem>
+              </ul>
+              <p>
                 Der din arbeidsgiver eller organisasjon er kunde hos oss, kan opplysninger deles internt
                 i tråd med avtalen og tilgangsstyring i produktet.
               </p>
@@ -219,58 +229,46 @@ export default function PersonvernPage() {
 
             <LegalSection id="rettigheter" title="8. Dine rettigheter">
               <p>Du har følgende rettigheter etter personvernregelverket, med de begrensningene loven setter:</p>
-              <ul className="mt-4 list-disc space-y-2 pl-5 marker:text-[#2DD4BF]">
-                <li>
-                  <strong className="font-medium text-foreground">Innsyn</strong> — få informasjon om
-                  hvilke opplysninger vi behandler om deg.
-                </li>
-                <li>
-                  <strong className="font-medium text-foreground">Retting</strong> — få rettet uriktige
-                  eller ufullstendige opplysninger.
-                </li>
-                <li>
-                  <strong className="font-medium text-foreground">Sletting</strong> — be om sletting når
-                  vilkårene i GDPR er oppfylt.
-                </li>
-                <li>
-                  <strong className="font-medium text-foreground">Begrensning</strong> — i visse
-                  tilfeller kreve begrenset behandling.
-                </li>
-                <li>
-                  <strong className="font-medium text-foreground">Dataportabilitet</strong> — der
-                  behandlingen er automatisert og basert på samtykke eller avtale, kan du i visse
-                  tilfeller motta opplysningene i et strukturert, maskinlesbart format.
-                </li>
-                <li>
-                  <strong className="font-medium text-foreground">Innsigelse</strong> — mot behandling
-                  som er basert på berettiget interesse, med mindre vi har tungtveiende berettigede
-                  grunner.
-                </li>
-                <li>
-                  <strong className="font-medium text-foreground">Trekke samtykke</strong> — når
-                  behandlingen er basert på samtykke.
-                </li>
+              <ul className="mt-2 space-y-2">
+                <ListItem label="Innsyn">få informasjon om hvilke opplysninger vi behandler om deg.</ListItem>
+                <ListItem label="Retting">få rettet uriktige eller ufullstendige opplysninger.</ListItem>
+                <ListItem label="Sletting">be om sletting når vilkårene i GDPR er oppfylt.</ListItem>
+                <ListItem label="Begrensning">i visse tilfeller kreve begrenset behandling.</ListItem>
+                <ListItem label="Dataportabilitet">
+                  der behandlingen er automatisert og basert på samtykke eller avtale, kan du i visse tilfeller motta opplysningene i et strukturert, maskinlesbart format.
+                </ListItem>
+                <ListItem label="Innsigelse">
+                  mot behandling som er basert på berettiget interesse, med mindre vi har tungtveiende berettigede grunner.
+                </ListItem>
+                <ListItem label="Trekke samtykke">når behandlingen er basert på samtykke.</ListItem>
               </ul>
-              <p className="mt-4">
+              <p>
                 For å utøve rettighetene, ta kontakt via{" "}
                 <Link href={LANDING_CONTACT_PAGE_PATH} className={accentLink}>
                   kontaktskjemaet
                 </Link>
-                .                 Vi besvarer henvendelser uten ugrunnlagt opphold og senest innen én måned, med mindre
-                særskilte forhold tilsier forlengelse etter regelverket.
+                . Vi besvarer henvendelser uten ugrunnlagt opphold og senest innen én måned.
               </p>
             </LegalSection>
 
-            <LegalSection id="cookies" title="9. Informasjonskapsler (cookies)">
+            <LegalSection id="cookies" title="9. Informasjonskapsler og lignende teknologi">
+              <p>Vi bruker følgende teknologier:</p>
+              <ul className="mt-2 space-y-2">
+                <ListItem label="Påloggingscookies (nødvendig)">
+                  Clerk setter sesjons-cookies for å holde deg innlogget i dashboardet. Disse er strengt nødvendige og kan ikke deaktiveres.
+                </ListItem>
+                <ListItem label="Brukerpreferanser (nødvendig)">
+                  En cookie lagrer UI-innstillinger (f.eks. sidemenyens tilstand) for påloggede brukere.
+                </ListItem>
+                <ListItem label="Feilsporing (Sentry)">
+                  Sentry registrerer tekniske feil og ytelsesdata for å feilsøke problemer. Ingen sesjonsopptak er aktivert. Data lagres i EU (Germany).
+                </ListItem>
+                <ListItem label="Widget — localStorage">
+                  Chat-widgeten lagrer en anonym sesjons-ID i nettleserens localStorage for å bevare samtalehistorikk mellom sideinnlastinger. Ingen cookies settes av embed-skriptet.
+                </ListItem>
+              </ul>
               <p>
-                Vi bruker informasjonskapsler og lignende teknologi der det er nødvendig for at nettsiden
-                og tjenesten skal fungere (f.eks. innlogging, sikkerhet og preferanser). Vi kan også
-                bruke analyse- eller funksjonelle cookies for å forstå bruk og forbedre opplevelsen, i
-                tråd med samtykkeinnstillinger der det kreves.
-              </p>
-              <p className="mt-4">
-                Du kan endre innstillinger i nettleseren for å blokkere eller slette cookies; merk at
-                deler av tjenesten da kan slutte å fungere som forventet.
+                Du kan endre innstillinger i nettleseren for å blokkere eller slette cookies og localStorage; merk at deler av tjenesten da kan slutte å fungere som forventet.
               </p>
             </LegalSection>
 
@@ -299,7 +297,7 @@ export default function PersonvernPage() {
                 </Link>
                 .
               </p>
-              <p className="mt-4">
+              <p>
                 Du har rett til å klage til tilsynsmyndigheten. I Norge er det{" "}
                 <a
                   href="https://www.datatilsynet.no"
@@ -314,15 +312,10 @@ export default function PersonvernPage() {
             </LegalSection>
           </div>
 
-          <p className="mt-14 rounded-xl border border-[#2DD4BF]/25 bg-[#2DD4BF]/[0.07] px-4 py-3 text-sm leading-relaxed text-muted-foreground shadow-[inset_0_1px_0_0_rgba(255,255,255,0.5)]">
-            <strong className="font-medium text-foreground">Merk:</strong> Erklæringen er ment som et
-            utgangspunkt for typisk SaaS-bruk. Juridisk bør fullt selskapsnavn, organisasjonsnummer,
-            konkrete databehandlere og eventuelle bransjekrav avklares med juridisk rådgiver før den
-            benyttes som eneste grunnlag i kundeavtaler.
-          </p>
         </div>
+
         <MarketingSubpageCta />
-      </article>
+      </div>
     </MarketingPageLayout>
   );
 }
@@ -337,9 +330,22 @@ function LegalSection({
   children: ReactNode;
 }) {
   return (
-    <section id={id} className="scroll-mt-28">
-      <h2 className="text-lg font-semibold tracking-tight text-foreground md:text-xl">{title}</h2>
-      <div className="mt-4 space-y-4">{children}</div>
+    <section id={id} className="scroll-mt-24">
+      <h2 className="text-[18px] font-semibold leading-[1.25] tracking-[-0.4px] text-[#f7f8f8]">
+        {title}
+      </h2>
+      <div className="mt-4 space-y-4 text-[15px] leading-[1.65] text-[#d0d6e0]">{children}</div>
     </section>
+  );
+}
+
+function ListItem({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <li className="flex items-start gap-3 text-[14px] leading-[1.6] text-[#d0d6e0]">
+      <span aria-hidden className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#5e6ad2]" />
+      <span>
+        <span className="font-medium text-[#d0d6e0]">{label}:</span> {children}
+      </span>
+    </li>
   );
 }

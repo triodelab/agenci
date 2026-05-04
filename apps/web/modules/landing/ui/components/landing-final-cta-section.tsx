@@ -5,63 +5,49 @@ import { Button } from "@workspace/ui/components/button";
 import { AuthAwareLink } from "@/components/auth-aware-link";
 import {
   LANDING_AUTH_PATHS,
-  LANDING_MARKETING_PRIMARY_CTA_SURFACE_CLASS,
   LANDING_SECTION_IDS,
   landingSectionHref,
 } from "@/modules/landing/constants";
-import { cn } from "@workspace/ui/lib/utils";
 
 export function LandingFinalCtaSection() {
   return (
     <section
       id={LANDING_SECTION_IDS.finalCta}
       data-landing-nav-surface="dark"
-      className="relative scroll-mt-24 overflow-hidden border-t border-white/10 bg-zinc-950 py-20 md:py-28"
+      className="border-t border-[#1a1a1a] bg-black px-6 py-20 md:py-28 xl:px-8"
       aria-labelledby="final-cta-heading"
     >
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_90%_70%_at_50%_-30%,rgba(45,212,191,0.12),transparent_58%)]"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute bottom-0 left-1/2 h-[min(50vh,420px)] w-[min(120vw,900px)] -translate-x-1/2 rounded-[100%] bg-[radial-gradient(circle_at_center,rgba(45,212,191,0.06),transparent_65%)] blur-3xl"
-      />
-
-      <div className="relative mx-auto max-w-3xl px-5 text-center md:px-10">
-        <h2
-          id="final-cta-heading"
-          className="text-balance text-2xl font-semibold tracking-[-0.03em] text-white sm:text-3xl md:text-[2.15rem] md:leading-[1.15]"
-        >
-          Prøv det gratis — se selv om det funker for deg
-        </h2>
-        <p className="mx-auto mt-4 max-w-xl text-pretty text-[15px] leading-relaxed text-zinc-400 md:text-lg">
-          Opprett konto og ha widgeten live på nettsiden din i dag. Ingen kortinfo, ingen binding.
-          Ser du ikke verdien innen 14 dager, koster det deg ingenting.
-        </p>
-        <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
-          <Button
-            size="lg"
-            className={cn(
-              LANDING_MARKETING_PRIMARY_CTA_SURFACE_CLASS,
-              "h-12 min-w-[11rem] rounded-full px-8 text-[15px] shadow-[0_0_40px_-12px_rgba(45,212,191,0.35)]",
-            )}
-            asChild
+      <div className="mx-auto max-w-[1200px]">
+        {/* CTA panel */}
+        <div className="rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a] px-8 py-16 md:px-16 md:py-20">
+          <p className="mb-5 font-mono text-[11px] tracking-[0.2em] text-[#333]">KOM I GANG</p>
+          <h2
+            id="final-cta-heading"
+            className="max-w-3xl text-[2rem] font-semibold leading-[1.06] tracking-[-0.055em] text-[#f0eeeb] sm:text-[2.6rem] md:text-[3.2rem]"
           >
-            <AuthAwareLink href={LANDING_AUTH_PATHS.signUp} loggedInHref={LANDING_AUTH_PATHS.marketingLoggedInCta}>
-              Start gratis i dag
-            </AuthAwareLink>
-          </Button>
-          <Button
-            size="lg"
-            variant="ghost"
-            className="h-12 rounded-full px-8 text-[15px] font-medium text-zinc-300 hover:bg-white/[0.08] hover:text-white"
-            asChild
-          >
-            <Link href={landingSectionHref("contact")}>
-              Book en demo
-            </Link>
-          </Button>
+            Prøv det gratis — se selv om det funker for deg
+          </h2>
+          <p className="mt-5 max-w-lg text-[14px] leading-relaxed text-[#555]">
+            Opprett konto og ha widgeten live på nettsiden din i dag. Ingen kortinfo, ingen binding.
+            Ser du ikke verdien innen 14 dager, koster det deg ingenting.
+          </p>
+          <div className="mt-10 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
+            <Button
+              className="h-9 rounded-full bg-white px-6 text-[13px] font-medium text-black hover:bg-white/90"
+              asChild
+            >
+              <AuthAwareLink href={LANDING_AUTH_PATHS.signUp} loggedInHref={LANDING_AUTH_PATHS.marketingLoggedInCta}>
+                Start gratis i dag
+              </AuthAwareLink>
+            </Button>
+            <Button
+              variant="ghost"
+              className="h-9 rounded-full px-6 text-[13px] font-medium text-[#555] hover:bg-white/[0.05] hover:text-[#888]"
+              asChild
+            >
+              <Link href={landingSectionHref("contact")}>Book en demo</Link>
+            </Button>
+          </div>
         </div>
       </div>
     </section>

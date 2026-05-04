@@ -9,15 +9,13 @@ import { Button } from "@workspace/ui/components/button";
 import { AuthAwareLink } from "@/components/auth-aware-link";
 import {
   LANDING_AUTH_PATHS,
-  LANDING_HERO_WORKFLOW_LEAD,
-  LANDING_MARKETING_PRIMARY_CTA_SURFACE_CLASS,
   LANDING_NAV_TONE_BOUNDARY_ID,
   LANDING_SECTION_IDS,
   landingSectionHref,
 } from "@/modules/landing/constants";
 import { cn } from "@workspace/ui/lib/utils";
 
-const HERO_ROTATE_MS = 2000;
+const HERO_ROTATE_MS = 2400;
 
 const HERO_DASHBOARD_SLIDES = [
   { src: "/screenshot1.png", label: "Innsikt: volum, trender og status" },
@@ -61,26 +59,20 @@ function HeroDashboardRotator({
           loading={i === 0 ? undefined : "lazy"}
           aria-hidden={i !== index}
           className={cn(
-            "object-cover object-top [image-rendering:auto] transition-opacity duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)]",
+            "object-cover object-top transition-opacity duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)]",
             i === index ? "z-[1] opacity-100" : "z-0 opacity-0",
           )}
         />
       ))}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-y-0 left-0 z-[2] w-[min(22%,120px)] bg-gradient-to-r from-black from-[18%] via-black/55 to-transparent sm:w-[min(18%,100px)]"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-y-0 right-0 z-[2] w-[min(22%,120px)] bg-gradient-to-l from-black from-[18%] via-black/55 to-transparent sm:w-[min(18%,100px)]"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-[32%] bg-gradient-to-t from-[#0a0a0a] from-[20%] via-[#0a0a0a]/75 to-transparent"
-      />
 
+      {/* Edge fades — must match the surface-1 panel bg (#0f1011) */}
+      <div aria-hidden className="pointer-events-none absolute inset-y-0 left-0 z-[2] w-[10%] bg-gradient-to-r from-[#0f1011] to-transparent" />
+      <div aria-hidden className="pointer-events-none absolute inset-y-0 right-0 z-[2] w-[10%] bg-gradient-to-l from-[#0f1011] to-transparent" />
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-1/4 bg-gradient-to-t from-[#0f1011] to-transparent" />
+
+      {/* Slide dots */}
       <div
-        className="pointer-events-auto absolute bottom-3 left-1/2 z-[5] flex -translate-x-1/2 gap-2 md:bottom-4"
+        className="pointer-events-auto absolute bottom-3 left-1/2 z-[5] flex -translate-x-1/2 gap-1.5"
         role="tablist"
         aria-label="Velg forhåndsvisning"
       >
@@ -93,8 +85,8 @@ function HeroDashboardRotator({
             aria-label={slide.label}
             tabIndex={i === index ? 0 : -1}
             className={cn(
-              "h-1.5 rounded-full transition-[width,background-color] duration-500 ease-out",
-              i === index ? "w-7 bg-white/85" : "w-1.5 bg-white/35 hover:bg-white/55",
+              "h-[3px] rounded-full transition-[width,opacity] duration-500",
+              i === index ? "w-5 bg-[#f7f8f8]/70" : "w-[3px] bg-[#f7f8f8]/20 hover:bg-[#f7f8f8]/35",
             )}
             onClick={() => setIndex(i)}
           />
@@ -104,141 +96,101 @@ function HeroDashboardRotator({
   );
 }
 
-/**
- * Referanse: ren svart hero → skarp linje til hvitt. Podium ~40 % i sort sone, ~60 % i hvitt.
- * Undertekst + «Book en demo» ligger på hvitt rett under sokkelen (som i design).
- */
 export function LandingHeroSection() {
   return (
     <section
-      className="relative overflow-hidden pt-[4.25rem]"
+      className="relative overflow-hidden bg-[#010102] pt-[4.25rem]"
       aria-labelledby="landing-hero-heading"
+      id={LANDING_NAV_TONE_BOUNDARY_ID}
+      data-landing-nav-surface="dark"
     >
-      {/* Mørk sone — dyp nøytral base (ikke ren svart), linje for podium */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[min(64vh,700px)] bg-[#050507] sm:h-[min(62vh,660px)] lg:h-[min(64vh,680px)]"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-0 z-0 bg-white top-[min(64vh,700px)] sm:top-[min(62vh,660px)] lg:top-[min(64vh,680px)]"
-      />
-      {/* Subtil vertikal dybde */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[min(64vh,700px)] bg-[linear-gradient(180deg,rgba(255,255,255,0.025)_0%,transparent_42%,rgba(0,0,0,0.2)_100%)] sm:h-[min(62vh,660px)] lg:h-[min(64vh,680px)]"
-      />
-      {/* Myk atmosfære — store, lavmettede blobs som spres utover hero */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-[min(64vh,700px)] bg-[radial-gradient(ellipse_120%_85%_at_50%_-25%,rgba(45,212,191,0.07),transparent_58%)] sm:h-[min(62vh,660px)] lg:h-[min(64vh,680px)]"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-[min(64vh,700px)] bg-[radial-gradient(ellipse_90%_70%_at_95%_20%,rgba(56,189,248,0.045),transparent_52%)] sm:h-[min(62vh,660px)] lg:h-[min(64vh,680px)]"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-[min(64vh,700px)] bg-[radial-gradient(ellipse_85%_65%_at_5%_35%,rgba(20,184,166,0.035),transparent_55%)] sm:h-[min(62vh,660px)] lg:h-[min(64vh,680px)]"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-[min(64vh,700px)] bg-[radial-gradient(ellipse_75%_55%_at_50%_85%,rgba(99,102,241,0.04),transparent_60%)] sm:h-[min(62vh,660px)] lg:h-[min(64vh,680px)]"
-      />
-      {/* Ekstra myk glød bak typografi (bred, lav intensitet) */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute left-1/2 top-[min(18%,140px)] z-[1] h-[min(70vw,560px)] w-[min(130vw,960px)] -translate-x-1/2 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(45,212,191,0.055)_0%,rgba(56,189,248,0.03)_38%,transparent_68%)] blur-[64px]"
-      />
+      {/* ── Hero text ── */}
+      <div className="mx-auto max-w-[1200px] px-6 pt-16 md:pt-24 lg:pt-28 xl:px-8">
 
-      <div className="relative z-10 mx-auto flex max-w-3xl flex-col items-center px-5 pt-10 text-center sm:px-6 md:max-w-4xl md:pt-14 lg:pt-16">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-teal-300/75 md:text-xs">
-          KI-chat for nettsiden din
-        </p>
+        {/*
+          display-xl spec: 80px · weight 600 · line-height 1.05 · letter-spacing -3px
+          -3px at 80px = -0.0375em. Scale down on smaller viewports toward display-md (40px).
+        */}
         <h1
           id="landing-hero-heading"
-          className="mt-4 text-balance text-[2rem] font-semibold leading-[1.12] tracking-[-0.035em] text-white sm:text-4xl md:mt-5 md:text-5xl md:leading-[1.08] lg:text-[3.125rem]"
+          className="max-w-4xl text-[2.5rem] font-semibold leading-[1.05] tracking-[-0.038em] text-[#f7f8f8] sm:text-[3.5rem] md:text-[5rem] lg:text-[5.5rem]"
         >
-          Kunder som ikke får svar, kjøper et annet sted
+          Aldri mer tapte kunder.
         </h1>
-        <p className="mt-5 max-w-[34rem] text-pretty text-[15px] leading-[1.65] text-zinc-400/95 md:mt-6 md:text-lg md:leading-relaxed">
-          Agenci er en chat på nettsiden din som svarer med dine egne ord — FAQ, produktsider, retningslinjer.
-          Kunden får svar der og da. Du slipper å svare de samme spørsmålene om og om igjen.
-        </p>
-        <div className="mt-8 flex flex-col items-center gap-3 sm:mt-10 sm:flex-row sm:gap-4">
+
+        {/*
+          Subtext: body-lg spec (18px · weight 400 · -0.1px tracking · #d0d6e0 ink-muted).
+          Announcement link right-side — matches Linear's "Issue tracking is dead →" pattern.
+        */}
+        <div className="mt-7 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <p className="max-w-lg text-[18px] leading-[1.5] tracking-[-0.01em] text-[#d0d6e0]">
+            AI-chat for nettsiden din — svarer med dine egne ord, hele døgnet.
+          </p>
+          <Link
+            href={landingSectionHref("workflow")}
+            className="inline-flex shrink-0 items-center gap-2 text-[13px] font-medium text-[#8a8f98] transition-colors hover:text-[#f7f8f8]"
+          >
+            <span className="size-1.5 rounded-full bg-[#5e6ad2]" />
+            Se hvordan det fungerer
+            <ChevronRight className="size-3.5" strokeWidth={1.75} />
+          </Link>
+        </div>
+
+        {/*
+          CTAs — button-inverse (white) as primary, button-tertiary as ghost.
+          rounded-[8px] = Linear rounded.md. Never rounded-full on CTAs.
+          padding: 8px 14px per spec.
+        */}
+        <div className="mt-8 flex items-center gap-2.5">
           <Button
-            size="lg"
-            className={cn(
-              LANDING_MARKETING_PRIMARY_CTA_SURFACE_CLASS,
-              "h-12 min-w-[11rem] rounded-full px-8 text-[15px] shadow-[0_0_48px_-14px_rgba(45,212,191,0.28),0_18px_40px_-18px_rgba(45,212,191,0.18)]",
-            )}
+            className="h-9 rounded-[8px] bg-[#f7f8f8] px-[14px] text-[14px] font-medium text-[#010102] transition-colors hover:bg-white"
             asChild
           >
             <AuthAwareLink
               href={LANDING_AUTH_PATHS.signUp}
               loggedInHref={LANDING_AUTH_PATHS.marketingLoggedInCta}
             >
-              Opprett konto
+              Kom i gang gratis
             </AuthAwareLink>
           </Button>
           <Button
-            size="lg"
             variant="ghost"
-            className="h-12 gap-1 rounded-full px-4 text-[15px] font-medium text-white hover:bg-white/[0.08] hover:text-white"
-            asChild
-          >
-            <Link href="/produkt" className="inline-flex items-center gap-1">
-              Se produktet
-              <ChevronRight className="size-4" strokeWidth={2} aria-hidden />
-            </Link>
-          </Button>
-        </div>
-      </div>
-
-      {/* Podium (uten ekstra bak-kort); bilde ~40 % over sort/hvit-linje, ~60 % under (inkl. sokkel) */}
-      <div className="relative z-20 mx-auto mt-4 w-full px-2 sm:mt-6 sm:px-4 md:mt-8 lg:mt-8">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -bottom-2 left-1/2 z-0 h-[min(32vw,280px)] w-[min(92%,520px)] -translate-x-1/2 rounded-[100%] bg-[radial-gradient(ellipse_at_center,rgba(45,212,191,0.09),rgba(56,189,248,0.04)_45%,transparent_72%)] blur-[72px] md:blur-[84px]"
-        />
-
-        <div className="relative z-10 mx-auto w-[min(96vw,1200px)] max-w-full">
-          <div className="relative overflow-hidden rounded-[16px] bg-[#0a0a0a] p-[2px] shadow-[0_0_0_1px_rgba(255,255,255,0.055),0_28px_72px_-28px_rgba(0,0,0,0.88),0_48px_120px_-48px_rgba(45,212,191,0.08)] ring-1 ring-white/[0.08] md:rounded-[20px] md:p-[3px]">
-            <div className="relative overflow-hidden rounded-t-[12px] bg-[#0a0a0a] md:rounded-t-[16px]">
-              <HeroDashboardRotator
-                className="h-[min(48vh,430px)] w-full sm:h-[min(52vh,480px)] md:h-[min(56vh,540px)] lg:h-[min(60vh,600px)]"
-                sizes="(max-width: 960px) 96vw, 1200px"
-              />
-            </div>
-
-            <div className="border-t border-white/[0.07] bg-[#0a0a0a]" aria-hidden>
-              <div className="h-1.5 bg-gradient-to-b from-white/[0.04] to-transparent md:h-2" />
-              <div className="h-2 bg-gradient-to-b from-black/30 to-[#050505] md:h-2.5" />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Hvit sone under podium — som i design (undertekst + Book en demo før feature-grid) */}
-      <div
-        id={LANDING_NAV_TONE_BOUNDARY_ID}
-        className="relative z-20 bg-white px-4 pb-2 pt-8 sm:px-6 sm:pt-10 md:pb-4 md:pt-12"
-      >
-        <p className="mx-auto max-w-2xl text-pretty text-center text-[15px] leading-relaxed text-zinc-600 md:max-w-3xl md:text-lg md:leading-relaxed">
-          {LANDING_HERO_WORKFLOW_LEAD}
-        </p>
-        <div className="mt-6 flex justify-center md:mt-8">
-          <Button
-            size="lg"
-            className={cn(
-              LANDING_MARKETING_PRIMARY_CTA_SURFACE_CLASS,
-              "h-12 min-w-[10.5rem] rounded-full px-8 text-[15px] shadow-[0_14px_36px_-14px_rgba(45,212,191,0.22)]",
-            )}
+            className="h-9 rounded-[8px] px-[14px] text-[14px] font-medium text-[#8a8f98] hover:bg-[#0f1011] hover:text-[#f7f8f8]"
             asChild
           >
             <Link href={landingSectionHref("contact")}>Book en demo</Link>
           </Button>
         </div>
+      </div>
+
+      {/*
+        ── Screenshot panel ──
+        product-screenshot-card spec: surface-1 bg · rounded-xl (16px) · hairline border.
+        Linear resists drop shadows on dark — no heavy shadows.
+        NO atmospheric gradients per DESIGN.md "Don't" rules.
+      */}
+      <div className="mx-auto mt-14 max-w-[1200px] px-4 md:mt-20 xl:px-8">
+        <div className="overflow-hidden rounded-[16px] border border-[#23252a] bg-[#0f1011]">
+          {/* Minimal window chrome */}
+          <div className="flex h-9 items-center gap-1.5 border-b border-[#23252a] px-4">
+            <span className="size-2 rounded-full bg-[#34343a]" />
+            <span className="size-2 rounded-full bg-[#34343a]" />
+            <span className="size-2 rounded-full bg-[#34343a]" />
+          </div>
+          <HeroDashboardRotator
+            className="h-[min(48vh,420px)] w-full sm:h-[min(52vh,460px)] md:h-[min(56vh,520px)] lg:h-[min(62vh,600px)]"
+            sizes="(max-width: 960px) 96vw, 1200px"
+          />
+        </div>
+      </div>
+
+      {/* Lead text below screenshot */}
+      <div className="mx-auto max-w-[1200px] px-6 pb-20 pt-12 md:pb-28 xl:px-8">
+        <p className="max-w-2xl text-[16px] leading-[1.75] text-[#d0d6e0]">
+          Du svarer sannsynligvis de samme spørsmålene hver eneste dag. Åpningstider, priser,
+          leveringstid, returpolicy. Agenci gjør det for deg — på nettsiden, hele døgnet — med
+          svarene du selv har skrevet.
+        </p>
       </div>
     </section>
   );

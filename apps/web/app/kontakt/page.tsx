@@ -1,17 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { MarketingPageLayout } from "@/modules/landing/ui/components/marketing-page-layout";
 import { LandingContactForm } from "@/modules/landing/ui/components/landing-contact-form";
 import { MarketingSubpageCta } from "@/modules/landing/ui/components/marketing-subpage-cta";
-import {
-  landingSectionHref,
-  LANDING_MARKETING_EYEBROW_CLASS,
-  LANDING_MARKETING_FORM_PANEL_CLASS,
-  LANDING_MARKETING_H1_CLASS,
-  LANDING_MARKETING_INLINE_LINK_CLASS,
-  LANDING_MARKETING_LEAD_CLASS,
-} from "@/modules/landing/constants";
-import { cn } from "@workspace/ui/lib/utils";
 
 export const metadata: Metadata = {
   title: "Kontakt",
@@ -23,23 +13,48 @@ export const metadata: Metadata = {
 export default function KontaktPage() {
   return (
     <MarketingPageLayout>
-      <article className="landing-section-mesh border-b border-border/40">
-        <div className="mx-auto max-w-2xl px-4 py-14 md:px-6 md:py-20">
-          <p className={cn("text-sm", LANDING_MARKETING_EYEBROW_CLASS)}>Kontakt</p>
-          <h1 className={cn("mt-3", LANDING_MARKETING_H1_CLASS)}>Snakk med oss</h1>
-          <p className={cn("mt-5", LANDING_MARKETING_LEAD_CLASS)}>
-            Fyll ut skjemaet — eller gå til{" "}
-            <Link href={landingSectionHref("contact")} className={LANDING_MARKETING_INLINE_LINK_CLASS}>
-              kontaktseksjonen på forsiden
-            </Link>{" "}
-            om du allerede er der.
-          </p>
-          <div className={cn("mt-10", LANDING_MARKETING_FORM_PANEL_CLASS)}>
-            <LandingContactForm variant="light" />
+      {/* Hero */}
+      <section className="bg-[#010102]">
+        <div className="mx-auto max-w-[1200px] px-6 py-20 md:py-24 xl:px-8">
+          <div className="grid gap-14 lg:grid-cols-[1fr_1.5fr] lg:gap-20 xl:gap-24">
+
+            {/* Left — intro */}
+            <div className="flex flex-col justify-center">
+              <p className="text-[13px] font-medium uppercase tracking-[0.4px] text-[#8a8f98]">
+                Kontakt
+              </p>
+              <h1 className="mt-5 text-[40px] font-semibold leading-[1.15] tracking-[-1px] text-[#f7f8f8] sm:text-[44px]">
+                Snakk med oss
+              </h1>
+              <p className="mt-5 text-[16px] leading-[1.5] tracking-[-0.05px] text-[#d0d6e0]">
+                Demo, pristilbud eller spørsmål om oppsett — vi svarer vanligvis innen én arbeidsdag.
+              </p>
+
+              <div className="mt-10 space-y-6">
+                <div>
+                  <p className="text-[12px] font-medium uppercase tracking-[0.4px] text-[#62666d]">
+                    E-post
+                  </p>
+                  <p className="mt-1.5 text-[14px] text-[#d0d6e0]">hei@agenci.no</p>
+                </div>
+                <div>
+                  <p className="text-[12px] font-medium uppercase tracking-[0.4px] text-[#62666d]">
+                    Responstid
+                  </p>
+                  <p className="mt-1.5 text-[14px] text-[#d0d6e0]">Innen én arbeidsdag</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Right — form */}
+            <div className="rounded-[12px] border border-[#23252a] bg-[#141516] p-8 md:p-10">
+              <LandingContactForm variant="dark" />
+            </div>
           </div>
         </div>
-        <MarketingSubpageCta omitContactButton />
-      </article>
+      </section>
+
+      <MarketingSubpageCta omitContactButton />
     </MarketingPageLayout>
   );
 }

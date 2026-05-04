@@ -64,14 +64,8 @@ export const WidgetAuthScreen = () => {
     const metadata: Doc<"contactSessions">["metadata"] = {
       userAgent: navigator.userAgent,
       language: navigator.language,
-      languages: navigator.languages?.join(","),
-      platform: navigator.platform,
-      vendor: navigator.vendor,
-      screenResolution: `${screen.width}x${screen.height}`,
-      viewportSize: `${window.innerWidth}x${window.innerHeight}`,
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       timezoneOffset: new Date().getTimezoneOffset(),
-      cookieEnabled: navigator.cookieEnabled,
       referrer: document.referrer || "direct",
       currentUrl: window.location.href,
     };
@@ -178,6 +172,17 @@ export const WidgetAuthScreen = () => {
           >
             Hopp over — chat anonymt
           </button>
+          <p className="text-center text-[11px] leading-relaxed text-muted-foreground/70">
+            Ved å fortsette godtar du at navn og e-post lagres for å håndtere din henvendelse.{" "}
+            <a
+              href="https://agenci.no/personvern"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline underline-offset-2 hover:text-muted-foreground transition-colors"
+            >
+              Personvernerklæring
+            </a>
+          </p>
         </form>
       </Form>
     </>

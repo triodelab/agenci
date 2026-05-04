@@ -8,29 +8,48 @@ export function LandingContactSection() {
     <section
       id={LANDING_SECTION_IDS.contact}
       data-landing-nav-surface="dark"
-      className="relative scroll-mt-24 overflow-hidden border-t border-white/[0.07] bg-[#050507] py-20 md:py-28"
+      className="bg-[#010102]"
       aria-labelledby="contact-heading"
     >
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_0%,rgba(45,212,191,0.07),transparent_55%)]"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute bottom-0 left-1/2 h-[min(40vh,420px)] w-[min(100vw,720px)] -translate-x-1/2 rounded-[100%] bg-[radial-gradient(circle_at_center,rgba(45,212,191,0.05),transparent_68%)] blur-3xl"
-      />
+      <div className="mx-auto max-w-[1200px] px-6 py-24 md:py-[96px] xl:px-8">
+        <div className="grid gap-14 lg:grid-cols-[1fr_1.5fr] lg:gap-20 xl:gap-24">
 
-      <div className="relative mx-auto max-w-2xl px-4 md:px-6">
-        <h2
-          id="contact-heading"
-          className="text-balance text-center text-2xl font-semibold tracking-tight text-white md:text-3xl"
-        >
-          Kontakt oss
-        </h2>
-        <p className="mx-auto mt-3 max-w-lg text-center text-[15px] leading-relaxed text-zinc-400 md:text-base">
-          Demo, pristilbud eller spørsmål om oppsett — vi svarer vanligvis innen én arbeidsdag.
-        </p>
-        <LandingContactForm variant="dark" className="mt-10" />
+          {/* Left */}
+          <div>
+            <p className="mb-4 text-[13px] font-medium uppercase tracking-[0.4px] text-[#8a8f98]">
+              Kontakt
+            </p>
+            <h2
+              id="contact-heading"
+              className="text-[40px] font-semibold leading-[1.15] tracking-[-1px] text-[#f7f8f8] sm:text-[44px]"
+            >
+              La oss ta en prat
+            </h2>
+            <p className="mt-5 max-w-sm text-[16px] leading-[1.5] tracking-[-0.05px] text-[#d0d6e0]">
+              Demo, pristilbud eller spørsmål om oppsett — vi svarer vanligvis innen én arbeidsdag.
+            </p>
+
+            <div className="mt-10 space-y-6">
+              <div>
+                <p className="text-[12px] font-medium uppercase tracking-[0.4px] text-[#62666d]">
+                  E-post
+                </p>
+                <p className="mt-1.5 text-[14px] text-[#d0d6e0]">hei@agenci.no</p>
+              </div>
+              <div>
+                <p className="text-[12px] font-medium uppercase tracking-[0.4px] text-[#62666d]">
+                  Responstid
+                </p>
+                <p className="mt-1.5 text-[14px] text-[#d0d6e0]">Innen én arbeidsdag</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Right — form panel (surface-2 lift over canvas) */}
+          <div className="rounded-[12px] border border-[#23252a] bg-[#141516] p-8 md:p-10">
+            <LandingContactForm variant="dark" />
+          </div>
+        </div>
       </div>
     </section>
   );

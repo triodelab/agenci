@@ -1,16 +1,13 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
+import { AuthAwareLink } from "@/components/auth-aware-link";
 import { MarketingPageLayout } from "@/modules/landing/ui/components/marketing-page-layout";
-import { MarketingSubpageCta } from "@/modules/landing/ui/components/marketing-subpage-cta";
+import { Button } from "@workspace/ui/components/button";
 import {
-  LANDING_MARKETING_EYEBROW_CLASS,
-  LANDING_MARKETING_FEATURE_CARD_CLASS,
-  LANDING_MARKETING_H1_CLASS,
-  LANDING_MARKETING_ICON_TILE_CLASS,
-  LANDING_MARKETING_LEAD_CLASS,
-  LANDING_MARKETING_PILL_CLASS,
+  LANDING_AUTH_PATHS,
+  LANDING_CONTACT_PAGE_PATH,
 } from "@/modules/landing/constants";
-import { cn } from "@workspace/ui/lib/utils";
 import { BookOpen, LayoutDashboard, Sparkles } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -90,79 +87,119 @@ const practicalSteps = [
 export default function HvordanDetVirkerPage() {
   return (
     <MarketingPageLayout>
-      <article className="border-b border-border/40">
-        {/* Hero */}
-        <div className="landing-section-mesh">
-          <div className="mx-auto max-w-3xl px-4 pb-12 pt-14 text-center md:px-6 md:pb-16 md:pt-20">
-            <p className={cn("text-sm", LANDING_MARKETING_EYEBROW_CLASS)}>Slik fungerer det</p>
-            <h1 className={cn("mt-3", LANDING_MARKETING_H1_CLASS)}>
-              Fra widget på nettsiden til full kontroll i dashboardet
-            </h1>
-            <p className={cn("mx-auto mt-5 max-w-2xl", LANDING_MARKETING_LEAD_CLASS)}>
-              Agenci er bygget som en sammenhengende flyt: kunden møter dere på nettsiden, assistenten
-              svarer ut fra deres kunnskap, og teamet styrer kvalitet og volum i samme produkt. Under
-              ser du tre kjernedeler — slik de faktisk ser ut i løsningen.
+      {/* ── Hero ── */}
+      <section className="bg-[#010102]">
+        <div className="mx-auto max-w-[1200px] px-6 pb-20 pt-20 text-center md:pb-24 md:pt-24 xl:px-8">
+          <p className="text-[13px] font-medium uppercase tracking-[0.4px] text-[#8a8f98]">
+            Slik fungerer det
+          </p>
+          <h1 className="mx-auto mt-5 max-w-3xl text-balance text-[40px] font-semibold leading-[1.15] tracking-[-1.8px] text-[#f7f8f8] md:text-[56px] md:leading-[1.10]">
+            Fra widget på nettsiden til full kontroll i dashboardet
+          </h1>
+          <p className="mx-auto mt-6 max-w-2xl text-[18px] leading-[1.5] tracking-[-0.1px] text-[#d0d6e0]">
+            Agenci er bygget som en sammenhengende flyt: kunden møter dere på nettsiden, assistenten
+            svarer ut fra deres kunnskap, og teamet styrer kvalitet og volum i samme produkt.
+          </p>
+          <nav
+            aria-label="Hopp til seksjon"
+            className="mt-10 flex flex-wrap items-center justify-center gap-2"
+          >
+            {visualSections.map((s) => (
+              <a
+                key={s.id}
+                href={`#${s.id}`}
+                className="rounded-full border border-[#23252a] bg-[#0f1011] px-4 py-1.5 text-[13px] font-medium text-[#8a8f98] transition-colors hover:border-[#34343a] hover:text-[#f7f8f8]"
+              >
+                {s.badge.split("·")[1]?.trim() ?? s.title}
+              </a>
+            ))}
+          </nav>
+        </div>
+      </section>
+
+      {/* ── Visual sections ── */}
+      {visualSections.map((section, index) => (
+        <VisualSection key={section.id} section={section} priority={index === 0} />
+      ))}
+
+      {/* ── Praktiske steg ── */}
+      <section className="border-t border-[#23252a] bg-[#0f1011]">
+        <div className="mx-auto max-w-[1200px] px-6 py-24 xl:px-8">
+          <div className="mx-auto max-w-2xl text-center">
+            <p className="text-[13px] font-medium uppercase tracking-[0.4px] text-[#8a8f98]">
+              I praksis
             </p>
-            <nav
-              aria-label="Hopp til seksjon"
-              className="mx-auto mt-10 flex max-w-xl flex-wrap items-center justify-center gap-2 text-sm"
-            >
-              {visualSections.map((s) => (
-                <a key={s.id} href={`#${s.id}`} className={LANDING_MARKETING_PILL_CLASS}>
-                  {s.badge.split("·")[1]?.trim() ?? s.title}
-                </a>
-              ))}
-            </nav>
+            <h2 className="mt-5 text-balance text-[40px] font-semibold leading-[1.15] tracking-[-1px] text-[#f7f8f8]">
+              Tre steg — fra tom side til levende assistent
+            </h2>
+            <p className="mt-5 text-[16px] leading-[1.5] tracking-[-0.05px] text-[#d0d6e0]">
+              Skjermbildene over viser hvordan det ser ut når dere er i gang. Her er den enkle
+              rekkefølgen for å komme dit.
+            </p>
           </div>
-        </div>
 
-        {/* Visual sections */}
-        <div className="divide-y divide-border/50 bg-gradient-to-b from-background via-muted/15 to-background">
-          {visualSections.map((section, index) => (
-            <VisualSection key={section.id} section={section} priority={index === 0} />
-          ))}
+          <ul className="mt-16 grid gap-5 md:grid-cols-3">
+            {practicalSteps.map((s) => (
+              <li
+                key={s.n}
+                className="flex flex-col rounded-[12px] border border-[#23252a] bg-[#141516] p-6"
+              >
+                <span className="text-[13px] font-medium tabular-nums text-[#5e6ad2]">
+                  {s.n}
+                </span>
+                <div className="mt-5 flex h-10 w-10 items-center justify-center rounded-[8px] bg-[#5e6ad2]/10 text-[#5e6ad2]">
+                  <s.icon className="size-5" strokeWidth={1.75} aria-hidden />
+                </div>
+                <h3 className="mt-5 text-[22px] font-medium leading-[1.25] tracking-[-0.4px] text-[#f7f8f8]">
+                  {s.title}
+                </h3>
+                <p className="mt-3 flex-1 text-[14px] leading-[1.5] text-[#d0d6e0]">{s.body}</p>
+              </li>
+            ))}
+          </ul>
         </div>
+      </section>
 
-        {/* Praktiske steg */}
-        <div className="landing-section-mesh border-t border-border/40">
-          <div className="mx-auto max-w-5xl px-4 py-16 md:px-6 md:py-24">
-            <div className="mx-auto max-w-2xl text-center">
-              <p className={cn("text-sm", LANDING_MARKETING_EYEBROW_CLASS)}>I praksis</p>
-              <h2 className="mt-3 text-balance text-2xl font-semibold tracking-[-0.03em] text-foreground md:text-3xl">
-                Tre steg — fra tom side til levende assistent
-              </h2>
-              <p className="mt-4 text-pretty text-muted-foreground">
-                Skjermbildene over viser hvordan det ser ut når dere er i gang. Her er den enkle
-                rekkefølgen for å komme dit.
-              </p>
-            </div>
-            <ul className="mt-14 grid gap-6 md:grid-cols-3 md:gap-8">
-              {practicalSteps.map((s) => (
-                <li
-                  key={s.n}
-                  className={cn(
-                    LANDING_MARKETING_FEATURE_CARD_CLASS,
-                    "relative flex flex-col bg-card/80 ring-1 ring-black/[0.03] dark:ring-white/[0.06]",
-                  )}
+      {/* ── CTA banner ── */}
+      <section className="border-t border-[#23252a] bg-[#010102]">
+        <div className="mx-auto max-w-[1200px] px-6 py-24 xl:px-8">
+          <div className="rounded-[12px] border border-[#23252a] bg-[#0f1011] px-8 py-10 md:px-12 md:py-12">
+            <div className="flex flex-col gap-8 md:flex-row md:items-center md:justify-between">
+              <div>
+                <p className="text-[13px] font-medium uppercase tracking-[0.4px] text-[#8a8f98]">
+                  Neste steg
+                </p>
+                <h2 className="mt-4 max-w-md text-[28px] font-semibold leading-[1.20] tracking-[-0.6px] text-[#f7f8f8]">
+                  Vil dere se Agenci på deres egen nettside?
+                </h2>
+                <p className="mt-3 max-w-md text-[16px] leading-[1.5] tracking-[-0.05px] text-[#d0d6e0]">
+                  Opprett konto for å teste widget og dashboard, eller send oss en melding — vi hjelper
+                  med oppsett og nivå som passer volumet deres.
+                </p>
+              </div>
+              <div className="flex shrink-0 flex-wrap gap-3">
+                <Button
+                  className="h-9 rounded-[8px] bg-[#5e6ad2] px-3.5 text-[14px] font-medium text-white transition-colors hover:bg-[#828fff]"
+                  asChild
                 >
-                  <div className="flex items-start justify-between gap-3">
-                    <span className="text-xs font-bold tabular-nums text-[#2DD4BF] dark:text-teal-400">
-                      {s.n}
-                    </span>
-                    <div className={LANDING_MARKETING_ICON_TILE_CLASS}>
-                      <s.icon className="size-5" strokeWidth={2} aria-hidden />
-                    </div>
-                  </div>
-                  <h3 className="mt-4 text-lg font-semibold text-foreground">{s.title}</h3>
-                  <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground">{s.body}</p>
-                </li>
-              ))}
-            </ul>
+                  <AuthAwareLink
+                    href={LANDING_AUTH_PATHS.signUp}
+                    loggedInHref={LANDING_AUTH_PATHS.marketingLoggedInCta}
+                  >
+                    Kom i gang
+                  </AuthAwareLink>
+                </Button>
+                <Button
+                  className="h-9 rounded-[8px] border border-[#34343a] bg-transparent px-3.5 text-[14px] font-medium text-[#d0d6e0] transition-colors hover:border-[#5e6ad2]/50 hover:bg-[#5e6ad2]/5 hover:text-[#f7f8f8]"
+                  asChild
+                >
+                  <Link href={LANDING_CONTACT_PAGE_PATH}>Kontaktskjema</Link>
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
-
-        <MarketingSubpageCta />
-      </article>
+      </section>
     </MarketingPageLayout>
   );
 }
@@ -178,26 +215,27 @@ function VisualSection({
 
   const textBlock = (
     <div className="flex flex-col justify-center">
-      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#0f766e]">{badge}</p>
-      <h2 className="mt-3 text-2xl font-semibold tracking-tight text-foreground md:text-[1.65rem] md:leading-snug">
+      <p className="text-[13px] font-medium uppercase tracking-[0.4px] text-[#8a8f98]">{badge}</p>
+      <h2 className="mt-5 text-[32px] font-semibold leading-[1.15] tracking-[-1px] text-[#f7f8f8] md:text-[40px]">
         {title}
       </h2>
-      <p className="mt-4 text-[15px] leading-relaxed text-muted-foreground md:text-base">{lead}</p>
-      <ul className="mt-6 list-disc space-y-2 pl-5 text-[15px] leading-relaxed text-muted-foreground marker:text-[#2DD4BF]">
+      <p className="mt-5 text-[16px] leading-[1.5] tracking-[-0.05px] text-[#d0d6e0]">{lead}</p>
+      <ul className="mt-6 space-y-3">
         {bullets.map((b) => (
-          <li key={b}>{b}</li>
+          <li key={b} className="flex items-start gap-3 text-[14px] leading-[1.5] text-[#d0d6e0]">
+            <span
+              aria-hidden
+              className="mt-[6px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#5e6ad2]"
+            />
+            {b}
+          </li>
         ))}
       </ul>
     </div>
   );
 
   const imageBlock = (
-    <div
-      className={cn(
-        "relative overflow-hidden rounded-2xl border border-border/60 bg-[#0a0a0a]/[0.03] shadow-[0_24px_64px_-28px_rgba(0,0,0,0.35)] ring-1 ring-black/[0.06]",
-        "dark:bg-black/20",
-      )}
-    >
+    <div className="overflow-hidden rounded-[16px] border border-[#23252a] bg-[#0f1011]">
       <div className="relative aspect-[16/10] w-full">
         <Image
           src={src}
@@ -205,20 +243,16 @@ function VisualSection({
           fill
           sizes={IMG_SIZES}
           priority={priority}
-          className="object-cover object-top [image-rendering:auto]"
+          className="object-cover object-top"
         />
       </div>
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-background/90 via-background/25 to-transparent"
-      />
     </div>
   );
 
   return (
-    <section id={id} className="scroll-mt-24">
-      <div className="mx-auto max-w-6xl px-4 py-14 md:px-6 md:py-20 lg:py-24">
-        <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16 xl:gap-20">
+    <section id={id} className="scroll-mt-20 border-t border-[#23252a] bg-[#010102]">
+      <div className="mx-auto max-w-[1200px] px-6 py-20 md:py-24 xl:px-8">
+        <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
           {imageFirst ? (
             <>
               {imageBlock}

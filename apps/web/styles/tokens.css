@@ -63,6 +63,21 @@
   --leading-tight: 1.2;
   --leading-normal: 1.5;
   --leading-relaxed: 1.65;
+  /* Linear-inspired landing tokens — pure black canvas */
+  --landing-canvas: #000000;
+  --landing-surface-1: #0a0a0a;
+  --landing-surface-2: #0f0f0f;
+  --landing-ink: #f0eeeb;
+  --landing-ink-muted: #aaa;
+  --landing-ink-subtle: #666;
+  --landing-ink-tertiary: #444;
+  --landing-hairline: #1a1a1a;
+  --landing-hairline-strong: #282828;
+}
+
+.landing-warp {
+  background-color: var(--landing-canvas);
+  color: var(--landing-ink);
 }
 
 .dark {

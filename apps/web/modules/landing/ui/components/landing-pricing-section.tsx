@@ -7,7 +7,6 @@ import { Button } from "@workspace/ui/components/button";
 import { AuthAwareLink } from "@/components/auth-aware-link";
 import {
   LANDING_AUTH_PATHS,
-  LANDING_MARKETING_PRIMARY_CTA_SURFACE_CLASS,
   LANDING_SECTION_IDS,
   landingSectionHref,
 } from "@/modules/landing/constants";
@@ -16,38 +15,51 @@ import { cn } from "@workspace/ui/lib/utils";
 const plans = [
   {
     name: "Gratis",
-    blurb: "Prøv Agenci uten å legge inn kortinfo. Ingen skjulte kostnader.",
+    price: "0",
+    unit: "kr",
+    period: null,
+    blurb: "Kom i gang uten kortinfo. Se hvordan Agenci fungerer for bedriften din.",
     bullets: [
-      "Chat-widget på nettsiden din",
-      "Se alle innkommende samtaler",
+      "Chat-widget på nettsiden",
+      "Alle innkommende samtaler",
       "Manuell oppfølging fra dashboard",
     ],
     cta: "Start gratis",
+    ctaStyle: "secondary" as const,
     href: LANDING_AUTH_PATHS.signUp,
     featured: false,
   },
   {
     name: "Pro",
-    blurb: "Alt du trenger for å la AI-en jobbe for deg. 14 dager gratis — ingen kortinfo.",
+    price: "499",
+    unit: "kr",
+    period: "/ mnd",
+    blurb: "Alt du trenger for å la AI-en jobbe for deg, døgnet rundt.",
     bullets: [
-      "AI-assistent som svarer automatisk",
-      "Last opp FAQ, dokumenter og produktsider",
-      "Tilpass utseende og tone helt selv",
+      "AI-assistent svarer automatisk",
+      "Last opp FAQ og produktsider",
+      "Tilpass utseende og tone",
       "Opptil 5 i teamet",
+      "14 dager gratis — ingen kortinfo",
     ],
     cta: "Prøv 14 dager gratis",
+    ctaStyle: "primary" as const,
     href: LANDING_AUTH_PATHS.signUp,
     featured: true,
   },
   {
     name: "Enterprise",
-    blurb: "Tilpasset oppsett for større team med spesifikke krav.",
+    price: null,
+    unit: null,
+    period: null,
+    blurb: "Skreddersydd oppsett for større team med spesifikke krav og volum.",
     bullets: [
       "Dedikert onboarding og støtte",
       "SLA og egne integrasjoner",
-      "Volumpriser og skreddersydd avtale",
+      "Volumpriser og tilpasset avtale",
     ],
     cta: "Ta kontakt",
+    ctaStyle: "secondary" as const,
     href: landingSectionHref("contact"),
     featured: false,
   },
@@ -59,99 +71,113 @@ export function LandingPricingSection() {
   return (
     <section
       id={LANDING_SECTION_IDS.pricing}
-      data-landing-nav-surface="light"
-      className="relative z-10 -mt-8 scroll-mt-24 rounded-t-[2rem] border-x border-t border-zinc-200/65 bg-[#fafafa] py-20 shadow-[0_-28px_70px_-42px_rgba(0,0,0,0.52)] md:-mt-10 md:rounded-t-[2.5rem] md:py-28"
+      data-landing-nav-surface="dark"
+      className="bg-[#080808]"
       aria-labelledby="pricing-heading"
     >
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_0%,rgba(45,212,191,0.045),transparent_55%)]"
-      />
+      <div className="mx-auto max-w-[1200px] px-6 py-20 md:py-28 xl:px-8">
 
-      <div className="relative mx-auto max-w-6xl px-5 md:px-10 lg:px-12">
-        <div className="mx-auto max-w-2xl text-center">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-teal-700/85 md:text-xs">
-            Priser
-          </p>
+        {/* Header */}
+        <motion.div
+          className="mb-14"
+          initial={reduceMotion ? false : { opacity: 0, y: 14 }}
+          whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <p className="mb-5 font-mono text-[11px] tracking-[0.2em] text-[#333]">PRISER</p>
           <h2
             id="pricing-heading"
-            className="mt-3 text-balance text-2xl font-semibold tracking-[-0.03em] text-zinc-950 sm:text-3xl md:text-[2.1rem] md:leading-[1.15]"
+            className="max-w-xl text-[2rem] font-semibold leading-[1.06] tracking-[-0.055em] text-[#f0eeeb] sm:text-[2.4rem] md:text-[2.8rem]"
           >
             Start gratis. Betal bare når du ser verdien.
           </h2>
-          <p className="mt-4 text-[15px] leading-relaxed text-zinc-600 md:text-base">
-            Gratis konto for å komme i gang. Pro-planen gir deg AI-assistenten og alt annet — med 14 dagers gratis prøveperiode. Ingen kortinfo kreves.
+          <p className="mt-4 max-w-lg text-[14px] leading-relaxed text-[#555]">
+            Gratis konto for å komme i gang. Pro-planen gir deg AI-assistenten med 14 dagers prøveperiode. Ingen kortinfo kreves.
           </p>
-        </div>
+        </motion.div>
 
-        <div className="mx-auto mt-14 grid max-w-5xl gap-6 md:mt-16 md:grid-cols-3 md:gap-5 lg:gap-6">
+        {/* Cards */}
+        <div className="grid gap-3 md:grid-cols-3">
           {plans.map((plan, i) => (
             <motion.article
               key={plan.name}
-              initial={reduceMotion ? false : { opacity: 0, y: 18 }}
+              initial={reduceMotion ? false : { opacity: 0, y: 20 }}
               whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-30px" }}
-              transition={{ duration: 0.45, delay: i * 0.06, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.5, delay: i * 0.07, ease: [0.22, 1, 0.36, 1] }}
               className={cn(
-                "relative flex flex-col rounded-2xl border bg-white/95 p-7 shadow-sm md:p-8",
+                "relative flex flex-col rounded-xl border p-7",
                 plan.featured
-                  ? "border-teal-400/35 shadow-[0_20px_50px_-28px_rgba(45,212,191,0.25),0_0_0_1px_rgba(45,212,191,0.12)] ring-1 ring-teal-500/15"
-                  : "border-zinc-200/90",
+                  ? "border-[#2a2a2a] bg-[#0f0f0f]"
+                  : "border-[#1a1a1a] bg-[#0a0a0a]",
               )}
             >
-              {plan.featured ? (
-                <span
-                  className={cn(
-                    LANDING_MARKETING_PRIMARY_CTA_SURFACE_CLASS,
-                    "absolute -top-3 left-1/2 -translate-x-1/2 rounded-full px-3 py-0.5 text-[11px] uppercase tracking-wider",
-                  )}
-                >
-                  14 dager gratis
-                </span>
-              ) : null}
-              <h3 className="text-lg font-semibold tracking-tight text-zinc-950 md:text-xl">{plan.name}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-zinc-600">{plan.blurb}</p>
-              <ul className="mt-6 flex flex-1 flex-col gap-3 text-sm text-zinc-700">
+              {/* Plan */}
+              <p className="mb-5 text-[11px] font-medium uppercase tracking-[0.25em] text-[#444]">
+                {plan.name}
+              </p>
+
+              {/* Price */}
+              <div className="flex items-baseline gap-1.5">
+                {plan.price !== null ? (
+                  <>
+                    <span className="text-[2.4rem] font-semibold leading-none tracking-[-0.04em] text-[#f0eeeb]">
+                      {plan.price}
+                    </span>
+                    <span className="text-[15px] text-[#444]">
+                      {plan.unit}{plan.period}
+                    </span>
+                  </>
+                ) : (
+                  <span className="text-[1.5rem] font-semibold leading-none tracking-[-0.03em] text-[#f0eeeb]">
+                    Kontakt oss
+                  </span>
+                )}
+              </div>
+
+              <p className="mt-4 text-[13px] leading-relaxed text-[#555]">{plan.blurb}</p>
+
+              {/* Divider */}
+              <div className="my-6 h-px bg-[#1a1a1a]" />
+
+              {/* Bullets */}
+              <ul className="flex flex-1 flex-col gap-2.5">
                 {plan.bullets.map((b) => (
-                  <li key={b} className="flex gap-2.5">
+                  <li key={b} className="flex items-start gap-2.5">
                     <Check
-                      className="mt-0.5 size-4 shrink-0 text-teal-600"
-                      strokeWidth={2}
+                      className="mt-0.5 size-3.5 shrink-0 text-[#444]"
+                      strokeWidth={2.5}
                       aria-hidden
                     />
-                    <span>{b}</span>
+                    <span className="text-[13px] text-[#888]">{b}</span>
                   </li>
                 ))}
               </ul>
+
+              {/* CTA */}
               <div className="mt-8">
-                {plan.href !== LANDING_AUTH_PATHS.signUp ? (
+                {plan.ctaStyle === "primary" ? (
                   <Button
-                    className={cn(
-                      "h-11 w-full rounded-full font-semibold",
-                      plan.featured &&
-                        cn(
-                          LANDING_MARKETING_PRIMARY_CTA_SURFACE_CLASS,
-                          "shadow-[0_8px_28px_-10px_rgba(45,212,191,0.35)]",
-                        ),
-                      !plan.featured && "border-zinc-200 bg-white hover:bg-zinc-50",
-                    )}
-                    variant={plan.featured ? "default" : "outline"}
+                    className="h-9 w-full rounded-lg bg-white text-[13px] font-medium text-black hover:bg-white/90"
+                    asChild
+                  >
+                    <AuthAwareLink href={plan.href} loggedInHref={LANDING_AUTH_PATHS.marketingLoggedInCta}>
+                      {plan.cta}
+                    </AuthAwareLink>
+                  </Button>
+                ) : plan.href !== LANDING_AUTH_PATHS.signUp ? (
+                  <Button
+                    variant="outline"
+                    className="h-9 w-full rounded-lg border-[#222] bg-transparent text-[13px] font-medium text-[#888] hover:border-[#333] hover:bg-[#111] hover:text-[#ccc]"
                     asChild
                   >
                     <Link href={plan.href}>{plan.cta}</Link>
                   </Button>
                 ) : (
                   <Button
-                    className={cn(
-                      "h-11 w-full rounded-full font-semibold",
-                      plan.featured &&
-                        cn(
-                          LANDING_MARKETING_PRIMARY_CTA_SURFACE_CLASS,
-                          "shadow-[0_8px_28px_-10px_rgba(45,212,191,0.35)]",
-                        ),
-                      !plan.featured && "border-zinc-200 bg-white hover:bg-zinc-50",
-                    )}
-                    variant={plan.featured ? "default" : "outline"}
+                    variant="outline"
+                    className="h-9 w-full rounded-lg border-[#222] bg-transparent text-[13px] font-medium text-[#888] hover:border-[#333] hover:bg-[#111] hover:text-[#ccc]"
                     asChild
                   >
                     <AuthAwareLink href={plan.href} loggedInHref={LANDING_AUTH_PATHS.marketingLoggedInCta}>
