@@ -1,7 +1,6 @@
 "use client";
 
 import { WidgetHeader } from "@/modules/widget/ui/components/widget-header";
-import { Button } from "@workspace/ui/components/button";
 import { useAtomValue, useSetAtom } from "jotai";
 import { ChevronRightIcon, MessageSquareTextIcon, MicIcon, PhoneIcon } from "lucide-react";
 import { useWidgetDisplayTitle } from "@/lib/widget-display-title";
@@ -68,58 +67,85 @@ export const WidgetSelectionScreen = () => {
   return (
     <>
       <WidgetHeader>
-        <div className="flex flex-col justify-between gap-y-2 px-2 pb-6 pt-1 font-semibold">
-          <p className="text-center text-[15px] font-semibold tracking-tight">
+        <div className="flex flex-col justify-between gap-y-2 px-2 pb-6 pt-1">
+          <p
+            className="text-center text-[15px] font-semibold tracking-tight"
+            style={{ color: "var(--widget-header-text)" }}
+          >
             {widgetTitle}
           </p>
-          <p className="text-3xl">
+          <p
+            className="text-3xl font-semibold"
+            style={{ color: "var(--widget-header-text)" }}
+          >
             Hei! 👋
           </p>
-          <p className="text-lg">
+          <p
+            className="text-lg font-medium"
+            style={{ color: "var(--widget-header-text)", opacity: 0.85 }}
+          >
             La oss komme i gang
           </p>
         </div>
       </WidgetHeader>
-      <div className="flex flex-1 flex-col gap-y-4 p-4 overflow-y-auto">
-        <Button
-          className="h-16 w-full justify-between"
-          variant="outline"
+      <div
+        className="flex flex-1 flex-col gap-y-3 p-4 overflow-y-auto"
+        style={{ backgroundColor: "var(--widget-bg, #fff)" }}
+      >
+        <button
+          type="button"
+          className="flex h-16 w-full items-center justify-between rounded-xl border px-4 text-[14px] font-medium transition-opacity hover:opacity-80 disabled:opacity-40"
+          style={{
+            backgroundColor: "var(--widget-input-bg, #fff)",
+            borderColor: "var(--widget-input-border, #e4e4e7)",
+            color: "var(--widget-input-text, #18181b)",
+          }}
           onClick={handleNewConversation}
           disabled={isPending}
         >
-          <div className="flex items-center gap-x-2">
-            <MessageSquareTextIcon className="size-4" />
+          <div className="flex items-center gap-x-2.5">
+            <MessageSquareTextIcon className="size-4 shrink-0" />
             <span>Start samtale</span>
           </div>
-          <ChevronRightIcon />
-        </Button>
+          <ChevronRightIcon className="size-4 shrink-0 opacity-50" />
+        </button>
         {hasVapiSecrets && widgetSettings?.vapiSettings?.assistantId && (
-          <Button
-            className="h-16 w-full justify-between"
-            variant="outline"
+          <button
+            type="button"
+            className="flex h-16 w-full items-center justify-between rounded-xl border px-4 text-[14px] font-medium transition-opacity hover:opacity-80 disabled:opacity-40"
+            style={{
+              backgroundColor: "var(--widget-input-bg, #fff)",
+              borderColor: "var(--widget-input-border, #e4e4e7)",
+              color: "var(--widget-input-text, #18181b)",
+            }}
             onClick={() => setScreen("voice")}
             disabled={isPending}
           >
-            <div className="flex items-center gap-x-2">
-              <MicIcon className="size-4" />
+            <div className="flex items-center gap-x-2.5">
+              <MicIcon className="size-4 shrink-0" />
               <span>Start talesamtale</span>
             </div>
-            <ChevronRightIcon />
-          </Button>
+            <ChevronRightIcon className="size-4 shrink-0 opacity-50" />
+          </button>
         )}
         {hasVapiSecrets && widgetSettings?.vapiSettings?.phoneNumber && (
-          <Button
-            className="h-16 w-full justify-between"
-            variant="outline"
+          <button
+            type="button"
+            className="flex h-16 w-full items-center justify-between rounded-xl border px-4 text-[14px] font-medium transition-opacity hover:opacity-80 disabled:opacity-40"
+            style={{
+              backgroundColor: "var(--widget-input-bg, #fff)",
+              borderColor: "var(--widget-input-border, #e4e4e7)",
+              color: "var(--widget-input-text, #18181b)",
+            }}
             onClick={() => setScreen("contact")}
             disabled={isPending}
           >
-            <div className="flex items-center gap-x-2">
-              <PhoneIcon className="size-4" />
+            <div className="flex items-center gap-x-2.5">
+              <PhoneIcon className="size-4 shrink-0" />
               <span>Ring oss</span>
             </div>
-            <ChevronRightIcon />
-          </Button>
+            <ChevronRightIcon className="size-4 shrink-0 opacity-50" />
+          </button>
         )}
       </div>
       <WidgetFooter />

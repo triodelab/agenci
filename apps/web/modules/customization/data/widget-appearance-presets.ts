@@ -36,6 +36,44 @@ export interface WidgetColorPreset {
 
 /** Alle fargepresetter – naturlige, abstrakte og andre. Lys- og mørkvarianter der det gir mening. */
 export const WIDGET_COLOR_PRESETS: WidgetColorPreset[] = [
+  // ——— Agenci-brand ———
+  {
+    name: "Agenci",
+    design: lightPreset({
+      headerColor: "#5e6ad2",
+      headerTextColor: "#ffffff",
+      bubbleUserColor: "#5e6ad2",
+      bubbleUserTextColor: "#ffffff",
+      bubbleAssistantColor: "#f4f4f5",
+      bubbleAssistantTextColor: "#18181b",
+      backgroundColor: "#ffffff",
+      inputBorderColor: "#e4e4e7",
+      inputBackgroundColor: "#ffffff",
+      inputTextColor: "#18181b",
+      inputPlaceholderColor: "#8a8f98",
+      bubbleButtonColor: "#5e6ad2",
+      bubbleButtonIconColor: "#ffffff",
+    }),
+  },
+  {
+    name: "Agenci (mørk)",
+    design: darkPreset({
+      headerColor: "#5e6ad2",
+      headerTextColor: "#f7f8f8",
+      bubbleUserColor: "#5e6ad2",
+      bubbleUserTextColor: "#ffffff",
+      bubbleAssistantColor: "#23252a",
+      bubbleAssistantTextColor: "#d0d6e0",
+      backgroundColor: "#0f1011",
+      inputBorderColor: "#23252a",
+      inputBackgroundColor: "#0f1011",
+      inputTextColor: "#f7f8f8",
+      inputPlaceholderColor: "#8a8f98",
+      bubbleButtonColor: "#5e6ad2",
+      bubbleButtonIconColor: "#ffffff",
+    }),
+  },
+
   // ——— Klassiske (lys) ———
   {
     name: "Blå",

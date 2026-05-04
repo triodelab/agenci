@@ -105,21 +105,31 @@ export const WidgetAuthScreen = () => {
   return (
     <>
       <WidgetHeader>
-        <div className="flex flex-col justify-between gap-y-2 px-2 pb-6 pt-1 font-semibold">
-          <p className="text-center text-[15px] font-semibold tracking-tight">
+        <div className="flex flex-col justify-between gap-y-2 px-2 pb-6 pt-1">
+          <p
+            className="text-center text-[15px] font-semibold tracking-tight"
+            style={{ color: "var(--widget-header-text)" }}
+          >
             {widgetTitle}
           </p>
-          <p className="text-3xl">
+          <p
+            className="text-3xl font-semibold"
+            style={{ color: "var(--widget-header-text)" }}
+          >
             Hei! 👋
           </p>
-          <p className="text-lg">
+          <p
+            className="text-lg font-medium"
+            style={{ color: "var(--widget-header-text, #fff)", opacity: 0.85 }}
+          >
             La oss komme i gang
           </p>
         </div>
       </WidgetHeader>
       <Form {...form}>
         <form
-          className="flex flex-1 flex-col gap-y-4 p-4"
+          className="flex flex-1 flex-col gap-y-3 p-4"
+          style={{ backgroundColor: "var(--widget-bg, #fff)" }}
           onSubmit={form.handleSubmit(onSubmit)}
         >
           <FormField
@@ -129,7 +139,12 @@ export const WidgetAuthScreen = () => {
               <FormItem>
                 <FormControl>
                   <Input
-                    className="h-10 bg-background"
+                    className="h-10 border focus-visible:ring-1"
+                    style={{
+                      backgroundColor: "var(--widget-input-bg, #fff)",
+                      borderColor: "var(--widget-input-border, #e4e4e7)",
+                      color: "var(--widget-input-text, #18181b)",
+                    }}
                     placeholder="f.eks. Ola Nordmann"
                     type="text"
                     {...field}
@@ -146,7 +161,12 @@ export const WidgetAuthScreen = () => {
               <FormItem>
                 <FormControl>
                   <Input
-                    className="h-10 bg-background"
+                    className="h-10 border focus-visible:ring-1"
+                    style={{
+                      backgroundColor: "var(--widget-input-bg, #fff)",
+                      borderColor: "var(--widget-input-border, #e4e4e7)",
+                      color: "var(--widget-input-text, #18181b)",
+                    }}
                     placeholder="f.eks. ola@eksempel.no"
                     type="email"
                     {...field}
@@ -156,29 +176,36 @@ export const WidgetAuthScreen = () => {
               </FormItem>
             )}
           />
-          <Button
-            className="bg-black hover:bg-black/85 border-0 text-white"
+          <button
+            className="mt-1 h-10 w-full rounded-lg text-[14px] font-semibold transition-opacity hover:opacity-90 disabled:opacity-50"
+            style={{
+              backgroundColor: "var(--widget-header-bg, #5e6ad2)",
+              color: "var(--widget-header-text, #fff)",
+            }}
             disabled={form.formState.isSubmitting}
-            size="lg"
             type="submit"
           >
             Fortsett
-          </Button>
+          </button>
           <button
             type="button"
             onClick={() => void onSkip()}
             disabled={form.formState.isSubmitting}
-            className="text-center text-[13px] text-muted-foreground hover:text-foreground transition-colors underline-offset-2 hover:underline"
+            className="text-center text-[13px] transition-opacity hover:opacity-80 underline-offset-2 hover:underline disabled:opacity-40"
+            style={{ color: "var(--widget-input-placeholder, #8a8f98)" }}
           >
             Hopp over — chat anonymt
           </button>
-          <p className="text-center text-[11px] leading-relaxed text-muted-foreground/70">
+          <p
+            className="text-center text-[11px] leading-relaxed"
+            style={{ color: "var(--widget-input-placeholder, #8a8f98)", opacity: 0.8 }}
+          >
             Ved å fortsette godtar du at navn og e-post lagres for å håndtere din henvendelse.{" "}
             <a
               href="https://agenci.no/personvern"
               target="_blank"
               rel="noopener noreferrer"
-              className="underline underline-offset-2 hover:text-muted-foreground transition-colors"
+              className="underline underline-offset-2"
             >
               Personvernerklæring
             </a>

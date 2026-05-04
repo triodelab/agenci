@@ -13,7 +13,6 @@ import {
 import { ConversationStatusIcon } from "@workspace/ui/components/conversation-status-icon";
 import { WidgetHeader } from "@/modules/widget/ui/components/widget-header";
 import { WidgetFooter } from "../components/widget-footer";
-import { Button } from "@workspace/ui/components/button";
 import { usePaginatedQuery } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
 import { useInfiniteScroll } from "@workspace/ui/hooks/use-infinite-scroll";
@@ -63,22 +62,38 @@ export const WidgetInboxScreen = () => {
           <p className="truncate font-semibold">{widgetTitle}</p>
         </div>
       </WidgetHeader>
-      <div className="flex flex-1 flex-col gap-y-2 p-4 overflow-y-auto">
-        {conversations?.results.length > 0 && 
+      <div
+        className="flex flex-1 flex-col gap-y-2 p-4 overflow-y-auto"
+        style={{ backgroundColor: "var(--widget-bg, #fff)" }}
+      >
+        {conversations?.results.length > 0 &&
           conversations?.results.map((conversation) => (
-            <Button
-              className="h-20 w-full justify-between"
+            <button
+              type="button"
+              className="flex h-20 w-full items-center justify-between rounded-xl border px-4 text-left transition-opacity hover:opacity-80"
               key={conversation._id}
+              style={{
+                backgroundColor: "var(--widget-input-bg, #fff)",
+                borderColor: "var(--widget-input-border, #e4e4e7)",
+                color: "var(--widget-input-text, #18181b)",
+              }}
               onClick={() => {
                 setConversationId(conversation._id);
                 setScreen("chat");
               }}
-              variant="outline"
             >
-              <div className="flex w-full flex-col gap-4 overflow-hidden text-start">
+              <div className="flex w-full flex-col gap-2 overflow-hidden">
                 <div className="flex w-full items-center justify-between gap-x-2">
-                  <p className="text-muted-foreground text-xs">Chat</p>
-                  <p className="text-muted-foreground text-xs">
+                  <p
+                    className="text-xs"
+                    style={{ color: "var(--widget-input-placeholder, #8a8f98)" }}
+                  >
+                    Chat
+                  </p>
+                  <p
+                    className="text-xs"
+                    style={{ color: "var(--widget-input-placeholder, #8a8f98)" }}
+                  >
                     {formatDistanceToNow(new Date(conversation._creationTime))}
                   </p>
                 </div>
@@ -89,7 +104,7 @@ export const WidgetInboxScreen = () => {
                   <ConversationStatusIcon status={conversation.status} className="shrink-0" />
                 </div>
               </div>
-            </Button>
+            </button>
           ))
         }
         <InfiniteScrollTrigger
