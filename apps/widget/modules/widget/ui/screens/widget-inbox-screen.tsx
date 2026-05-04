@@ -52,14 +52,20 @@ export const WidgetInboxScreen = () => {
     <>
       <WidgetHeader>
         <div className="flex items-center gap-x-2">
-          <Button
-            variant="transparent"
-            size="icon"
+          <button
+            type="button"
+            className="flex size-9 shrink-0 items-center justify-center rounded-lg transition-opacity hover:opacity-70"
+            style={{ color: "var(--widget-header-text)" }}
             onClick={() => setScreen("selection")}
           >
-            <ArrowLeftIcon />
-          </Button>
-          <p className="truncate font-semibold">{widgetTitle}</p>
+            <ArrowLeftIcon className="size-4" />
+          </button>
+          <p
+            className="truncate font-semibold"
+            style={{ color: "var(--widget-header-text)" }}
+          >
+            {widgetTitle}
+          </p>
         </div>
       </WidgetHeader>
       <div
