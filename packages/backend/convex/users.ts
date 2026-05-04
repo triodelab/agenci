@@ -1,6 +1,7 @@
 import { UserJSON } from "@clerk/backend";
 import { ConvexError, v, Validator } from "convex/values";
 import { internalMutation, query, QueryCtx, mutation } from "./_generated/server";
+import { getOrgIdOrNull } from "./lib/auth";
 
 /** Synk innlogget Clerk-bruker til `users` (tabellen har ikke organizationId). */
 export const add = mutation({
@@ -44,6 +45,47 @@ export const current = query({
   args: {},
   handler: async (ctx) => {
     return await getCurrentUser(ctx);
+  },
+});
+
+export const getExportData = query({
+  args: {},
+  handler: async (ctx) => {
+    const user = await getCurrentUser(ctx);
+    if (!user) return null;
+
+    const orgId = await getOrgIdOrNull(ctx);
+
+    const conversations = orgId
+      ? await ctx.db
+          .query("conversations")
+          .withIndex("by_organization_id", (q) => q.eq("organizationId", orgId))
+          .collect()
+      : [];
+
+    const agents = orgId
+      ? await ctx.db
+          .query("agents")
+          .withIndex("by_organization_id", (q) => q.eq("organizationId", orgId))
+          .collect()
+      : [];
+
+    return {
+      exportedAt: Date.now(),
+      user: { name: user.name, email: user.email },
+      organizationId: orgId,
+      conversations: conversations.map((c) => ({
+        id: c._id,
+        status: c.status,
+        createdAt: c._creationTime,
+      })),
+      agents: agents.map((a) => ({
+        id: a._id,
+        name: a.name,
+        slug: a.slug,
+        createdAt: a.createdAt,
+      })),
+    };
   },
 });
 

@@ -12,6 +12,7 @@ import {
   PlugIcon,
   ZapIcon,
   ChevronLeftIcon,
+  SettingsIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
@@ -55,6 +56,7 @@ function agentNavItems(agentId: string) {
 
 const globalNavItems = [
   { title: "Agenter", url: "/agents", icon: BotIcon, badge: false, exact: true },
+  { title: "Innstillinger", url: "/settings", icon: SettingsIcon, badge: false, exact: true },
 ] as const;
 
 // ─── NavItem ─────────────────────────────────────────────────────────────────
