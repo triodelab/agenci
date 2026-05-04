@@ -131,7 +131,7 @@ export function LandingIntegrationsSection() {
                 integration={integration}
                 index={i}
                 reduceMotion={reduceMotion ?? false}
-                ease={ease}
+                ease={[...ease]}
               />
             ))}
           </div>
@@ -153,7 +153,7 @@ function IntegrationCard({
   integration: Integration;
   index: number;
   reduceMotion: boolean;
-  ease: readonly number[];
+  ease: [number, number, number, number];
 }) {
   return (
     <motion.div
