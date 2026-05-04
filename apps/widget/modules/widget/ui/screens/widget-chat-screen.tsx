@@ -8,7 +8,7 @@ import { useThreadMessages, toUIMessages } from "@convex-dev/agent/react";
 import { WidgetHeader } from "@/modules/widget/ui/components/widget-header";
 import { Button } from "@workspace/ui/components/button";
 import { useAtomValue, useSetAtom } from "jotai";
-import { ArrowLeftIcon, MenuIcon } from "lucide-react";
+import { ArrowLeftIcon, MenuIcon, XIcon, Trash2Icon, ExternalLinkIcon } from "lucide-react";
 import { DicebearAvatar } from "@workspace/ui/components/dicebear-avatar";
 import { useInfiniteScroll } from "@workspace/ui/hooks/use-infinite-scroll";
 import { InfiniteScrollTrigger } from "@workspace/ui/components/infinite-scroll-trigger";
@@ -20,7 +20,7 @@ import {
   screenAtom,
   widgetSettingsAtom,
 } from "../../atoms/widget-atoms";
-import { useAction, useQuery } from "convex/react";
+import { useAction, useQuery, useMutation } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
 import { Form, FormField } from "@workspace/ui/components/form";
 import {
@@ -52,6 +52,9 @@ export const WidgetChatScreen = () => {
   const organizationId = useAtomValue(organizationIdAtom);
   const setConversationId = useSetAtom(
     conversationIdAtomFamily(organizationId || ""),
+  );
+  const setContactSessionId = useSetAtom(
+    contactSessionIdAtomFamily(organizationId || ""),
   );
 
   const widgetSettings = useAtomValue(widgetSettingsAtom);
@@ -115,7 +118,10 @@ export const WidgetChatScreen = () => {
   });
 
   const createMessage = useAction(api.public.messages.create);
+  const deleteMySession = useMutation(api.public.contactSessions.deleteMySession);
   const [isAwaitingAssistant, setIsAwaitingAssistant] = useState(false);
+  const [showPrivacyPanel, setShowPrivacyPanel] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (!conversation || !contactSessionId) {
@@ -135,8 +141,21 @@ export const WidgetChatScreen = () => {
     }
   };
 
+  const handleDeleteHistory = async () => {
+    if (!contactSessionId) return;
+    setIsDeleting(true);
+    try {
+      await deleteMySession({ contactSessionId });
+      setContactSessionId(null);
+      setConversationId(null);
+      setScreen("auth");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   return (
-    <div className="flex h-full min-h-0 min-w-0 flex-1 flex-col">
+    <div className="relative flex h-full min-h-0 min-w-0 flex-1 flex-col">
       <WidgetHeader className="flex w-full min-w-0 shrink-0 items-center justify-between gap-2">
         <div className="flex min-w-0 flex-1 items-center gap-x-2">
           <Button
@@ -155,10 +174,68 @@ export const WidgetChatScreen = () => {
           className="shrink-0"
           size="icon"
           variant="transparent"
+          onClick={() => setShowPrivacyPanel(true)}
+          aria-label="Personvern og innstillinger"
         >
           <MenuIcon />
         </Button>
       </WidgetHeader>
+
+      {/* Privacy panel overlay */}
+      {showPrivacyPanel && (
+        <div className="absolute inset-0 z-10 flex flex-col bg-[var(--widget-bg,#fff)]">
+          <div className="flex items-center justify-between border-b border-[var(--widget-input-border)] px-4 py-3">
+            <p className="text-[14px] font-semibold text-[var(--widget-input-text,#111)]">Personvern</p>
+            <button
+              onClick={() => setShowPrivacyPanel(false)}
+              className="flex size-8 items-center justify-center rounded-lg text-[var(--widget-input-placeholder,#888)] hover:bg-[var(--widget-input-bg)] transition-colors"
+              aria-label="Lukk"
+            >
+              <XIcon className="size-4" />
+            </button>
+          </div>
+          <div className="flex flex-col gap-4 px-4 py-5">
+            <div>
+              <p className="text-[13px] font-medium text-[var(--widget-input-text,#111)]">Slett min chat-historikk</p>
+              <p className="mt-1 text-[12px] leading-relaxed text-[var(--widget-input-placeholder,#888)]">
+                Sletter navn, e-post og samtalehistorikk knyttet til denne enheten. Handlingen kan ikke angres.
+              </p>
+              <button
+                onClick={handleDeleteHistory}
+                disabled={isDeleting || !contactSessionId}
+                className="mt-3 inline-flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-3.5 py-2 text-[12px] font-medium text-red-600 transition-colors hover:bg-red-100 disabled:opacity-50 dark:border-red-900/40 dark:bg-red-950/20 dark:text-red-400 dark:hover:bg-red-950/30"
+              >
+                <Trash2Icon className="size-3.5" />
+                {isDeleting ? "Sletter…" : "Slett min historikk"}
+              </button>
+            </div>
+            <div className="border-t border-[var(--widget-input-border)] pt-4">
+              <p className="text-[13px] font-medium text-[var(--widget-input-text,#111)]">Andre rettigheter</p>
+              <p className="mt-1 text-[12px] leading-relaxed text-[var(--widget-input-placeholder,#888)]">
+                For innsyn, retting eller fullstendig sletting av samtaleinnhold, kontakt oss på{" "}
+                <a
+                  href="mailto:post@triodelab.no"
+                  className="underline"
+                >
+                  post@triodelab.no
+                </a>{" "}
+                med emnet «Personvern».
+              </p>
+            </div>
+            <div className="border-t border-[var(--widget-input-border)] pt-4">
+              <a
+                href="https://agenci.no/personvern"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-[12px] text-[var(--widget-input-placeholder,#888)] underline-offset-2 hover:underline"
+              >
+                <ExternalLinkIcon className="size-3" />
+                Les vår personvernerklæring
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
       <AIConversation className="min-h-0 min-w-0 flex-1 bg-[var(--widget-bg,#fff)]">
         <AIConversationContent className="px-3 pb-2 pt-1 sm:px-4">
           <InfiniteScrollTrigger
