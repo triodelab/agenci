@@ -191,7 +191,7 @@ export const IntegrationsView = () => {
                 <PlatformCard
                   key={integration.id}
                   integration={integration}
-                  description={PLATFORM_META[integration.id]}
+                  description={PLATFORM_META[integration.id as IntegrationId]}
                   selected={selectedPlatform === integration.id}
                   style={{ animationDelay: `${i * 60}ms` }}
                   onClick={() => handlePlatformClick(integration.id)}
