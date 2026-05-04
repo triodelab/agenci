@@ -8,7 +8,7 @@ import { useThreadMessages, toUIMessages } from "@convex-dev/agent/react";
 import { WidgetHeader } from "@/modules/widget/ui/components/widget-header";
 import { Button } from "@workspace/ui/components/button";
 import { useAtomValue, useSetAtom } from "jotai";
-import { ArrowLeftIcon, MenuIcon, XIcon, Trash2Icon, ExternalLinkIcon } from "lucide-react";
+import { ArrowLeftIcon, MenuIcon, ExternalLinkIcon } from "lucide-react";
 import { DicebearAvatar } from "@workspace/ui/components/dicebear-avatar";
 import { useInfiniteScroll } from "@workspace/ui/hooks/use-infinite-scroll";
 import { InfiniteScrollTrigger } from "@workspace/ui/components/infinite-scroll-trigger";
@@ -146,11 +146,14 @@ export const WidgetChatScreen = () => {
     setIsDeleting(true);
     try {
       await deleteMySession({ contactSessionId });
+    } catch {
+      // best-effort; clear local state regardless
+    } finally {
       setContactSessionId(null);
       setConversationId(null);
-      setScreen("auth");
-    } finally {
       setIsDeleting(false);
+      setShowPrivacyPanel(false);
+      setScreen("auth");
     }
   };
 
@@ -181,58 +184,52 @@ export const WidgetChatScreen = () => {
         </Button>
       </WidgetHeader>
 
-      {/* Privacy panel overlay */}
+      {/* Action sheet */}
       {showPrivacyPanel && (
-        <div className="absolute inset-0 z-10 flex flex-col bg-[var(--widget-bg,#fff)]">
-          <div className="flex items-center justify-between border-b border-[var(--widget-input-border)] px-4 py-3">
-            <p className="text-[14px] font-semibold text-[var(--widget-input-text,#111)]">Personvern</p>
-            <button
-              onClick={() => setShowPrivacyPanel(false)}
-              className="flex size-8 items-center justify-center rounded-lg text-[var(--widget-input-placeholder,#888)] hover:bg-[var(--widget-input-bg)] transition-colors"
-              aria-label="Lukk"
+        <div className="absolute inset-0 z-10 flex flex-col justify-end">
+          <div
+            className="absolute inset-0"
+            style={{ backgroundColor: "rgba(0,0,0,0.32)" }}
+            onClick={() => setShowPrivacyPanel(false)}
+          />
+          <div className="relative z-10 mx-2 mb-2 flex flex-col gap-2">
+            {/* Actions */}
+            <div
+              className="overflow-hidden rounded-2xl"
+              style={{ backgroundColor: "var(--widget-bg, #fff)" }}
             >
-              <XIcon className="size-4" />
-            </button>
-          </div>
-          <div className="flex flex-col gap-4 px-4 py-5">
-            <div>
-              <p className="text-[13px] font-medium text-[var(--widget-input-text,#111)]">Slett min chat-historikk</p>
-              <p className="mt-1 text-[12px] leading-relaxed text-[var(--widget-input-placeholder,#888)]">
-                Sletter navn, e-post og samtalehistorikk knyttet til denne enheten. Handlingen kan ikke angres.
-              </p>
               <button
+                type="button"
                 onClick={handleDeleteHistory}
-                disabled={isDeleting || !contactSessionId}
-                className="mt-3 inline-flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-3.5 py-2 text-[12px] font-medium text-red-600 transition-colors hover:bg-red-100 disabled:opacity-50 dark:border-red-900/40 dark:bg-red-950/20 dark:text-red-400 dark:hover:bg-red-950/30"
+                disabled={isDeleting}
+                className="w-full px-4 py-[15px] text-[15px] font-normal text-red-500 transition-opacity active:opacity-50 disabled:opacity-40"
               >
-                <Trash2Icon className="size-3.5" />
                 {isDeleting ? "Sletter…" : "Slett min historikk"}
               </button>
-            </div>
-            <div className="border-t border-[var(--widget-input-border)] pt-4">
-              <p className="text-[13px] font-medium text-[var(--widget-input-text,#111)]">Andre rettigheter</p>
-              <p className="mt-1 text-[12px] leading-relaxed text-[var(--widget-input-placeholder,#888)]">
-                For innsyn, retting eller fullstendig sletting av samtaleinnhold, kontakt oss på{" "}
-                <a
-                  href="mailto:post@triodelab.no"
-                  className="underline"
-                >
-                  post@triodelab.no
-                </a>{" "}
-                med emnet «Personvern».
-              </p>
-            </div>
-            <div className="border-t border-[var(--widget-input-border)] pt-4">
+              <div style={{ height: "0.5px", backgroundColor: "var(--widget-input-border, #e4e4e7)" }} />
               <a
                 href="https://agenci.no/personvern"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-[12px] text-[var(--widget-input-placeholder,#888)] underline-offset-2 hover:underline"
+                className="flex w-full items-center justify-between px-4 py-[15px] text-[15px] transition-opacity active:opacity-50"
+                style={{ color: "var(--widget-input-text, #18181b)" }}
               >
-                <ExternalLinkIcon className="size-3" />
-                Les vår personvernerklæring
+                Personvernerklæring
+                <ExternalLinkIcon className="size-3.5 opacity-35" />
               </a>
             </div>
+            {/* Cancel */}
+            <button
+              type="button"
+              onClick={() => setShowPrivacyPanel(false)}
+              className="w-full rounded-2xl px-4 py-[15px] text-[15px] font-semibold transition-opacity active:opacity-50"
+              style={{
+                backgroundColor: "var(--widget-bg, #fff)",
+                color: "var(--widget-input-text, #18181b)",
+              }}
+            >
+              Avbryt
+            </button>
           </div>
         </div>
       )}
