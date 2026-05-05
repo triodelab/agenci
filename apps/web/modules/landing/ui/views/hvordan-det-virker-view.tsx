@@ -240,71 +240,40 @@ function HeroSection({ reduceMotion }: { reduceMotion: boolean }) {
   );
 }
 
-// ─── Flow diagram ─────────────────────────────────────────────────────────────
+// ─── Flow ─────────────────────────────────────────────────────────────────────
 
 const FLOW_STEPS = [
-  { n: "01", label: "Widget", sub: "Kunden møter dere på nettsiden" },
-  { n: "02", label: "AI",     sub: "Svarer automatisk, døgnet rundt" },
+  { n: "01", label: "Widget",    sub: "Kunden møter dere på nettsiden" },
+  { n: "02", label: "AI",        sub: "Svarer automatisk, døgnet rundt" },
   { n: "03", label: "Dashboard", sub: "Teamet ser og styrer alt" },
 ] as const;
 
 function FlowSection({ reduceMotion }: { reduceMotion: boolean }) {
   return (
     <section className="border-y border-[#1a1b1e] bg-[#010102]">
-      <div className="mx-auto max-w-[1200px] px-6 py-20 xl:px-8">
-
-        {/* Connecting line — full width, sits at the dot level */}
-        <div className="relative">
-          <div className="absolute top-[11px] left-0 right-0 hidden h-px bg-[#1a1b1e] sm:block" />
-          <motion.div
-            className="absolute top-[11px] left-0 hidden h-px sm:block"
-            initial={reduceMotion ? false : { width: 0 }}
-            whileInView={{ width: "100%" }}
-            viewport={{ once: true, margin: "-40px" }}
-            transition={{ duration: 1.1, delay: 0.2, ease }}
-            style={{
-              background:
-                "linear-gradient(to right, rgba(94,106,210,0.5), rgba(94,106,210,0.15))",
-            }}
-          />
-
-          {/* Three nodes */}
-          <div className="relative flex flex-col gap-10 sm:flex-row sm:justify-between">
-            {FLOW_STEPS.map((step, i) => (
-              <motion.div
-                key={step.n}
-                initial={reduceMotion ? false : { opacity: 0, y: 14 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-40px" }}
-                transition={{ duration: 0.5, delay: 0.15 + i * 0.14, ease }}
-                className="flex flex-col gap-4"
-              >
-                {/* Dot indicator */}
-                <div className="flex items-center gap-3">
-                  <div className="size-[22px] shrink-0 rounded-full border border-[#5e6ad2]/40 bg-[#010102] ring-4 ring-[#010102]">
-                    <div className="flex size-full items-center justify-center rounded-full bg-[#5e6ad2]/10">
-                      <span className="size-1.5 rounded-full bg-[#5e6ad2]" />
-                    </div>
-                  </div>
-                  <span className="font-mono text-[10px] font-medium tracking-[0.2em] text-[#3e3e44]">
-                    {step.n}
-                  </span>
-                </div>
-
-                {/* Text */}
-                <div className="pl-1">
-                  <p className="text-[17px] font-semibold tracking-[-0.02em] text-[#f7f8f8]">
-                    {step.label}
-                  </p>
-                  <p className="mt-1 text-[13px] leading-relaxed text-[#62666d]">
-                    {step.sub}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+      <div className="mx-auto max-w-[1200px] px-6 xl:px-8">
+        <div className="grid divide-y divide-[#1a1b1e] sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+          {FLOW_STEPS.map((step, i) => (
+            <motion.div
+              key={step.n}
+              initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.5, delay: i * 0.1, ease }}
+              className="flex flex-col gap-2 px-8 py-12"
+            >
+              <span className="font-mono text-[11px] font-medium tracking-[0.2em] text-[#5e6ad2]">
+                {step.n}
+              </span>
+              <p className="mt-1 text-[18px] font-semibold tracking-[-0.025em] text-[#f7f8f8]">
+                {step.label}
+              </p>
+              <p className="text-[13px] leading-relaxed text-[#62666d]">
+                {step.sub}
+              </p>
+            </motion.div>
+          ))}
         </div>
-
       </div>
     </section>
   );
