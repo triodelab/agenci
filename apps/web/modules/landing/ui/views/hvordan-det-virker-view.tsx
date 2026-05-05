@@ -4,9 +4,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion, useReducedMotion } from "motion/react";
 import {
-  Code2Icon,
-  ZapIcon,
-  LayoutDashboardIcon,
   SparklesIcon,
   BookOpenIcon,
   BarChart2Icon,
@@ -65,33 +62,6 @@ const VISUAL_SECTIONS = [
     src: "/screenshot3.png",
     alt: "Agenci oppsett og snarveier",
     imageFirst: true,
-  },
-] as const;
-
-const FLOW_NODES = [
-  {
-    icon: Code2Icon,
-    label: "Widget",
-    sub: "Kunden møter dere",
-    color: "#5e6ad2",
-    bg: "rgba(94,106,210,0.08)",
-    border: "rgba(94,106,210,0.25)",
-  },
-  {
-    icon: ZapIcon,
-    label: "AI",
-    sub: "Svarer automatisk",
-    color: "#27a644",
-    bg: "rgba(39,166,68,0.08)",
-    border: "rgba(39,166,68,0.25)",
-  },
-  {
-    icon: LayoutDashboardIcon,
-    label: "Dashboard",
-    sub: "Teamet styrer",
-    color: "#5e6ad2",
-    bg: "rgba(94,106,210,0.08)",
-    border: "rgba(94,106,210,0.25)",
   },
 ] as const;
 
@@ -272,83 +242,69 @@ function HeroSection({ reduceMotion }: { reduceMotion: boolean }) {
 
 // ─── Flow diagram ─────────────────────────────────────────────────────────────
 
+const FLOW_STEPS = [
+  { n: "01", label: "Widget", sub: "Kunden møter dere på nettsiden" },
+  { n: "02", label: "AI",     sub: "Svarer automatisk, døgnet rundt" },
+  { n: "03", label: "Dashboard", sub: "Teamet ser og styrer alt" },
+] as const;
+
 function FlowSection({ reduceMotion }: { reduceMotion: boolean }) {
   return (
-    <section className="border-y border-[#23252a] bg-[#0f1011]">
-      <div className="mx-auto max-w-[1200px] px-6 py-16 xl:px-8">
-        <motion.p
-          initial={reduceMotion ? false : { opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true, margin: "-40px" }}
-          transition={{ duration: 0.5, ease }}
-          className="mb-10 text-center text-[12px] font-medium uppercase tracking-[0.2em] text-[#3e3e44]"
-        >
-          Slik henger det sammen
-        </motion.p>
+    <section className="border-y border-[#1a1b1e] bg-[#010102]">
+      <div className="mx-auto max-w-[1200px] px-6 py-20 xl:px-8">
 
-        <div className="flex flex-col items-center gap-6 sm:flex-row sm:justify-center sm:gap-0">
-          {FLOW_NODES.map((node, i) => (
-            <div key={node.label} className="flex items-center gap-0">
-              {/* Node */}
+        {/* Connecting line — full width, sits at the dot level */}
+        <div className="relative">
+          <div className="absolute top-[11px] left-0 right-0 hidden h-px bg-[#1a1b1e] sm:block" />
+          <motion.div
+            className="absolute top-[11px] left-0 hidden h-px sm:block"
+            initial={reduceMotion ? false : { width: 0 }}
+            whileInView={{ width: "100%" }}
+            viewport={{ once: true, margin: "-40px" }}
+            transition={{ duration: 1.1, delay: 0.2, ease }}
+            style={{
+              background:
+                "linear-gradient(to right, rgba(94,106,210,0.5), rgba(94,106,210,0.15))",
+            }}
+          />
+
+          {/* Three nodes */}
+          <div className="relative flex flex-col gap-10 sm:flex-row sm:justify-between">
+            {FLOW_STEPS.map((step, i) => (
               <motion.div
-                initial={reduceMotion ? false : { opacity: 0, scale: 0.88 }}
-                whileInView={{ opacity: 1, scale: 1 }}
+                key={step.n}
+                initial={reduceMotion ? false : { opacity: 0, y: 14 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-40px" }}
-                transition={{ duration: 0.45, delay: i * 0.14, ease }}
-                className="flex flex-col items-center gap-3 text-center"
+                transition={{ duration: 0.5, delay: 0.15 + i * 0.14, ease }}
+                className="flex flex-col gap-4"
               >
-                <div
-                  className="flex size-[60px] items-center justify-center rounded-[14px]"
-                  style={{
-                    backgroundColor: node.bg,
-                    border: `1px solid ${node.border}`,
-                  }}
-                >
-                  <node.icon
-                    className="size-6"
-                    style={{ color: node.color }}
-                    strokeWidth={1.5}
-                  />
+                {/* Dot indicator */}
+                <div className="flex items-center gap-3">
+                  <div className="size-[22px] shrink-0 rounded-full border border-[#5e6ad2]/40 bg-[#010102] ring-4 ring-[#010102]">
+                    <div className="flex size-full items-center justify-center rounded-full bg-[#5e6ad2]/10">
+                      <span className="size-1.5 rounded-full bg-[#5e6ad2]" />
+                    </div>
+                  </div>
+                  <span className="font-mono text-[10px] font-medium tracking-[0.2em] text-[#3e3e44]">
+                    {step.n}
+                  </span>
                 </div>
-                <div>
-                  <p className="text-[13px] font-semibold tracking-[-0.01em] text-[#d0d6e0]">
-                    {node.label}
+
+                {/* Text */}
+                <div className="pl-1">
+                  <p className="text-[17px] font-semibold tracking-[-0.02em] text-[#f7f8f8]">
+                    {step.label}
                   </p>
-                  <p className="mt-0.5 text-[11px] text-[#62666d]">{node.sub}</p>
+                  <p className="mt-1 text-[13px] leading-relaxed text-[#62666d]">
+                    {step.sub}
+                  </p>
                 </div>
               </motion.div>
-
-              {/* Animated connector */}
-              {i < FLOW_NODES.length - 1 && (
-                <div className="relative mx-6 hidden h-px w-24 sm:block">
-                  <div className="absolute inset-0 bg-[#23252a]" />
-                  <motion.div
-                    className="absolute inset-0 bg-gradient-to-r from-[#5e6ad2]/50 to-[#27a644]/50"
-                    initial={reduceMotion ? false : { scaleX: 0 }}
-                    whileInView={{ scaleX: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.7, delay: 0.3 + i * 0.14, ease }}
-                    style={{ transformOrigin: "left" }}
-                  />
-                  {/* Moving dot */}
-                  {!reduceMotion && (
-                    <motion.div
-                      className="absolute top-1/2 size-1.5 -translate-y-1/2 rounded-full bg-[#5e6ad2]"
-                      animate={{ x: [0, 96, 0], opacity: [0, 1, 0] }}
-                      transition={{
-                        duration: 2.4,
-                        delay: i * 0.8,
-                        repeat: Infinity,
-                        ease: "easeInOut",
-                      }}
-                      style={{ left: -3 }}
-                    />
-                  )}
-                </div>
-              )}
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
+
       </div>
     </section>
   );
