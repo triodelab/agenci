@@ -123,11 +123,10 @@ export const UploadDialog = ({
         <DialogHeader className="flex flex-row items-start gap-4 border-border border-b bg-card px-6 pt-6 pb-5 text-left sm:gap-5">
           <div className="min-w-0 flex-1 space-y-2">
             <DialogTitle className="font-semibold text-xl text-foreground tracking-tight">
-              Upload Document
+              Last opp dokument
             </DialogTitle>
             <DialogDescription className="text-[14px] leading-relaxed text-muted-foreground">
-              Upload documents to your knowledge base for AI-powered search and
-              retrieval.
+              Last opp dokumenter til kunnskapsbasen for AI-drevet søk og gjenfinning.
             </DialogDescription>
           </div>
           <DialogClose
@@ -139,7 +138,7 @@ export const UploadDialog = ({
             type="button"
           >
             <XIcon className="size-4" strokeWidth={2} />
-            <span className="sr-only">Close</span>
+            <span className="sr-only">Lukk</span>
           </DialogClose>
         </DialogHeader>
 
@@ -149,7 +148,7 @@ export const UploadDialog = ({
               className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.12em]"
               htmlFor="category"
             >
-              Category
+              Kategori
             </Label>
             <Input
               className={cn(inputClean)}
@@ -160,7 +159,7 @@ export const UploadDialog = ({
                   category: e.target.value,
                 }))
               }
-              placeholder="e.g. Documentation, Support, Product"
+              placeholder="f.eks. Dokumentasjon, Support, Produkt"
               type="text"
               value={uploadForm.category}
             />
@@ -171,9 +170,9 @@ export const UploadDialog = ({
               className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.12em]"
               htmlFor="filename"
             >
-              Filename{" "}
+              Filnavn{" "}
               <span className="font-normal normal-case tracking-normal text-muted-foreground/80">
-                (optional)
+                (valgfritt)
               </span>
             </Label>
             <Input
@@ -185,7 +184,7 @@ export const UploadDialog = ({
                   filename: e.target.value,
                 }))
               }
-              placeholder="Override default filename"
+              placeholder="Overstyr standard filnavn"
               type="text"
               value={uploadForm.filename}
             />
@@ -193,7 +192,7 @@ export const UploadDialog = ({
 
           <div className="space-y-2">
             <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.12em]">
-              File
+              Fil
             </span>
             <Dropzone
               accept={{
@@ -219,10 +218,10 @@ export const UploadDialog = ({
                   </span>
                   <div className="space-y-1.5 text-center">
                     <p className="font-medium text-[15px] text-foreground">
-                      Drop a file here or click to browse
+                      Slipp en fil her eller klikk for å velge
                     </p>
                     <p className="text-balance text-sm text-muted-foreground">
-                      PDF, TXT or CSV · one file
+                      PDF, TXT eller CSV · én fil
                     </p>
                   </div>
                 </div>
@@ -237,7 +236,7 @@ export const UploadDialog = ({
                       {uploadedFiles[0]?.name}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      Drag and drop or click to replace
+                      Dra og slipp eller klikk for å erstatte
                     </p>
                   </div>
                 </div>
@@ -254,7 +253,7 @@ export const UploadDialog = ({
             type="button"
             variant="outline"
           >
-            Cancel
+            Avbryt
           </Button>
           <Button
             className="h-11 min-w-[7.5rem] rounded-xl font-medium"
@@ -265,7 +264,7 @@ export const UploadDialog = ({
             type="button"
             variant="default"
           >
-            {isUploading ? "Uploading…" : "Upload"}
+            {isUploading ? "Laster opp…" : "Last opp"}
           </Button>
         </DialogFooter>
       </DialogContent>

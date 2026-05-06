@@ -189,13 +189,15 @@ export function LandingNav({ variant = "dark" }: LandingNavProps) {
       <div
         id="landing-nav-mobile"
         className={cn(
-          "border-t lg:hidden",
-          effectiveIsDark ? "border-[#23252a] bg-[#010102]/95 backdrop-blur-xl" : "border-border bg-background",
+          "absolute right-4 top-[4.25rem] z-50 w-64 rounded-xl border shadow-lg lg:hidden",
+          effectiveIsDark
+            ? "border-[#23252a] bg-[#0f1011]/95 backdrop-blur-xl"
+            : "border-border bg-background",
           open ? "block" : "hidden",
         )}
       >
         <nav
-          className="flex max-h-[min(70vh,calc(100dvh-5rem))] flex-col gap-1 overflow-y-auto px-4 py-4"
+          className="flex max-h-[min(70vh,calc(100dvh-5rem))] flex-col gap-1 overflow-y-auto px-3 py-3"
           aria-label="Mobilmeny"
         >
           {LANDING_NAV_PRIMARY_LINKS.map((item) => (

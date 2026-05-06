@@ -145,7 +145,7 @@ export const WidgetAuthScreen = () => {
                       borderColor: "var(--widget-input-border, #e4e4e7)",
                       color: "var(--widget-input-text, #18181b)",
                     }}
-                    placeholder="f.eks. Ola Nordmann"
+                    placeholder="Ditt navn"
                     type="text"
                     {...field}
                   />
@@ -167,7 +167,7 @@ export const WidgetAuthScreen = () => {
                       borderColor: "var(--widget-input-border, #e4e4e7)",
                       color: "var(--widget-input-text, #18181b)",
                     }}
-                    placeholder="f.eks. ola@eksempel.no"
+                    placeholder="din@epost.no"
                     type="email"
                     {...field}
                   />

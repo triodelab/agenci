@@ -52,11 +52,10 @@ export const DeleteFileDialog = ({
       <DialogContent className="dashboard-app-shell rounded-2xl border border-border/80 bg-card text-card-foreground shadow-2xl sm:max-w-md">
         <DialogHeader>
           <DialogTitle>
-            Delete File
+            Slett fil
           </DialogTitle>
           <DialogDescription>
-            Are you sure you want to delete this file? This action cannot be
-            undone.
+            Er du sikker på at du vil slette denne filen? Handlingen kan ikke angres.
           </DialogDescription>
         </DialogHeader>
 
@@ -65,7 +64,7 @@ export const DeleteFileDialog = ({
             <div className="rounded-lg border bg-muted/50 p-4">
               <p className="font-medium">{file.name}</p>
               <p className="text-muted-foreground text-sm">
-                Type: {file.type.toUpperCase()} | Size: {file.size}
+                Type: {file.type.toUpperCase()} · Størrelse: {file.size}
               </p>
             </div>
           </div>
@@ -77,14 +76,14 @@ export const DeleteFileDialog = ({
             onClick={() => onOpenChange(false)}
             variant="outline"
           >
-            Cancel
+            Avbryt
           </Button>
           <Button
             disabled={isDeleting || !file}
             onClick={handleDelete}
             variant="destructive"
           >
-            {isDeleting ? "Deleting..." : "Delete"}
+            {isDeleting ? "Sletter…" : "Slett"}
           </Button>
         </DialogFooter>
       </DialogContent>

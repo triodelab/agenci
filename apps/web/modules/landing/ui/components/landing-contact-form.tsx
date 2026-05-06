@@ -115,7 +115,7 @@ export function LandingContactForm({
             className={cn(
               isDark ? fieldDark : "h-10 rounded-[8px] " + fieldLight,
             )}
-            placeholder="Ola Nordmann"
+            placeholder="Ditt navn"
           />
         </div>
         <div className="space-y-1.5">
@@ -130,7 +130,7 @@ export function LandingContactForm({
             required
             autoComplete="email"
             className={cn(isDark ? fieldDark : "h-10 rounded-[8px] " + fieldLight)}
-            placeholder="ola@firma.no"
+            placeholder="din@epost.no"
           />
         </div>
       </div>
