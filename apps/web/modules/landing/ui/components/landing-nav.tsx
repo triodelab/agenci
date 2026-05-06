@@ -121,7 +121,7 @@ export function LandingNav({ variant = "dark" }: LandingNavProps) {
           </div>
         </nav>
 
-        <div className="flex shrink-0 items-center justify-end gap-2 md:gap-3">
+        <div className="col-start-3 flex shrink-0 items-center justify-end gap-2 md:gap-3">
           {isLoaded && user ? (
             <Button
               variant="ghost"
