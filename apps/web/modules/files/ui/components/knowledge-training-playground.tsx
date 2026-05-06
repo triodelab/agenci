@@ -197,8 +197,14 @@ export function KnowledgeTrainingPlayground({
     try {
       await saveSystemPromptMutation({ systemPrompt: instructions });
       toast.success("Instruksjoner lagret — gjelder for nye samtaler.");
-    } catch {
-      toast.error("Kunne ikke lagre instruksjoner.");
+    } catch (e) {
+      const msg =
+        e instanceof Error
+          ? e.message
+          : typeof e === "object" && e && "message" in e
+            ? String((e as { message: unknown }).message)
+            : "Ukjent feil";
+      toast.error(`Kunne ikke lagre instruksjoner: ${msg}`);
     } finally {
       setIsSavingPrompt(false);
     }

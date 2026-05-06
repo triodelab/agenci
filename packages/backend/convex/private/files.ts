@@ -92,24 +92,45 @@ export const addFile = action({
     const blob = new Blob([bytes], { type: mimeType });
     const storageId = await ctx.storage.store(blob);
 
-    const text = await extractTextContent(ctx, { storageId, filename, bytes, mimeType });
+    let text: string;
+    try {
+      text = await extractTextContent(ctx, { storageId, filename, bytes, mimeType });
+    } catch (e) {
+      await ctx.storage.delete(storageId);
+      const msg = e instanceof Error ? e.message : String(e);
+      throw new ConvexError({ code: "BAD_REQUEST", message: `Kunne ikke lese filinnhold: ${msg}` });
+    }
 
     const namespace = agentNamespace(orgId, args.agentId);
 
-    const { entryId, created } = await rag.add(ctx, {
-      namespace,
-      text,
-      key: filename,
-      title: filename,
-      metadata: {
-        storageId,
-        uploadedBy: orgId,
-        filename,
-        category: category ?? null,
-        agentId: args.agentId ?? null,
-      } as EntryMetadata,
-      contentHash: await contentHashFromArrayBuffer(bytes),
-    });
+    let entryId: string;
+    let created: boolean;
+    try {
+      ({ entryId, created } = await rag.add(ctx, {
+        namespace,
+        text,
+        key: filename,
+        title: filename,
+        metadata: {
+          storageId,
+          uploadedBy: orgId,
+          filename,
+          category: category ?? null,
+          agentId: args.agentId ?? null,
+        } as EntryMetadata,
+        contentHash: await contentHashFromArrayBuffer(bytes),
+      }));
+    } catch (e) {
+      await ctx.storage.delete(storageId);
+      const msg = e instanceof Error ? e.message : String(e);
+      const isKeyMissing = msg.toLowerCase().includes("api key") || msg.toLowerCase().includes("openai");
+      throw new ConvexError({
+        code: "BAD_REQUEST",
+        message: isKeyMissing
+          ? "Mangler OpenAI API-nøkkel på Convex-deploymenten. Sett OPENAI_API_KEY i Convex-dashboardet."
+          : `Kunne ikke prosessere filen (embedding feilet): ${msg}`,
+      });
+    }
 
     if (!created) {
       await ctx.storage.delete(storageId);
@@ -216,21 +237,34 @@ export const addWebpage = action({
 
     const namespace = agentNamespace(orgId, args.agentId);
 
-    const { entryId, created } = await rag.add(ctx, {
-      namespace,
-      text: plain,
-      key: normalizedUrl,
-      title: displayName,
-      metadata: {
-        uploadedBy: orgId,
-        filename: displayName,
-        category: args.category ?? null,
-        sourceType: "webpage",
-        sourceUrl: normalizedUrl,
-        agentId: args.agentId ?? null,
-      } as EntryMetadata,
-      contentHash: await contentHashFromArrayBuffer(textBytes.buffer),
-    });
+    let entryId: string;
+    let created: boolean;
+    try {
+      ({ entryId, created } = await rag.add(ctx, {
+        namespace,
+        text: plain,
+        key: normalizedUrl,
+        title: displayName,
+        metadata: {
+          uploadedBy: orgId,
+          filename: displayName,
+          category: args.category ?? null,
+          sourceType: "webpage",
+          sourceUrl: normalizedUrl,
+          agentId: args.agentId ?? null,
+        } as EntryMetadata,
+        contentHash: await contentHashFromArrayBuffer(textBytes.buffer),
+      }));
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      const isKeyMissing = msg.toLowerCase().includes("api key") || msg.toLowerCase().includes("openai");
+      throw new ConvexError({
+        code: "BAD_REQUEST",
+        message: isKeyMissing
+          ? "Mangler OpenAI API-nøkkel på Convex-deploymenten. Sett OPENAI_API_KEY i Convex-dashboardet."
+          : `Kunne ikke indeksere nettsiden (embedding feilet): ${msg}`,
+      });
+    }
 
     if (!created) {
       console.debug("webpage entry unchanged, skipping duplicate");
