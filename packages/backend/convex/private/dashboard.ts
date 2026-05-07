@@ -105,6 +105,56 @@ export const getOverview = query({
   },
 });
 
+/** Recent notifications (escalated + new conversations) for the bell popover. */
+export const getNotifications = query({
+  args: {},
+  handler: async (ctx) => {
+    const orgId = await getOrgIdOrNull(ctx);
+    if (!orgId) return [];
+
+    const [escalated, unresolved] = await Promise.all([
+      ctx.db
+        .query("conversations")
+        .withIndex("by_status_and_organization_id", (q) =>
+          q.eq("status", "escalated").eq("organizationId", orgId),
+        )
+        .order("desc")
+        .take(5),
+      ctx.db
+        .query("conversations")
+        .withIndex("by_status_and_organization_id", (q) =>
+          q.eq("status", "unresolved").eq("organizationId", orgId),
+        )
+        .order("desc")
+        .take(5),
+    ]);
+
+    const all = [...escalated, ...unresolved];
+    const enriched = await Promise.all(
+      all.map(async (conv) => {
+        const session = await ctx.db.get(conv.contactSessionId);
+        let agentName: string | null = null;
+        if (conv.agentId) {
+          const agent = await ctx.db.get(conv.agentId);
+          agentName = agent?.name ?? null;
+        }
+        return {
+          _id: conv._id,
+          _creationTime: conv._creationTime,
+          status: conv.status,
+          agentId: conv.agentId ?? null,
+          contactName: session?.name ?? "Ukjent",
+          agentName,
+        };
+      }),
+    );
+
+    return enriched
+      .sort((a, b) => b._creationTime - a._creationTime)
+      .slice(0, 10);
+  },
+});
+
 /** Per-agent overview for the agent detail page. */
 export const getAgentOverview = query({
   args: { agentId: v.id("agents") },

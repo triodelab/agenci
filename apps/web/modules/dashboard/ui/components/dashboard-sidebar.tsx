@@ -11,6 +11,7 @@ import {
   PaletteIcon,
   PlugIcon,
   ZapIcon,
+  GemIcon,
   ChevronLeftIcon,
   SettingsIcon,
 } from "lucide-react";
@@ -131,24 +132,90 @@ function NavItem({
   return <SidebarMenuItem>{button}</SidebarMenuItem>;
 }
 
-// ─── UpgradeCard ─────────────────────────────────────────────────────────────
+// ─── PlanCard ─────────────────────────────────────────────────────────────────
 
-function UpgradeCard({ collapsed }: { collapsed: boolean }) {
+const PLAN_LABEL: Record<string, string> = {
+  starter: "Starter",
+  pro: "Pro",
+  business: "Business",
+};
+
+const PLAN_DESCRIPTION: Record<string, string> = {
+  starter: "1 AI-agent · Kunnskapsbase",
+  pro: "3 AI-agenter · Alle funksjoner",
+  business: "10 AI-agenter · Prioritert støtte",
+};
+
+function PlanCard({ collapsed }: { collapsed: boolean }) {
+  const sub = useQuery(api.private.subscription.getOwn);
+
   if (collapsed) return null;
+
+  const isActive = sub?.status === "active";
+  const isTrialing = sub?.status === "trialing";
+  const planKey = sub?.planKey ?? null;
+
+  if (isActive && planKey) {
+    const label = PLAN_LABEL[planKey] ?? planKey;
+    const description = PLAN_DESCRIPTION[planKey] ?? "";
+    return (
+      <div className="mx-2 mb-1 overflow-hidden rounded-xl border border-border/60 bg-muted/40 p-4">
+        <div className="flex items-center gap-2 mb-2">
+          <div className="flex size-7 items-center justify-center rounded-lg border border-border/60 bg-card shrink-0">
+            <GemIcon className="size-3 text-foreground" strokeWidth={2} />
+          </div>
+          <span className="text-[11px] font-bold uppercase tracking-wide text-foreground/70">
+            {label}
+          </span>
+        </div>
+        <p className="text-[11px] text-muted-foreground leading-relaxed">{description}</p>
+        <Link
+          href="/billing"
+          className="mt-2.5 inline-flex items-center gap-1 text-[11px] font-medium text-muted-foreground hover:text-foreground transition-colors"
+        >
+          Administrer plan <span aria-hidden>→</span>
+        </Link>
+      </div>
+    );
+  }
+
+  if (isTrialing) {
+    const daysLeft = sub?.trialEndsAt
+      ? Math.max(0, Math.ceil((sub.trialEndsAt - Date.now()) / 86_400_000))
+      : null;
+    return (
+      <div className="mx-2 mb-1 overflow-hidden rounded-xl border border-border/60 bg-muted/40 p-4">
+        <div className="flex size-7 items-center justify-center rounded-lg border border-border/60 bg-card mb-2.5 shrink-0">
+          <ZapIcon className="size-3 text-foreground" strokeWidth={2} />
+        </div>
+        <p className="text-[13px] font-semibold text-foreground leading-snug">Prøveperiode</p>
+        <p className="mt-1 text-[11px] text-muted-foreground leading-relaxed">
+          {daysLeft !== null ? `${daysLeft} dager igjen` : "Aktiv prøveperiode"}
+        </p>
+        <Link
+          href="/billing"
+          className="mt-2.5 inline-flex items-center gap-1 text-[11px] font-medium text-muted-foreground hover:text-foreground transition-colors"
+        >
+          Velg plan <span aria-hidden>→</span>
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <div className="mx-2 mb-1 overflow-hidden rounded-xl border border-border/60 bg-muted/40 p-4">
       <div className="flex size-8 items-center justify-center rounded-lg border border-border/60 bg-card mb-3 shrink-0">
         <ZapIcon className="size-3.5 text-foreground" strokeWidth={2} />
       </div>
-      <p className="text-[13px] font-semibold text-foreground leading-snug">Prøv Pro gratis</p>
+      <p className="text-[13px] font-semibold text-foreground leading-snug">Oppgrader plan</p>
       <p className="mt-1 text-[11px] text-muted-foreground leading-relaxed">
-        14 dager gratis — AI-agent, kunnskapsbase og tilpasning
+        Lås opp AI-agenter, kunnskapsbase og tilpasning
       </p>
       <Link
         href="/billing"
         className="mt-3 inline-flex items-center gap-1 text-[12px] font-medium text-muted-foreground hover:text-foreground transition-colors"
       >
-        Start prøveperiode <span aria-hidden>→</span>
+        Se planer <span aria-hidden>→</span>
       </Link>
     </div>
   );
@@ -289,7 +356,7 @@ export const DashboardSidebar = () => {
       </SidebarContent>
 
       <SidebarFooter className="p-0 pb-2">
-        <UpgradeCard collapsed={collapsed} />
+        <PlanCard collapsed={collapsed} />
         <div className="mx-2 mb-1">
           {collapsed ? (
             <Tooltip>
