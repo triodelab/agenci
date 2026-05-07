@@ -105,14 +105,15 @@ export const getOverview = query({
   },
 });
 
-/** Recent notifications (escalated + new conversations) for the bell popover. */
+/** Full notification feed: conversation alerts + system tips. */
 export const getNotifications = query({
   args: {},
   handler: async (ctx) => {
     const orgId = await getOrgIdOrNull(ctx);
-    if (!orgId) return [];
+    if (!orgId) return { conversations: [], tips: [] };
 
-    const [escalated, unresolved] = await Promise.all([
+    // ── Conversation notifications ──────────────────────────────────────────
+    const [escalated, unresolved, allAgents, anyConv, subscription] = await Promise.all([
       ctx.db
         .query("conversations")
         .withIndex("by_status_and_organization_id", (q) =>
@@ -127,11 +128,23 @@ export const getNotifications = query({
         )
         .order("desc")
         .take(5),
+      ctx.db
+        .query("agents")
+        .withIndex("by_organization_id", (q) => q.eq("organizationId", orgId))
+        .take(10),
+      ctx.db
+        .query("conversations")
+        .withIndex("by_organization_id", (q) => q.eq("organizationId", orgId))
+        .first(),
+      ctx.db
+        .query("subscriptions")
+        .withIndex("by_organization_id", (q) => q.eq("organizationId", orgId))
+        .unique(),
     ]);
 
-    const all = [...escalated, ...unresolved];
-    const enriched = await Promise.all(
-      all.map(async (conv) => {
+    const allConvs = [...escalated, ...unresolved];
+    const conversations = await Promise.all(
+      allConvs.map(async (conv) => {
         const session = await ctx.db.get(conv.contactSessionId);
         let agentName: string | null = null;
         if (conv.agentId) {
@@ -139,19 +152,78 @@ export const getNotifications = query({
           agentName = agent?.name ?? null;
         }
         return {
-          _id: conv._id,
+          _id: conv._id as string,
           _creationTime: conv._creationTime,
           status: conv.status,
-          agentId: conv.agentId ?? null,
-          contactName: session?.name ?? "Ukjent",
+          agentId: conv.agentId ? (conv.agentId as string) : null,
+          contactName: session?.name ?? "Anonym",
+          contactEmail: session?.email ?? null,
           agentName,
         };
       }),
     );
 
-    return enriched
-      .sort((a, b) => b._creationTime - a._creationTime)
-      .slice(0, 10);
+    // ── System tips (computed, dismissed client-side) ───────────────────────
+    type Tip = {
+      id: string;
+      icon: "welcome" | "tip" | "knowledge" | "upgrade" | "share";
+      title: string;
+      body: string;
+      url: string | null;
+    };
+    const tips: Tip[] = [];
+
+    const activeAgents = allAgents.filter((a) => a.isActive);
+    const hasNoAgents = allAgents.length === 0;
+    const hasNoConversations = !anyConv;
+    const isOnFreePlan =
+      !subscription ||
+      subscription.status === "canceled" ||
+      subscription.status === "free";
+
+    // Welcome — always show (dismissed client-side)
+    tips.push({
+      id: "welcome-v1",
+      icon: "welcome",
+      title: "Velkommen til Agenci! 👋",
+      body: "Vi er glad for at du er her. Lag din første AI-agent for å komme i gang.",
+      url: hasNoAgents ? "/agents" : null,
+    });
+
+    if (hasNoAgents) {
+      tips.push({
+        id: "onboard-create-agent",
+        icon: "tip",
+        title: "Lag din første AI-agent",
+        body: "Sett opp en agent på under 2 minutter — gi den et navn og last opp relevant innhold.",
+        url: "/agents",
+      });
+    } else if (hasNoConversations) {
+      tips.push({
+        id: "onboard-share-widget",
+        icon: "share",
+        title: "Del chatten med kundene dine",
+        body: `${activeAgents[0]?.name ?? "Agenten din"} er klar — del widget-koden på nettsiden din.`,
+        url: activeAgents[0] ? `/agents/${activeAgents[0]._id}/customization` : "/agents",
+      });
+    }
+
+    if (isOnFreePlan && allAgents.length > 0) {
+      tips.push({
+        id: "upgrade-tip-v1",
+        icon: "upgrade",
+        title: "Lås opp alle funksjoner",
+        body: "Oppgrader til Starter eller Pro for kunnskapsbase, tilpasning og mer.",
+        url: "/billing",
+      });
+    }
+
+    return {
+      conversations: conversations
+        .sort((a, b) => b._creationTime - a._creationTime)
+        .slice(0, 8),
+      tips,
+    };
   },
 });
 

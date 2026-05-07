@@ -1,9 +1,20 @@
 "use client";
 
 import { OrganizationSwitcher, UserButton } from "@clerk/nextjs";
-import { BellIcon, SidebarIcon } from "lucide-react";
+import {
+  BellIcon,
+  SidebarIcon,
+  AlertCircleIcon,
+  MessageCircleIcon,
+  SparklesIcon,
+  RocketIcon,
+  ShareIcon,
+  XIcon,
+  ArrowRightIcon,
+  GemIcon,
+} from "lucide-react";
 import Link from "next/link";
-import { Suspense, Component, type ReactNode } from "react";
+import { Suspense, Component, type ReactNode, useState, useEffect, useCallback } from "react";
 import { useQuery } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
 import { LogoIcon } from "@/components/logo";
@@ -15,6 +26,8 @@ import {
   PopoverTrigger,
 } from "@workspace/ui/components/popover";
 import { cn } from "@workspace/ui/lib/utils";
+
+// ── Error boundary ────────────────────────────────────────────────────────────
 
 class QueryErrorBoundary extends Component<
   { children: ReactNode; fallback?: ReactNode },
@@ -28,12 +41,9 @@ class QueryErrorBoundary extends Component<
   }
 }
 
-const PLAN_LABEL: Record<string, string> = {
-  starter: "Starter",
-  pro: "Pro",
-  business: "Business",
-};
+// ── Plan badge ────────────────────────────────────────────────────────────────
 
+const PLAN_LABEL: Record<string, string> = { starter: "Starter", pro: "Pro", business: "Business" };
 const PLAN_COLOR: Record<string, string> = {
   starter: "bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-400",
   pro: "bg-violet-100 text-violet-700 dark:bg-violet-950/60 dark:text-violet-400",
@@ -43,87 +53,88 @@ const PLAN_COLOR: Record<string, string> = {
 function PlanBadge() {
   const sub = useQuery(api.private.subscription.getOwn);
   if (!sub) return null;
-
   const isTrialing = sub.status === "trialing";
   const isActive = sub.status === "active";
-
   if (!isActive && !isTrialing) return null;
-
   const planKey = sub.planKey ?? "starter";
-  const label = PLAN_LABEL[planKey] ?? planKey;
-  const colorClass = PLAN_COLOR[planKey] ?? PLAN_COLOR.starter;
-
   return (
-    <span
-      className={cn(
-        "hidden sm:inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide",
-        isTrialing
-          ? "bg-muted text-muted-foreground"
-          : colorClass,
-      )}
-    >
-      {isTrialing ? "Prøve" : label}
+    <span className={cn(
+      "hidden sm:inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide",
+      isTrialing ? "bg-muted text-muted-foreground" : (PLAN_COLOR[planKey] ?? PLAN_COLOR.starter),
+    )}>
+      {isTrialing ? "Prøve" : (PLAN_LABEL[planKey] ?? planKey)}
     </span>
   );
 }
 
-function NotificationItem({
-  notification,
-}: {
-  notification: {
-    _id: string;
-    _creationTime: number;
-    status: string;
-    agentId: string | null;
-    contactName: string;
-    agentName: string | null;
-  };
-}) {
-  const isEscalated = notification.status === "escalated";
-  const timeAgo = formatTimeAgo(notification._creationTime);
-  const href = notification.agentId
-    ? `/agents/${notification.agentId}/conversations`
-    : "/agents";
-
-  return (
-    <Link
-      href={href}
-      className="flex items-start gap-3 px-4 py-3 hover:bg-muted/50 transition-colors"
-    >
-      <div
-        className={cn(
-          "mt-0.5 size-2 shrink-0 rounded-full",
-          isEscalated ? "bg-red-500" : "bg-blue-500",
-        )}
-      />
-      <div className="min-w-0 flex-1">
-        <p className="text-[12px] font-medium text-foreground truncate">
-          {isEscalated ? "Eskalert samtale" : "Ny samtale"}
-        </p>
-        <p className="text-[11px] text-muted-foreground truncate">
-          {notification.contactName}
-          {notification.agentName ? ` · ${notification.agentName}` : ""}
-        </p>
-      </div>
-      <span className="text-[10px] text-muted-foreground shrink-0">{timeAgo}</span>
-    </Link>
-  );
-}
+// ── Helpers ───────────────────────────────────────────────────────────────────
 
 function formatTimeAgo(ms: number): string {
   const diff = Date.now() - ms;
   const minutes = Math.floor(diff / 60_000);
   if (minutes < 1) return "nå";
-  if (minutes < 60) return `${minutes}m`;
+  if (minutes < 60) return `${minutes}m siden`;
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}t`;
-  return `${Math.floor(hours / 24)}d`;
+  if (hours < 24) return `${hours}t siden`;
+  const days = Math.floor(hours / 24);
+  if (days < 7) return `${days}d siden`;
+  return new Date(ms).toLocaleDateString("no-NO", { day: "numeric", month: "short" });
 }
 
+const TIP_ICONS = {
+  welcome: SparklesIcon,
+  tip: RocketIcon,
+  knowledge: GemIcon,
+  upgrade: GemIcon,
+  share: ShareIcon,
+} as const;
+
+type Tip = {
+  id: string;
+  icon: keyof typeof TIP_ICONS;
+  title: string;
+  body: string;
+  url: string | null;
+};
+
+type ConvNotification = {
+  _id: string;
+  _creationTime: number;
+  status: string;
+  agentId: string | null;
+  contactName: string;
+  contactEmail: string | null;
+  agentName: string | null;
+};
+
+// ── Notification panel ────────────────────────────────────────────────────────
+
 function NotificationsPopover() {
-  const notifications = useQuery(api.private.dashboard.getNotifications);
-  const hasNew = (notifications?.length ?? 0) > 0;
-  const escalatedCount = notifications?.filter((n) => n.status === "escalated").length ?? 0;
+  const data = useQuery(api.private.dashboard.getNotifications);
+  const [dismissed, setDismissed] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("agenci:dismissed-tips");
+      if (raw) setDismissed(new Set(JSON.parse(raw) as string[]));
+    } catch {}
+  }, []);
+
+  const dismiss = useCallback((id: string) => {
+    setDismissed((prev) => {
+      const next = new Set(prev);
+      next.add(id);
+      try { localStorage.setItem("agenci:dismissed-tips", JSON.stringify([...next])); } catch {}
+      return next;
+    });
+  }, []);
+
+  const conversations: ConvNotification[] = data?.conversations ?? [];
+  const visibleTips: Tip[] = (data?.tips ?? []).filter((t) => !dismissed.has(t.id));
+
+  const escalatedCount = conversations.filter((n) => n.status === "escalated").length;
+  const totalBadge = escalatedCount > 0 ? escalatedCount : conversations.length;
+  const hasConvBadge = conversations.length > 0;
 
   return (
     <Popover>
@@ -133,57 +144,79 @@ function NotificationsPopover() {
           aria-label="Varsler"
         >
           <BellIcon className="size-4" strokeWidth={1.75} />
-          {hasNew && (
-            <span
-              className={cn(
-                "absolute -top-0.5 -right-0.5 flex size-3.5 items-center justify-center rounded-full text-[8px] font-bold text-white",
-                escalatedCount > 0 ? "bg-red-500" : "bg-blue-500",
-              )}
-            >
-              {escalatedCount > 0 ? escalatedCount : notifications!.length}
+          {hasConvBadge && (
+            <span className={cn(
+              "absolute -top-0.5 -right-0.5 flex min-w-[14px] h-3.5 items-center justify-center rounded-full px-0.5 text-[8px] font-bold text-white",
+              escalatedCount > 0 ? "bg-red-500" : "bg-blue-500",
+            )}>
+              {totalBadge > 9 ? "9+" : totalBadge}
             </span>
           )}
         </button>
       </PopoverTrigger>
-      <PopoverContent
-        align="end"
-        className="dashboard-app-shell w-80 p-0"
-        sideOffset={8}
-      >
+
+      <PopoverContent align="end" className="dashboard-app-shell w-[420px] p-0" sideOffset={8}>
+        {/* Header */}
         <div className="flex items-center justify-between border-b border-border/60 px-4 py-3">
           <p className="text-[13px] font-semibold text-foreground">Varsler</p>
-          {hasNew && (
-            <span className="text-[10px] font-medium text-muted-foreground">
-              {notifications!.length} aktive
+          {conversations.length > 0 && (
+            <span className={cn(
+              "rounded-full px-2 py-0.5 text-[10px] font-semibold",
+              escalatedCount > 0
+                ? "bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400"
+                : "bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400",
+            )}>
+              {escalatedCount > 0 ? `${escalatedCount} eskalert` : `${conversations.length} aktive`}
             </span>
           )}
         </div>
 
-        {!notifications || notifications.length === 0 ? (
-          <div className="flex flex-col items-center justify-center gap-2 px-4 py-8 text-center">
-            <div className="flex size-10 items-center justify-center rounded-xl border border-border/50 bg-muted/30">
-              <BellIcon className="size-[1.125rem] text-muted-foreground/50" strokeWidth={1.5} />
-            </div>
-            <p className="text-[13px] font-medium text-foreground">Ingen varsler</p>
-            <p className="text-[12px] text-muted-foreground">
-              Nye samtaler og eskaleringer vises her.
-            </p>
-          </div>
-        ) : (
-          <div className="divide-y divide-border/40 max-h-80 overflow-y-auto">
-            {notifications.map((n) => (
-              <NotificationItem key={n._id} notification={n} />
-            ))}
-          </div>
-        )}
+        <div className="max-h-[480px] overflow-y-auto">
 
-        {hasNew && (
+          {/* ── Conversations ── */}
+          {conversations.length > 0 && (
+            <div>
+              <p className="px-4 pt-3 pb-1.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60">
+                Samtaler
+              </p>
+              {conversations.map((n) => (
+                <ConvNotificationRow key={n._id} n={n} />
+              ))}
+            </div>
+          )}
+
+          {/* ── Tips & news ── */}
+          {visibleTips.length > 0 && (
+            <div className={cn(conversations.length > 0 && "border-t border-border/40")}>
+              <p className="px-4 pt-3 pb-1.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60">
+                Tips & nyheter
+              </p>
+              {visibleTips.map((tip) => (
+                <TipRow key={tip.id} tip={tip} onDismiss={dismiss} />
+              ))}
+            </div>
+          )}
+
+          {/* ── Empty state ── */}
+          {conversations.length === 0 && visibleTips.length === 0 && (
+            <div className="flex flex-col items-center justify-center gap-2 px-4 py-10 text-center">
+              <div className="flex size-10 items-center justify-center rounded-xl border border-border/50 bg-muted/30">
+                <BellIcon className="size-[1.125rem] text-muted-foreground/50" strokeWidth={1.5} />
+              </div>
+              <p className="text-[13px] font-medium text-foreground">Alt er i orden</p>
+              <p className="text-[12px] text-muted-foreground">Ingen aktive varsler akkurat nå.</p>
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        {conversations.length > 0 && (
           <div className="border-t border-border/60 px-4 py-2.5">
             <Link
               href="/agents"
-              className="text-[12px] font-medium text-muted-foreground hover:text-foreground transition-colors"
+              className="inline-flex items-center gap-1 text-[12px] font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
-              Se alle samtaler →
+              Se alle samtaler <ArrowRightIcon className="size-3" />
             </Link>
           </div>
         )}
@@ -191,6 +224,87 @@ function NotificationsPopover() {
     </Popover>
   );
 }
+
+function ConvNotificationRow({ n }: { n: ConvNotification }) {
+  const isEscalated = n.status === "escalated";
+  const href = n.agentId
+    ? `/agents/${n.agentId}/conversations/${n._id}`
+    : "/agents";
+
+  return (
+    <Link
+      href={href}
+      className="group flex items-start gap-3 px-4 py-3 hover:bg-muted/50 transition-colors"
+    >
+      <div className={cn(
+        "mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg",
+        isEscalated
+          ? "bg-red-100 dark:bg-red-950/40"
+          : "bg-blue-100 dark:bg-blue-950/40",
+      )}>
+        {isEscalated
+          ? <AlertCircleIcon className="size-3.5 text-red-600 dark:text-red-400" strokeWidth={2} />
+          : <MessageCircleIcon className="size-3.5 text-blue-600 dark:text-blue-400" strokeWidth={2} />
+        }
+      </div>
+
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-1.5">
+          <p className="text-[12px] font-semibold text-foreground truncate">
+            {isEscalated ? "Trenger din hjelp" : "Ny samtale"}
+          </p>
+          {isEscalated && (
+            <span className="shrink-0 rounded-full bg-red-100 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-red-600 dark:bg-red-950/40 dark:text-red-400">
+              Eskalert
+            </span>
+          )}
+        </div>
+        <p className="text-[11px] text-muted-foreground truncate">
+          {n.contactName}
+          {n.contactEmail ? ` · ${n.contactEmail}` : ""}
+          {n.agentName ? ` · ${n.agentName}` : ""}
+        </p>
+        <p className="mt-0.5 text-[10px] text-muted-foreground/60">{formatTimeAgo(n._creationTime)}</p>
+      </div>
+
+      <ArrowRightIcon className="mt-1 size-3.5 shrink-0 text-muted-foreground/40 transition-transform group-hover:translate-x-0.5" />
+    </Link>
+  );
+}
+
+function TipRow({ tip, onDismiss }: { tip: Tip; onDismiss: (id: string) => void }) {
+  const Icon = TIP_ICONS[tip.icon];
+  const content = (
+    <div className="group flex items-start gap-3 px-4 py-3 hover:bg-muted/50 transition-colors">
+      <div className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg bg-muted/60">
+        <Icon className="size-3.5 text-muted-foreground" strokeWidth={1.75} />
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="text-[12px] font-semibold text-foreground">{tip.title}</p>
+        <p className="mt-0.5 text-[11px] text-muted-foreground leading-relaxed">{tip.body}</p>
+        {tip.url && (
+          <span className="mt-1 inline-flex items-center gap-1 text-[11px] font-medium text-foreground/70 group-hover:text-foreground transition-colors">
+            Gå dit <ArrowRightIcon className="size-2.5" />
+          </span>
+        )}
+      </div>
+      <button
+        onClick={(e) => { e.preventDefault(); e.stopPropagation(); onDismiss(tip.id); }}
+        className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-md text-muted-foreground/40 hover:bg-muted hover:text-muted-foreground transition-colors"
+        aria-label="Lukk"
+      >
+        <XIcon className="size-3" />
+      </button>
+    </div>
+  );
+
+  if (tip.url) {
+    return <Link href={tip.url}>{content}</Link>;
+  }
+  return content;
+}
+
+// ── Top nav ───────────────────────────────────────────────────────────────────
 
 export function DashboardTopNav() {
   const { toggleSidebar } = useSidebar();
