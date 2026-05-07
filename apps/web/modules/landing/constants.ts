@@ -54,7 +54,6 @@ export const LANDING_NAV_PRIMARY_LINKS = [
 
 /** Egne markedsføringssider */
 export const LANDING_MARKETING_PAGE_LINKS = [
-  { name: "Produkt", href: "/produkt" },
   { name: "Integrasjoner", href: "/integrasjoner" },
   { name: "Slik fungerer det", href: "/hvordan-det-virker" },
   { name: "Kontakt", href: LANDING_CONTACT_PAGE_PATH },
@@ -62,7 +61,6 @@ export const LANDING_MARKETING_PAGE_LINKS = [
 
 /** Footer / «Utforsk» */
 export const LANDING_FORSIDE_SECTION_LINKS = [
-  { name: "Produkt", href: "/produkt" },
   { name: "Priser", href: hash(LANDING_SECTION_IDS.pricing) },
   { name: "Integrasjoner", href: hash(LANDING_SECTION_IDS.integrations) },
   { name: "Slik det fungerer", href: "/hvordan-det-virker" },
@@ -82,14 +80,12 @@ export const LANDING_DESKTOP_NAV_LINKS = [
 ] as const;
 
 export const LANDING_FOOTER_PRODUCT_LINKS = [
-  { href: "/produkt", label: "Produkt" },
   { href: hash(LANDING_SECTION_IDS.pricing), label: "Priser" },
   { href: hash(LANDING_SECTION_IDS.faq), label: "FAQ" },
   { href: LANDING_CONTACT_PAGE_PATH, label: "Kontakt" },
 ] as const;
 
 export const LANDING_FOOTER_EXPLORE_LINKS = [
-  { href: "/produkt", label: "Produkt" },
   { href: "/integrasjoner", label: "Integrasjoner" },
   { href: "/hvordan-det-virker", label: "Slik fungerer det" },
 ] as const;
@@ -115,7 +111,7 @@ export const LANDING_AUTH_PATHS = {
    * Innlogget bruker som klikker «Opprett konto» / «Kom i gang» på landing — ikke send til innboks;
    * behold kontekst på markedsføringssider (AuthAwareLink `loggedInHref`).
    */
-  marketingLoggedInCta: "/produkt",
+  marketingLoggedInCta: "/agents",
 } as const;
 
 /** Primær CTA — mint/teal (referansedesign) */

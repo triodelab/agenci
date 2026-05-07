@@ -10,7 +10,7 @@ export async function notifyTeamEmail(params: {
   const to = process.env.NOTIFY_TO_EMAIL?.trim() ?? "post@triodelab.no";
   const from =
     process.env.RESEND_FROM_EMAIL?.trim() ??
-    "Agenci <onboarding@resend.dev>";
+    "Agenci <post@triodelab.no>";
 
   if (!apiKey) {
     if (process.env.NODE_ENV === "development") {

@@ -2,7 +2,6 @@ import { StructuredData } from "@/components/structured-data";
 import { LandingNav } from "@/modules/landing/ui/components/landing-nav";
 import { LandingContactSection } from "@/modules/landing/ui/components/landing-contact-section";
 import { LandingFaqSection } from "@/modules/landing/ui/components/landing-faq-section";
-import { LandingFinalCtaSection } from "@/modules/landing/ui/components/landing-final-cta-section";
 import { LandingHeroSection } from "@/modules/landing/ui/components/landing-hero-section";
 import { LandingIntegrationsSection } from "@/modules/landing/ui/components/landing-integrations-section";
 import { LandingPricingSection } from "@/modules/landing/ui/components/landing-pricing-section";
@@ -35,7 +34,6 @@ export function LandingPageView() {
         <LandingPricingSection />
         <LandingFaqSection />
         <LandingContactSection />
-        <LandingFinalCtaSection />
       </main>
       <LandingFooter />
       <CookieConsentBanner />
