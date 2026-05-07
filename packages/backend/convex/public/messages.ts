@@ -76,12 +76,23 @@ export const create = action({
         { organizationId: conversation.organizationId },
       );
 
+      const osloTime = new Date().toLocaleString("no-NO", {
+        timeZone: "Europe/Oslo",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      });
+      const timeContext = `Nåværende tidspunkt i Norge: ${osloTime}. Bruk dette til å si "Ha en fin dag!", "Ha en fin kveld!" eller "Ha en fin natt!" avhengig av tidspunkt (dag = 06–17, kveld = 17–23, natt = 23–06).`;
+      const systemWithTime = [timeContext, widgetSettings?.systemPrompt]
+        .filter(Boolean)
+        .join("\n\n");
+
       await supportAgent.generateText(
         ctx,
         { threadId: args.threadId },
         {
           prompt: args.prompt,
-          system: widgetSettings?.systemPrompt || undefined,
+          system: systemWithTime,
           tools: {
             escalateConversationTool: escalateConversation,
             resolveConversationTool: resolveConversation,
