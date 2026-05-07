@@ -36,19 +36,15 @@ export const deleteFile = mutation({
   handler: async (ctx, args) => {
     const orgId = await getOrgIdOrNull(ctx);
     if (!orgId) {
-      throw new ConvexError({
-        code: "BAD_REQUEST",
-        message:
-          "No organization in session. Select an organization in Clerk (JWT template must include orgId).",
-      });
+      throw new ConvexError("No organization in session. Select an organization in Clerk.");
     }
 
     const entry = await rag.getEntry(ctx, { entryId: args.entryId });
     if (!entry) {
-      throw new ConvexError({ code: "NOT_FOUND", message: "Entry not found" });
+      throw new ConvexError("Entry not found");
     }
     if (entry.metadata?.uploadedBy !== orgId) {
-      throw new ConvexError({ code: "UNAUTHORIZED", message: "Invalid Organization ID" });
+      throw new ConvexError("Invalid Organization ID");
     }
 
     const meta = entry.metadata as EntryMetadata | undefined;
@@ -71,11 +67,7 @@ export const addFile = action({
   handler: async (ctx, args) => {
     const orgId = await getOrgIdOrNull(ctx);
     if (!orgId) {
-      throw new ConvexError({
-        code: "BAD_REQUEST",
-        message:
-          "No organization in session. Select an organization in Clerk (JWT template must include orgId).",
-      });
+      throw new ConvexError("No organization in session. Select an organization in Clerk.");
     }
 
     const subscription = await ctx.runQuery(
@@ -84,7 +76,7 @@ export const addFile = action({
     );
     const userEmail = await getUserEmailOrNull(ctx);
     if (!hasActiveSubscriptionAccess(orgId, subscription, { userEmail })) {
-      throw new ConvexError({ code: "BAD_REQUEST", message: "Missing subscription" });
+      throw new ConvexError("Du trenger et aktivt abonnement for å laste opp filer. Gå til Fakturering for å velge en plan.");
     }
 
     const { bytes, filename, category } = args;
@@ -98,7 +90,7 @@ export const addFile = action({
     } catch (e) {
       await ctx.storage.delete(storageId);
       const msg = e instanceof Error ? e.message : String(e);
-      throw new ConvexError({ code: "BAD_REQUEST", message: `Kunne ikke lese filinnhold: ${msg}` });
+      throw new ConvexError(`Kunne ikke lese filinnhold: ${msg}`);
     }
 
     const namespace = agentNamespace(orgId, args.agentId);
@@ -124,12 +116,11 @@ export const addFile = action({
       await ctx.storage.delete(storageId);
       const msg = e instanceof Error ? e.message : String(e);
       const isKeyMissing = msg.toLowerCase().includes("api key") || msg.toLowerCase().includes("openai");
-      throw new ConvexError({
-        code: "BAD_REQUEST",
-        message: isKeyMissing
+      throw new ConvexError(
+        isKeyMissing
           ? "Mangler OpenAI API-nøkkel på Convex-deploymenten. Sett OPENAI_API_KEY i Convex-dashboardet."
           : `Kunne ikke prosessere filen (embedding feilet): ${msg}`,
-      });
+      );
     }
 
     if (!created) {
@@ -152,11 +143,7 @@ export const addWebpage = action({
   handler: async (ctx, args) => {
     const orgId = await getOrgIdOrNull(ctx);
     if (!orgId) {
-      throw new ConvexError({
-        code: "BAD_REQUEST",
-        message:
-          "No organization in session. Select an organization in Clerk (JWT template must include orgId).",
-      });
+      throw new ConvexError("No organization in session. Select an organization in Clerk.");
     }
 
     const subscription = await ctx.runQuery(
@@ -165,7 +152,7 @@ export const addWebpage = action({
     );
     const userEmail = await getUserEmailOrNull(ctx);
     if (!hasActiveSubscriptionAccess(orgId, subscription, { userEmail })) {
-      throw new ConvexError({ code: "BAD_REQUEST", message: "Missing subscription" });
+      throw new ConvexError("Du trenger et aktivt abonnement for å legge til nettsider. Gå til Fakturering for å velge en plan.");
     }
 
     const publicUrl = assertPublicHttpUrl(args.url);
@@ -199,10 +186,7 @@ export const addWebpage = action({
     }
 
     if (!response.ok) {
-      throw new ConvexError({
-        code: "BAD_REQUEST",
-        message: `HTTP ${response.status} fra serveren`,
-      });
+      throw new ConvexError(`HTTP ${response.status} fra serveren`);
     }
 
     const contentType = (response.headers.get("content-type") ?? "").toLowerCase();
@@ -213,22 +197,18 @@ export const addWebpage = action({
       contentType.includes("text/plain") ||
       /^\s*</.test(html.slice(0, 800));
     if (!looksHtml) {
-      throw new ConvexError({
-        code: "BAD_REQUEST",
-        message:
-          "URL-en ser ikke ut som en vanlig nettside (HTML). Prøv en annen adresse eller last opp som fil.",
-      });
+      throw new ConvexError(
+        "URL-en ser ikke ut som en vanlig nettside (HTML). Prøv en annen adresse eller last opp som fil.",
+      );
     }
 
     if (html.length > MAX_WEB_HTML_CHARS) html = html.slice(0, MAX_WEB_HTML_CHARS);
 
     const plain = htmlToPlainText(html);
     if (plain.length < MIN_WEB_TEXT_CHARS) {
-      throw new ConvexError({
-        code: "BAD_REQUEST",
-        message:
-          "For lite tekst hentet fra siden (kanskje JavaScript-app eller blokkert innhold). Prøv en annen URL eller last opp som fil.",
-      });
+      throw new ConvexError(
+        "For lite tekst hentet fra siden (kanskje JavaScript-app eller blokkert innhold). Prøv en annen URL eller last opp som fil.",
+      );
     }
 
     const titleFromPage = extractHtmlTitle(html);
@@ -258,12 +238,11 @@ export const addWebpage = action({
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       const isKeyMissing = msg.toLowerCase().includes("api key") || msg.toLowerCase().includes("openai");
-      throw new ConvexError({
-        code: "BAD_REQUEST",
-        message: isKeyMissing
+      throw new ConvexError(
+        isKeyMissing
           ? "Mangler OpenAI API-nøkkel på Convex-deploymenten. Sett OPENAI_API_KEY i Convex-dashboardet."
           : `Kunne ikke indeksere nettsiden (embedding feilet): ${msg}`,
-      });
+      );
     }
 
     if (!created) {
