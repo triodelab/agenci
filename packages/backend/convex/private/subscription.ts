@@ -1,5 +1,6 @@
 import { query } from "../_generated/server";
-import { getOrgIdOrNull } from "../lib/auth";
+import { getOrgIdOrNull, getUserEmailOrNull } from "../lib/auth";
+import { getMaxAgents } from "../lib/subscriptionAccess";
 
 export const getOwn = query({
   args: {},
@@ -7,10 +8,15 @@ export const getOwn = query({
     const orgId = await getOrgIdOrNull(ctx);
     if (!orgId) return null;
 
-    const sub = await ctx.db
-      .query("subscriptions")
-      .withIndex("by_organization_id", (q) => q.eq("organizationId", orgId))
-      .unique();
+    const [sub, email] = await Promise.all([
+      ctx.db
+        .query("subscriptions")
+        .withIndex("by_organization_id", (q) => q.eq("organizationId", orgId))
+        .unique(),
+      getUserEmailOrNull(ctx),
+    ]);
+
+    const maxAgents = getMaxAgents(orgId, sub, { userEmail: email });
 
     if (!sub) {
       return {
@@ -18,6 +24,7 @@ export const getOwn = query({
         trialEndsAt: null,
         planKey: null,
         stripeCustomerId: null,
+        maxAgents,
       };
     }
 
@@ -26,6 +33,7 @@ export const getOwn = query({
       trialEndsAt: sub.trialEndsAt ?? null,
       planKey: sub.planKey ?? null,
       stripeCustomerId: sub.stripeCustomerId ?? null,
+      maxAgents,
     };
   },
 });

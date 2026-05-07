@@ -1,8 +1,7 @@
 import { ConvexError, v } from "convex/values";
 import { mutation, query } from "../_generated/server";
-import { getOrgIdOrNull } from "../lib/auth";
-
-const MAX_AGENTS = 5;
+import { getOrgIdOrNull, getUserEmailOrNull } from "../lib/auth";
+import { getMaxAgents } from "../lib/subscriptionAccess";
 
 function slugifyName(name: string): string {
   const lower = name
@@ -123,15 +122,24 @@ export const create = mutation({
       });
     }
 
-    const existing = await ctx.db
-      .query("agents")
-      .withIndex("by_organization_id", (q) => q.eq("organizationId", orgId))
-      .collect();
+    const [existing, subscription, email] = await Promise.all([
+      ctx.db
+        .query("agents")
+        .withIndex("by_organization_id", (q) => q.eq("organizationId", orgId))
+        .collect(),
+      ctx.db
+        .query("subscriptions")
+        .withIndex("by_organization_id", (q) => q.eq("organizationId", orgId))
+        .unique(),
+      getUserEmailOrNull(ctx),
+    ]);
 
-    if (existing.length >= MAX_AGENTS) {
+    const maxAgents = getMaxAgents(orgId, subscription, { userEmail: email });
+
+    if (existing.length >= maxAgents) {
       throw new ConvexError({
         code: "BAD_REQUEST",
-        message: `Du har nådd maks ${MAX_AGENTS} agenter. Slett en eksisterende for å opprette ny.`,
+        message: `Du har nådd maks ${maxAgents} agenter på din plan. Oppgrader for å opprette flere.`,
       });
     }
 

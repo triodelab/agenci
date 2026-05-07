@@ -20,23 +20,23 @@ interface Feature {
 const features: Feature[] = [
   {
     icon: BotIcon,
-    label: "AI-kundestøtte",
-    description: "Intelligente automatiske svar hele døgnet",
+    label: "Opptil 10 AI-agenter",
+    description: "Lag agenter for ulike brukstilfeller",
   },
   {
     icon: BookOpenIcon,
     label: "Kunnskapsbase",
-    description: "Tren AI på din dokumentasjon",
+    description: "Last opp FAQ, priser og retningslinjer",
   },
   {
     icon: PaletteIcon,
     label: "Widget-tilpasning",
-    description: "Tilpass utseendet på chat-widgeten",
+    description: "Egne farger, logo og velkomsttekst",
   },
   {
     icon: UsersIcon,
-    label: "Teamtilgang",
-    description: "Opptil 5 operatører per organisasjon",
+    label: "Teammedlemmer",
+    description: "Inviter kolleger til å følge opp samtaler",
   },
 ];
 
@@ -67,9 +67,9 @@ export const PremiumFeatureOverlay = ({
                 <GemIcon className="size-5 text-foreground" strokeWidth={1.75} />
               </div>
             </div>
-            <p className="text-[16px] font-semibold text-foreground">Pro-funksjon</p>
+            <p className="text-[16px] font-semibold text-foreground">Betalt funksjon</p>
             <p className="mt-1 text-[13px] text-muted-foreground">
-              Prøv gratis i 14 dager — ingen kortinfo kreves
+              Velg en plan for å låse opp denne funksjonen
             </p>
           </div>
 
@@ -94,7 +94,7 @@ export const PremiumFeatureOverlay = ({
               className="w-full rounded-xl font-medium"
               onClick={() => router.push("/billing")}
             >
-              Start 14-dagers gratis prøve
+              Se planer og priser
             </Button>
           </div>
         </div>

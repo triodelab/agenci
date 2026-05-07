@@ -53,6 +53,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { DashboardAccentButton } from "@/modules/dashboard/ui/components/dashboard-accent";
 import { DashboardPageShell } from "@/modules/dashboard/ui/components/dashboard-page-shell";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@workspace/ui/components/tooltip";
 
 type AgentDoc = Doc<"agents">;
 
@@ -106,6 +107,7 @@ function StatusDot({ active }: { active: boolean }) {
 
 export function AgentsView() {
   const agents = useQuery(api.private.agents.list);
+  const subscription = useQuery(api.private.subscription.getOwn);
   const seedDefaults = useMutation(api.private.agents.seedDefaults);
   const createAgent = useMutation(api.private.agents.create);
   const updateAgent = useMutation(api.private.agents.update);
@@ -202,6 +204,10 @@ export function AgentsView() {
     );
   }, [agents, filterQuery]);
 
+  const agentCount = agents?.length ?? 0;
+  const maxAgents = subscription?.maxAgents ?? 1;
+  const atLimit = agentCount >= maxAgents;
+
   return (
     <DashboardPageShell contentClassName="max-w-6xl">
 
@@ -218,14 +224,41 @@ export function AgentsView() {
             AI-assistentene som svarer kundene dine. Innebygd støtte-agent er aktiv som standard.
           </p>
         </div>
-        <DashboardAccentButton
-          className="w-full sm:w-auto shrink-0 gap-2"
-          onClick={() => setCreateOpen(true)}
-          type="button"
-        >
-          <PlusIcon className="size-4" />
-          Ny agent
-        </DashboardAccentButton>
+        <div className="flex items-center gap-3">
+          {agents !== undefined && agents !== null && (
+            <span className={cn(
+              "text-[12px] font-medium tabular-nums",
+              atLimit ? "text-amber-600 dark:text-amber-400" : "text-muted-foreground",
+            )}>
+              {agentCount}/{maxAgents} agenter
+            </span>
+          )}
+          {atLimit ? (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Link
+                  href="/billing"
+                  className="inline-flex h-9 shrink-0 items-center gap-2 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 text-[13px] font-medium text-amber-700 transition-colors hover:bg-amber-500/15 dark:text-amber-400"
+                >
+                  <PlusIcon className="size-4" />
+                  Oppgrader plan
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                Du har nådd maks {maxAgents} agent{maxAgents === 1 ? "" : "er"} på din plan.
+              </TooltipContent>
+            </Tooltip>
+          ) : (
+            <DashboardAccentButton
+              className="w-full sm:w-auto shrink-0 gap-2"
+              onClick={() => setCreateOpen(true)}
+              type="button"
+            >
+              <PlusIcon className="size-4" />
+              Ny agent
+            </DashboardAccentButton>
+          )}
+        </div>
       </div>
 
       {/* ── Loading ── */}
