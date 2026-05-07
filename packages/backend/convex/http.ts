@@ -74,19 +74,27 @@ http.route({
     switch (event.type) {
       case "checkout.session.completed": {
         const session = event.data.object as {
-          metadata?: { orgId?: string };
+          metadata?: { orgId?: string; priceId?: string };
           subscription?: string;
           customer?: string;
         };
         const orgId = session.metadata?.orgId;
-        if (!orgId) break;
+        if (!orgId) {
+          console.error("[stripe-webhook] checkout.session.completed missing orgId in metadata");
+          break;
+        }
+
+        const priceId = session.metadata?.priceId;
+        const planKey = priceId ? (PRICE_TO_PLAN[priceId] ?? "starter") : "starter";
+
+        console.log("[stripe-webhook] checkout.session.completed", { orgId, priceId, planKey });
 
         await ctx.runMutation(internal.system.subscriptions.upsert, {
           organizationId: orgId,
           status: "active",
           stripeCustomerId: typeof session.customer === "string" ? session.customer : undefined,
           stripeSubscriptionId: typeof session.subscription === "string" ? session.subscription : undefined,
-          planKey: "starter",
+          planKey,
         });
         break;
       }

@@ -24,7 +24,7 @@ export async function POST(req: Request) {
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${origin}/billing?checkout=success`,
       cancel_url: `${origin}/billing`,
-      metadata: { orgId },
+      metadata: { orgId, priceId },
       subscription_data: { metadata: { orgId } },
     });
 
