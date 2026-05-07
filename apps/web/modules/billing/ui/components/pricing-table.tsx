@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { CheckIcon, MinusIcon, Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { cn } from "@workspace/ui/lib/utils";
 
 type Bullet = { text: string; included: boolean };
@@ -96,7 +96,11 @@ export function PricingTable({ currentPlanKey }: { currentPlanKey: string | null
       const data = await res.json() as { url?: string; error?: string };
       if (data.url) {
         window.location.href = data.url;
+      } else {
+        toast.error(data.error ?? "Kunne ikke starte betaling. Prøv igjen.");
       }
+    } catch {
+      toast.error("Nettverksfeil. Sjekk internettforbindelsen og prøv igjen.");
     } finally {
       setLoadingPlan(null);
     }

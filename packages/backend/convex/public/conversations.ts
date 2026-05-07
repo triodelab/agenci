@@ -8,7 +8,7 @@ import type { Doc } from "../_generated/dataModel";
 
 async function createNewConversation(
   ctx: MutationCtx,
-  args: { organizationId: string; session: Doc<"contactSessions"> },
+  args: { organizationId: string; session: Doc<"contactSessions">; agentId?: string },
 ) {
   const widgetSettings = await ctx.db
     .query("widgetSettings")
@@ -17,10 +17,13 @@ async function createNewConversation(
     )
     .unique();
 
-  // Use the agent pinned in widget settings, otherwise fall back to first active agent
-  let widgetAgent = widgetSettings?.agentId
-    ? await ctx.db.get(widgetSettings.agentId)
-    : null;
+  // Priority: explicit agentId → widget settings agent → first active agent
+  let widgetAgent = args.agentId
+    ? await ctx.db.get(args.agentId as import("../_generated/dataModel").Id<"agents">)
+    : widgetSettings?.agentId
+      ? await ctx.db.get(widgetSettings.agentId)
+      : null;
+
   if (!widgetAgent || !widgetAgent.isActive) {
     widgetAgent = await ctx.db
       .query("agents")
@@ -183,6 +186,7 @@ export const resumeOrCreate = mutation({
     organizationId: v.string(),
     contactSessionId: v.id("contactSessions"),
     resumeConversationId: v.optional(v.id("conversations")),
+    agentId: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const session = await ctx.db.get(args.contactSessionId);
@@ -213,6 +217,7 @@ export const resumeOrCreate = mutation({
     return createNewConversation(ctx, {
       organizationId: args.organizationId,
       session,
+      agentId: args.agentId,
     });
   },
 });

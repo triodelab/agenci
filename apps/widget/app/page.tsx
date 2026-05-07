@@ -8,6 +8,7 @@ import { WidgetMissingOrg } from "./widget-missing-org";
 interface Props {
   searchParams: Promise<{
     organizationId?: string;
+    agentId?: string;
     playground?: string;
   }>;
 }
@@ -15,6 +16,7 @@ interface Props {
 const Page = ({ searchParams }: Props) => {
   const params = use(searchParams);
   const organizationId = params.organizationId?.trim() ?? null;
+  const agentId = params.agentId?.trim() ?? null;
   const playground =
     params.playground === "1" || params.playground === "true";
 
@@ -29,7 +31,7 @@ const Page = ({ searchParams }: Props) => {
   if (playground) {
     return (
       <div className="h-[100dvh] w-full overflow-hidden bg-background">
-        <WidgetView organizationId={organizationId} />
+        <WidgetView organizationId={organizationId} agentId={agentId} />
       </div>
     );
   }
@@ -37,7 +39,7 @@ const Page = ({ searchParams }: Props) => {
   // Embedded in iframe — fill the full frame, let the container handle clipping
   return (
     <div className="h-screen w-screen overflow-hidden bg-background">
-      <WidgetView organizationId={organizationId} />
+      <WidgetView organizationId={organizationId} agentId={agentId} />
     </div>
   );
 };

@@ -4,6 +4,7 @@ import { useQuery } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@workspace/ui/components/button";
 import {
   DashboardPageHeader,
@@ -70,8 +71,14 @@ export const BillingView = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ customerId: subscription.stripeCustomerId }),
       });
-      const data = await res.json() as { url?: string };
-      if (data.url) window.location.href = data.url;
+      const data = await res.json() as { url?: string; error?: string };
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        toast.error(data.error ?? "Kunne ikke åpne betalingsportalen. Prøv igjen.");
+      }
+    } catch {
+      toast.error("Nettverksfeil. Sjekk internettforbindelsen og prøv igjen.");
     } finally {
       setPortalLoading(false);
     }

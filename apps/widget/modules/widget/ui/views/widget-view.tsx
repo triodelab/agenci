@@ -20,9 +20,10 @@ import { WidgetContactScreen } from "../screens/widget-contact-screen";
 
 interface Props {
   organizationId: string | null;
+  agentId?: string | null;
 }
 
-export const WidgetView = ({ organizationId }: Props) => {
+export const WidgetView = ({ organizationId, agentId }: Props) => {
   const searchParams = useSearchParams();
   const embedPlayground =
     searchParams.get("playground") === "1" ||
@@ -49,7 +50,7 @@ export const WidgetView = ({ organizationId }: Props) => {
   }, [widgetSettings]);
 
   const screenComponents = {
-    loading: <WidgetLoadingScreen organizationId={organizationId} />,
+    loading: <WidgetLoadingScreen organizationId={organizationId} agentId={agentId ?? null} />,
     error: <WidgetErrorScreen />,
     auth: <WidgetAuthScreen />,
     voice: <WidgetVoiceScreen />,

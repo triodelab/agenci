@@ -21,7 +21,7 @@ import { api } from "@workspace/backend/_generated/api";
 
 type InitStep = "org" | "session" | "settings" | "vapi" | "done";
 
-export const WidgetLoadingScreen = ({ organizationId }: { organizationId: string | null }) => {
+export const WidgetLoadingScreen = ({ organizationId, agentId }: { organizationId: string | null; agentId: string | null }) => {
   const searchParams = useSearchParams();
   const playgroundEmbed =
     searchParams.get("playground") === "1" ||
@@ -220,6 +220,7 @@ export const WidgetLoadingScreen = ({ organizationId }: { organizationId: string
             contactSessionId,
             organizationId,
             resumeConversationId: savedConversationId ?? undefined,
+            agentId: agentId ?? undefined,
           });
           if (!cancelled) {
             setConversationId(conversationId);
@@ -244,6 +245,7 @@ export const WidgetLoadingScreen = ({ organizationId }: { organizationId: string
           contactSessionId,
           organizationId,
           resumeConversationId: savedConversationId ?? undefined,
+          agentId: agentId ?? undefined,
         });
         if (!cancelled) {
           setConversationId(conversationId);
