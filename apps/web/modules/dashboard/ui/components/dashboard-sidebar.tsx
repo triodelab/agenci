@@ -18,8 +18,21 @@ import {
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import { useQuery } from "convex/react";
+import { Component, type ReactNode } from "react";
 import { api } from "@workspace/backend/_generated/api";
 import type { Id } from "@workspace/backend/_generated/dataModel";
+
+class QueryErrorBoundary extends Component<
+  { children: ReactNode },
+  { error: boolean }
+> {
+  state = { error: false };
+  static getDerivedStateFromError() { return { error: true }; }
+  render() {
+    if (this.state.error) return null;
+    return this.props.children;
+  }
+}
 
 import {
   Sidebar,
@@ -356,7 +369,9 @@ export const DashboardSidebar = () => {
       </SidebarContent>
 
       <SidebarFooter className="p-0 pb-2">
-        <PlanCard collapsed={collapsed} />
+        <QueryErrorBoundary>
+          <PlanCard collapsed={collapsed} />
+        </QueryErrorBoundary>
         <div className="mx-2 mb-1">
           {collapsed ? (
             <Tooltip>

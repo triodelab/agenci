@@ -3,7 +3,7 @@
 import { OrganizationSwitcher, UserButton } from "@clerk/nextjs";
 import { BellIcon, SidebarIcon } from "lucide-react";
 import Link from "next/link";
-import { Suspense } from "react";
+import { Suspense, Component, type ReactNode } from "react";
 import { useQuery } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
 import { LogoIcon } from "@/components/logo";
@@ -15,6 +15,18 @@ import {
   PopoverTrigger,
 } from "@workspace/ui/components/popover";
 import { cn } from "@workspace/ui/lib/utils";
+
+class QueryErrorBoundary extends Component<
+  { children: ReactNode; fallback?: ReactNode },
+  { error: boolean }
+> {
+  state = { error: false };
+  static getDerivedStateFromError() { return { error: true }; }
+  render() {
+    if (this.state.error) return this.props.fallback ?? null;
+    return this.props.children;
+  }
+}
 
 const PLAN_LABEL: Record<string, string> = {
   starter: "Starter",
@@ -202,9 +214,11 @@ export function DashboardTopNav() {
           </span>
         </Link>
 
-        <Suspense fallback={null}>
-          <PlanBadge />
-        </Suspense>
+        <QueryErrorBoundary>
+          <Suspense fallback={null}>
+            <PlanBadge />
+          </Suspense>
+        </QueryErrorBoundary>
       </div>
 
       {/* Right: theme, org, bell, user */}
@@ -231,7 +245,13 @@ export function DashboardTopNav() {
           />
         </Suspense>
 
-        <NotificationsPopover />
+        <QueryErrorBoundary fallback={
+          <div className="relative flex size-8 shrink-0 items-center justify-center rounded-lg border border-border/70 text-muted-foreground">
+            <BellIcon className="size-4" strokeWidth={1.75} />
+          </div>
+        }>
+          <NotificationsPopover />
+        </QueryErrorBoundary>
 
         <Suspense fallback={<div className="size-8 animate-pulse rounded-lg bg-muted" />}>
           <UserButton
