@@ -99,6 +99,7 @@ http.route({
         break;
       }
 
+      case "customer.subscription.created":
       case "customer.subscription.updated": {
         const sub = event.data.object as {
           id: string;
