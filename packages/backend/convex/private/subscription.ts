@@ -12,11 +12,20 @@ export const getOwn = query({
       .withIndex("by_organization_id", (q) => q.eq("organizationId", orgId))
       .unique();
 
-    if (!sub) return { status: "free" as const, trialEndsAt: null };
+    if (!sub) {
+      return {
+        status: "free" as const,
+        trialEndsAt: null,
+        planKey: null,
+        stripeCustomerId: null,
+      };
+    }
 
     return {
       status: sub.status as "active" | "trialing" | "canceled" | "free",
       trialEndsAt: sub.trialEndsAt ?? null,
+      planKey: sub.planKey ?? null,
+      stripeCustomerId: sub.stripeCustomerId ?? null,
     };
   },
 });

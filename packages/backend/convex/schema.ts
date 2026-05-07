@@ -6,8 +6,12 @@ export default defineSchema({
     organizationId: v.string(),
     status: v.string(),
     trialEndsAt: v.optional(v.number()),
+    stripeCustomerId: v.optional(v.string()),
+    stripeSubscriptionId: v.optional(v.string()),
+    planKey: v.optional(v.string()),
   })
-    .index("by_organization_id", ["organizationId"]),
+    .index("by_organization_id", ["organizationId"])
+    .index("by_stripe_customer_id", ["stripeCustomerId"]),
   widgetSettings: defineTable({
     organizationId: v.string(),
     /** Vises i widget-header (f.eks. «Agenci»). */

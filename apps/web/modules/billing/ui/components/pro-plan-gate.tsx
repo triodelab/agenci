@@ -1,6 +1,8 @@
 "use client";
 
-import { Protect, useUser } from "@clerk/nextjs";
+import { useQuery } from "convex/react";
+import { api } from "@workspace/backend/_generated/api";
+import { useUser } from "@clerk/nextjs";
 import { hasUiPremiumBypass } from "@/lib/dev-bypass";
 import { PremiumFeatureOverlay } from "./premium-feature-overlay";
 import { CardGridSkeleton } from "@/modules/dashboard/ui/components/dashboard-skeleton";
@@ -8,21 +10,22 @@ import { CardGridSkeleton } from "@/modules/dashboard/ui/components/dashboard-sk
 export function ProPlanGate({ children }: { children: React.ReactNode }) {
   const { user, isLoaded } = useUser();
   const email = user?.primaryEmailAddress?.emailAddress;
+  const subscription = useQuery(api.private.subscription.getOwn);
 
   if (hasUiPremiumBypass(email)) {
     return <>{children}</>;
   }
 
-  if (!isLoaded) {
+  if (!isLoaded || subscription === undefined) {
     return <CardGridSkeleton count={3} />;
   }
 
-  return (
-    <Protect
-      condition={(has) => has({ plan: "pro" })}
-      fallback={<PremiumFeatureOverlay>{children}</PremiumFeatureOverlay>}
-    >
-      {children}
-    </Protect>
-  );
+  const hasAccess =
+    subscription?.status === "active" || subscription?.status === "trialing";
+
+  if (!hasAccess) {
+    return <PremiumFeatureOverlay>{children}</PremiumFeatureOverlay>;
+  }
+
+  return <>{children}</>;
 }

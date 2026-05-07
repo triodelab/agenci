@@ -6,9 +6,12 @@ export const upsert = internalMutation({
     organizationId: v.string(),
     status: v.string(),
     trialEndsAt: v.optional(v.number()),
+    stripeCustomerId: v.optional(v.string()),
+    stripeSubscriptionId: v.optional(v.string()),
+    planKey: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const existingSubscription = await ctx.db
+    const existing = await ctx.db
       .query("subscriptions")
       .withIndex("by_organization_id", (q) =>
         q.eq("organizationId", args.organizationId),
@@ -18,10 +21,13 @@ export const upsert = internalMutation({
     const fields = {
       status: args.status,
       trialEndsAt: args.trialEndsAt,
+      stripeCustomerId: args.stripeCustomerId,
+      stripeSubscriptionId: args.stripeSubscriptionId,
+      planKey: args.planKey,
     };
 
-    if (existingSubscription) {
-      await ctx.db.patch(existingSubscription._id, fields);
+    if (existing) {
+      await ctx.db.patch(existing._id, fields);
     } else {
       await ctx.db.insert("subscriptions", {
         organizationId: args.organizationId,
@@ -32,14 +38,24 @@ export const upsert = internalMutation({
 });
 
 export const getByOrganizationId = internalQuery({
-  args: {
-    organizationId: v.string(),
-  },
+  args: { organizationId: v.string() },
   handler: async (ctx, args) => {
     return await ctx.db
       .query("subscriptions")
-      .withIndex("by_organization_id", (q) => 
+      .withIndex("by_organization_id", (q) =>
         q.eq("organizationId", args.organizationId),
+      )
+      .unique();
+  },
+});
+
+export const getByStripeCustomerId = internalQuery({
+  args: { stripeCustomerId: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("subscriptions")
+      .withIndex("by_stripe_customer_id", (q) =>
+        q.eq("stripeCustomerId", args.stripeCustomerId),
       )
       .unique();
   },

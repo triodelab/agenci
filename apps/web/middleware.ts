@@ -14,6 +14,7 @@ const isPublicRoute = createRouteMatcher([
   "/robots.txt",
   "/api/contact",
   "/api/newsletter",
+  "/api/stripe/webhook",
 ]);
 
 /** Markedsføring + kontakt — innloggede brukere uten org skal fortsatt kunne besøke */
