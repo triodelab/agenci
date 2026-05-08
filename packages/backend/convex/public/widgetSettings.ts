@@ -19,7 +19,6 @@ export const getByOrganizationId = query({
       .withIndex("by_organization_id", (q) =>
         q.eq("organizationId", args.organizationId),
       )
-      .filter((q) => q.eq(q.field("agentId"), undefined))
       .first();
   },
 });

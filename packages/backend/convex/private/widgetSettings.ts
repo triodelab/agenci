@@ -70,7 +70,6 @@ export const upsert = mutation({
       : await ctx.db
           .query("widgetSettings")
           .withIndex("by_organization_id", (q) => q.eq("organizationId", orgId))
-          .filter((q) => q.eq(q.field("agentId"), undefined))
           .first();
 
     const patch = {
@@ -132,7 +131,6 @@ export const saveSystemPrompt = mutation({
       : await ctx.db
           .query("widgetSettings")
           .withIndex("by_organization_id", (q) => q.eq("organizationId", orgId))
-          .filter((q) => q.eq(q.field("agentId"), undefined))
           .first();
 
     if (existing) {
