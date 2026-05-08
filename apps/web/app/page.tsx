@@ -24,6 +24,7 @@ export default function HomePage() {
         <Script
           src="/widget.iife.js"
           data-organization-id={orgId}
+          data-agent-id="j57c6whw940s0jyg62kmdbph5n869gmz"
           strategy="afterInteractive"
         />
       )}

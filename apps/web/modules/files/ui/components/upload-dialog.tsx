@@ -2,6 +2,7 @@
 
 import { useAction } from "convex/react";
 import { UploadIcon, XIcon } from "lucide-react";
+import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import {
   Dialog,
@@ -96,7 +97,13 @@ export const UploadDialog = ({
       onFileUploaded?.();
       handleCancel();
     } catch (error) {
-      console.error(error);
+      const msg =
+        error instanceof Error
+          ? error.message
+          : typeof error === "object" && error && "message" in error
+            ? String((error as { message: unknown }).message)
+            : "Ukjent feil";
+      toast.error(msg);
     } finally {
       setIsUploading(false);
     }
@@ -258,7 +265,7 @@ export const UploadDialog = ({
           <Button
             className="h-11 min-w-[7.5rem] rounded-xl font-medium"
             disabled={
-              uploadedFiles.length === 0 || isUploading || !uploadForm.category
+              uploadedFiles.length === 0 || isUploading
             }
             onClick={handleUpload}
             type="button"
