@@ -10,12 +10,25 @@ async function createNewConversation(
   ctx: MutationCtx,
   args: { organizationId: string; session: Doc<"contactSessions">; agentId?: string },
 ) {
-  const widgetSettings = await ctx.db
-    .query("widgetSettings")
-    .withIndex("by_organization_id", (q) =>
-      q.eq("organizationId", args.organizationId),
-    )
-    .first();
+  const widgetSettings = args.agentId
+    ? (await ctx.db
+        .query("widgetSettings")
+        .withIndex("by_agent_id", (q) =>
+          q.eq("agentId", args.agentId as import("../_generated/dataModel").Id<"agents">),
+        )
+        .first()) ??
+      (await ctx.db
+        .query("widgetSettings")
+        .withIndex("by_organization_id", (q) =>
+          q.eq("organizationId", args.organizationId),
+        )
+        .first())
+    : await ctx.db
+        .query("widgetSettings")
+        .withIndex("by_organization_id", (q) =>
+          q.eq("organizationId", args.organizationId),
+        )
+        .first();
 
   // Priority: explicit agentId → widget settings agent → first active agent
   let widgetAgent = args.agentId
@@ -155,6 +168,7 @@ export const create = mutation({
   args: {
     organizationId: v.string(),
     contactSessionId: v.id("contactSessions"),
+    agentId: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const session = await ctx.db.get(args.contactSessionId);
@@ -173,6 +187,7 @@ export const create = mutation({
     return createNewConversation(ctx, {
       organizationId: args.organizationId,
       session,
+      agentId: args.agentId,
     });
   },
 });
