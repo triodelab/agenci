@@ -36,6 +36,7 @@ const appearanceArgs = v.optional(
 
 export const upsert = mutation({
   args: {
+    forAgentId: v.optional(v.id("agents")),
     agentId: v.optional(v.id("agents")),
     widgetTitle: v.string(),
     greetMessage: v.string(),
@@ -61,13 +62,19 @@ export const upsert = mutation({
       });
     }
 
-    const existingWidgetSettings = await ctx.db
-      .query("widgetSettings")
-      .withIndex("by_organization_id", (q) => q.eq("organizationId", orgId))
-      .unique();
+    const existingWidgetSettings = args.forAgentId
+      ? await ctx.db
+          .query("widgetSettings")
+          .withIndex("by_agent_id", (q) => q.eq("agentId", args.forAgentId!))
+          .first()
+      : await ctx.db
+          .query("widgetSettings")
+          .withIndex("by_organization_id", (q) => q.eq("organizationId", orgId))
+          .filter((q) => q.eq(q.field("agentId"), undefined))
+          .first();
 
     const patch = {
-      agentId: args.agentId,
+      agentId: args.forAgentId ?? args.agentId,
       widgetTitle: args.widgetTitle,
       greetMessage: args.greetMessage,
       defaultSuggestions: args.defaultSuggestions,
@@ -85,25 +92,29 @@ export const upsert = mutation({
 
 
 export const getOne = query({
-  args: {},
-  handler: async (ctx) => {
+  args: { agentId: v.optional(v.id("agents")) },
+  handler: async (ctx, args) => {
     const orgId = await getOrgIdOrNull(ctx);
+    if (!orgId) return null;
 
-    if (!orgId) {
-      return null;
+    if (args.agentId) {
+      const agentSettings = await ctx.db
+        .query("widgetSettings")
+        .withIndex("by_agent_id", (q) => q.eq("agentId", args.agentId!))
+        .first();
+      if (agentSettings) return agentSettings;
     }
 
-    const widgetSettings = await ctx.db
+    return ctx.db
       .query("widgetSettings")
       .withIndex("by_organization_id", (q) => q.eq("organizationId", orgId))
-      .unique();
-
-    return widgetSettings;
+      .filter((q) => q.eq(q.field("agentId"), undefined))
+      .first();
   },
 });
 
 export const saveSystemPrompt = mutation({
-  args: { systemPrompt: v.string() },
+  args: { systemPrompt: v.string(), agentId: v.optional(v.id("agents")) },
   handler: async (ctx, args) => {
     const orgId = await getOrgIdOrNull(ctx);
     if (!orgId) {
@@ -113,16 +124,23 @@ export const saveSystemPrompt = mutation({
       });
     }
 
-    const existing = await ctx.db
-      .query("widgetSettings")
-      .withIndex("by_organization_id", (q) => q.eq("organizationId", orgId))
-      .unique();
+    const existing = args.agentId
+      ? await ctx.db
+          .query("widgetSettings")
+          .withIndex("by_agent_id", (q) => q.eq("agentId", args.agentId!))
+          .first()
+      : await ctx.db
+          .query("widgetSettings")
+          .withIndex("by_organization_id", (q) => q.eq("organizationId", orgId))
+          .filter((q) => q.eq(q.field("agentId"), undefined))
+          .first();
 
     if (existing) {
       await ctx.db.patch(existing._id, { systemPrompt: args.systemPrompt });
     } else {
       await ctx.db.insert("widgetSettings", {
         organizationId: orgId,
+        agentId: args.agentId,
         greetMessage: "Hei! Hvordan kan jeg hjelpe deg i dag?",
         defaultSuggestions: {},
         vapiSettings: {},
@@ -133,13 +151,21 @@ export const saveSystemPrompt = mutation({
 });
 
 export const getByOrganizationId = internalQuery({
-  args: { organizationId: v.string() },
+  args: { organizationId: v.string(), agentId: v.optional(v.id("agents")) },
   handler: async (ctx, args) => {
+    if (args.agentId) {
+      const agentSettings = await ctx.db
+        .query("widgetSettings")
+        .withIndex("by_agent_id", (q) => q.eq("agentId", args.agentId!))
+        .first();
+      if (agentSettings) return agentSettings;
+    }
     return ctx.db
       .query("widgetSettings")
       .withIndex("by_organization_id", (q) =>
         q.eq("organizationId", args.organizationId),
       )
-      .unique();
+      .filter((q) => q.eq(q.field("agentId"), undefined))
+      .first();
   },
 });

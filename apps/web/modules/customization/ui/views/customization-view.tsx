@@ -97,8 +97,8 @@ const SECTION_COPY: Record<
   },
 };
 
-export const CustomizationView = () => {
-  const widgetSettings = useQuery(api.private.widgetSettings.getOne);
+export const CustomizationView = ({ agentId }: { agentId?: import("@workspace/backend/_generated/dataModel").Id<"agents"> }) => {
+  const widgetSettings = useQuery(api.private.widgetSettings.getOne, agentId ? { agentId } : {});
   const vapiPlugin = useQuery(api.private.plugins.getOne, { service: "vapi" });
   const agents = useQuery(api.private.agents.list);
 
@@ -232,6 +232,7 @@ export const CustomizationView = () => {
             hasVapiPlugin={hasVapi}
             initialData={widgetSettings}
             agents={agents ?? []}
+            forAgentId={agentId}
           />
         </div>
       </div>

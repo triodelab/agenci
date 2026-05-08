@@ -122,9 +122,10 @@ export const WidgetLoadingScreen = ({ organizationId, agentId }: { organizationI
   }, [step, contactSessionId, validateContactSession, setLoadingMessage]);
 
   // Step 3: Load Widget Settings
-  const widgetSettings = useQuery(api.public.widgetSettings.getByOrganizationId, 
+  const widgetSettings = useQuery(api.public.widgetSettings.getByOrganizationId,
     organizationId ? {
       organizationId,
+      ...(agentId ? { agentId: agentId as import("@workspace/backend/_generated/dataModel").Id<"agents"> } : {}),
     } : "skip",
   );
   useEffect(() => {

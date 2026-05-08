@@ -61,7 +61,8 @@ export default defineSchema({
       }),
     ),
   })
-  .index("by_organization_id", ["organizationId"]),
+  .index("by_organization_id", ["organizationId"])
+  .index("by_agent_id", ["agentId"]),
   plugins: defineTable({
     organizationId: v.string(),
     service: v.union(v.literal("vapi")),

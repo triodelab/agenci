@@ -73,7 +73,7 @@ export const create = action({
     if (shouldTriggerAgent) {
       const widgetSettings = await ctx.runQuery(
         internal.private.widgetSettings.getByOrganizationId,
-        { organizationId: conversation.organizationId },
+        { organizationId: conversation.organizationId, agentId: conversation.agentId },
       );
 
       const osloTime = new Date().toLocaleString("no-NO", {

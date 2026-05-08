@@ -43,6 +43,7 @@ interface CustomizationFormProps {
   hasVapiPlugin: boolean;
   activeSection: WidgetCustomizationSection;
   agents: { _id: string; name: string; isActive: boolean }[];
+  forAgentId?: import("@workspace/backend/_generated/dataModel").Id<"agents">;
 }
 
 export const CustomizationForm = ({
@@ -50,6 +51,7 @@ export const CustomizationForm = ({
   hasVapiPlugin,
   activeSection,
   agents,
+  forAgentId,
 }: CustomizationFormProps) => {
   const upsertWidgetSettings = useMutation(api.private.widgetSettings.upsert);
 
@@ -88,7 +90,8 @@ export const CustomizationForm = ({
       };
 
       await upsertWidgetSettings({
-        agentId: values.agentId as import("@workspace/backend/_generated/dataModel").Id<"agents"> | undefined || undefined,
+        forAgentId,
+        agentId: forAgentId ? undefined : (values.agentId as import("@workspace/backend/_generated/dataModel").Id<"agents"> | undefined || undefined),
         widgetTitle: values.widgetTitle.trim(),
         greetMessage: values.greetMessage,
         defaultSuggestions: values.defaultSuggestions,
