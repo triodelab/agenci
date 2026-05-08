@@ -82,7 +82,7 @@ export const getOverview = query({
     const widgetSettings = await ctx.db
       .query("widgetSettings")
       .withIndex("by_organization_id", (q) => q.eq("organizationId", orgId))
-      .unique();
+      .first();
 
     const vapiPlugin = await ctx.db
       .query("plugins")

@@ -15,7 +15,7 @@ async function createNewConversation(
     .withIndex("by_organization_id", (q) =>
       q.eq("organizationId", args.organizationId),
     )
-    .unique();
+    .first();
 
   // Priority: explicit agentId → widget settings agent → first active agent
   let widgetAgent = args.agentId
