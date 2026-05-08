@@ -180,8 +180,8 @@ export function KnowledgeTrainingPlayground({
   const [showCapacityBanner, setShowCapacityBanner] = useState(true);
 
   const widgetUrl = useMemo(
-    () => organization?.id ? getWidgetPreviewUrl(organization.id, { playground: true }) : null,
-    [organization?.id],
+    () => organization?.id ? getWidgetPreviewUrl(organization.id, { playground: true, agentId: agentId ?? undefined }) : null,
+    [organization?.id, agentId],
   );
 
   // Load system prompt from Convex when settings arrive

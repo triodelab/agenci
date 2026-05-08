@@ -6,7 +6,7 @@
  */
 export function getWidgetPreviewUrl(
   organizationId: string,
-  options?: { playground?: boolean },
+  options?: { playground?: boolean; agentId?: string },
 ): string {
   const origin =
     process.env.NEXT_PUBLIC_WIDGET_PREVIEW_ORIGIN?.replace(/\/$/, "") ||
@@ -15,6 +15,9 @@ export function getWidgetPreviewUrl(
   u.searchParams.set("organizationId", organizationId);
   if (options?.playground) {
     u.searchParams.set("playground", "1");
+  }
+  if (options?.agentId) {
+    u.searchParams.set("agentId", options.agentId);
   }
   return u.toString();
 }
