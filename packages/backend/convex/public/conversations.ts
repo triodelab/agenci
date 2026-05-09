@@ -4,7 +4,7 @@ import { ConvexError, v } from "convex/values";
 import { supportAgent } from "../system/ai/agents/supportAgent";
 import { MessageDoc, saveMessage } from "@convex-dev/agent";
 import { paginationOptsValidator } from "convex/server";
-import type { Doc } from "../_generated/dataModel";
+import type { Doc, Id } from "../_generated/dataModel";
 
 async function createNewConversation(
   ctx: MutationCtx,
@@ -14,7 +14,7 @@ async function createNewConversation(
     ? (await ctx.db
         .query("widgetSettings")
         .withIndex("by_agent_id", (q) =>
-          q.eq("agentId", args.agentId as import("../_generated/dataModel").Id<"agents">),
+          q.eq("agentId", args.agentId as Id<"agents">),
         )
         .first()) ??
       (await ctx.db
