@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useWidgetDisplayTitle } from "@/lib/widget-display-title";
 import {
+  agentIdAtom,
   contactSessionIdAtomFamily,
   conversationIdAtomFamily,
   errorMessageAtom,
@@ -34,6 +35,7 @@ export const WidgetLoadingScreen = ({ organizationId, agentId }: { organizationI
   const loadingMessage = useAtomValue(loadingMessageAtom);
   const setWidgetSettings = useSetAtom(widgetSettingsAtom);
   const setOrganizationId = useSetAtom(organizationIdAtom);
+  const setAgentId = useSetAtom(agentIdAtom);
   const setLoadingMessage = useSetAtom(loadingMessageAtom);
   const setErrorMessage = useSetAtom(errorMessageAtom);
   const setScreen = useSetAtom(screenAtom);
@@ -72,6 +74,7 @@ export const WidgetLoadingScreen = ({ organizationId, agentId }: { organizationI
       .then((result) => {
         if (result.valid) {
           setOrganizationId(organizationId);
+          setAgentId(agentId);
           setStep("session");
         } else {
           setErrorMessage(result.reason || "Ugyldig konfigurasjon");

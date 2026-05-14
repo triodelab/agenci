@@ -5,6 +5,7 @@ const isPublicRoute = createRouteMatcher([
   "/",
   "/sign-in(.*)",
   "/sign-up(.*)",
+  "/sso-callback(.*)",
   "/integrasjoner",
   "/hvordan-det-virker",
   "/personvern",
@@ -21,6 +22,7 @@ const isPublicRoute = createRouteMatcher([
 const isOrgFreeRoute = createRouteMatcher([
   "/sign-in(.*)",
   "/sign-up(.*)",
+  "/sso-callback(.*)",
   "/org-selection(.*)",
   "/integrasjoner",
   "/hvordan-det-virker",

@@ -5,6 +5,7 @@ import { useAtomValue, useSetAtom } from "jotai";
 import { ChevronRightIcon, MessageSquareTextIcon, MicIcon, PhoneIcon } from "lucide-react";
 import { useWidgetDisplayTitle } from "@/lib/widget-display-title";
 import {
+  agentIdAtom,
   contactSessionIdAtomFamily,
   conversationIdAtomFamily,
   errorMessageAtom,
@@ -29,6 +30,7 @@ export const WidgetSelectionScreen = () => {
   const widgetSettings = useAtomValue(widgetSettingsAtom);
   const widgetTitle = useWidgetDisplayTitle();
   const hasVapiSecrets = useAtomValue(hasVapiSecretsAtom);
+  const agentId = useAtomValue(agentIdAtom);
   const contactSessionId = useAtomValue(
     contactSessionIdAtomFamily(organizationId || "")
   );
@@ -53,7 +55,7 @@ export const WidgetSelectionScreen = () => {
       const conversationId = await createConversation({
         contactSessionId,
         organizationId,
-        agentId: widgetSettings?.agentId ?? undefined,
+        agentId: agentId ?? undefined,
       });
 
       setConversationId(conversationId);

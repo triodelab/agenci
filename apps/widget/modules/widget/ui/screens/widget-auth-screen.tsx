@@ -18,6 +18,7 @@ import { useSearchParams } from "next/navigation";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useWidgetDisplayTitle } from "@/lib/widget-display-title";
 import {
+  agentIdAtom,
   contactSessionIdAtomFamily,
   conversationIdAtomFamily,
   organizationIdAtom,
@@ -39,6 +40,7 @@ export const WidgetAuthScreen = () => {
   const widgetTitle = useWidgetDisplayTitle();
 
   const organizationId = useAtomValue(organizationIdAtom);
+  const agentId = useAtomValue(agentIdAtom);
   const setContactSessionId = useSetAtom(
     contactSessionIdAtomFamily(organizationId || ""),
   );
@@ -85,6 +87,7 @@ export const WidgetAuthScreen = () => {
       const conversationId = await createConversation({
         contactSessionId,
         organizationId,
+        agentId: agentId ?? undefined,
       });
       setConversationId(conversationId);
       setScreen("chat");
