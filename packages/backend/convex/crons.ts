@@ -9,4 +9,10 @@ crons.daily(
   internal.system.contactSessions.purgeExpired,
 );
 
+crons.interval(
+  "schedule-website-syncs",
+  { hours: 1 },
+  internal.system.websites.scheduleDueRuns,
+);
+
 export default crons;

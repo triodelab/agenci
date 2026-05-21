@@ -55,6 +55,12 @@ JWT / `orgId`: se [packages/backend/docs/CONVEX_CLERK_JWT.md](../packages/backen
 - `.env` med `NEXT_PUBLIC_CONVEX_URL`, Clerk-nøkler, ev. `NEXT_PUBLIC_DEV_BYPASS_PREMIUM` for utvikling (kun UI-gate, ikke Convex-logikk).
 - **Billing / faktura:** på `/billing` vises `OrganizationProfile` og `PricingTable` som standard. Valgfritt: `NEXT_PUBLIC_HIDE_CLERK_BILLING_UI=true` viser plassholder for brukere som ikke står i `NEXT_PUBLIC_TEAM_DEVELOPER_EMAILS` (f.eks. miljø uten Clerk Billing). `NEXT_PUBLIC_DEV_BYPASS_PREMIUM` styrer kun ProPlanGate, ikke billing-siden.
 
+### 3a. Convex Workflow for nettside-workflows
+
+Nettside-crawl og synkronisering kjøres som durable Convex Workflows. Convex eier både state, RAG-indeksering og workflow-kjøring, så web-appen trenger ingen ekstra workflow-secret eller separat event-server.
+
+Når du legger til en nettside i dashboardet, opprettes en `websiteRun` og Convex Workflow fortsetter batchene i bakgrunnen. Den hourly Convex-cronen starter også nye workflow-kjøringer for kilder som er klare for resync.
+
 ## 4. Widget (`apps/widget`)
 
 - `.env.local` med **samme** `NEXT_PUBLIC_CONVEX_URL` som web.

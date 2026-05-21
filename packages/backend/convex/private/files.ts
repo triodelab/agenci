@@ -10,13 +10,14 @@ import {
 import { action, mutation, query, QueryCtx } from "../_generated/server";
 import { getOrgIdOrNull, getUserEmailOrNull } from "../lib/auth";
 import { hasActiveSubscriptionAccess } from "../lib/subscriptionAccess";
-import { extractHtmlTitle, htmlToPlainText } from "../lib/htmlToPlainText";
-import { assertPublicHttpUrl } from "../lib/publicHttpUrl";
 import { extractTextContent } from "../lib/extractTextContent";
+import { agentNamespace, type EntryMetadata } from "../lib/knowledgeIngestion";
 import rag from "../system/ai/rag";
 import { Id } from "../_generated/dataModel";
 import { paginationOptsValidator } from "convex/server";
 import { internal } from "../_generated/api";
+
+const internalApi = internal as any;
 
 function guessMimeType(filename: string, bytes: ArrayBuffer): string {
   return (
@@ -24,11 +25,6 @@ function guessMimeType(filename: string, bytes: ArrayBuffer): string {
     guessMimeTypeFromContents(bytes) ||
     "application/octet-stream"
   );
-}
-
-/** Per-agent namespace: orgId:agentId. Falls back to orgId for legacy files. */
-function agentNamespace(orgId: string, agentId?: Id<"agents"> | null): string {
-  return agentId ? `${orgId}:${agentId}` : orgId;
 }
 
 export const deleteFile = mutation({
@@ -50,6 +46,19 @@ export const deleteFile = mutation({
     const meta = entry.metadata as EntryMetadata | undefined;
     if (meta?.storageId) {
       await ctx.storage.delete(meta.storageId as Id<"_storage">);
+    }
+
+    if (meta?.websiteSourceId && meta.sourceUrl) {
+      const websitePage = await ctx.db
+        .query("websitePages")
+        .withIndex("by_website_source_id_and_source_url", (q) =>
+          q.eq("websiteSourceId", meta.websiteSourceId as Id<"websiteSources">).eq("sourceUrl", meta.sourceUrl!),
+        )
+        .unique();
+
+      if (websitePage) {
+        await ctx.db.delete(websitePage._id);
+      }
     }
 
     await rag.deleteAsync(ctx, { entryId: args.entryId });
@@ -131,14 +140,14 @@ export const addFile = action({
   },
 });
 
-const MAX_WEB_HTML_CHARS = 2_000_000;
-const MIN_WEB_TEXT_CHARS = 40;
-
 export const addWebpage = action({
   args: {
     url: v.string(),
     category: v.optional(v.string()),
     agentId: v.optional(v.id("agents")),
+    mode: v.optional(v.union(v.literal("single"), v.literal("crawl"))),
+    maxPages: v.optional(v.number()),
+    syncIntervalMinutes: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     const orgId = await getOrgIdOrNull(ctx);
@@ -155,101 +164,101 @@ export const addWebpage = action({
       throw new ConvexError("Du trenger et aktivt abonnement for å legge til nettsider. Gå til Fakturering for å velge en plan.");
     }
 
-    const publicUrl = assertPublicHttpUrl(args.url);
-    const normalizedUrl = publicUrl.toString();
+    const queued = await ctx.runMutation(internalApi.system.websites.enqueue, {
+      organizationId: orgId,
+      agentId: args.agentId,
+      url: args.url,
+      category: args.category,
+      mode: args.mode,
+      maxPages: args.maxPages,
+      syncIntervalMinutes: args.syncIntervalMinutes,
+    });
 
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 25_000);
+    return {
+      sourceId: queued.sourceId,
+      runId: queued.runId,
+      status: queued.status,
+      url: queued.url,
+      title: queued.url,
+      alreadyQueued: queued.alreadyQueued,
+    };
+  },
+});
 
-    let response: Response;
-    try {
-      response = await fetch(normalizedUrl, {
-        redirect: "follow",
-        signal: controller.signal,
-        headers: {
-          Accept:
-            "text/html,application/xhtml+xml,application/xml;q=0.9,text/plain;q=0.8,*/*;q=0.5",
-          "User-Agent": "AgenciKnowledgeBot/1.0",
-        },
-      });
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : String(e);
-      const isRedirectLoop = msg.toLowerCase().includes("too many redirects") || msg.toLowerCase().includes("redirect");
-      throw new ConvexError({
-        code: "BAD_REQUEST",
-        message: isRedirectLoop
-          ? "Nettsiden har for mange omdirigeringer og kan ikke hentes. Prøv en mer direkte URL (f.eks. uten www, eller bruk https:// direkte), eller last opp innholdet som en fil i stedet."
-          : `Kunne ikke hente siden: ${msg}`,
-      });
-    } finally {
-      clearTimeout(timeoutId);
+export const deleteWebsiteSource = action({
+  args: {
+    sourceId: v.id("websiteSources"),
+  },
+  handler: async (ctx, args) => {
+    const orgId = await getOrgIdOrNull(ctx);
+    if (!orgId) {
+      throw new ConvexError("No organization in session. Select an organization in Clerk.");
     }
 
-    if (!response.ok) {
-      throw new ConvexError(`HTTP ${response.status} fra serveren`);
+    const source = await ctx.runQuery(internalApi.system.websites.getSourceById, {
+      sourceId: args.sourceId,
+    });
+    if (!source || source.organizationId !== orgId) {
+      throw new ConvexError("Nettsidekilden ble ikke funnet.");
     }
 
-    const contentType = (response.headers.get("content-type") ?? "").toLowerCase();
-    let html = await response.text();
-    const looksHtml =
-      contentType.includes("text/html") ||
-      contentType.includes("application/xhtml") ||
-      contentType.includes("text/plain") ||
-      /^\s*</.test(html.slice(0, 800));
-    if (!looksHtml) {
-      throw new ConvexError(
-        "URL-en ser ikke ut som en vanlig nettside (HTML). Prøv en annen adresse eller last opp som fil.",
-      );
+    const deletedRuns = await ctx.runMutation(internalApi.system.websites.finalizeDeleteSource, {
+      sourceId: source._id,
+    });
+    const deletedPages = await ctx.runMutation(internalApi.system.websites.deleteSourcePages, {
+      sourceId: source._id,
+    });
+
+    return {
+      deletedPages: deletedPages.deletedPages,
+      deletedRuns: deletedRuns.deletedRuns,
+    };
+  },
+});
+
+export const pauseWebsiteSource = action({
+  args: {
+    sourceId: v.id("websiteSources"),
+  },
+  handler: async (ctx, args) => {
+    const orgId = await getOrgIdOrNull(ctx);
+    if (!orgId) {
+      throw new ConvexError("No organization in session. Select an organization in Clerk.");
     }
 
-    if (html.length > MAX_WEB_HTML_CHARS) html = html.slice(0, MAX_WEB_HTML_CHARS);
-
-    const plain = htmlToPlainText(html);
-    if (plain.length < MIN_WEB_TEXT_CHARS) {
-      throw new ConvexError(
-        "For lite tekst hentet fra siden (kanskje JavaScript-app eller blokkert innhold). Prøv en annen URL eller last opp som fil.",
-      );
+    const source = await ctx.runQuery(internalApi.system.websites.getSourceById, {
+      sourceId: args.sourceId,
+    });
+    if (!source || source.organizationId !== orgId) {
+      throw new ConvexError("Nettsidekilden ble ikke funnet.");
     }
 
-    const titleFromPage = extractHtmlTitle(html);
-    const displayName = titleFromPage ?? `${publicUrl.hostname}${publicUrl.pathname}`;
-    const textBytes = new TextEncoder().encode(plain);
+    return await ctx.runMutation(internalApi.system.websites.pauseSource, {
+      sourceId: source._id,
+    });
+  },
+});
 
-    const namespace = agentNamespace(orgId, args.agentId);
-
-    let entryId: string;
-    let created: boolean;
-    try {
-      ({ entryId, created } = await rag.add(ctx, {
-        namespace,
-        text: plain,
-        key: normalizedUrl,
-        title: displayName,
-        metadata: {
-          uploadedBy: orgId,
-          filename: displayName,
-          category: args.category ?? null,
-          sourceType: "webpage",
-          sourceUrl: normalizedUrl,
-          agentId: args.agentId ?? null,
-        } as EntryMetadata,
-        contentHash: await contentHashFromArrayBuffer(textBytes.buffer),
-      }));
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : String(e);
-      const isKeyMissing = msg.toLowerCase().includes("api key") || msg.toLowerCase().includes("openai");
-      throw new ConvexError(
-        isKeyMissing
-          ? "Mangler OpenAI API-nøkkel på Convex-deploymenten. Sett OPENAI_API_KEY i Convex-dashboardet."
-          : `Kunne ikke indeksere nettsiden (embedding feilet): ${msg}`,
-      );
+export const resumeWebsiteSource = action({
+  args: {
+    sourceId: v.id("websiteSources"),
+  },
+  handler: async (ctx, args) => {
+    const orgId = await getOrgIdOrNull(ctx);
+    if (!orgId) {
+      throw new ConvexError("No organization in session. Select an organization in Clerk.");
     }
 
-    if (!created) {
-      console.debug("webpage entry unchanged, skipping duplicate");
+    const source = await ctx.runQuery(internalApi.system.websites.getSourceById, {
+      sourceId: args.sourceId,
+    });
+    if (!source || source.organizationId !== orgId) {
+      throw new ConvexError("Nettsidekilden ble ikke funnet.");
     }
 
-    return { entryId, url: normalizedUrl, title: displayName };
+    return await ctx.runMutation(internalApi.system.websites.resumeSource, {
+      sourceId: source._id,
+    });
   },
 });
 
@@ -288,6 +297,40 @@ export const list = query({
   },
 });
 
+export const listWebsiteSources = query({
+  args: {
+    agentId: v.optional(v.id("agents")),
+  },
+  handler: async (ctx, args) => {
+    const orgId = await getOrgIdOrNull(ctx);
+    if (!orgId) {
+      return [];
+    }
+
+    const sources = await ctx.db
+      .query("websiteSources")
+      .withIndex("by_organization_id", (q) => q.eq("organizationId", orgId))
+      .collect();
+
+    return sources
+      .filter((source) => source.agentId === args.agentId)
+      .sort((left, right) => right.updatedAt - left.updatedAt)
+      .map((source) => ({
+        id: source._id,
+        rootUrl: source.rootUrl,
+        host: source.host,
+        status: source.status,
+        mode: source.mode,
+        maxPages: source.maxPages,
+        category: source.category,
+        lastError: source.lastError,
+        lastRunAt: source.lastRunAt,
+        lastCompletedAt: source.lastCompletedAt,
+        lastIndexedCount: source.lastIndexedCount,
+      }));
+  },
+});
+
 export type PublicFile = {
   id: EntryId;
   name: string;
@@ -299,14 +342,18 @@ export type PublicFile = {
   sourceUrl?: string;
 };
 
-type EntryMetadata = {
-  storageId?: Id<"_storage">;
-  uploadedBy: string;
-  filename: string;
-  category: string | null;
-  sourceType?: "file" | "webpage";
-  sourceUrl?: string;
-  agentId?: string | null;
+export type PublicWebsiteSource = {
+  id: Id<"websiteSources">;
+  rootUrl: string;
+  host: string;
+  status: "queued" | "running" | "ready" | "error" | "paused";
+  mode: "single" | "crawl";
+  maxPages: number;
+  category?: string;
+  lastError?: string;
+  lastRunAt?: number;
+  lastCompletedAt?: number;
+  lastIndexedCount?: number;
 };
 
 async function convertEntryToPublicFile(ctx: QueryCtx, entry: Entry): Promise<PublicFile> {
