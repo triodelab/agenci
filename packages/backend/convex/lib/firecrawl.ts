@@ -1,6 +1,10 @@
+import { contentHashFromArrayBuffer } from "@convex-dev/rag";
 import { ConvexError, v } from "convex/values";
 import Firecrawl from "@mendable/firecrawl-js";
 import { internalAction } from "../_generated/server";
+import type { Id } from "../_generated/dataModel";
+import { agentNamespace } from "./knowledgeIngestion";
+import rag from "../system/ai/rag";
 
 export const firecrawlClient = new Firecrawl({
   apiKey: process.env.FIRECRAWL_API_KEY,
@@ -47,5 +51,49 @@ export const scrapeWebsiteUrlFn = internalAction({
       markdown: doc.markdown ?? null,
       branding,
     };
+  },
+});
+
+const MIN_MARKDOWN_CHARS = 40;
+
+export const ingestMarkdownFn = internalAction({
+  args: {
+    orgId: v.string(),
+    agentId: v.id("agents"),
+    url: v.string(),
+    markdown: v.string(),
+  },
+  handler: async (ctx, args) => {
+    if (args.markdown.length < MIN_MARKDOWN_CHARS) {
+      throw new ConvexError(
+        "For lite tekst hentet fra siden. Prøv en annen URL eller last opp innholdet som fil.",
+      );
+    }
+
+    const publicUrl = new URL(args.url);
+    const title = `${publicUrl.hostname}${publicUrl.pathname}`;
+    const textBytes = new TextEncoder().encode(args.markdown);
+
+    const { entryId, created } = await rag.add(ctx, {
+      namespace: agentNamespace(args.orgId, args.agentId as Id<"agents">),
+      text: args.markdown,
+      key: args.url,
+      title,
+      metadata: {
+        uploadedBy: args.orgId,
+        filename: title,
+        category: null,
+        sourceType: "webpage",
+        sourceUrl: args.url,
+        agentId: args.agentId,
+      },
+      contentHash: await contentHashFromArrayBuffer(textBytes.buffer),
+    });
+
+    if (!created) {
+      console.debug("Markdown entry uendret, hopper over duplikat");
+    }
+
+    return { entryId, created };
   },
 });
