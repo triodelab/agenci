@@ -1,6 +1,16 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
+const websiteStatus = v.union(
+  v.literal("queued"),
+  v.literal("running"),
+  v.literal("ready"),
+  v.literal("error"),
+  v.literal("paused"),
+);
+
+const websiteMode = v.union(v.literal("single"), v.literal("crawl"));
+
 export default defineSchema({
   subscriptions: defineTable({
     organizationId: v.string(),
@@ -127,6 +137,75 @@ export default defineSchema({
   })
     .index("by_organization_id", ["organizationId"])
     .index("by_organization_and_slug", ["organizationId", "slug"]),
+  websiteSources: defineTable({
+    organizationId: v.string(),
+    agentId: v.optional(v.id("agents")),
+    rootUrl: v.string(),
+    host: v.string(),
+    category: v.optional(v.string()),
+    mode: websiteMode,
+    status: websiteStatus,
+    maxPages: v.number(),
+    syncIntervalMinutes: v.number(),
+    nextRunAt: v.number(),
+    lastRunAt: v.optional(v.number()),
+    lastCompletedAt: v.optional(v.number()),
+    activeRunId: v.optional(v.id("websiteRuns")),
+    lastRunId: v.optional(v.id("websiteRuns")),
+    lastError: v.optional(v.string()),
+    lastIndexedCount: v.optional(v.number()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_organization_id", ["organizationId"])
+    .index("by_organization_id_and_agent_id", ["organizationId", "agentId"])
+    .index("by_organization_agent_root_url", [
+      "organizationId",
+      "agentId",
+      "rootUrl",
+    ])
+    .index("by_status_and_next_run_at", ["status", "nextRunAt"]),
+  websiteRuns: defineTable({
+    websiteSourceId: v.id("websiteSources"),
+    organizationId: v.string(),
+    agentId: v.optional(v.id("agents")),
+    status: websiteStatus,
+    mode: websiteMode,
+    maxPages: v.number(),
+    attempt: v.number(),
+    pendingUrls: v.array(v.string()),
+    visitedUrls: v.array(v.string()),
+    failedUrls: v.array(v.string()),
+    discoveredCount: v.number(),
+    processedCount: v.number(),
+    succeededCount: v.number(),
+    failedCount: v.number(),
+    workflowId: v.optional(v.string()),
+    startedAt: v.number(),
+    updatedAt: v.number(),
+    completedAt: v.optional(v.number()),
+    lastError: v.optional(v.string()),
+  })
+    .index("by_website_source_id", ["websiteSourceId"])
+    .index("by_status", ["status"])
+    .index("by_started_at", ["startedAt"]),
+  websitePages: defineTable({
+    websiteSourceId: v.id("websiteSources"),
+    organizationId: v.string(),
+    agentId: v.optional(v.id("agents")),
+    sourceUrl: v.string(),
+    entryId: v.string(),
+    lastRunId: v.optional(v.id("websiteRuns")),
+    lastSeenAt: v.number(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_website_source_id", ["websiteSourceId"])
+    .index("by_website_source_id_and_source_url", [
+      "websiteSourceId",
+      "sourceUrl",
+    ])
+    .index("by_entry_id", ["entryId"]),
   /** Operatør «forventet svar» fra Playground (Chatbase-lignende forbedring av AI-svar). */
   answerTrainingExamples: defineTable({
     organizationId: v.string(),

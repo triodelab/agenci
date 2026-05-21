@@ -14,9 +14,12 @@ import type * as http from "../http.js";
 import type * as lib_auth from "../lib/auth.js";
 import type * as lib_extractTextContent from "../lib/extractTextContent.js";
 import type * as lib_htmlToPlainText from "../lib/htmlToPlainText.js";
+import type * as lib_knowledgeIngestion from "../lib/knowledgeIngestion.js";
 import type * as lib_publicHttpUrl from "../lib/publicHttpUrl.js";
 import type * as lib_secrets from "../lib/secrets.js";
 import type * as lib_subscriptionAccess from "../lib/subscriptionAccess.js";
+import type * as lib_webpageCrawler from "../lib/webpageCrawler.js";
+import type * as lib_workflow from "../lib/workflow.js";
 import type * as playground from "../playground.js";
 import type * as private_agents from "../private/agents.js";
 import type * as private_answerTraining from "../private/answerTraining.js";
@@ -49,6 +52,7 @@ import type * as system_conversations from "../system/conversations.js";
 import type * as system_plugins from "../system/plugins.js";
 import type * as system_secrets from "../system/secrets.js";
 import type * as system_subscriptions from "../system/subscriptions.js";
+import type * as system_websites from "../system/websites.js";
 import type * as users from "../users.js";
 
 import type {
@@ -64,9 +68,12 @@ declare const fullApi: ApiFromModules<{
   "lib/auth": typeof lib_auth;
   "lib/extractTextContent": typeof lib_extractTextContent;
   "lib/htmlToPlainText": typeof lib_htmlToPlainText;
+  "lib/knowledgeIngestion": typeof lib_knowledgeIngestion;
   "lib/publicHttpUrl": typeof lib_publicHttpUrl;
   "lib/secrets": typeof lib_secrets;
   "lib/subscriptionAccess": typeof lib_subscriptionAccess;
+  "lib/webpageCrawler": typeof lib_webpageCrawler;
+  "lib/workflow": typeof lib_workflow;
   playground: typeof playground;
   "private/agents": typeof private_agents;
   "private/answerTraining": typeof private_answerTraining;
@@ -99,6 +106,7 @@ declare const fullApi: ApiFromModules<{
   "system/plugins": typeof system_plugins;
   "system/secrets": typeof system_secrets;
   "system/subscriptions": typeof system_subscriptions;
+  "system/websites": typeof system_websites;
   users: typeof users;
 }>;
 
@@ -129,6 +137,7 @@ export declare const internal: FilterApi<
 >;
 
 export declare const components: {
+  workflow: any;
   agent: {
     apiKeys: {
       destroy: FunctionReference<

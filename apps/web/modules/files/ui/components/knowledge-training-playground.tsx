@@ -1,9 +1,17 @@
 "use client";
 
 import { useOrganization } from "@clerk/nextjs";
-import { useQuery, useAction, useMutation, usePaginatedQuery } from "convex/react";
+import {
+  useQuery,
+  useAction,
+  useMutation,
+  usePaginatedQuery,
+} from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
-import type { PublicFile } from "@workspace/backend/private/files";
+import type {
+  PublicFile,
+  PublicWebsiteSource,
+} from "@workspace/backend/private/files";
 import { getWidgetPreviewUrl } from "@/lib/widget-preview-url";
 import { DashboardAccentButton } from "@/modules/dashboard/ui/components/dashboard-accent";
 import { Button } from "@workspace/ui/components/button";
@@ -22,6 +30,8 @@ import {
   ExternalLinkIcon,
   FileIcon,
   GlobeIcon,
+  PauseIcon,
+  PlayIcon,
   PlusIcon,
   RefreshCwIcon,
   RotateCcwIcon,
@@ -35,6 +45,7 @@ import { Skeleton } from "@workspace/ui/components/skeleton";
 import { toast } from "sonner";
 import { UploadDialog } from "./upload-dialog";
 import { DeleteFileDialog } from "./delete-file-dialog";
+import { DeleteWebsiteSourceDialog } from "./delete-website-source-dialog";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -143,6 +154,115 @@ function SourceRow({
   );
 }
 
+function WebsiteSourceRow({
+  source,
+  isUpdating,
+  onTogglePaused,
+  onDelete,
+}: {
+  source: PublicWebsiteSource;
+  isUpdating: boolean;
+  onTogglePaused: () => void;
+  onDelete: () => void;
+}) {
+  const statusLabel =
+    source.status === "queued"
+      ? "I kø"
+      : source.status === "running"
+        ? "Henter"
+        : source.status === "paused"
+          ? "Pauset"
+          : source.status === "ready"
+            ? "Synkronisert"
+            : "Feil";
+  const statusTone =
+    source.status === "queued"
+      ? "text-amber-500"
+      : source.status === "running"
+        ? "text-sky-500"
+        : source.status === "paused"
+          ? "text-slate-500"
+          : source.status === "ready"
+            ? "text-emerald-500"
+            : "text-red-500";
+
+  const details: string[] = [];
+  details.push(
+    source.mode === "crawl" ? `Inntil ${source.maxPages} sider` : "Enkeltside",
+  );
+  if (source.lastIndexedCount && source.lastIndexedCount > 0) {
+    details.push(`${source.lastIndexedCount} sider indeksert`);
+  }
+  if (source.lastCompletedAt) {
+    details.push(
+      `Sist ferdig ${formatDistanceToNow(source.lastCompletedAt, { addSuffix: true })}`,
+    );
+  } else if (source.lastRunAt) {
+    details.push(
+      `Startet ${formatDistanceToNow(source.lastRunAt, { addSuffix: true })}`,
+    );
+  }
+
+  return (
+    <div className="flex items-start gap-2.5 rounded-xl border border-border/50 bg-muted/20 px-3 py-2.5">
+      <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg border border-border/40 bg-background text-muted-foreground">
+        <GlobeIcon className="size-3.5" strokeWidth={1.75} />
+      </span>
+      <div className="min-w-0 flex-1">
+        <a
+          href={source.rootUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block truncate text-[12px] font-medium text-foreground hover:underline underline-offset-2"
+        >
+          {source.rootUrl}
+        </a>
+        <p className="text-[10px] text-muted-foreground">
+          <span className={statusTone}>{statusLabel}</span>
+          {details.length > 0 ? ` · ${details.join(" · ")}` : ""}
+        </p>
+        {source.lastError ? (
+          <p
+            className="mt-1 truncate text-[10px] text-red-500"
+            title={source.lastError}
+          >
+            {source.lastError}
+          </p>
+        ) : null}
+      </div>
+      <div className="mt-0.5 flex shrink-0 items-center gap-1">
+        <button
+          onClick={onTogglePaused}
+          disabled={isUpdating}
+          className="flex size-6 items-center justify-center rounded-lg text-muted-foreground/50 transition-colors hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+          aria-label={
+            source.status === "paused"
+              ? "Gjenoppta nettsidekilde"
+              : "Paus nettsidekilde"
+          }
+          title={source.status === "paused" ? "Gjenoppta" : "Paus"}
+          type="button"
+        >
+          {source.status === "paused" ? (
+            <PlayIcon className="size-3.5" />
+          ) : (
+            <PauseIcon className="size-3.5" />
+          )}
+        </button>
+        <button
+          onClick={onDelete}
+          disabled={isUpdating}
+          className="flex size-6 items-center justify-center rounded-lg text-muted-foreground/40 transition-colors hover:bg-destructive/10 hover:text-destructive disabled:cursor-not-allowed disabled:opacity-50"
+          aria-label="Slett nettsidekilde"
+          type="button"
+        >
+          <TrashIcon className="size-3.5" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export function KnowledgeTrainingPlayground({
@@ -157,7 +277,9 @@ export function KnowledgeTrainingPlayground({
     agentId ? { agentId } : "skip",
   );
   const widgetSettings = useQuery(api.private.widgetSettings.getOne, {});
-  const saveSystemPromptMutation = useMutation(api.private.widgetSettings.saveSystemPrompt);
+  const saveSystemPromptMutation = useMutation(
+    api.private.widgetSettings.saveSystemPrompt,
+  );
 
   // File management
   const files = usePaginatedQuery(
@@ -165,11 +287,24 @@ export function KnowledgeTrainingPlayground({
     agentId !== undefined ? { agentId } : {},
     { initialNumItems: 20 },
   );
+  const websiteSources = useQuery(
+    api.private.files.listWebsiteSources,
+    agentId !== undefined ? { agentId } : {},
+  );
   const addWebpage = useAction(api.private.files.addWebpage);
+  const pauseWebsiteSource = useAction(api.private.files.pauseWebsiteSource);
+  const resumeWebsiteSource = useAction(api.private.files.resumeWebsiteSource);
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const [presetFile, setPresetFile] = useState<File | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<PublicFile | null>(null);
+  const [deleteWebsiteSourceDialogOpen, setDeleteWebsiteSourceDialogOpen] =
+    useState(false);
+  const [selectedWebsiteSource, setSelectedWebsiteSource] =
+    useState<PublicWebsiteSource | null>(null);
+  const [websiteSourceActionId, setWebsiteSourceActionId] = useState<
+    PublicWebsiteSource["id"] | null
+  >(null);
   const [webUrl, setWebUrl] = useState("");
   const [isImportingWebpage, setIsImportingWebpage] = useState(false);
 
@@ -180,7 +315,13 @@ export function KnowledgeTrainingPlayground({
   const [showCapacityBanner, setShowCapacityBanner] = useState(true);
 
   const widgetUrl = useMemo(
-    () => organization?.id ? getWidgetPreviewUrl(organization.id, { playground: true, agentId: agentId ?? undefined }) : null,
+    () =>
+      organization?.id
+        ? getWidgetPreviewUrl(organization.id, {
+            playground: true,
+            agentId: agentId ?? undefined,
+          })
+        : null,
     [organization?.id, agentId],
   );
 
@@ -230,7 +371,11 @@ export function KnowledgeTrainingPlayground({
     setIsImportingWebpage(true);
     try {
       const result = await addWebpage({ url: webUrl.trim(), agentId });
-      toast.success(`Nettside lagt til: ${result.title ?? result.url}`);
+      if (result.alreadyQueued) {
+        toast.info(`Nettsiden er allerede i kø: ${result.url}`);
+      } else {
+        toast.success(`Nettside satt i kø: ${result.url}`);
+      }
       setWebUrl("");
     } catch (e) {
       const msg =
@@ -242,6 +387,29 @@ export function KnowledgeTrainingPlayground({
       toast.error(msg);
     } finally {
       setIsImportingWebpage(false);
+    }
+  };
+
+  const handleToggleWebsiteSourcePaused = async (
+    source: PublicWebsiteSource,
+  ) => {
+    setWebsiteSourceActionId(source.id);
+    try {
+      if (source.status === "paused") {
+        await resumeWebsiteSource({ sourceId: source.id });
+        toast.success(`Nettsidekilden ble gjenopptatt: ${source.rootUrl}`);
+      } else {
+        await pauseWebsiteSource({ sourceId: source.id });
+        toast.success(`Nettsidekilden ble pauset: ${source.rootUrl}`);
+      }
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Kunne ikke oppdatere nettsidekilden";
+      toast.error(message);
+    } finally {
+      setWebsiteSourceActionId(null);
     }
   };
 
@@ -259,7 +427,10 @@ export function KnowledgeTrainingPlayground({
   const trainedSubtitle = useMemo(() => {
     if (!indexed) return "Legg til kilder nedenfor for å bygge indeksen.";
     const parts: string[] = [];
-    if (lastIndexedAt) parts.push(`Sist oppdatert ${formatDistanceToNow(lastIndexedAt, { addSuffix: true })}`);
+    if (lastIndexedAt)
+      parts.push(
+        `Sist oppdatert ${formatDistanceToNow(lastIndexedAt, { addSuffix: true })}`,
+      );
     if (approxKb > 0) parts.push(`~${approxKb} KB indeksert tekst`);
     if (hasMore) parts.push("minst én side til i indeksen");
     return parts.join(" · ");
@@ -267,7 +438,9 @@ export function KnowledgeTrainingPlayground({
 
   const statsLoading = agentId
     ? agentOverview === undefined
-    : overview === undefined || widgetSettings === undefined;
+    : overview === undefined ||
+      widgetSettings === undefined ||
+      websiteSources === undefined;
   if (statsLoading || !orgLoaded) {
     return (
       <div className="flex h-full min-h-0 flex-1 flex-col lg:flex-row">
@@ -292,6 +465,12 @@ export function KnowledgeTrainingPlayground({
         onOpenChange={setDeleteDialogOpen}
         open={deleteDialogOpen}
       />
+      <DeleteWebsiteSourceDialog
+        source={selectedWebsiteSource}
+        onDeleted={() => setSelectedWebsiteSource(null)}
+        onOpenChange={setDeleteWebsiteSourceDialogOpen}
+        open={deleteWebsiteSourceDialogOpen}
+      />
       <UploadDialog
         agentId={agentId}
         onOpenChange={(open) => {
@@ -302,12 +481,13 @@ export function KnowledgeTrainingPlayground({
         presetFile={presetFile}
       />
 
-      <div className="flex h-full min-h-0 flex-1 flex-col lg:flex-row" data-agenci-knowledge-training="playground">
-
+      <div
+        className="flex h-full min-h-0 flex-1 flex-col lg:flex-row"
+        data-agenci-knowledge-training="playground"
+      >
         {/* ── Venstre: konfig + kilder ── */}
         <div className="flex min-h-0 w-full shrink-0 flex-col overflow-y-auto overscroll-y-contain border-border/50 bg-background px-5 py-6 lg:w-[min(100%,440px)] lg:min-w-[360px] lg:border-r xl:w-[460px]">
           <div className="space-y-5">
-
             {/* Header */}
             <header className="space-y-1.5">
               <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
@@ -387,7 +567,7 @@ export function KnowledgeTrainingPlayground({
                   {isImportingWebpage ? (
                     <span className="flex items-center gap-1.5">
                       <RefreshCwIcon className="size-3 animate-spin" />
-                      Henter…
+                      Køer…
                     </span>
                   ) : (
                     <span className="flex items-center gap-1.5">
@@ -398,6 +578,25 @@ export function KnowledgeTrainingPlayground({
                 </Button>
               </div>
 
+              {websiteSources && websiteSources.length > 0 ? (
+                <div className="space-y-1.5">
+                  {websiteSources.map((source) => (
+                    <WebsiteSourceRow
+                      key={source.id}
+                      source={source}
+                      isUpdating={websiteSourceActionId === source.id}
+                      onTogglePaused={() =>
+                        void handleToggleWebsiteSourcePaused(source)
+                      }
+                      onDelete={() => {
+                        setSelectedWebsiteSource(source);
+                        setDeleteWebsiteSourceDialogOpen(true);
+                      }}
+                    />
+                  ))}
+                </div>
+              ) : null}
+
               {/* Filliste */}
               {files.status === "LoadingFirstPage" ? (
                 <div className="space-y-2">
@@ -405,7 +604,8 @@ export function KnowledgeTrainingPlayground({
                     <Skeleton key={i} className="h-12 w-full rounded-xl" />
                   ))}
                 </div>
-              ) : files.results.length === 0 ? (
+              ) : files.results.length === 0 &&
+                (!websiteSources || websiteSources.length === 0) ? (
                 <button
                   className="flex w-full flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border/70 bg-muted/10 py-7 text-center transition-colors hover:border-border hover:bg-muted/20"
                   onClick={() => {
@@ -415,7 +615,10 @@ export function KnowledgeTrainingPlayground({
                   type="button"
                 >
                   <div className="flex size-10 items-center justify-center rounded-xl border border-border/50 bg-background">
-                    <UploadIcon className="size-5 text-muted-foreground" strokeWidth={1.5} />
+                    <UploadIcon
+                      className="size-5 text-muted-foreground"
+                      strokeWidth={1.5}
+                    />
                   </div>
                   <div>
                     <p className="text-[13px] font-medium text-foreground">
@@ -450,7 +653,11 @@ export function KnowledgeTrainingPlayground({
                 </span>
                 <DashboardAccentButton
                   className="h-8 shrink-0 px-3 text-[12px] font-medium"
-                  onClick={() => toast.info("Modellsammenligning kommer i en senere versjon.")}
+                  onClick={() =>
+                    toast.info(
+                      "Modellsammenligning kommer i en senere versjon.",
+                    )
+                  }
                   type="button"
                 >
                   Sammenlign
@@ -465,12 +672,16 @@ export function KnowledgeTrainingPlayground({
                   <SelectValue placeholder={SUPPORT_CHAT_MODEL_LABEL} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="gpt-4o-mini">{SUPPORT_CHAT_MODEL_LABEL}</SelectItem>
+                  <SelectItem value="gpt-4o-mini">
+                    {SUPPORT_CHAT_MODEL_LABEL}
+                  </SelectItem>
                 </SelectContent>
               </Select>
               <p className="text-[11px] leading-relaxed text-muted-foreground">
                 Samme modell som produksjons-agenten (
-                <code className="rounded bg-muted px-1 font-mono text-[10px]">supportAgent</code>
+                <code className="rounded bg-muted px-1 font-mono text-[10px]">
+                  supportAgent
+                </code>
                 ). Valg av modell i UI er planlagt.
               </p>
             </PlaygroundSection>
@@ -487,8 +698,11 @@ export function KnowledgeTrainingPlayground({
                   <XIcon className="size-4" />
                 </button>
                 <p className="text-[12px] leading-relaxed">
-                  <span className="font-medium text-foreground">Mer kontekst snart:</span>{" "}
-                  vedlegg i chat, flere modeller og lengre instruks — på roadmap.
+                  <span className="font-medium text-foreground">
+                    Mer kontekst snart:
+                  </span>{" "}
+                  vedlegg i chat, flere modeller og lengre instruks — på
+                  roadmap.
                 </p>
               </div>
             )}
@@ -497,7 +711,11 @@ export function KnowledgeTrainingPlayground({
             <PlaygroundSection title="AI-handlinger">
               <button
                 className="flex w-full items-center justify-center rounded-xl border border-dashed border-border/80 bg-muted/20 py-8 text-[13px] font-medium text-muted-foreground transition-colors hover:border-primary/30 hover:bg-muted/35 hover:text-foreground"
-                onClick={() => toast.info("Egendefinerte handlinger kobles til integrasjoner — kommer.")}
+                onClick={() =>
+                  toast.info(
+                    "Egendefinerte handlinger kobles til integrasjoner — kommer.",
+                  )
+                }
                 type="button"
               >
                 Legg til din første handling
@@ -539,7 +757,8 @@ export function KnowledgeTrainingPlayground({
               }
             >
               <p className="text-[11px] leading-relaxed text-muted-foreground">
-                Overstyrer standardoppførselen til assistenten. Tom = standard. Gjelder for nye samtaler etter lagring.
+                Overstyrer standardoppførselen til assistenten. Tom = standard.
+                Gjelder for nye samtaler etter lagring.
               </p>
               <Textarea
                 className="min-h-[180px] resize-y rounded-xl border-border/80 bg-background/90 text-[13px] leading-relaxed"
@@ -549,7 +768,6 @@ export function KnowledgeTrainingPlayground({
                 value={instructions}
               />
             </PlaygroundSection>
-
           </div>
         </div>
 
@@ -560,7 +778,9 @@ export function KnowledgeTrainingPlayground({
               <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                 Forhåndsvisning
               </p>
-              <p className="text-[13px] font-medium text-foreground">Live widget</p>
+              <p className="text-[13px] font-medium text-foreground">
+                Live widget
+              </p>
             </div>
             <div className="flex flex-wrap items-center justify-end gap-2">
               <Button
@@ -577,7 +797,8 @@ export function KnowledgeTrainingPlayground({
                 className="h-9 gap-1.5 rounded-lg px-3 text-[13px]"
                 disabled={!widgetUrl}
                 onClick={() => {
-                  if (widgetUrl) window.open(widgetUrl, "_blank", "noopener,noreferrer");
+                  if (widgetUrl)
+                    window.open(widgetUrl, "_blank", "noopener,noreferrer");
                 }}
                 type="button"
                 variant="outline"
@@ -591,7 +812,9 @@ export function KnowledgeTrainingPlayground({
           <div className="flex min-h-0 flex-1 items-center justify-center px-5 py-10 lg:px-8 lg:py-12">
             {!organization ? (
               <div className="app-dashboard-panel max-w-md rounded-2xl px-6 py-8 text-center">
-                <p className="text-[14px] font-medium text-foreground">Velg en organisasjon</p>
+                <p className="text-[14px] font-medium text-foreground">
+                  Velg en organisasjon
+                </p>
                 <p className="mt-2 text-[13px] leading-relaxed text-muted-foreground">
                   Widget krever aktiv organisasjon i Clerk.
                 </p>
@@ -617,7 +840,6 @@ export function KnowledgeTrainingPlayground({
             )}
           </div>
         </div>
-
       </div>
     </>
   );
