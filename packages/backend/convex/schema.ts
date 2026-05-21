@@ -215,4 +215,18 @@ export default defineSchema({
     expectedResponse: v.string(),
     createdAt: v.number(),
   }).index("by_organization_id", ["organizationId"]),
+  agentBranding: defineTable({
+    organizationId: v.string(),
+    agentId: v.id("agents"),
+    sourceUrl: v.string(),
+    logoUrl: v.optional(v.string()),
+    colorScheme: v.optional(v.string()),
+    primaryColor: v.optional(v.string()),
+    secondaryColor: v.optional(v.string()),
+    backgroundColor: v.optional(v.string()),
+    textPrimaryColor: v.optional(v.string()),
+    extractedAt: v.number(),
+  })
+    .index("by_agent_id", ["agentId"])
+    .index("by_organization_id", ["organizationId"]),
 });
