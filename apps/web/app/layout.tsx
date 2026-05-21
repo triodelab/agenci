@@ -4,7 +4,6 @@ import { Geist, Geist_Mono } from "next/font/google"
 import "@workspace/ui/globals.css";
 import "@clerk/ui/themes/shadcn.css";
 import "@/styles/tokens.css";
-import { AGENCI_LOGO_SRC } from "@/components/logo";
 import { Providers } from "@/components/providers"
 import { Toaster } from "@workspace/ui/components/sonner";
 
@@ -35,10 +34,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     site: "@agenci_no",
   },
-  icons: {
-    icon: AGENCI_LOGO_SRC,
-    apple: AGENCI_LOGO_SRC,
-  },
+
   robots: { index: true, follow: true },
 };
 

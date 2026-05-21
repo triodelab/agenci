@@ -195,13 +195,11 @@ export function AgentsHomeView() {
             Velg en agent for å se samtaler, kunnskapsbase og innstillinger.
           </p>
         </div>
-        <DashboardAccentButton
-          className="w-full sm:w-auto shrink-0 gap-2"
-          onClick={() => setCreateOpen(true)}
-          type="button"
-        >
-          <PlusIcon className="size-4" />
-          Ny agent
+        <DashboardAccentButton asChild className="w-full sm:w-auto shrink-0 gap-2">
+          <Link href="/onboarding">
+            <PlusIcon className="size-4" />
+            Ny agent
+          </Link>
         </DashboardAccentButton>
       </div>
 
