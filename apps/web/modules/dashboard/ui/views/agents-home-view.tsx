@@ -18,10 +18,14 @@ import { cn } from "@workspace/ui/lib/utils";
 import { useMutation, useQuery } from "convex/react";
 import {
   BotIcon,
+  BookOpenIcon,
   ChevronRightIcon,
+  CodeIcon,
   InboxIcon,
   Loader2Icon,
+  PaletteIcon,
   PlusIcon,
+  SparklesIcon,
   Trash2Icon,
 } from "lucide-react";
 import Link from "next/link";
@@ -207,12 +211,49 @@ export function AgentsHomeView() {
           {[0, 1].map((i) => <AgentCardSkeleton key={i} />)}
         </div>
       ) : agents === null || agents.length === 0 ? (
-        <div className="flex flex-col items-center rounded-2xl border border-border/60 bg-card px-4 py-16 text-center">
-          <div className="mb-4 grid size-12 place-items-center rounded-2xl border border-border/50 bg-muted/30">
-            <BotIcon className="size-5 text-muted-foreground/50" strokeWidth={1.5} />
+        <div className="overflow-hidden rounded-2xl border border-border/60 bg-card">
+          {/* Hero */}
+          <div className="flex flex-col items-center px-6 py-12 text-center sm:px-12">
+            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-border/50 bg-muted/30">
+              <SparklesIcon className="size-6 text-muted-foreground/60" strokeWidth={1.5} />
+            </div>
+            <h2 className="text-[18px] font-bold tracking-tight text-foreground">
+              Klar til å sette opp din AI-assistent?
+            </h2>
+            <p className="mt-2 max-w-sm text-[13px] leading-relaxed text-muted-foreground">
+              Agenci hjelper deg å svare kunder automatisk — 24/7, på din tone og med din kunnskap.
+              Kom i gang på under 5 minutter.
+            </p>
+            <Link
+              href="/onboarding"
+              className="mt-6 inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
+              style={{ background: "#0d9488" }}
+            >
+              <SparklesIcon className="size-4" />
+              Start oppsett
+              <ChevronRightIcon className="size-4" />
+            </Link>
           </div>
-          <p className="text-[14px] font-semibold text-foreground">Ingen agenter ennå</p>
-          <p className="mt-1 text-[13px] text-muted-foreground">Opprett din første agent for å komme i gang.</p>
+
+          {/* Steps preview */}
+          <div className="grid divide-y border-t border-border/60 sm:grid-cols-2 sm:divide-x sm:divide-y-0">
+            {[
+              { icon: BotIcon,       label: "Opprett agent",     desc: "Gi agenten et navn og beskrivelse" },
+              { icon: BookOpenIcon,  label: "Legg til kunnskap", desc: "Nettside-URL eller dokument" },
+              { icon: PaletteIcon,   label: "Tilpass utseende",  desc: "Farger, tittel og velkomstmelding" },
+              { icon: CodeIcon,      label: "Integrer på nett",  desc: "Lim inn én kodelinje" },
+            ].map(({ icon: Icon, label, desc }) => (
+              <div key={label} className="flex items-center gap-3.5 px-5 py-4">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-muted/40">
+                  <Icon className="size-4 text-muted-foreground" strokeWidth={1.5} />
+                </div>
+                <div>
+                  <p className="text-[13px] font-semibold text-foreground">{label}</p>
+                  <p className="text-[12px] text-muted-foreground">{desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

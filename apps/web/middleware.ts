@@ -23,6 +23,7 @@ const isOrgFreeRoute = createRouteMatcher([
   "/sign-in(.*)",
   "/sign-up(.*)",
   "/sso-callback(.*)",
+  "/onboarding(.*)",
   "/org-selection(.*)",
   "/integrasjoner",
   "/hvordan-det-virker",
