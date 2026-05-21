@@ -3,14 +3,15 @@ import Script from "next/script";
 import { LandingPageView } from "@/modules/landing";
 
 export const metadata: Metadata = {
-  title: "Agenci — KI-chat på nettsiden med kunnskap dere styrer",
+  title: { absolute: "Agenci — KI-chatassistent for norske nettsteder" },
   description:
-    "Chat-widget som svarer ut fra deres innhold (filer og nettsider), samtaler i dashboard og overtagelse til mennesker når det trengs.",
+    "AI-chatassistent som svarer kunder automatisk — 24/7, basert på din kunnskapsbase. Sett opp på under 5 minutter. Ingen koding.",
   openGraph: {
-    title: "Agenci — KI-chat på nettsiden",
+    title: "Agenci — KI-chatassistent for norske nettsteder",
     description:
-      "Svar kunder i chat fra egen kunnskapsbase. Dashboard for teamet. Eskalering til menneske når saken krever det.",
-    url: "/",
+      "Svar kunder i chat fra din kunnskapsbase. Dashboard for teamet. Eskalering til menneske når det trengs.",
+    url: "https://agenci.no",
+    type: "website",
   },
   alternates: { canonical: "/" },
 };

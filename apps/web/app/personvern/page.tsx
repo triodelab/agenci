@@ -20,6 +20,8 @@ export const metadata: Metadata = {
   title: "Personvernerklæring",
   description:
     "Hvordan Agenci samler inn, bruker og beskytter personopplysninger i tråd med GDPR og personopplysningsloven.",
+  alternates: { canonical: "/personvern" },
+  robots: { index: true, follow: true },
 };
 
 const toc = [

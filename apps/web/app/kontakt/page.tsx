@@ -4,9 +4,9 @@ import { LandingContactForm } from "@/modules/landing/ui/components/landing-cont
 import { MarketingSubpageCta } from "@/modules/landing/ui/components/marketing-subpage-cta";
 
 export const metadata: Metadata = {
-  title: "Kontakt",
+  title: "Kontakt oss",
   description:
-    "Book demo, spør om pris eller send oss en melding. Vi svarer vanligvis innen én arbeidsdag.",
+    "Book en demo, spør om pris eller send oss en melding. Vi svarer innen én arbeidsdag.",
   alternates: { canonical: "/kontakt" },
 };
 

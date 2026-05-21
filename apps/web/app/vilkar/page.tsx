@@ -18,6 +18,8 @@ export const metadata: Metadata = {
   title: "Vilkår for bruk",
   description:
     "Generelle vilkår for bruk av Agenci — konto, tjeneste, betaling, ansvar og oppsigelse.",
+  alternates: { canonical: "/vilkar" },
+  robots: { index: true, follow: true },
 };
 
 const toc = [

@@ -1,6 +1,9 @@
+import type { Metadata } from "next";
 import { ProPlanGate } from "@/modules/billing/ui/components/pro-plan-gate";
 import { CustomizationView } from "@/modules/customization/ui/views/customization-view";
 import type { Id } from "@workspace/backend/_generated/dataModel";
+
+export const metadata: Metadata = { title: "Tilpasning" };
 
 interface Props {
   params: Promise<{ agentId: string }>;

@@ -21,7 +21,8 @@ import { Plug, Webhook, Database, ArrowRight } from "lucide-react";
 export const metadata: Metadata = {
   title: "Integrasjoner",
   description:
-    "Koble Agenci-chatten til nettside, kunnskapskilder og CRM/e-post slik at samtaler og leads havner der teamet jobber.",
+    "Koble Agenci til nettsiden din, kunnskapskilder og teamverktøy. Fungerer med WordPress, Webflow, Framer og de fleste CMS.",
+  alternates: { canonical: "/integrasjoner" },
 };
 
 const items = [

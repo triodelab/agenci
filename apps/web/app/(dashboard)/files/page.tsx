@@ -1,5 +1,8 @@
+import type { Metadata } from "next";
 import { ProPlanGate } from "@/modules/billing/ui/components/pro-plan-gate";
 import { FilesView } from "@/modules/files/ui/views/files-view";
+
+export const metadata: Metadata = { title: "Kunnskapsbase" };
 
 const Page = () => {
   return (

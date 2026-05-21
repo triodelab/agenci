@@ -1,4 +1,7 @@
+import type { Metadata } from "next";
 import { AgentsHomeView } from "@/modules/dashboard/ui/views/agents-home-view";
+
+export const metadata: Metadata = { title: "Agenter" };
 
 export default function AgentsPage() {
   return (

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google"
 
 import "@workspace/ui/globals.css";
@@ -17,11 +18,28 @@ const fontMono = Geist_Mono({
   variable: "--font-mono",
 })
 
-export const metadata = {
+export const metadata: Metadata = {
+  metadataBase: new URL("https://agenci.no"),
+  title: {
+    default: "Agenci — KI-chatassistent for norske nettsteder",
+    template: "%s | Agenci",
+  },
+  description:
+    "AI-chatassistent som svarer kunder automatisk — 24/7, basert på din kunnskapsbase. Sett opp på under 5 minutter. Norsk support.",
+  openGraph: {
+    siteName: "Agenci",
+    locale: "nb_NO",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: "@agenci_no",
+  },
   icons: {
     icon: AGENCI_LOGO_SRC,
     apple: AGENCI_LOGO_SRC,
   },
+  robots: { index: true, follow: true },
 };
 
 export default function RootLayout({
