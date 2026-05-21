@@ -17,8 +17,8 @@ import { Textarea } from "@workspace/ui/components/textarea";
 import { cn } from "@workspace/ui/lib/utils";
 import { useMutation, useQuery } from "convex/react";
 import {
-  BotIcon,
   BookOpenIcon,
+  BotIcon,
   ChevronRightIcon,
   CodeIcon,
   InboxIcon,
@@ -218,21 +218,18 @@ export function AgentsHomeView() {
               <SparklesIcon className="size-6 text-muted-foreground/60" strokeWidth={1.5} />
             </div>
             <h2 className="text-[18px] font-bold tracking-tight text-foreground">
-              Klar til å sette opp din AI-assistent?
+              Ingen agenter ennå
             </h2>
             <p className="mt-2 max-w-sm text-[13px] leading-relaxed text-muted-foreground">
-              Agenci hjelper deg å svare kunder automatisk — 24/7, på din tone og med din kunnskap.
-              Kom i gang på under 5 minutter.
+              Opprett din første agent og kom i gang på under 5 minutter.
             </p>
-            <Link
-              href="/onboarding"
-              className="mt-6 inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
-              style={{ background: "#0d9488" }}
-            >
-              <SparklesIcon className="size-4" />
-              Start oppsett
-              <ChevronRightIcon className="size-4" />
-            </Link>
+            <Button asChild className="mt-6">
+              <Link href="/onboarding">
+                <SparklesIcon className="size-4" />
+                Kom i gang
+                <ChevronRightIcon className="size-4" />
+              </Link>
+            </Button>
           </div>
 
           {/* Steps preview */}

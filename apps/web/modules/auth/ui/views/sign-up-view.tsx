@@ -135,7 +135,7 @@ export const SignUpView = () => {
               onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
               placeholder="123456"
               disabled={busy}
-              className="w-full rounded-lg border border-zinc-200 bg-white px-3.5 py-2.5 text-center text-lg font-semibold tracking-[0.3em] text-zinc-900 outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 disabled:opacity-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:focus:border-teal-400 dark:focus:ring-teal-400/20"
+              className="w-full rounded-lg border border-zinc-200 bg-white px-3.5 py-2.5 text-center text-lg font-semibold tracking-[0.3em] text-zinc-900 outline-none transition focus:border-zinc-400 focus:ring-2 focus:ring-zinc-900/10 disabled:opacity-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:focus:border-zinc-600"
             />
           </div>
 
@@ -148,8 +148,7 @@ export const SignUpView = () => {
           <button
             type="submit"
             disabled={busy || code.length < 6}
-            className="flex h-10 w-full items-center justify-center gap-2 rounded-lg text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-50"
-            style={{ background: "#0d9488" }}
+            className="flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-zinc-900 text-sm font-semibold text-white transition hover:bg-zinc-800 disabled:opacity-50 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
           >
             {isLoading && <LoaderIcon className="h-4 w-4 animate-spin" />}
             Bekreft konto
@@ -232,7 +231,7 @@ export const SignUpView = () => {
               onChange={(e) => setFirstName(e.target.value)}
               placeholder="Ola"
               disabled={busy}
-              className="w-full rounded-lg border border-zinc-200 bg-white px-3.5 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 disabled:opacity-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:placeholder-zinc-500 dark:focus:border-teal-400 dark:focus:ring-teal-400/20"
+              className="w-full rounded-lg border border-zinc-200 bg-white px-3.5 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 outline-none transition focus:border-zinc-400 focus:ring-2 focus:ring-zinc-900/10 disabled:opacity-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:placeholder-zinc-500 dark:focus:border-zinc-600"
             />
           </div>
           <div className="space-y-1.5">
@@ -251,7 +250,7 @@ export const SignUpView = () => {
               onChange={(e) => setLastName(e.target.value)}
               placeholder="Nordmann"
               disabled={busy}
-              className="w-full rounded-lg border border-zinc-200 bg-white px-3.5 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 disabled:opacity-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:placeholder-zinc-500 dark:focus:border-teal-400 dark:focus:ring-teal-400/20"
+              className="w-full rounded-lg border border-zinc-200 bg-white px-3.5 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 outline-none transition focus:border-zinc-400 focus:ring-2 focus:ring-zinc-900/10 disabled:opacity-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:placeholder-zinc-500 dark:focus:border-zinc-600"
             />
           </div>
         </div>
@@ -272,7 +271,7 @@ export const SignUpView = () => {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="din@epost.no"
             disabled={busy}
-            className="w-full rounded-lg border border-zinc-200 bg-white px-3.5 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 disabled:opacity-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:placeholder-zinc-500 dark:focus:border-teal-400 dark:focus:ring-teal-400/20"
+            className="w-full rounded-lg border border-zinc-200 bg-white px-3.5 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 outline-none transition focus:border-zinc-400 focus:ring-2 focus:ring-zinc-900/10 disabled:opacity-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:placeholder-zinc-500 dark:focus:border-zinc-600"
           />
         </div>
 
@@ -294,7 +293,7 @@ export const SignUpView = () => {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Minst 8 tegn"
               disabled={busy}
-              className="w-full rounded-lg border border-zinc-200 bg-white py-2.5 pl-3.5 pr-10 text-sm text-zinc-900 placeholder-zinc-400 outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 disabled:opacity-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:placeholder-zinc-500 dark:focus:border-teal-400 dark:focus:ring-teal-400/20"
+              className="w-full rounded-lg border border-zinc-200 bg-white py-2.5 pl-3.5 pr-10 text-sm text-zinc-900 placeholder-zinc-400 outline-none transition focus:border-zinc-400 focus:ring-2 focus:ring-zinc-900/10 disabled:opacity-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:placeholder-zinc-500 dark:focus:border-zinc-600"
             />
             <button
               type="button"
@@ -320,8 +319,7 @@ export const SignUpView = () => {
         <button
           type="submit"
           disabled={busy}
-          className="flex h-10 w-full items-center justify-center gap-2 rounded-lg text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-50"
-          style={{ background: "#0d9488" }}
+          className="flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-zinc-900 text-sm font-semibold text-white transition hover:bg-zinc-800 disabled:opacity-50 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
         >
           {isLoading && <LoaderIcon className="h-4 w-4 animate-spin" />}
           Opprett konto
@@ -344,7 +342,7 @@ export const SignUpView = () => {
         Har du allerede konto?{" "}
         <Link
           href="/sign-in"
-          className="font-medium text-teal-600 hover:text-teal-700 dark:text-teal-400 dark:hover:text-teal-300"
+          className="font-semibold text-zinc-900 hover:text-zinc-700 dark:text-zinc-100 dark:hover:text-zinc-300"
         >
           Logg inn
         </Link>

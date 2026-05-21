@@ -9,312 +9,316 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import {
   BotIcon,
-  BookOpenIcon,
-  PaletteIcon,
-  CodeIcon,
   CheckIcon,
-  ChevronRightIcon,
-  LoaderIcon,
-  LinkIcon,
-  UploadIcon,
+  Code2Icon,
+  DatabaseZapIcon,
+  FileTextIcon,
+  GlobeIcon,
+  Loader2Icon,
+  Paintbrush2Icon,
   CopyIcon,
   ArrowRightIcon,
-  XIcon,
-  SparklesIcon,
 } from "lucide-react";
-import { Logo } from "@/components/logo";
 import { cn } from "@workspace/ui/lib/utils";
+import { Button } from "@workspace/ui/components/button";
+import { Input } from "@workspace/ui/components/input";
+import { Textarea } from "@workspace/ui/components/textarea";
+import { Label } from "@workspace/ui/components/label";
+import { Logo } from "@/components/logo";
 
 // ─── Embed script ─────────────────────────────────────────────────────────────
-const EMBED_SCRIPT_SRC =
+const EMBED_SRC =
   process.env.NEXT_PUBLIC_WIDGET_EMBED_SCRIPT_URL?.trim() ||
   "https://agenci-embed.vercel.app/widget.iife.js";
 
-function buildEmbedScript(orgId: string, agentId?: string) {
-  const agentAttr = agentId ? ` data-agent-id="${agentId}"` : "";
-  return `<script\n  src="${EMBED_SCRIPT_SRC}"\n  data-organization-id="${orgId}"${agentAttr}\n></script>`;
+function buildEmbed(orgId: string, agentId: string) {
+  return `<script\n  src="${EMBED_SRC}"\n  data-organization-id="${orgId}"\n  data-agent-id="${agentId}"\n></script>`;
 }
 
-// ─── Step definitions ─────────────────────────────────────────────────────────
+// ─── Step config ──────────────────────────────────────────────────────────────
 const STEPS = [
-  { id: 1, label: "Din agent",    icon: BotIcon },
-  { id: 2, label: "Kunnskap",     icon: BookOpenIcon },
-  { id: 3, label: "Utseende",     icon: PaletteIcon },
-  { id: 4, label: "Integrasjon",  icon: CodeIcon },
-] as const;
-
+  { id: 1 as const, icon: BotIcon,         label: "Din agent",   desc: "Navn og beskrivelse" },
+  { id: 2 as const, icon: DatabaseZapIcon,  label: "Kunnskap",    desc: "Nettside eller dokument" },
+  { id: 3 as const, icon: Paintbrush2Icon,  label: "Utseende",    desc: "Tilpass widgeten" },
+  { id: 4 as const, icon: Code2Icon,        label: "Integrasjon", desc: "Hent koden" },
+];
 type StepId = (typeof STEPS)[number]["id"];
 
-// ─── Step indicator ───────────────────────────────────────────────────────────
-function StepIndicator({
+// ─── Left sidebar ─────────────────────────────────────────────────────────────
+function Sidebar({
   current,
   completed,
+  onSkip,
 }: {
   current: StepId;
   completed: Set<StepId>;
+  onSkip: () => void;
 }) {
   return (
-    <div className="flex items-center justify-center gap-0">
-      {STEPS.map((step, idx) => {
-        const done = completed.has(step.id);
-        const active = step.id === current;
-        const future = step.id > current && !done;
-        return (
-          <div key={step.id} className="flex items-center">
-            <div className="flex flex-col items-center gap-1.5">
+    <aside className="hidden w-72 shrink-0 flex-col justify-between bg-zinc-950 p-8 lg:flex">
+      <div>
+        <Logo className="h-6 w-auto brightness-0 invert" />
+
+        <div className="mt-10 space-y-1">
+          {STEPS.map((step) => {
+            const done    = completed.has(step.id);
+            const active  = step.id === current;
+            const future  = step.id > current && !done;
+            const Icon    = step.icon;
+
+            return (
               <div
+                key={step.id}
                 className={cn(
-                  "flex h-8 w-8 items-center justify-center rounded-full border-2 text-xs font-semibold transition-all duration-200",
-                  done &&
-                    "border-teal-500 bg-teal-500 text-white",
-                  active &&
-                    !done &&
-                    "border-teal-500 bg-teal-500 text-white shadow-[0_0_0_4px_rgba(20,184,166,0.15)]",
-                  future &&
-                    "border-zinc-200 bg-white text-zinc-400 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-500",
+                  "flex items-center gap-3.5 rounded-xl px-3 py-3 transition-colors",
+                  active  && "bg-white/[0.07]",
+                  future  && "opacity-40",
                 )}
               >
-                {done ? (
-                  <CheckIcon className="h-3.5 w-3.5" />
-                ) : (
-                  <span>{step.id}</span>
-                )}
+                {/* Icon box */}
+                <div
+                  className={cn(
+                    "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg",
+                    done   && "bg-white/90",
+                    active && !done && "bg-white",
+                    future && "border border-white/20 bg-transparent",
+                  )}
+                >
+                  {done ? (
+                    <CheckIcon className="h-4 w-4 text-zinc-950" />
+                  ) : (
+                    <Icon
+                      className={cn(
+                        "h-4 w-4",
+                        active  ? "text-zinc-950" : "text-white/50",
+                      )}
+                      strokeWidth={1.75}
+                    />
+                  )}
+                </div>
+
+                {/* Label */}
+                <div className="min-w-0">
+                  <p
+                    className={cn(
+                      "text-[13px] font-semibold leading-none",
+                      active || done ? "text-white" : "text-white/50",
+                    )}
+                  >
+                    {step.label}
+                  </p>
+                  <p className="mt-1 truncate text-[11px] text-white/35">
+                    {step.desc}
+                  </p>
+                </div>
               </div>
-              <span
-                className={cn(
-                  "text-[11px] font-medium whitespace-nowrap",
-                  (active || done) ? "text-zinc-700 dark:text-zinc-300" : "text-zinc-400 dark:text-zinc-500",
-                )}
-              >
-                {step.label}
-              </span>
-            </div>
-            {idx < STEPS.length - 1 && (
-              <div
-                className={cn(
-                  "mb-5 h-px w-12 transition-colors duration-300 sm:w-16 md:w-20",
-                  done || completed.has(STEPS[idx + 1]!.id) || step.id < current
-                    ? "bg-teal-400"
-                    : "bg-zinc-200 dark:bg-zinc-700",
-                )}
-              />
-            )}
-          </div>
-        );
-      })}
+            );
+          })}
+        </div>
+      </div>
+
+      <button
+        type="button"
+        onClick={onSkip}
+        className="text-left text-[12px] text-white/30 transition-colors hover:text-white/60"
+      >
+        Hopp over oppsett →
+      </button>
+    </aside>
+  );
+}
+
+// ─── Step header (mobile step bar) ────────────────────────────────────────────
+function MobileStepBar({ current }: { current: StepId }) {
+  return (
+    <div className="flex items-center gap-1.5 lg:hidden">
+      {STEPS.map((s) => (
+        <div
+          key={s.id}
+          className={cn(
+            "h-1 flex-1 rounded-full transition-all",
+            s.id <= current ? "bg-foreground" : "bg-border",
+          )}
+        />
+      ))}
     </div>
   );
 }
 
-// ─── Input component (shared style) ───────────────────────────────────────────
-function Field({
-  label,
-  hint,
-  required,
-  children,
-}: {
-  label: string;
-  hint?: string;
-  required?: boolean;
-  children: React.ReactNode;
-}) {
+// ─── Error box ────────────────────────────────────────────────────────────────
+function ErrorBox({ message }: { message: string }) {
   return (
-    <div className="space-y-1.5">
-      <label className="flex items-center gap-1 text-sm font-medium text-zinc-700 dark:text-zinc-300">
-        {label}
-        {required && <span className="text-teal-500">*</span>}
-      </label>
-      {children}
-      {hint && (
-        <p className="text-xs text-zinc-400 dark:text-zinc-500">{hint}</p>
-      )}
-    </div>
-  );
-}
-
-function Input({
-  className,
-  ...props
-}: React.InputHTMLAttributes<HTMLInputElement>) {
-  return (
-    <input
-      className={cn(
-        "h-10 w-full rounded-xl border border-zinc-200 bg-white px-3.5 text-sm text-zinc-900 placeholder-zinc-400 outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/15 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50 dark:placeholder-zinc-500 dark:focus:border-teal-400",
-        className,
-      )}
-      {...props}
-    />
-  );
-}
-
-function Textarea({
-  className,
-  ...props
-}: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
-  return (
-    <textarea
-      className={cn(
-        "w-full rounded-xl border border-zinc-200 bg-white px-3.5 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/15 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50 dark:placeholder-zinc-500 dark:focus:border-teal-400",
-        className,
-      )}
-      {...props}
-    />
-  );
-}
-
-// ─── Error banner ─────────────────────────────────────────────────────────────
-function ErrorBanner({ message }: { message: string }) {
-  return (
-    <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600 dark:border-red-900/40 dark:bg-red-900/15 dark:text-red-400">
+    <p className="rounded-lg border border-destructive/30 bg-destructive/8 px-3.5 py-2.5 text-[13px] text-destructive">
       {message}
-    </div>
+    </p>
   );
 }
 
-// ─── STEP 1: Create agent ─────────────────────────────────────────────────────
-function StepAgent({
-  onComplete,
+// ─── Step 1: Create agent ─────────────────────────────────────────────────────
+function Step1({
+  onDone,
 }: {
-  onComplete: (agentId: Id<"agents">, agentName: string) => void;
+  onDone: (id: Id<"agents">, name: string) => void;
 }) {
   const createAgent = useMutation(api.private.agents.create);
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [name, setName]         = useState("");
+  const [desc, setDesc]         = useState("");
+  const [busy, setBusy]         = useState(false);
+  const [error, setError]       = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
-    setLoading(true);
+    setBusy(true);
     setError(null);
     try {
-      const { agentId } = await createAgent({ name: name.trim(), description: description.trim() || undefined });
-      onComplete(agentId, name.trim());
+      const { agentId } = await createAgent({
+        name: name.trim(),
+        description: desc.trim() || undefined,
+      });
+      onDone(agentId, name.trim());
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message
-        : typeof err === "object" && err && "message" in err
-          ? String((err as { message: unknown }).message)
-          : "Noe gikk galt. Prøv igjen.";
+      const msg =
+        err instanceof Error
+          ? err.message
+          : typeof err === "object" && err && "message" in err
+            ? String((err as { message: unknown }).message)
+            : "Noe gikk galt";
       setError(msg);
     } finally {
-      setLoading(false);
+      setBusy(false);
     }
   };
 
   return (
-    <form onSubmit={(e) => void handleSubmit(e)} className="space-y-5">
-      <div className="flex items-start gap-4">
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-teal-50 dark:bg-teal-950/40">
-          <BotIcon className="h-5 w-5 text-teal-600 dark:text-teal-400" />
-        </div>
-        <div>
-          <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-            Gi agenten et navn
-          </h2>
-          <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">
-            Agenten din svarer kundene dine automatisk — gi den et navn som
-            gjenspeiler jobben den skal gjøre.
-          </p>
-        </div>
+    <form onSubmit={(e) => void submit(e)} className="space-y-6">
+      <div className="space-y-1">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+          Steg 1 av 4
+        </p>
+        <h1 className="text-[22px] font-semibold tracking-tight text-foreground">
+          Gi agenten et navn
+        </h1>
+        <p className="text-[13px] leading-relaxed text-muted-foreground">
+          Agenten din svarer kunder automatisk — gi den et navn som
+          gjenspeiler hva den gjør.
+        </p>
       </div>
 
       <div className="space-y-4">
-        <Field label="Agentnavn" required hint='F.eks. "Kundesupport", "Salgsassistent" eller "Triodelab-hjelper"'>
+        <div className="space-y-2">
+          <Label htmlFor="agent-name">
+            Agentnavn <span className="text-destructive">*</span>
+          </Label>
           <Input
+            id="agent-name"
             autoFocus
-            placeholder="Kundesupport"
+            placeholder='F.eks. "Kundesupport" eller "Salgsassistent"'
             value={name}
             onChange={(e) => setName(e.target.value)}
-            disabled={loading}
+            disabled={busy}
             maxLength={60}
           />
-        </Field>
+        </div>
 
-        <Field label="Beskrivelse" hint="Fortell kort hva agenten skal hjelpe med (vises kun internt)">
+        <div className="space-y-2">
+          <Label htmlFor="agent-desc">
+            Beskrivelse{" "}
+            <span className="text-[11px] font-normal text-muted-foreground">
+              (valgfritt)
+            </span>
+          </Label>
           <Textarea
+            id="agent-desc"
+            placeholder="Beskriv kort hva agenten skal hjelpe med"
+            value={desc}
+            onChange={(e) => setDesc(e.target.value)}
+            disabled={busy}
             rows={3}
-            placeholder="Hjelper kunder med spørsmål om produkter, priser og levering."
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            disabled={loading}
             maxLength={300}
           />
-        </Field>
+        </div>
       </div>
 
-      {error && <ErrorBanner message={error} />}
+      {error && <ErrorBox message={error} />}
 
-      <button
+      <Button
         type="submit"
-        disabled={loading || !name.trim()}
-        className="flex h-10 w-full items-center justify-center gap-2 rounded-xl text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-40"
-        style={{ background: "#0d9488" }}
+        className="w-full"
+        size="lg"
+        disabled={busy || !name.trim()}
       >
-        {loading ? (
-          <LoaderIcon className="h-4 w-4 animate-spin" />
+        {busy ? (
+          <Loader2Icon className="animate-spin" />
         ) : (
           <>
             Opprett agent
-            <ChevronRightIcon className="h-4 w-4" />
+            <ArrowRightIcon />
           </>
         )}
-      </button>
+      </Button>
     </form>
   );
 }
 
-// ─── STEP 2: Add knowledge ────────────────────────────────────────────────────
-function StepKnowledge({
+// ─── Step 2: Add knowledge ────────────────────────────────────────────────────
+function Step2({
   agentId,
-  onComplete,
-  onSkip,
+  onDone,
 }: {
   agentId: Id<"agents">;
-  onComplete: () => void;
-  onSkip: () => void;
+  onDone: () => void;
 }) {
   const addWebpage = useAction(api.private.files.addWebpage);
-  const addFile = useAction(api.private.files.addFile);
+  const addFile    = useAction(api.private.files.addFile);
 
-  const [tab, setTab] = useState<"url" | "file">("url");
-  const [url, setUrl] = useState("");
-  const [file, setFile] = useState<File | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [subscriptionError, setSubscriptionError] = useState(false);
-  const fileRef = useRef<HTMLInputElement>(null);
+  const [tab, setTab]                     = useState<"url" | "file">("url");
+  const [url, setUrl]                     = useState("");
+  const [file, setFile]                   = useState<File | null>(null);
+  const [busy, setBusy]                   = useState(false);
+  const [error, setError]                 = useState<string | null>(null);
+  const [planError, setPlanError]         = useState(false);
+  const fileRef                           = useRef<HTMLInputElement>(null);
 
-  const handleUrl = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!url.trim()) return;
-    setLoading(true);
-    setError(null);
-    setSubscriptionError(false);
-    try {
-      await addWebpage({ url: url.trim(), agentId });
-      onComplete();
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message
+  const handleError = (err: unknown) => {
+    const msg =
+      err instanceof Error
+        ? err.message
         : typeof err === "object" && err && "message" in err
           ? String((err as { message: unknown }).message)
-          : "Noe gikk galt.";
-      if (msg.toLowerCase().includes("abonnement") || msg.toLowerCase().includes("subscription")) {
-        setSubscriptionError(true);
-      } else {
-        setError(msg);
-      }
-    } finally {
-      setLoading(false);
+          : "Noe gikk galt";
+    if (
+      msg.toLowerCase().includes("abonnement") ||
+      msg.toLowerCase().includes("subscription")
+    ) {
+      setPlanError(true);
+    } else {
+      setError(msg);
     }
   };
 
-  const handleFile = async (e: React.FormEvent) => {
+  const submitUrl = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!url.trim()) return;
+    setBusy(true);
+    setError(null);
+    setPlanError(false);
+    try {
+      await addWebpage({ url: url.trim(), agentId });
+      onDone();
+    } catch (err) {
+      handleError(err);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const submitFile = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!file) return;
-    setLoading(true);
+    setBusy(true);
     setError(null);
-    setSubscriptionError(false);
+    setPlanError(false);
     try {
       await addFile({
         bytes: await file.arrayBuffer(),
@@ -322,124 +326,91 @@ function StepKnowledge({
         mimeType: file.type || "text/plain",
         agentId,
       });
-      onComplete();
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message
-        : typeof err === "object" && err && "message" in err
-          ? String((err as { message: unknown }).message)
-          : "Noe gikk galt.";
-      if (msg.toLowerCase().includes("abonnement") || msg.toLowerCase().includes("subscription")) {
-        setSubscriptionError(true);
-      } else {
-        setError(msg);
-      }
+      onDone();
+    } catch (err) {
+      handleError(err);
     } finally {
-      setLoading(false);
+      setBusy(false);
     }
   };
 
   return (
-    <div className="space-y-5">
-      <div className="flex items-start gap-4">
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-teal-50 dark:bg-teal-950/40">
-          <BookOpenIcon className="h-5 w-5 text-teal-600 dark:text-teal-400" />
-        </div>
-        <div>
-          <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-            Legg til kunnskap
-          </h2>
-          <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">
-            Agenten bruker dette til å svare riktig på kundenes spørsmål. Legg
-            til nettsiden din eller last opp et dokument.
-          </p>
-        </div>
+    <div className="space-y-6">
+      <div className="space-y-1">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+          Steg 2 av 4
+        </p>
+        <h1 className="text-[22px] font-semibold tracking-tight text-foreground">
+          Legg til kunnskap
+        </h1>
+        <p className="text-[13px] leading-relaxed text-muted-foreground">
+          Agenten bruker dette til å svare riktig på kundenes spørsmål. Legg
+          til en nettside eller last opp et dokument.
+        </p>
       </div>
 
-      {/* Tab switcher */}
-      <div className="flex gap-1 rounded-xl bg-zinc-100 p-1 dark:bg-zinc-800">
-        <button
-          type="button"
-          onClick={() => setTab("url")}
-          className={cn(
-            "flex flex-1 items-center justify-center gap-2 rounded-lg py-2 text-sm font-medium transition",
-            tab === "url"
-              ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-700 dark:text-zinc-50"
-              : "text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-300",
-          )}
-        >
-          <LinkIcon className="h-3.5 w-3.5" />
-          Nettside-URL
-        </button>
-        <button
-          type="button"
-          onClick={() => setTab("file")}
-          className={cn(
-            "flex flex-1 items-center justify-center gap-2 rounded-lg py-2 text-sm font-medium transition",
-            tab === "file"
-              ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-700 dark:text-zinc-50"
-              : "text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-300",
-          )}
-        >
-          <UploadIcon className="h-3.5 w-3.5" />
-          Last opp fil
-        </button>
-      </div>
-
-      {subscriptionError ? (
-        <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3.5 dark:border-amber-800/40 dark:bg-amber-900/15">
-          <p className="text-sm font-medium text-amber-800 dark:text-amber-300">
-            Krever abonnement
-          </p>
-          <p className="mt-0.5 text-sm text-amber-700 dark:text-amber-400">
-            Opplasting av kunnskap krever et aktivt abonnement. Du kan legge til
-            kunnskap fra Knowledge Base etter du har valgt en plan.
-          </p>
-          <Link
-            href="/agents"
-            className="mt-2.5 inline-flex items-center gap-1 text-sm font-medium text-amber-800 underline underline-offset-2 hover:text-amber-900 dark:text-amber-300"
-            onClick={onSkip}
+      {/* Tab toggle */}
+      <div className="grid h-9 grid-cols-2 gap-1 rounded-lg border border-border bg-muted/30 p-0.5">
+        {(["url", "file"] as const).map((t) => (
+          <button
+            key={t}
+            type="button"
+            onClick={() => setTab(t)}
+            className={cn(
+              "flex items-center justify-center gap-2 rounded-md text-[13px] font-medium transition-all",
+              tab === t
+                ? "bg-background text-foreground shadow-xs"
+                : "text-muted-foreground hover:text-foreground",
+            )}
           >
-            Gå til fakturering <ArrowRightIcon className="h-3 w-3" />
-          </Link>
+            {t === "url" ? (
+              <><GlobeIcon className="size-3.5" /> Nettside-URL</>
+            ) : (
+              <><FileTextIcon className="size-3.5" /> Last opp fil</>
+            )}
+          </button>
+        ))}
+      </div>
+
+      {planError ? (
+        <div className="space-y-3 rounded-xl border border-border bg-muted/20 p-5">
+          <p className="text-[13px] font-semibold text-foreground">
+            Krever aktivt abonnement
+          </p>
+          <p className="text-[13px] leading-relaxed text-muted-foreground">
+            Opplasting av kunnskap krever et aktivt abonnement. Du kan legge
+            til innhold fra Knowledge Base etter du har valgt en plan.
+          </p>
+          <Button variant="outline" size="sm" onClick={onDone}>
+            Fortsett uten kunnskap
+          </Button>
         </div>
       ) : tab === "url" ? (
-        <form onSubmit={(e) => void handleUrl(e)} className="space-y-4">
-          <Field
-            label="Nettside-URL"
-            hint="Vi henter innholdet og gjør det søkbart for agenten. Legg til flere sider fra Knowledge Base."
-          >
+        <form onSubmit={(e) => void submitUrl(e)} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="kb-url">Nettside-URL</Label>
             <Input
+              id="kb-url"
               type="url"
               autoFocus
               placeholder="https://dinbedrift.no/om-oss"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
-              disabled={loading}
+              disabled={busy}
             />
-          </Field>
-          {error && <ErrorBanner message={error} />}
-          <button
-            type="submit"
-            disabled={loading || !url.trim()}
-            className="flex h-10 w-full items-center justify-center gap-2 rounded-xl text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-40"
-            style={{ background: "#0d9488" }}
-          >
-            {loading ? (
-              <LoaderIcon className="h-4 w-4 animate-spin" />
-            ) : (
-              <>
-                Hent innhold
-                <ChevronRightIcon className="h-4 w-4" />
-              </>
-            )}
-          </button>
+            <p className="text-[11px] text-muted-foreground">
+              Vi henter innholdet og gjør det søkbart for agenten.
+            </p>
+          </div>
+          {error && <ErrorBox message={error} />}
+          <Button type="submit" className="w-full" size="lg" disabled={busy || !url.trim()}>
+            {busy ? <Loader2Icon className="animate-spin" /> : <>Hent innhold <ArrowRightIcon /></>}
+          </Button>
         </form>
       ) : (
-        <form onSubmit={(e) => void handleFile(e)} className="space-y-4">
-          <Field
-            label="Dokument"
-            hint="Støttede formater: PDF, DOCX, TXT, Markdown"
-          >
+        <form onSubmit={(e) => void submitFile(e)} className="space-y-4">
+          <div className="space-y-2">
+            <Label>Dokument</Label>
             <input
               ref={fileRef}
               type="file"
@@ -451,52 +422,46 @@ function StepKnowledge({
               type="button"
               onClick={() => fileRef.current?.click()}
               className={cn(
-                "flex h-24 w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed transition",
+                "flex h-28 w-full flex-col items-center justify-center gap-2.5 rounded-xl border-2 border-dashed transition-colors",
                 file
-                  ? "border-teal-400 bg-teal-50 dark:border-teal-600 dark:bg-teal-950/30"
-                  : "border-zinc-200 hover:border-zinc-300 dark:border-zinc-700 dark:hover:border-zinc-600",
+                  ? "border-border bg-muted/30"
+                  : "border-border hover:border-foreground/30 hover:bg-muted/20",
               )}
             >
               {file ? (
                 <>
-                  <CheckIcon className="h-5 w-5 text-teal-500" />
-                  <span className="text-sm font-medium text-teal-700 dark:text-teal-400">
+                  <CheckIcon className="size-5 text-foreground" />
+                  <span className="text-[13px] font-medium text-foreground">
                     {file.name}
+                  </span>
+                  <span className="text-[11px] text-muted-foreground">
+                    Klikk for å bytte fil
                   </span>
                 </>
               ) : (
                 <>
-                  <UploadIcon className="h-5 w-5 text-zinc-400" />
-                  <span className="text-sm text-zinc-500">
+                  <FileTextIcon className="size-5 text-muted-foreground/60" strokeWidth={1.5} />
+                  <span className="text-[13px] text-muted-foreground">
                     Klikk for å velge fil
+                  </span>
+                  <span className="text-[11px] text-muted-foreground/60">
+                    PDF, DOCX, TXT, Markdown
                   </span>
                 </>
               )}
             </button>
-          </Field>
-          {error && <ErrorBanner message={error} />}
-          <button
-            type="submit"
-            disabled={loading || !file}
-            className="flex h-10 w-full items-center justify-center gap-2 rounded-xl text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-40"
-            style={{ background: "#0d9488" }}
-          >
-            {loading ? (
-              <LoaderIcon className="h-4 w-4 animate-spin" />
-            ) : (
-              <>
-                Last opp
-                <ChevronRightIcon className="h-4 w-4" />
-              </>
-            )}
-          </button>
+          </div>
+          {error && <ErrorBox message={error} />}
+          <Button type="submit" className="w-full" size="lg" disabled={busy || !file}>
+            {busy ? <Loader2Icon className="animate-spin" /> : <>Last opp <ArrowRightIcon /></>}
+          </Button>
         </form>
       )}
 
       <button
         type="button"
-        onClick={onSkip}
-        className="w-full text-center text-sm text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-400"
+        onClick={onDone}
+        className="w-full text-center text-[12px] text-muted-foreground/60 transition-colors hover:text-muted-foreground"
       >
         Hopp over — legg til kunnskap senere
       </button>
@@ -504,31 +469,29 @@ function StepKnowledge({
   );
 }
 
-// ─── STEP 3: Customize widget ─────────────────────────────────────────────────
-function StepCustomize({
+// ─── Step 3: Customize widget ─────────────────────────────────────────────────
+function Step3({
   agentId,
   agentName,
-  onComplete,
-  onSkip,
+  onDone,
 }: {
   agentId: Id<"agents">;
   agentName: string;
-  onComplete: () => void;
-  onSkip: () => void;
+  onDone: () => void;
 }) {
-  const upsertSettings = useMutation(api.private.widgetSettings.upsert);
-  const [title, setTitle] = useState(agentName);
+  const upsert = useMutation(api.private.widgetSettings.upsert);
+  const [title,    setTitle]   = useState(agentName);
   const [greeting, setGreeting] = useState("Hei! Hvordan kan jeg hjelpe deg i dag?");
-  const [headerColor, setHeaderColor] = useState("#0d9488");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [color,    setColor]   = useState("#18181b");
+  const [busy,     setBusy]    = useState(false);
+  const [error,    setError]   = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setBusy(true);
     setError(null);
     try {
-      await upsertSettings({
+      await upsert({
         forAgentId: agentId,
         widgetTitle: title.trim() || agentName,
         greetMessage: greeting.trim() || "Hei! Hvordan kan jeg hjelpe deg i dag?",
@@ -542,116 +505,120 @@ function StepCustomize({
           phoneNumber: undefined,
         },
         appearance: {
-          headerColor,
+          headerColor: color,
           headerTextColor: "#ffffff",
         },
       });
-      onComplete();
+      onDone();
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message
-        : typeof err === "object" && err && "message" in err
-          ? String((err as { message: unknown }).message)
-          : "Noe gikk galt.";
+      const msg =
+        err instanceof Error
+          ? err.message
+          : typeof err === "object" && err && "message" in err
+            ? String((err as { message: unknown }).message)
+            : "Noe gikk galt";
       setError(msg);
     } finally {
-      setLoading(false);
+      setBusy(false);
     }
   };
 
   return (
-    <form onSubmit={(e) => void handleSubmit(e)} className="space-y-5">
-      <div className="flex items-start gap-4">
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-teal-50 dark:bg-teal-950/40">
-          <PaletteIcon className="h-5 w-5 text-teal-600 dark:text-teal-400" />
-        </div>
-        <div>
-          <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-            Tilpass widgeten
-          </h2>
-          <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">
-            Bestem hvordan chatwidgeten presenterer seg på nettsiden din. Du kan
-            alltid endre dette fra Widget-innstillinger.
-          </p>
-        </div>
+    <form onSubmit={(e) => void submit(e)} className="space-y-6">
+      <div className="space-y-1">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+          Steg 3 av 4
+        </p>
+        <h1 className="text-[22px] font-semibold tracking-tight text-foreground">
+          Tilpass widgeten
+        </h1>
+        <p className="text-[13px] leading-relaxed text-muted-foreground">
+          Sett opp hvordan chatwidgeten ser ut på nettsiden din. Du kan endre
+          alt dette fra Widget-innstillinger senere.
+        </p>
       </div>
 
       <div className="space-y-4">
-        <Field label="Widgettittel" hint="Vises øverst i chatvinduet">
+        <div className="space-y-2">
+          <Label htmlFor="widget-title">Widgettittel</Label>
           <Input
-            autoFocus
-            placeholder="Kundesupport"
+            id="widget-title"
+            placeholder={agentName}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            disabled={loading}
+            disabled={busy}
             maxLength={50}
           />
-        </Field>
+        </div>
 
-        <Field label="Velkomstmelding" required hint="Første melding kunden ser når de åpner chatten">
+        <div className="space-y-2">
+          <Label htmlFor="greeting">
+            Velkomstmelding <span className="text-destructive">*</span>
+          </Label>
           <Textarea
+            id="greeting"
             rows={3}
-            placeholder="Hei! Hvordan kan jeg hjelpe deg i dag?"
             value={greeting}
             onChange={(e) => setGreeting(e.target.value)}
-            disabled={loading}
+            disabled={busy}
             maxLength={300}
           />
-        </Field>
+        </div>
 
-        <Field label="Primærfarge" hint="Fargen på widget-headeren og meldingsbobler">
+        <div className="space-y-2">
+          <Label htmlFor="header-color">Primærfarge</Label>
           <div className="flex items-center gap-3">
-            <input
-              type="color"
-              value={headerColor}
-              onChange={(e) => setHeaderColor(e.target.value)}
-              disabled={loading}
-              className="h-10 w-14 cursor-pointer rounded-xl border border-zinc-200 bg-white p-1 dark:border-zinc-700 dark:bg-zinc-900"
-            />
+            <div className="relative">
+              <input
+                id="header-color"
+                type="color"
+                value={color}
+                onChange={(e) => setColor(e.target.value)}
+                disabled={busy}
+                className="h-9 w-12 cursor-pointer rounded-md border border-border bg-transparent p-0.5"
+              />
+            </div>
             <Input
-              value={headerColor}
-              onChange={(e) => setHeaderColor(e.target.value)}
-              disabled={loading}
-              className="max-w-[140px] font-mono text-xs uppercase"
-              placeholder="#0d9488"
+              value={color}
+              onChange={(e) => setColor(e.target.value)}
+              disabled={busy}
+              className="max-w-[110px] font-mono text-xs uppercase"
+              placeholder="#18181b"
             />
-            {/* Mini widget preview */}
-            <div className="ml-auto flex flex-col overflow-hidden rounded-xl shadow-md" style={{ width: 120, fontSize: 10 }}>
-              <div className="flex items-center gap-1.5 px-2.5 py-2" style={{ background: headerColor }}>
-                <div className="h-3.5 w-3.5 rounded-full bg-white/30" />
-                <span className="font-medium text-white truncate">{title || agentName}</span>
+            {/* Mini preview */}
+            <div className="ml-auto shrink-0 overflow-hidden rounded-lg border border-border shadow-xs" style={{ width: 100 }}>
+              <div
+                className="flex items-center gap-2 px-2.5 py-2"
+                style={{ background: color }}
+              >
+                <div className="h-3.5 w-3.5 shrink-0 rounded-full bg-white/20" />
+                <span className="truncate text-[10px] font-semibold text-white">
+                  {title || agentName}
+                </span>
               </div>
-              <div className="space-y-1.5 bg-white p-2 dark:bg-zinc-900">
-                <div className="rounded-lg px-2 py-1.5 text-white" style={{ background: headerColor, width: "70%" }}>
-                  {greeting.slice(0, 30)}…
+              <div className="bg-white p-2 dark:bg-zinc-900">
+                <div
+                  className="rounded-md px-2 py-1.5 text-[9px] font-medium text-white"
+                  style={{ background: color, maxWidth: "80%" }}
+                >
+                  {greeting.slice(0, 22)}…
                 </div>
               </div>
             </div>
           </div>
-        </Field>
+        </div>
       </div>
 
-      {error && <ErrorBanner message={error} />}
+      {error && <ErrorBox message={error} />}
 
-      <button
-        type="submit"
-        disabled={loading || !greeting.trim()}
-        className="flex h-10 w-full items-center justify-center gap-2 rounded-xl text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-40"
-        style={{ background: "#0d9488" }}
-      >
-        {loading ? (
-          <LoaderIcon className="h-4 w-4 animate-spin" />
-        ) : (
-          <>
-            Lagre innstillinger
-            <ChevronRightIcon className="h-4 w-4" />
-          </>
-        )}
-      </button>
+      <Button type="submit" className="w-full" size="lg" disabled={busy || !greeting.trim()}>
+        {busy ? <Loader2Icon className="animate-spin" /> : <>Lagre innstillinger <ArrowRightIcon /></>}
+      </Button>
 
       <button
         type="button"
-        onClick={onSkip}
-        className="w-full text-center text-sm text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-400"
+        onClick={onDone}
+        className="w-full text-center text-[12px] text-muted-foreground/60 transition-colors hover:text-muted-foreground"
       >
         Hopp over — bruk standardinnstillinger
       </button>
@@ -659,177 +626,138 @@ function StepCustomize({
   );
 }
 
-// ─── STEP 4: Integration embed code ──────────────────────────────────────────
-function StepIntegrate({
+// ─── Step 4: Integration ──────────────────────────────────────────────────────
+function Step4({
   orgId,
   agentId,
-  agentName,
   onFinish,
 }: {
   orgId: string;
   agentId: Id<"agents">;
-  agentName: string;
   onFinish: () => void;
 }) {
-  const embedCode = buildEmbedScript(orgId, agentId);
+  const code = buildEmbed(orgId, agentId);
   const [copied, setCopied] = useState(false);
 
-  const handleCopy = async () => {
-    await navigator.clipboard.writeText(embedCode);
+  const copy = async () => {
+    await navigator.clipboard.writeText(code);
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
   };
 
   return (
-    <div className="space-y-5">
-      <div className="flex items-start gap-4">
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-teal-50 dark:bg-teal-950/40">
-          <CodeIcon className="h-5 w-5 text-teal-600 dark:text-teal-400" />
-        </div>
-        <div>
-          <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-            Legg til på nettsiden din
-          </h2>
-          <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">
-            Lim inn denne script-taggen rett før{" "}
-            <code className="rounded bg-zinc-100 px-1 py-0.5 font-mono text-xs dark:bg-zinc-800">
-              &lt;/body&gt;
-            </code>{" "}
-            på nettsiden din. Widgeten starter automatisk.
-          </p>
-        </div>
+    <div className="space-y-6">
+      <div className="space-y-1">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+          Steg 4 av 4
+        </p>
+        <h1 className="text-[22px] font-semibold tracking-tight text-foreground">
+          Legg til på nettsiden din
+        </h1>
+        <p className="text-[13px] leading-relaxed text-muted-foreground">
+          Lim inn denne script-taggen rett før{" "}
+          <code className="rounded bg-muted px-1 py-0.5 font-mono text-[11px]">
+            &lt;/body&gt;
+          </code>{" "}
+          på nettsiden din. Widgeten starter automatisk.
+        </p>
       </div>
 
       {/* Code block */}
       <div className="relative">
-        <pre className="overflow-x-auto rounded-xl border border-zinc-200 bg-zinc-950 px-4 py-4 text-xs leading-relaxed text-zinc-300 dark:border-zinc-700">
-          <code>{embedCode}</code>
+        <pre className="overflow-x-auto rounded-xl border border-border bg-zinc-950 px-5 py-4 text-[12px] leading-relaxed text-zinc-300">
+          <code>{code}</code>
         </pre>
         <button
           type="button"
-          onClick={() => void handleCopy()}
+          onClick={() => void copy()}
           className={cn(
-            "absolute right-3 top-3 flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium transition",
+            "absolute right-3 top-3 flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-[11px] font-medium transition-all",
             copied
-              ? "bg-teal-500 text-white"
-              : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700",
+              ? "border-transparent bg-foreground text-background"
+              : "border-white/10 bg-zinc-800 text-zinc-300 hover:bg-zinc-700",
           )}
         >
           {copied ? (
-            <>
-              <CheckIcon className="h-3 w-3" />
-              Kopiert!
-            </>
+            <><CheckIcon className="size-3" /> Kopiert!</>
           ) : (
-            <>
-              <CopyIcon className="h-3 w-3" />
-              Kopier
-            </>
+            <><CopyIcon className="size-3" /> Kopier</>
           )}
         </button>
       </div>
 
-      {/* Tips */}
-      <div className="space-y-2.5">
-        <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400 dark:text-zinc-500">
+      {/* CMS tips */}
+      <div className="space-y-2">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
           Hvor limer du inn koden?
         </p>
-        <div className="grid gap-2 sm:grid-cols-2">
+        <div className="grid grid-cols-2 gap-2">
           {[
-            { label: "WordPress", hint: "Appearance → Theme Editor → footer.php" },
-            { label: "Webflow", hint: "Project Settings → Custom Code → Footer" },
-            { label: "Squarespace", hint: "Settings → Advanced → Code Injection" },
-            { label: "Shopify", hint: "Online Store → Themes → Edit code → theme.liquid" },
-          ].map((tip) => (
+            ["WordPress",   "Appearance → Theme Editor → footer.php"],
+            ["Webflow",     "Project Settings → Custom Code → Footer"],
+            ["Squarespace", "Settings → Advanced → Code Injection"],
+            ["Shopify",     "Online Store → Themes → theme.liquid"],
+          ].map(([platform, hint]) => (
             <div
-              key={tip.label}
-              className="rounded-xl border border-zinc-100 bg-zinc-50 px-3.5 py-3 dark:border-zinc-800 dark:bg-zinc-900"
+              key={platform}
+              className="rounded-xl border border-border bg-muted/20 px-3.5 py-3"
             >
-              <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">{tip.label}</p>
-              <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">{tip.hint}</p>
+              <p className="text-[12px] font-semibold text-foreground">
+                {platform}
+              </p>
+              <p className="mt-0.5 text-[11px] leading-relaxed text-muted-foreground">
+                {hint}
+              </p>
             </div>
           ))}
         </div>
       </div>
 
-      <button
-        type="button"
-        onClick={onFinish}
-        className="flex h-11 w-full items-center justify-center gap-2 rounded-xl text-sm font-semibold text-white transition hover:opacity-90"
-        style={{ background: "#0d9488" }}
-      >
-        <SparklesIcon className="h-4 w-4" />
+      <Button className="w-full" size="lg" onClick={onFinish}>
         Gå til dashboardet
-        <ArrowRightIcon className="h-4 w-4" />
-      </button>
+        <ArrowRightIcon />
+      </Button>
 
-      <p className="text-center text-xs text-zinc-400 dark:text-zinc-500">
-        Du kan alltid finne integrasjonskoden under{" "}
+      <p className="text-center text-[11px] text-muted-foreground/60">
+        Finn koden igjen under{" "}
         <Link
           href={`/agents/${agentId}/integrations`}
-          className="underline underline-offset-2 hover:text-zinc-600"
+          className="underline underline-offset-2 hover:text-muted-foreground"
         >
           Integrasjoner
         </Link>
-        .
       </p>
     </div>
   );
 }
 
-// ─── Main onboarding view ─────────────────────────────────────────────────────
+// ─── Main view ────────────────────────────────────────────────────────────────
 export const OnboardingView = () => {
-  const router = useRouter();
+  const router       = useRouter();
   const { organization } = useOrganization();
-  const agents = useQuery(api.private.agents.list);
+  const agents       = useQuery(api.private.agents.list);
 
-  const [step, setStep] = useState<StepId>(1);
+  const [step,      setStep]      = useState<StepId>(1);
   const [completed, setCompleted] = useState<Set<StepId>>(new Set());
-  const [agentId, setAgentId] = useState<Id<"agents"> | null>(null);
+  const [agentId,   setAgentId]   = useState<Id<"agents"> | null>(null);
   const [agentName, setAgentName] = useState("");
 
-  // Redirect users who already have agents
+  // Only redirect if we haven't started the wizard yet (agentId === null means
+  // the user hasn't created an agent in this session — so they already had one).
   useEffect(() => {
+    if (agentId !== null) return;
     if (agents !== undefined && agents !== null && agents.length > 0) {
       router.replace("/agents");
     }
-  }, [agents, router]);
+  }, [agents, router, agentId]);
 
-  const markDone = (s: StepId) =>
+  const done = (s: StepId) =>
     setCompleted((prev) => new Set([...prev, s]));
 
-  const goTo = (s: StepId) => setStep(s);
-
-  const handleAgentCreated = (id: Id<"agents">, name: string) => {
-    setAgentId(id);
-    setAgentName(name);
-    markDone(1);
-    goTo(2);
-  };
-
-  const handleKnowledgeDone = () => {
-    markDone(2);
-    goTo(3);
-  };
-
-  const handleCustomizeDone = () => {
-    markDone(3);
-    goTo(4);
-  };
-
-  const handleFinish = () => {
-    router.push(agentId ? `/agents/${agentId}` : "/agents");
-  };
-
-  const handleSkipAll = () => {
-    router.push("/agents");
-  };
-
-  // Loading state while checking agents
   if (agents === undefined) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-white dark:bg-zinc-950">
-        <LoaderIcon className="h-6 w-6 animate-spin text-zinc-400" />
+      <div className="dashboard-app-shell flex min-h-screen items-center justify-center bg-background">
+        <Loader2Icon className="size-5 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -837,98 +765,83 @@ export const OnboardingView = () => {
   const orgId = organization?.id ?? "";
 
   return (
-    <div
-      className="flex min-h-screen flex-col bg-white dark:bg-zinc-950"
-      style={{
-        backgroundImage:
-          "radial-gradient(oklch(0.88 0 0) 1px, transparent 1px)",
-        backgroundSize: "20px 20px",
-      }}
-    >
-      {/* Top bar */}
-      <header className="sticky top-0 z-10 flex h-14 items-center justify-between border-b border-zinc-100 bg-white/80 px-6 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/80">
-        <Logo className="h-6 w-auto dark:brightness-0 dark:invert" />
-        <button
-          type="button"
-          onClick={handleSkipAll}
-          className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm text-zinc-400 transition hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
-        >
-          <XIcon className="h-3.5 w-3.5" />
-          Hopp over oppsett
-        </button>
-      </header>
+    <div className="dashboard-app-shell flex h-screen overflow-hidden bg-background">
+      {/* ── Left sidebar ── */}
+      <Sidebar
+        current={step}
+        completed={completed}
+        onSkip={() => router.push("/agents")}
+      />
 
-      {/* Content */}
-      <main className="flex flex-1 flex-col items-center px-4 py-10">
-        {/* Intro text */}
-        <div className="mb-8 text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-teal-600 dark:text-teal-400">
-            Velkommen til Agenci
-          </p>
-          <h1 className="mt-1 text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-3xl">
-            La oss sette opp din AI-assistent
-          </h1>
-          <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
-            4 raske steg — du er i gang på under 5 minutter
-          </p>
-        </div>
+      {/* ── Right content ── */}
+      <div className="flex flex-1 flex-col overflow-y-auto">
+        {/* Mobile header */}
+        <header className="flex items-center justify-between border-b border-border px-5 py-3.5 lg:hidden">
+          <Logo className="h-6 w-auto dark:brightness-0 dark:invert" />
+          <button
+            type="button"
+            onClick={() => router.push("/agents")}
+            className="text-[12px] text-muted-foreground hover:text-foreground"
+          >
+            Hopp over
+          </button>
+        </header>
 
-        {/* Step indicator */}
-        <div className="mb-8 w-full max-w-lg">
-          <StepIndicator current={step} completed={completed} />
-        </div>
+        <div className="flex flex-1 flex-col items-center justify-center px-6 py-12">
+          <div className="w-full max-w-md space-y-8">
+            {/* Mobile progress bar */}
+            <MobileStepBar current={step} />
 
-        {/* Card */}
-        <div className="w-full max-w-lg">
-          <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.08)] dark:border-zinc-800 dark:bg-zinc-900 dark:shadow-[0_4px_24px_-4px_rgba(0,0,0,0.4)]">
+            {/* Step content */}
             {step === 1 && (
-              <StepAgent onComplete={handleAgentCreated} />
+              <Step1
+                onDone={(id, name) => {
+                  setAgentId(id);
+                  setAgentName(name);
+                  done(1);
+                  setStep(2);
+                }}
+              />
             )}
 
             {step === 2 && agentId && (
-              <StepKnowledge
+              <Step2
                 agentId={agentId}
-                onComplete={handleKnowledgeDone}
-                onSkip={handleKnowledgeDone}
+                onDone={() => { done(2); setStep(3); }}
               />
             )}
 
             {step === 3 && agentId && (
-              <StepCustomize
+              <Step3
                 agentId={agentId}
                 agentName={agentName}
-                onComplete={handleCustomizeDone}
-                onSkip={handleCustomizeDone}
+                onDone={() => { done(3); setStep(4); }}
               />
             )}
 
             {step === 4 && agentId && (
-              <StepIntegrate
+              <Step4
                 orgId={orgId}
                 agentId={agentId}
-                agentName={agentName}
-                onFinish={handleFinish}
+                onFinish={() =>
+                  router.push(agentId ? `/agents/${agentId}` : "/agents")
+                }
               />
             )}
+
+            {/* Back button */}
+            {step > 1 && step < 4 && (
+              <button
+                type="button"
+                onClick={() => setStep((s) => (s - 1) as StepId)}
+                className="mx-auto block text-[12px] text-muted-foreground/60 hover:text-muted-foreground"
+              >
+                ← Tilbake
+              </button>
+            )}
           </div>
-
-          {/* Back nav (steps 2+) */}
-          {step > 1 && step < 4 && (
-            <button
-              type="button"
-              onClick={() => goTo((step - 1) as StepId)}
-              className="mt-3 w-full text-center text-xs text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-400"
-            >
-              ← Tilbake
-            </button>
-          )}
         </div>
-
-        {/* Step count */}
-        <p className="mt-6 text-xs text-zinc-300 dark:text-zinc-600">
-          Steg {step} av {STEPS.length}
-        </p>
-      </main>
+      </div>
     </div>
   );
 };
