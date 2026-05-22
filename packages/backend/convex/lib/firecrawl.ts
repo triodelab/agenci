@@ -70,30 +70,49 @@ export const ingestMarkdownFn = internalAction({
       );
     }
 
-    const publicUrl = new URL(args.url);
+    let publicUrl: URL;
+    try {
+      publicUrl = new URL(args.url);
+    } catch {
+      throw new ConvexError(`Ugyldig URL: "${args.url}"`);
+    }
     const title = `${publicUrl.hostname}${publicUrl.pathname}`;
     const textBytes = new TextEncoder().encode(args.markdown);
 
-    const { entryId, created } = await rag.add(ctx, {
-      namespace: agentNamespace(args.orgId, args.agentId as Id<"agents">),
-      text: args.markdown,
-      key: args.url,
-      title,
-      metadata: {
-        uploadedBy: args.orgId,
-        filename: title,
-        category: null,
-        sourceType: "webpage",
-        sourceUrl: args.url,
-        agentId: args.agentId,
-      },
-      contentHash: await contentHashFromArrayBuffer(textBytes.buffer),
-    });
+    let entryId: string;
+    let created: boolean;
+    try {
+      ({ entryId, created } = await rag.add(ctx, {
+        namespace: agentNamespace(args.orgId, args.agentId),
+        text: args.markdown,
+        key: args.url,
+        title,
+        metadata: {
+          uploadedBy: args.orgId,
+          filename: title,
+          category: null,
+          sourceType: "webpage",
+          sourceUrl: args.url,
+          agentId: args.agentId,
+        },
+        contentHash: await contentHashFromArrayBuffer(textBytes.buffer),
+      }));
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      const isKeyMissing =
+        msg.toLowerCase().includes("api key") ||
+        msg.toLowerCase().includes("openai");
+      throw new ConvexError(
+        isKeyMissing
+          ? "Mangler OpenAI API-nøkkel på Convex-deploymenten. Sett OPENAI_API_KEY i Convex-dashboardet."
+          : `Kunne ikke indeksere siden (embedding feilet): ${msg}`,
+      );
+    }
 
     if (!created) {
       console.debug("Markdown entry uendret, hopper over duplikat");
     }
 
-    return { entryId, created };
+    return { entryId, created, url: args.url, title };
   },
 });
