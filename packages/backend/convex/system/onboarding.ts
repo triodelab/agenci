@@ -1,5 +1,8 @@
-import { v } from "convex/values";
-import { internalMutation } from "../_generated/server";
+import { ConvexError, v } from "convex/values";
+import { internalMutation, mutation } from "../_generated/server";
+import { getOrgIdOrNull } from "../lib/auth";
+import { workflow } from "../lib/workflow";
+import { internal } from "../_generated/api";
 
 const brandingArgs = v.object({
   logoUrl: v.union(v.string(), v.null()),
@@ -33,11 +36,21 @@ export const saveBrandingMutation = internalMutation({
       sourceUrl: url,
       extractedAt: now,
       ...(branding.logoUrl !== null ? { logoUrl: branding.logoUrl } : {}),
-      ...(branding.colorScheme !== null ? { colorScheme: branding.colorScheme } : {}),
-      ...(branding.primaryColor !== null ? { primaryColor: branding.primaryColor } : {}),
-      ...(branding.secondaryColor !== null ? { secondaryColor: branding.secondaryColor } : {}),
-      ...(branding.backgroundColor !== null ? { backgroundColor: branding.backgroundColor } : {}),
-      ...(branding.textPrimaryColor !== null ? { textPrimaryColor: branding.textPrimaryColor } : {}),
+      ...(branding.colorScheme !== null
+        ? { colorScheme: branding.colorScheme }
+        : {}),
+      ...(branding.primaryColor !== null
+        ? { primaryColor: branding.primaryColor }
+        : {}),
+      ...(branding.secondaryColor !== null
+        ? { secondaryColor: branding.secondaryColor }
+        : {}),
+      ...(branding.backgroundColor !== null
+        ? { backgroundColor: branding.backgroundColor }
+        : {}),
+      ...(branding.textPrimaryColor !== null
+        ? { textPrimaryColor: branding.textPrimaryColor }
+        : {}),
     };
 
     if (existing) {
@@ -99,5 +112,27 @@ export const saveBrandingMutation = internalMutation({
         appearance,
       });
     }
+  },
+});
+
+export const kickoffWebsiteOnboarding = mutation({
+  args: {
+    agentId: v.id("agents"),
+    url: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const orgId = await getOrgIdOrNull(ctx);
+    if (!orgId) throw new ConvexError("No organization in session.");
+
+    const agent = await ctx.db.get(args.agentId);
+    if (!agent || agent.organizationId !== orgId) {
+      throw new ConvexError("Agent not found.");
+    }
+
+    await workflow.start(
+      ctx,
+      internal.lib.workflow.supportAgentOnboarding,
+      { agentId: args.agentId, orgId, url: args.url },
+    );
   },
 });
