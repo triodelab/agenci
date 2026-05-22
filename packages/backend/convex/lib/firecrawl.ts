@@ -2,7 +2,6 @@ import { contentHashFromArrayBuffer } from "@convex-dev/rag";
 import { ConvexError, v } from "convex/values";
 import Firecrawl from "@mendable/firecrawl-js";
 import { internalAction } from "../_generated/server";
-import type { Id } from "../_generated/dataModel";
 import { agentNamespace } from "./knowledgeIngestion";
 import rag from "../system/ai/rag";
 
@@ -54,7 +53,7 @@ export const scrapeWebsiteUrlFn = internalAction({
   },
 });
 
-const MIN_MARKDOWN_CHARS = 40;
+export const MIN_MARKDOWN_CHARS = 40;
 
 export const ingestMarkdownFn = internalAction({
   args: {

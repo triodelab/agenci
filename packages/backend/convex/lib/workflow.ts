@@ -2,6 +2,7 @@ import { WorkflowManager } from "@convex-dev/workflow";
 import { components, internal } from "../_generated/api";
 import { v } from "convex/values";
 import type { ScrapedBranding } from "./firecrawl";
+import { MIN_MARKDOWN_CHARS } from "./firecrawl";
 
 export const workflow = new WorkflowManager((components as any).workflow, {
   workpoolOptions: {
@@ -33,7 +34,7 @@ export const supportAgentOnboarding = workflow.define({
     )) as { markdown: string | null; branding: ScrapedBranding };
 
     // Step 2: Ingest markdown into RAG (skip if no content returned)
-    if (scrapeResult.markdown && scrapeResult.markdown.length >= 40) {
+    if (scrapeResult.markdown && scrapeResult.markdown.length >= MIN_MARKDOWN_CHARS) {
       await step.runAction(
         internalApi.lib.firecrawl.ingestMarkdownFn,
         { orgId, agentId, url, markdown: scrapeResult.markdown },
@@ -45,7 +46,7 @@ export const supportAgentOnboarding = workflow.define({
     await step.runMutation(
       internalApi.system.onboarding.saveBrandingMutation,
       { orgId, agentId, url, branding: scrapeResult.branding },
-      { name: "save branding" },
+      { name: "save branding", retry: true },
     );
   },
 });
