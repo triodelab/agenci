@@ -1,6 +1,7 @@
 import { WorkflowManager } from "@convex-dev/workflow";
 import { components, internal } from "../_generated/api";
 import { v } from "convex/values";
+import type { ScrapedBranding } from "./firecrawl";
 
 export const workflow = new WorkflowManager((components as any).workflow, {
   workpoolOptions: {
@@ -29,20 +30,10 @@ export const supportAgentOnboarding = workflow.define({
       internalApi.lib.firecrawl.scrapeWebsiteUrlFn,
       { url },
       { name: "scrape website", retry: true },
-    )) as {
-      markdown: string | null;
-      branding: {
-        logoUrl: string | null;
-        colorScheme: string | null;
-        primaryColor: string | null;
-        secondaryColor: string | null;
-        backgroundColor: string | null;
-        textPrimaryColor: string | null;
-      };
-    };
+    )) as { markdown: string | null; branding: ScrapedBranding };
 
     // Step 2: Ingest markdown into RAG (skip if no content returned)
-    if (scrapeResult.markdown) {
+    if (scrapeResult.markdown && scrapeResult.markdown.length >= 40) {
       await step.runAction(
         internalApi.lib.firecrawl.ingestMarkdownFn,
         { orgId, agentId, url, markdown: scrapeResult.markdown },
