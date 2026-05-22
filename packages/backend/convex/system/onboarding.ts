@@ -47,24 +47,38 @@ export const saveBrandingMutation = internalMutation({
     }
 
     // Build appearance patch — only include fields where branding has a value
-    const appearance: Record<string, string> = {};
-    if (branding.primaryColor) {
+    const appearance: {
+      headerColor?: string;
+      bubbleUserColor?: string;
+      bubbleButtonColor?: string;
+      backgroundColor?: string;
+      bubbleAssistantColor?: string;
+      headerTextColor?: string;
+      bubbleUserTextColor?: string;
+      inputTextColor?: string;
+    } = {};
+    if (branding.primaryColor !== null) {
       appearance.headerColor = branding.primaryColor;
       appearance.bubbleUserColor = branding.primaryColor;
       appearance.bubbleButtonColor = branding.primaryColor;
     }
-    if (branding.backgroundColor) {
+    if (branding.backgroundColor !== null) {
       appearance.backgroundColor = branding.backgroundColor;
       appearance.bubbleAssistantColor = branding.backgroundColor;
     }
-    if (branding.textPrimaryColor) {
+    if (branding.textPrimaryColor !== null) {
       appearance.headerTextColor = branding.textPrimaryColor;
       appearance.bubbleUserTextColor = branding.textPrimaryColor;
       appearance.inputTextColor = branding.textPrimaryColor;
     }
 
     // Only touch widgetSettings if we have at least one color to apply
-    if (Object.keys(appearance).length === 0) return;
+    const hasColors =
+      appearance.headerColor !== undefined ||
+      appearance.backgroundColor !== undefined ||
+      appearance.headerTextColor !== undefined;
+
+    if (!hasColors) return;
 
     const widgetSettings = await ctx.db
       .query("widgetSettings")
