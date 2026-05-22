@@ -46,7 +46,7 @@ export const supportAgentOnboarding = workflow.define({
     await step.runMutation(
       internalApi.system.onboarding.saveBrandingMutation,
       { orgId, agentId, url, branding: scrapeResult.branding },
-      { name: "save branding", retry: true },
+      { name: "save branding" },
     );
   },
 });
