@@ -29,8 +29,8 @@ const PLANS: Plan[] = [
     conversations: "500 samtaler / mnd",
     blurb: "For bedrifter som vil spare tid på kundehenvendelser.",
     featured: false,
-    monthlyPriceId: "price_1TUVOv5i2xNBpguUAddDz9Vu",
-    yearlyPriceId: "price_1TUVTm5i2xNBpguUzSERdjQY",
+    monthlyPriceId: "price_1TZrmeHOeJUJdxUaxOoQL6wH",
+    yearlyPriceId: "price_1TZs1WHOeJUJdxUaiJ1pZhM8",
     bullets: [
       { text: "1 AI-agent", included: true },
       { text: "Chat-widget på nettsiden", included: true },
@@ -48,8 +48,8 @@ const PLANS: Plan[] = [
     conversations: "2 000 samtaler / mnd",
     blurb: "Full AI-kraft for voksende team med høyere volum.",
     featured: true,
-    monthlyPriceId: "price_1TUVPn5i2xNBpguU5ySJ7b7r",
-    yearlyPriceId: "price_1TUVUd5i2xNBpguUw2KOkCpU",
+    monthlyPriceId: "price_1TZs2pHOeJUJdxUaWaM0m5le",
+    yearlyPriceId: "price_1TaGiVHOeJUJdxUahmVuDG4y",
     bullets: [
       { text: "3 AI-agenter", included: true },
       { text: "Chat-widget på nettsiden", included: true },
@@ -67,8 +67,8 @@ const PLANS: Plan[] = [
     conversations: "10 000 samtaler / mnd",
     blurb: "For organisasjoner med høyt volum og flere kanaler.",
     featured: false,
-    monthlyPriceId: "price_1TUVQH5i2xNBpguUXW338drQ",
-    yearlyPriceId: "price_1TUVVE5i2xNBpguUPrDfEhRn",
+    monthlyPriceId: "price_1TaGppHOeJUJdxUaUzmYulpB",
+    yearlyPriceId: "price_1TaGqyHOeJUJdxUaW64xJuGo",
     bullets: [
       { text: "10 AI-agenter", included: true },
       { text: "Alle integrasjoner", included: true },
