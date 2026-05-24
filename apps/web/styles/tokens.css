@@ -71,13 +71,24 @@
   --landing-ink-muted: #aaa;
   --landing-ink-subtle: #666;
   --landing-ink-tertiary: #444;
-  --landing-hairline: #1a1a1a;
+  --landing-hairline: #1C1C1C;
   --landing-hairline-strong: #282828;
 }
 
 .landing-warp {
   background-color: var(--landing-canvas);
   color: var(--landing-ink);
+  font-family: var(--font-display), var(--font-sans-fallback);
+}
+
+/* Space Grotesk for all text on marketing subpages too */
+.marketing-warp {
+  font-family: var(--font-display), var(--font-sans-fallback);
+}
+
+/* Utility class to apply display font directly on any element */
+.font-display {
+  font-family: var(--font-display), var(--font-sans-fallback);
 }
 
 .dark {

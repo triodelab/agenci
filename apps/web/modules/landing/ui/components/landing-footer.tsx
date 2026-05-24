@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
-import { Logo } from "@/components/logo";
+import { AgenciNavWordmark } from "@/components/logo";
 import { useUser } from "@clerk/nextjs";
 import {
   LANDING_AUTH_PATHS,
@@ -67,16 +67,16 @@ export function LandingFooter() {
   return (
     <footer
       data-landing-nav-surface="dark"
-      className="border-t border-[#23252a] bg-[#010102] px-6 py-14 xl:px-8"
+      className="border-t border-[#2a2a2a] bg-[#1C1C1C] px-6 py-14 xl:px-8"
     >
       <div className="mx-auto max-w-[1200px]">
         {/* Top: logo + tagline */}
-        <div className="flex flex-wrap items-start justify-between gap-10 border-b border-[#23252a] pb-12">
+        <div className="flex flex-wrap items-start justify-between gap-10 border-b border-[#2a2a2a] pb-12">
           <div className="max-w-xs space-y-3">
             <Link href="/" aria-label="Agenci — forsiden" className="inline-block">
-              <Logo className="brightness-0 invert opacity-70" />
+              <AgenciNavWordmark surface="dark" className="text-white opacity-70" />
             </Link>
-            <p className="text-[13px] leading-relaxed text-[#8a8f98]">
+            <p className="text-[13px] leading-relaxed text-[#6b7280]">
               KI-chat for nettsiden din — svar fra din kunnskap, samtaler i dashboard, mennesker i loop.
             </p>
           </div>
@@ -89,7 +89,7 @@ export function LandingFooter() {
         >
           {LANDING_FOOTER_NAV_GROUPS.map((group) => (
             <div key={group.name}>
-              <h2 className="mb-4 text-[11px] font-medium uppercase tracking-[0.4px] text-[#62666d]">
+              <h2 className="mb-4 text-[11px] font-medium uppercase tracking-[0.4px] text-[#4b5563]">
                 {group.name}
               </h2>
               <ul className="space-y-2.5">
@@ -97,7 +97,7 @@ export function LandingFooter() {
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className="text-[13px] text-[#8a8f98] transition-colors hover:text-[#f7f8f8]"
+                      className="text-[13px] text-[#6b7280] transition-colors hover:text-[#f2f3f5]"
                     >
                       {link.label}
                     </Link>
@@ -107,7 +107,7 @@ export function LandingFooter() {
             </div>
           ))}
           <div>
-            <h2 className="mb-4 text-[11px] font-medium uppercase tracking-[0.4px] text-[#62666d]">
+            <h2 className="mb-4 text-[11px] font-medium uppercase tracking-[0.4px] text-[#4b5563]">
               Konto
             </h2>
             <ul className="space-y-2.5">
@@ -115,7 +115,7 @@ export function LandingFooter() {
                 <li key={`${link.label}-${link.href}`}>
                   <Link
                     href={link.href}
-                    className="text-[13px] text-[#8a8f98] transition-colors hover:text-[#f7f8f8]"
+                    className="text-[13px] text-[#6b7280] transition-colors hover:text-[#f2f3f5]"
                   >
                     {link.label}
                   </Link>
@@ -124,10 +124,10 @@ export function LandingFooter() {
             </ul>
           </div>
           <div className="col-span-2 lg:col-span-1">
-            <h2 className="mb-4 text-[11px] font-medium uppercase tracking-[0.4px] text-[#62666d]">
+            <h2 className="mb-4 text-[11px] font-medium uppercase tracking-[0.4px] text-[#4b5563]">
               Nyhetsbrev
             </h2>
-            <p className="text-[13px] text-[#8a8f98]">
+            <p className="text-[13px] text-[#6b7280]">
               Produktnyheter — ca. én gang i måneden.
             </p>
             <form
@@ -141,7 +141,7 @@ export function LandingFooter() {
               </Label>
               <Input
                 id="footer-newsletter-email"
-                className="h-9 rounded-[8px] border-[#23252a] bg-[#0f1011] text-[#d0d6e0] placeholder:text-[#62666d] focus-visible:border-[#5e6ad2] focus-visible:ring-2 focus-visible:ring-[#5e6ad2]/50"
+                className="h-9 rounded-[8px] border-[#2a2a2a] bg-[#161616] text-[#9ca3af] placeholder:text-[#4b5563] focus-visible:border-[#3a3a3a] focus-visible:ring-2 focus-visible:ring-white/10"
                 placeholder="din@epost.no"
                 type="email"
                 required
@@ -152,7 +152,7 @@ export function LandingFooter() {
               />
               <Button
                 type="submit"
-                className="mt-2 h-9 w-full rounded-[8px] bg-[#5e6ad2] text-[13px] font-medium text-white transition-colors hover:bg-[#828fff]"
+                className="mt-2 h-9 w-full rounded-[8px] bg-white text-[13px] font-medium text-[#1C1C1C] transition-colors hover:bg-[#f2f3f5]"
                 disabled={newsletterLoading || newsletterSuccess}
                 aria-busy={newsletterLoading}
               >
@@ -167,14 +167,14 @@ export function LandingFooter() {
         </nav>
 
         {/* Bottom bar */}
-        <div className="flex flex-col items-center justify-between gap-4 border-t border-[#23252a] pt-8 sm:flex-row">
+        <div className="flex flex-col items-center justify-between gap-4 border-t border-[#2a2a2a] pt-8 sm:flex-row">
           <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
-            <span className="text-[12px] text-[#62666d]">&copy; Agenci {new Date().getFullYear()}</span>
+            <span className="text-[12px] text-[#4b5563]">&copy; Agenci {new Date().getFullYear()}</span>
             {LANDING_LEGAL_LINKS.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-[12px] text-[#62666d] transition-colors hover:text-[#8a8f98]"
+                className="text-[12px] text-[#4b5563] transition-colors hover:text-[#6b7280]"
               >
                 {link.label}
               </Link>
@@ -182,7 +182,7 @@ export function LandingFooter() {
           </div>
           <div className="flex items-center gap-4">
             <CookieSettingsButton />
-            <span className="text-[12px] text-[#62666d]">Alle rettigheter reservert</span>
+            <span className="text-[12px] text-[#4b5563]">Alle rettigheter reservert</span>
           </div>
         </div>
       </div>

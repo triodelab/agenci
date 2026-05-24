@@ -114,46 +114,46 @@ export const LANDING_AUTH_PATHS = {
   marketingLoggedInCta: "/agents",
 } as const;
 
-/** Primær CTA — mint/teal (referansedesign) */
-export const LANDING_ACCENT_CTA_BG = "#2DD4BF" as const;
+/** Primær CTA — hvit på mørk bakgrunn */
+export const LANDING_ACCENT_CTA_BG = "#FFFFFF" as const;
 
 /**
- * Tailwind-klasser for markedsføringssider — matcher landing (ikke shadcn `primary` som ofte er blå).
+ * Tailwind-klasser for markedsføringssider — nøytral DOSS-palett.
  * Bruk til «eyebrow»-etiketter over H1 og små aksenter.
  */
 export const LANDING_MARKETING_EYEBROW_CLASS =
-  "font-medium text-[#0f766e] dark:text-teal-400" as const;
+  "font-medium text-[#6b7280]" as const;
 
 /** H1 på /produkt, /kontakt, /integrasjoner m.fl. — samme rytme som landing */
 export const LANDING_MARKETING_H1_CLASS =
-  "text-balance text-3xl font-semibold tracking-[-0.035em] text-foreground md:text-4xl md:leading-[1.12]" as const;
+  "text-balance text-3xl font-semibold tracking-[-0.035em] text-[#f2f3f5] md:text-4xl md:leading-[1.12]" as const;
 
 /** Ingress under H1 på markedsføringssider */
 export const LANDING_MARKETING_LEAD_CLASS =
-  "text-pretty text-lg leading-relaxed text-muted-foreground" as const;
+  "text-pretty text-lg leading-relaxed text-[#9ca3af]" as const;
 
-/** Tekstlenker i brødtekst (lys/mørk) */
+/** Tekstlenker i brødtekst */
 export const LANDING_MARKETING_INLINE_LINK_CLASS =
-  "font-medium text-[#0f766e] underline-offset-4 transition-colors hover:text-[#0d9488] hover:underline dark:text-teal-400 dark:hover:text-teal-300" as const;
+  "font-medium text-[#9ca3af] underline-offset-4 transition-colors hover:text-[#f2f3f5] hover:underline" as const;
 
-/** Feature-kort (produkt m.fl.) — teal hover, matcher landing-seksjoner */
+/** Feature-kort (produkt m.fl.) — nøytral hover */
 export const LANDING_MARKETING_FEATURE_CARD_CLASS =
-  "group rounded-2xl border border-border/60 bg-card/60 p-6 shadow-sm backdrop-blur-sm transition-[border-color,box-shadow] duration-200 hover:border-[#2DD4BF]/35 hover:shadow-[0_12px_40px_-24px_rgba(45,212,191,0.18)] dark:bg-card/40" as const;
+  "group rounded-2xl border border-[#2a2a2a] bg-[#161616] p-6 transition-[border-color] duration-200 hover:border-[#3a3a3a]" as const;
 
-/** Skjemaramme på lys markedsføringsbakgrunn */
+/** Skjemaramme på mørk markedsføringsbakgrunn */
 export const LANDING_MARKETING_FORM_PANEL_CLASS =
-  "rounded-2xl border border-border/60 bg-card/50 p-6 shadow-sm backdrop-blur-md md:p-8 dark:bg-card/30" as const;
+  "rounded-2xl border border-[#2a2a2a] bg-[#161616] p-6 md:p-8" as const;
 
 /**
  * Primær CTA — bakgrunn, tekst og hover (uten radius/skygge).
- * Bruk på hero (pill), nav, footer, prising m.m. sammen med egne `rounded-*` og `shadow-*`.
+ * Bruk på hero (pill), nav, footer, prising m.m.
  */
 export const LANDING_MARKETING_PRIMARY_CTA_SURFACE_CLASS =
-  "bg-[#2DD4BF] font-semibold text-neutral-950 hover:bg-[#2DD4BF]/90" as const;
+  "bg-white font-semibold text-[#1C1C1C] hover:bg-[#f2f3f5]" as const;
 
-/** Standard skygge for primær CTA på lys flate (markedsføringssider, skjema) */
+/** Standard skygge for primær CTA */
 export const LANDING_MARKETING_PRIMARY_CTA_SHADOW_CLASS =
-  "shadow-[0_14px_36px_-14px_rgba(45,212,191,0.35)]" as const;
+  "shadow-[0_14px_36px_-14px_rgba(255,255,255,0.15)]" as const;
 
 /** Primær knapp (markedsføring) — avrundet 2xl + standard skygge */
 export const LANDING_MARKETING_PRIMARY_CTA_CLASS =
@@ -161,15 +161,15 @@ export const LANDING_MARKETING_PRIMARY_CTA_CLASS =
 
 /** Sekundær outline (markedsføring) */
 export const LANDING_MARKETING_OUTLINE_CTA_CLASS =
-  "rounded-2xl border-[#2DD4BF]/45 bg-background/90 text-foreground hover:bg-[#2DD4BF]/10 dark:bg-background/40" as const;
+  "rounded-2xl border-[#2a2a2a] bg-transparent text-[#9ca3af] hover:border-[#3a3a3a] hover:text-[#f2f3f5]" as const;
 
 /** Ikonflate i feature-kort */
 export const LANDING_MARKETING_ICON_TILE_CLASS =
-  "flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#2DD4BF]/12 text-[#0f766e] dark:text-teal-400" as const;
+  "flex size-10 shrink-0 items-center justify-center rounded-xl bg-white/[0.08] text-[#9ca3af]" as const;
 
 /** Nav-piller (f.eks. hopp til seksjon) */
 export const LANDING_MARKETING_PILL_CLASS =
-  "rounded-full border border-[#2DD4BF]/30 bg-[#2DD4BF]/[0.06] px-3.5 py-1.5 font-medium text-[#0f766e] transition-colors hover:border-[#2DD4BF]/50 hover:bg-[#2DD4BF]/12 dark:text-teal-400 dark:hover:text-teal-300" as const;
+  "rounded-full border border-[#2a2a2a] bg-[#161616] px-3.5 py-1.5 font-medium text-[#6b7280] transition-colors hover:border-[#3a3a3a] hover:text-[#f2f3f5]" as const;
 
 /**
  * Første hvite blokk under dashboard i hero — brukes av `LandingNav variant="auto"`

@@ -24,7 +24,7 @@ import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
 import { Textarea } from "@workspace/ui/components/textarea";
 import { Label } from "@workspace/ui/components/label";
-import { Logo } from "@/components/logo";
+import { AgenciNavWordmark } from "@/components/logo";
 
 // ─── Embed script ─────────────────────────────────────────────────────────────
 const EMBED_SRC =
@@ -57,7 +57,7 @@ function Sidebar({
   return (
     <aside className="hidden w-72 shrink-0 flex-col justify-between bg-zinc-950 p-8 lg:flex">
       <div>
-        <Logo className="h-6 w-auto brightness-0 invert" />
+        <AgenciNavWordmark surface="dark" className="text-white" />
 
         <div className="mt-10 space-y-1">
           {STEPS.map((step) => {
@@ -777,7 +777,7 @@ export const OnboardingView = () => {
       <div className="flex flex-1 flex-col overflow-y-auto">
         {/* Mobile header */}
         <header className="flex items-center justify-between border-b border-border px-5 py-3.5 lg:hidden">
-          <Logo className="h-6 w-auto dark:brightness-0 dark:invert" />
+          <AgenciNavWordmark surface="dark" className="text-foreground dark:text-white" />
           <button
             type="button"
             onClick={() => router.push("/agents")}

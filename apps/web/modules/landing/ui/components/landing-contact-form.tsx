@@ -19,13 +19,12 @@ type LandingContactFormProps = {
   className?: string;
 };
 
-const labelDark = "text-[13px] font-medium text-[#8a8f98]";
+const labelDark = "text-[13px] font-medium text-[#6b7280]";
 const labelLight = "text-foreground";
-// Linear text-input spec: surface-1 bg, hairline border, ink text, lavender focus ring
 const fieldDark =
-  "h-10 rounded-[8px] border border-[#23252a] bg-[#0f1011] text-[#f7f8f8] placeholder:text-[#62666d] focus-visible:border-[#5e6ad2] focus-visible:ring-2 focus-visible:ring-[#5e6ad2]/50 focus-visible:outline-none transition-colors";
+  "h-10 rounded-[8px] border border-[#2a2a2a] bg-[#161616] text-[#f2f3f5] placeholder:text-[#4b5563] focus-visible:border-[#3a3a3a] focus-visible:ring-2 focus-visible:ring-white/10 focus-visible:outline-none transition-colors";
 const fieldLight =
-  "border-border/80 focus-visible:border-[#5e6ad2]/55 focus-visible:ring-[3px] focus-visible:ring-[#5e6ad2]/18";
+  "border-border/80 focus-visible:border-foreground/30 focus-visible:ring-[3px] focus-visible:ring-foreground/10";
 
 export function LandingContactForm({
   variant = "light",
@@ -104,7 +103,7 @@ export function LandingContactForm({
         <div className="space-y-1.5">
           <Label htmlFor="contact-name" className={cn(isDark ? labelDark : labelLight)}>
             Navn{" "}
-            <span className={isDark ? "text-[#62666d]" : "text-red-400"}>*</span>
+            <span className={isDark ? "text-[#4b5563]" : "text-red-400"}>*</span>
           </Label>
           <Input
             id="contact-name"
@@ -121,7 +120,7 @@ export function LandingContactForm({
         <div className="space-y-1.5">
           <Label htmlFor="contact-email" className={cn(isDark ? labelDark : labelLight)}>
             E-post{" "}
-            <span className={isDark ? "text-[#62666d]" : "text-red-400"}>*</span>
+            <span className={isDark ? "text-[#4b5563]" : "text-red-400"}>*</span>
           </Label>
           <Input
             id="contact-email"
@@ -139,7 +138,7 @@ export function LandingContactForm({
         <div className="space-y-1.5">
           <Label htmlFor="contact-phone" className={cn(isDark ? labelDark : labelLight)}>
             Telefon{" "}
-            <span className={isDark ? "text-[#62666d]" : "text-muted-foreground"}>
+            <span className={isDark ? "text-[#4b5563]" : "text-muted-foreground"}>
               (valgfritt)
             </span>
           </Label>
@@ -155,7 +154,7 @@ export function LandingContactForm({
         <div className="space-y-1.5">
           <Label htmlFor="contact-subject" className={cn(isDark ? labelDark : labelLight)}>
             Emne{" "}
-            <span className={isDark ? "text-[#62666d]" : "text-red-400"}>*</span>
+            <span className={isDark ? "text-[#4b5563]" : "text-red-400"}>*</span>
           </Label>
           <Input
             id="contact-subject"
@@ -171,7 +170,7 @@ export function LandingContactForm({
       <div className="space-y-1.5">
         <Label htmlFor="contact-message" className={cn(isDark ? labelDark : labelLight)}>
           Melding{" "}
-          <span className={isDark ? "text-[#62666d]" : "text-red-400"}>*</span>
+          <span className={isDark ? "text-[#4b5563]" : "text-red-400"}>*</span>
         </Label>
         <Textarea
           id="contact-message"
@@ -181,7 +180,7 @@ export function LandingContactForm({
           className={cn(
             "min-h-[120px]",
             isDark
-              ? "rounded-[8px] border border-[#23252a] bg-[#0f1011] text-[#f7f8f8] placeholder:text-[#62666d] focus-visible:border-[#5e6ad2] focus-visible:ring-2 focus-visible:ring-[#5e6ad2]/50 focus-visible:outline-none transition-colors"
+              ? "rounded-[8px] border border-[#2a2a2a] bg-[#161616] text-[#f2f3f5] placeholder:text-[#4b5563] focus-visible:border-[#3a3a3a] focus-visible:ring-2 focus-visible:ring-white/10 focus-visible:outline-none transition-colors"
               : "rounded-[8px] " + fieldLight,
           )}
           placeholder="Fortell kort om behov, volum eller tidslinje …"
@@ -190,7 +189,7 @@ export function LandingContactForm({
 
       <p
         id="contact-consent-hint"
-        className={cn("text-[12px] leading-[1.5]", isDark ? "text-[#62666d]" : "text-muted-foreground")}
+        className={cn("text-[12px] leading-[1.5]", isDark ? "text-[#4b5563]" : "text-muted-foreground")}
       >
         Ved å sende inn samtykker du til at vi lagrer opplysningene for å besvare henvendelsen. Les mer i{" "}
         <a
@@ -198,8 +197,8 @@ export function LandingContactForm({
           className={cn(
             "underline underline-offset-4 transition-colors",
             isDark
-              ? "text-[#5e6ad2] decoration-[#5e6ad2]/30 hover:text-[#828fff]"
-              : "text-[#0f766e] decoration-[#2DD4BF]/40 hover:text-[#0d9488]",
+              ? "text-[#9ca3af] decoration-[#9ca3af]/30 hover:text-[#f2f3f5]"
+              : "text-muted-foreground decoration-muted-foreground/30 hover:text-foreground",
           )}
         >
           personvernerklæringen
@@ -213,7 +212,7 @@ export function LandingContactForm({
         aria-busy={loading}
         className={cn(
           isDark
-            ? "h-9 rounded-[8px] bg-[#5e6ad2] px-3.5 text-[14px] font-medium text-white transition-colors hover:bg-[#828fff] disabled:opacity-50 sm:w-auto"
+            ? "h-9 rounded-[8px] bg-white px-3.5 text-[14px] font-medium text-[#1C1C1C] transition-colors hover:bg-[#f2f3f5] disabled:opacity-50 sm:w-auto"
             : cn(
                 LANDING_MARKETING_PRIMARY_CTA_SURFACE_CLASS,
                 "h-10 rounded-[8px] sm:w-auto sm:min-w-[10rem]",

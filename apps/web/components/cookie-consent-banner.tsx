@@ -129,15 +129,15 @@ function Toggle({
       disabled={disabled}
       onClick={() => onChange?.(!checked)}
       className={cn(
-        "relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5e6ad2] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f1011]",
-        checked ? "bg-[#5e6ad2]" : "bg-[#34343a]",
+        "relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30 focus-visible:ring-offset-2 focus-visible:ring-offset-[#161616]",
+        checked ? "bg-white" : "bg-[#2a2a2a]",
         disabled && "cursor-not-allowed opacity-60",
       )}
     >
       <span
         className={cn(
-          "pointer-events-none inline-block h-4 w-4 rounded-full bg-white shadow-sm transition-transform duration-200",
-          checked ? "translate-x-4" : "translate-x-0",
+          "pointer-events-none inline-block h-4 w-4 rounded-full shadow-sm transition-transform duration-200",
+          checked ? "translate-x-4 bg-[#1C1C1C]" : "translate-x-0 bg-[#6b7280]",
         )}
       />
     </button>
@@ -159,30 +159,30 @@ function CategoryRow({
   const isNecessary = cat.alwaysOn;
 
   return (
-    <div className="border-b border-[#23252a] last:border-b-0">
+    <div className="border-b border-[#2a2a2a] last:border-b-0">
       {/* Header */}
       <div className="flex items-center gap-3 py-4">
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
-          className="flex flex-1 items-center gap-2 text-left focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#5e6ad2] rounded"
+          className="flex flex-1 items-center gap-2 text-left focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20 rounded"
           aria-expanded={open}
         >
           <ChevronDown
             className={cn(
-              "size-4 shrink-0 text-[#62666d] transition-transform duration-200",
+              "size-4 shrink-0 text-[#4b5563] transition-transform duration-200",
               open && "rotate-180",
             )}
             strokeWidth={1.75}
           />
-          <span className="text-[14px] font-medium text-[#f7f8f8]">{cat.label}</span>
+          <span className="text-[14px] font-medium text-[#f2f3f5]">{cat.label}</span>
           {isNecessary && (
-            <span className="rounded-full bg-[#5e6ad2]/10 px-2 py-0.5 text-[11px] font-medium text-[#5e6ad2]">
+            <span className="rounded-full bg-white/[0.08] px-2 py-0.5 text-[11px] font-medium text-[#9ca3af]">
               Alltid på
             </span>
           )}
           {cat.cookies.length === 0 && !isNecessary && (
-            <span className="rounded-full bg-[#23252a] px-2 py-0.5 text-[11px] text-[#62666d]">
+            <span className="rounded-full bg-[#2a2a2a] px-2 py-0.5 text-[11px] text-[#4b5563]">
               Ingen
             </span>
           )}
@@ -198,26 +198,26 @@ function CategoryRow({
       {/* Expanded content */}
       {open && (
         <div className="pb-4 pl-6">
-          <p className="text-[13px] leading-[1.65] text-[#8a8f98]">{cat.description}</p>
+          <p className="text-[13px] leading-[1.65] text-[#6b7280]">{cat.description}</p>
 
           {cat.cookies.length > 0 && (
-            <div className="mt-4 overflow-hidden rounded-[8px] border border-[#23252a]">
+            <div className="mt-4 overflow-hidden rounded-[8px] border border-[#2a2a2a]">
               <table className="w-full text-[12px]">
                 <thead>
-                  <tr className="border-b border-[#23252a] bg-[#0a0a0b]">
-                    <th className="px-3 py-2 text-left font-medium text-[#62666d]">Navn</th>
-                    <th className="hidden px-3 py-2 text-left font-medium text-[#62666d] sm:table-cell">Leverandør</th>
-                    <th className="hidden px-3 py-2 text-left font-medium text-[#62666d] md:table-cell">Formål</th>
-                    <th className="px-3 py-2 text-left font-medium text-[#62666d]">Varighet</th>
+                  <tr className="border-b border-[#2a2a2a] bg-[#111111]">
+                    <th className="px-3 py-2 text-left font-medium text-[#4b5563]">Navn</th>
+                    <th className="hidden px-3 py-2 text-left font-medium text-[#4b5563] sm:table-cell">Leverandør</th>
+                    <th className="hidden px-3 py-2 text-left font-medium text-[#4b5563] md:table-cell">Formål</th>
+                    <th className="px-3 py-2 text-left font-medium text-[#4b5563]">Varighet</th>
                   </tr>
                 </thead>
                 <tbody>
                   {cat.cookies.map((c) => (
-                    <tr key={c.name} className="border-b border-[#23252a] last:border-b-0">
-                      <td className="px-3 py-2.5 font-mono text-[11px] text-[#d0d6e0]">{c.name}</td>
-                      <td className="hidden px-3 py-2.5 text-[#8a8f98] sm:table-cell">{c.provider}</td>
-                      <td className="hidden px-3 py-2.5 text-[#8a8f98] md:table-cell">{c.purpose}</td>
-                      <td className="px-3 py-2.5 text-[#8a8f98]">{c.duration}</td>
+                    <tr key={c.name} className="border-b border-[#2a2a2a] last:border-b-0">
+                      <td className="px-3 py-2.5 font-mono text-[11px] text-[#9ca3af]">{c.name}</td>
+                      <td className="hidden px-3 py-2.5 text-[#6b7280] sm:table-cell">{c.provider}</td>
+                      <td className="hidden px-3 py-2.5 text-[#6b7280] md:table-cell">{c.purpose}</td>
+                      <td className="px-3 py-2.5 text-[#6b7280]">{c.duration}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -226,7 +226,7 @@ function CategoryRow({
           )}
 
           {cat.cookies.length === 0 && (
-            <p className="mt-3 text-[13px] italic text-[#62666d]">
+            <p className="mt-3 text-[13px] italic text-[#4b5563]">
               Ingen informasjonskapsler i denne kategorien for øyeblikket.
             </p>
           )}
@@ -255,7 +255,6 @@ export function CookieConsentBanner() {
     }
   }, [mounted, hasConsented]);
 
-  // Re-open when reset() is called from footer
   useEffect(() => {
     const handler = (e: Event) => {
       const detail = (e as CustomEvent).detail;
@@ -294,29 +293,29 @@ export function CookieConsentBanner() {
   if (showDetails) {
     return (
       <div
-        className="fixed inset-0 z-[9999] flex items-end justify-center bg-black/60 p-4 backdrop-blur-sm sm:items-center"
+        className="fixed inset-0 z-[9999] flex items-end justify-center bg-black/70 p-4 backdrop-blur-sm sm:items-center"
         role="dialog"
         aria-modal="true"
         aria-label="Cookie-innstillinger"
       >
-        <div className="flex max-h-[90dvh] w-full max-w-[640px] flex-col rounded-[16px] border border-[#23252a] bg-[#0f1011] shadow-[0_24px_64px_rgba(0,0,0,0.6)]">
+        <div className="flex max-h-[90dvh] w-full max-w-[640px] flex-col rounded-[16px] border border-[#2a2a2a] bg-[#161616] shadow-[0_24px_64px_rgba(0,0,0,0.7)]">
           {/* Header */}
-          <div className="flex items-center gap-3 border-b border-[#23252a] px-6 py-5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-[8px] bg-[#5e6ad2]/10">
-              <Shield className="size-4 text-[#5e6ad2]" strokeWidth={1.75} />
+          <div className="flex items-center gap-3 border-b border-[#2a2a2a] px-6 py-5">
+            <div className="flex h-8 w-8 items-center justify-center rounded-[8px] bg-white/[0.08]">
+              <Shield className="size-4 text-[#9ca3af]" strokeWidth={1.75} />
             </div>
             <div>
-              <h2 className="text-[15px] font-semibold text-[#f7f8f8]">Cookie-innstillinger</h2>
-              <p className="text-[12px] text-[#62666d]">Agenci — Hassan Triodelab DA</p>
+              <h2 className="text-[15px] font-semibold text-[#f2f3f5]">Cookie-innstillinger</h2>
+              <p className="text-[12px] text-[#4b5563]">Agenci — Hassan Triodelab DA</p>
             </div>
           </div>
 
           {/* Intro */}
-          <div className="border-b border-[#23252a] px-6 py-4">
-            <p className="text-[13px] leading-[1.65] text-[#8a8f98]">
+          <div className="border-b border-[#2a2a2a] px-6 py-4">
+            <p className="text-[13px] leading-[1.65] text-[#6b7280]">
               Vi bruker informasjonskapsler og lignende teknologi for å sikre at nettsiden fungerer,
               analysere trafikk og forbedre tjenesten. Du kan velge hvilke kategorier du godtar.{" "}
-              <Link href="/personvern#cookies" className="text-[#5e6ad2] hover:underline underline-offset-2">
+              <Link href="/personvern#cookies" className="text-[#9ca3af] underline underline-offset-2 hover:text-[#f2f3f5] transition-colors">
                 Les mer i vår personvernerklæring
               </Link>
               .
@@ -340,11 +339,11 @@ export function CookieConsentBanner() {
           </div>
 
           {/* Footer actions */}
-          <div className="flex flex-col-reverse gap-2 border-t border-[#23252a] px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col-reverse gap-2 border-t border-[#2a2a2a] px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
             <button
               type="button"
               onClick={handleNecessary}
-              className="rounded-[8px] border border-[#23252a] px-4 py-2 text-[13px] font-medium text-[#8a8f98] transition-colors hover:border-[#34343a] hover:text-[#f7f8f8]"
+              className="rounded-[8px] border border-[#2a2a2a] px-4 py-2 text-[13px] font-medium text-[#6b7280] transition-colors hover:border-[#3a3a3a] hover:text-[#f2f3f5]"
             >
               Kun nødvendige
             </button>
@@ -352,14 +351,14 @@ export function CookieConsentBanner() {
               <button
                 type="button"
                 onClick={handleSave}
-                className="flex-1 rounded-[8px] border border-[#34343a] px-4 py-2 text-[13px] font-medium text-[#d0d6e0] transition-colors hover:border-[#5e6ad2]/50 hover:text-[#f7f8f8] sm:flex-none"
+                className="flex-1 rounded-[8px] border border-[#2a2a2a] px-4 py-2 text-[13px] font-medium text-[#9ca3af] transition-colors hover:border-[#3a3a3a] hover:text-[#f2f3f5] sm:flex-none"
               >
                 Lagre mitt valg
               </button>
               <button
                 type="button"
                 onClick={handleAcceptAll}
-                className="flex-1 rounded-[8px] bg-[#5e6ad2] px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-[#828fff] sm:flex-none"
+                className="flex-1 rounded-[8px] bg-white px-4 py-2 text-[13px] font-medium text-[#1C1C1C] transition-colors hover:bg-[#f2f3f5] sm:flex-none"
               >
                 Godta alle
               </button>
@@ -378,19 +377,19 @@ export function CookieConsentBanner() {
       aria-label="Cookie-samtykke"
       className="fixed bottom-0 inset-x-0 z-[9999] px-4 pb-4 sm:px-6 transition-[opacity,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
     >
-      <div className="mx-auto max-w-[960px] rounded-[12px] border border-[#23252a] bg-[#0f1011] p-5 shadow-[0_-4px_32px_rgba(0,0,0,0.5)]">
+      <div className="mx-auto max-w-[960px] rounded-[12px] border border-[#2a2a2a] bg-[#161616] p-5 shadow-[0_-4px_32px_rgba(0,0,0,0.6)]">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6">
           {/* Text */}
           <div className="flex-1">
-            <p className="text-[13px] font-semibold text-[#f7f8f8]">
+            <p className="text-[13px] font-semibold text-[#f2f3f5]">
               Vi bruker informasjonskapsler
             </p>
-            <p className="mt-1 text-[13px] leading-[1.65] text-[#8a8f98]">
+            <p className="mt-1 text-[13px] leading-[1.65] text-[#6b7280]">
               Vi bruker nødvendige cookies for å drifte nettsiden og Sentry for teknisk feilsporing.
               Du kan godta alle kategorier, velge kun nødvendige, eller tilpasse valget ditt.{" "}
               <Link
                 href="/personvern#cookies"
-                className="text-[#5e6ad2] underline-offset-2 hover:underline transition-colors"
+                className="text-[#9ca3af] underline-offset-2 hover:underline transition-colors"
                 target="_blank"
               >
                 Personvernerklæring
@@ -403,21 +402,21 @@ export function CookieConsentBanner() {
             <button
               type="button"
               onClick={() => setShowDetails(true)}
-              className="h-9 rounded-[8px] border border-[#23252a] px-3.5 text-[13px] font-medium text-[#8a8f98] transition-colors hover:border-[#34343a] hover:text-[#f7f8f8]"
+              className="h-9 rounded-[8px] border border-[#2a2a2a] px-3.5 text-[13px] font-medium text-[#6b7280] transition-colors hover:border-[#3a3a3a] hover:text-[#f2f3f5]"
             >
               Innstillinger
             </button>
             <button
               type="button"
               onClick={handleNecessary}
-              className="h-9 rounded-[8px] border border-[#34343a] px-3.5 text-[13px] font-medium text-[#d0d6e0] transition-colors hover:text-[#f7f8f8]"
+              className="h-9 rounded-[8px] border border-[#2a2a2a] px-3.5 text-[13px] font-medium text-[#9ca3af] transition-colors hover:text-[#f2f3f5]"
             >
               Kun nødvendige
             </button>
             <button
               type="button"
               onClick={handleAcceptAll}
-              className="h-9 rounded-[8px] bg-[#5e6ad2] px-3.5 text-[13px] font-medium text-white transition-colors hover:bg-[#828fff]"
+              className="h-9 rounded-[8px] bg-white px-3.5 text-[13px] font-medium text-[#1C1C1C] transition-colors hover:bg-[#f2f3f5]"
             >
               Godta alle
             </button>

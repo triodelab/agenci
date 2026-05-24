@@ -9,7 +9,7 @@ export function CookieSettingsButton() {
     <button
       type="button"
       onClick={reset}
-      className="text-[12px] text-[#62666d] transition-colors hover:text-[#8a8f98]"
+      className="text-[12px] text-[#4b5563] transition-colors hover:text-[#6b7280]"
     >
       Cookie-innstillinger
     </button>

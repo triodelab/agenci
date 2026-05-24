@@ -4,33 +4,24 @@ import Link from "next/link";
 import { useEffect, useLayoutEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
-import { Button } from "@workspace/ui/components/button";
 import { cn } from "@workspace/ui/lib/utils";
 import { AgenciNavWordmark } from "@/components/logo";
 import { AuthAwareLink } from "@/components/auth-aware-link";
 import {
   LANDING_AUTH_PATHS,
-  LANDING_MARKETING_PRIMARY_CTA_SURFACE_CLASS,
   LANDING_NAV_PRIMARY_LINKS,
   LANDING_NAV_SURFACE_ATTR,
   LANDING_NAV_TONE_BOUNDARY_ID,
-  LANDING_SECTION_IDS,
 } from "@/modules/landing/constants";
 
-/** Høyde på fixed header — må matche `h-[4.25rem]` (scroll-terskel for tone) */
 const NAV_HEIGHT_PX = 68;
 
 type LandingNavProps = {
-  /**
-   * `dark` / `light` = statisk.
-   * `auto` = lys nav når toppen av viewport er over hvit seksjon, mørk over hero eller footer.
-   */
   variant?: "dark" | "light" | "auto";
 };
 
 function readAutoSurfaceTone(): "dark" | "light" {
   if (typeof document === "undefined") return "dark";
-
   const x = window.innerWidth / 2;
   const y = NAV_HEIGHT_PX / 2;
   const surfaces = document.querySelectorAll(`[${LANDING_NAV_SURFACE_ATTR}]`);
@@ -41,14 +32,9 @@ function readAutoSurfaceTone(): "dark" | "light" {
       return s === "light" ? "light" : "dark";
     }
   }
-
   const boundary = document.getElementById(LANDING_NAV_TONE_BOUNDARY_ID);
   if (!boundary) return "dark";
-  const br = boundary.getBoundingClientRect();
-  if (br.top <= NAV_HEIGHT_PX) {
-    return "light";
-  }
-  return "dark";
+  return boundary.getBoundingClientRect().top <= NAV_HEIGHT_PX ? "light" : "dark";
 }
 
 export function LandingNav({ variant = "dark" }: LandingNavProps) {
@@ -76,171 +62,176 @@ export function LandingNav({ variant = "dark" }: LandingNavProps) {
     };
   }, [variant]);
 
-  const effectiveIsDark =
+  const isDark =
     variant === "light" ? false : variant === "dark" ? true : autoSurface === "dark";
 
   return (
     <header
       className={cn(
-        "fixed inset-x-0 top-0 z-50 transition-[background-color,box-shadow,border-color] duration-300",
-        effectiveIsDark
+        "fixed inset-x-0 top-0 z-50 transition-[background-color,border-color] duration-300",
+        isDark
           ? scrolled
-            ? "border-b border-[#23252a] bg-[#010102]/95 backdrop-blur-sm"
+            ? "border-b border-[#2a2a2a] bg-[#1C1C1C]/96 backdrop-blur-md"
             : "border-b border-transparent bg-transparent"
-          : "border-b border-border/60 bg-background shadow-sm",
+          : "border-b border-border/50 bg-background/95 backdrop-blur-sm shadow-sm",
       )}
     >
-      <div className="mx-auto grid h-[4.25rem] max-w-7xl grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 px-4 md:px-8 lg:px-10">
+      <div className="mx-auto flex h-[4.25rem] max-w-[1200px] items-center justify-between gap-4 px-6 xl:px-8">
+
+        {/* Logo */}
         <Link
           href="/"
-          className={cn(
-            "flex w-fit min-w-0 items-center font-semibold tracking-tight",
-            effectiveIsDark ? "text-white" : "text-foreground",
-          )}
+          className="flex shrink-0 items-center"
           aria-label="Agenci — hjem"
         >
-          <AgenciNavWordmark surface={effectiveIsDark ? "dark" : "light"} />
+          <AgenciNavWordmark surface={isDark ? "dark" : "light"} />
         </Link>
 
-        <nav className="hidden justify-center lg:flex" aria-label="Hovedlenker">
-          <div className="flex items-center gap-0.5 xl:gap-1">
-            {LANDING_NAV_PRIMARY_LINKS.map((item) => (
-              <Link
-                key={item.name}
-                href={item.href}
-                className={cn(
-                  "rounded-lg px-2.5 py-2 text-[13px] font-medium transition-colors xl:px-3.5",
-                  effectiveIsDark
-                    ? "text-[#8a8f98] hover:bg-white/[0.07] hover:text-[#f7f8f8]"
-                    : "text-muted-foreground hover:bg-muted/80 hover:text-foreground",
-                )}
-              >
-                {item.name}
-              </Link>
-            ))}
-          </div>
+        {/* Center nav */}
+        <nav className="hidden items-center gap-0.5 lg:flex" aria-label="Hovedlenker">
+          {LANDING_NAV_PRIMARY_LINKS.map((item) => (
+            <Link
+              key={item.name}
+              href={item.href}
+              className={cn(
+                "rounded-md px-3 py-2 text-[13px] font-medium transition-colors",
+                isDark
+                  ? "text-[#b8bfca] hover:bg-white/[0.07] hover:text-white"
+                  : "text-muted-foreground hover:bg-muted/70 hover:text-foreground",
+              )}
+            >
+              {item.name}
+            </Link>
+          ))}
         </nav>
 
-        <div className="col-start-3 flex shrink-0 items-center justify-end gap-2 md:gap-3">
+        {/* Right actions */}
+        <div className="flex shrink-0 items-center gap-2">
           {isLoaded && user ? (
-            <Button
-              variant="ghost"
-              size="sm"
+            <Link
+              href={LANDING_AUTH_PATHS.appHome}
               className={cn(
-                "hidden sm:inline-flex text-[13px]",
-                effectiveIsDark && "text-[#d0d6e0] hover:bg-white/[0.07] hover:text-[#f7f8f8]",
+                "hidden rounded-md px-3 py-2 text-[13px] font-medium transition-colors sm:inline-flex",
+                isDark
+                  ? "text-[#b8bfca] hover:bg-white/[0.07] hover:text-white"
+                  : "text-muted-foreground hover:bg-muted/70 hover:text-foreground",
               )}
-              asChild
             >
-              <Link href={LANDING_AUTH_PATHS.appHome}>Dashboard</Link>
-            </Button>
+              Dashboard
+            </Link>
           ) : isLoaded ? (
-            <Button
-              variant="ghost"
-              size="sm"
+            <Link
+              href={LANDING_AUTH_PATHS.signIn}
               className={cn(
-                "hidden sm:inline-flex text-[13px]",
-                effectiveIsDark && "text-[#8a8f98] hover:bg-white/[0.07] hover:text-[#f7f8f8]",
+                "hidden rounded-md px-3 py-2 text-[13px] font-medium transition-colors sm:inline-flex",
+                isDark
+                  ? "text-[#b8bfca] hover:bg-white/[0.07] hover:text-white"
+                  : "text-muted-foreground hover:bg-muted/70 hover:text-foreground",
               )}
-              asChild
             >
-              <Link href={LANDING_AUTH_PATHS.signIn}>Logg inn</Link>
-            </Button>
+              Logg inn
+            </Link>
           ) : null}
 
-          {isLoaded && !user ? (
-            <Button
-              size="sm"
+          {isLoaded && !user && (
+            <AuthAwareLink
+              href={LANDING_AUTH_PATHS.signUp}
+              loggedInHref={LANDING_AUTH_PATHS.marketingLoggedInCta}
               className={cn(
-                "hidden rounded-[8px] px-[14px] text-[13px] font-medium sm:inline-flex",
-                effectiveIsDark
-                  ? "bg-[#f7f8f8] text-[#010102] hover:bg-white"
-                  : "bg-foreground text-background hover:bg-foreground/90",
+                "hidden h-9 items-center justify-center rounded-[8px] border px-[18px] text-[13px] font-medium transition-colors sm:inline-flex",
+                isDark
+                  ? "border-white/45 text-white hover:border-white/75 hover:bg-white/[0.08]"
+                  : "border-border bg-foreground text-background hover:bg-foreground/90",
               )}
-              asChild
             >
-              <AuthAwareLink
-                href={LANDING_AUTH_PATHS.signUp}
-                loggedInHref={LANDING_AUTH_PATHS.marketingLoggedInCta}
-              >
-                Opprett konto
-              </AuthAwareLink>
-            </Button>
-          ) : null}
+              Kom i gang
+            </AuthAwareLink>
+          )}
 
+          {/* Mobile hamburger */}
           <button
             type="button"
-            className={cn(
-              "inline-flex rounded-lg p-2 lg:hidden",
-              effectiveIsDark
-                ? "text-white hover:bg-white/10"
-                : "text-foreground hover:bg-muted",
-            )}
+            onClick={() => setOpen((v) => !v)}
             aria-expanded={open}
             aria-controls="landing-nav-mobile"
             aria-label={open ? "Lukk meny" : "Åpne meny"}
-            onClick={() => setOpen((v) => !v)}
+            className={cn(
+              "inline-flex rounded-lg p-2 lg:hidden",
+              isDark ? "text-[#9ca3af] hover:bg-white/10" : "text-foreground hover:bg-muted",
+            )}
           >
-            {open ? <X className="size-6" /> : <Menu className="size-6" />}
+            {open ? <X className="size-5" /> : <Menu className="size-5" />}
           </button>
         </div>
       </div>
 
+      {/* Mobile drawer */}
       <div
         id="landing-nav-mobile"
         className={cn(
-          "absolute right-4 top-[4.25rem] z-50 w-64 rounded-xl border shadow-lg lg:hidden",
-          effectiveIsDark
-            ? "border-[#23252a] bg-[#0f1011]/95 backdrop-blur-xl"
+          "absolute right-4 top-[4.25rem] z-50 w-60 rounded-xl border shadow-xl lg:hidden",
+          isDark
+            ? "border-[#2a2a2a] bg-[#1C1C1C]/97 backdrop-blur-xl"
             : "border-border bg-background",
           open ? "block" : "hidden",
         )}
       >
         <nav
-          className="flex max-h-[min(70vh,calc(100dvh-5rem))] flex-col gap-1 overflow-y-auto px-3 py-3"
+          className="flex max-h-[min(70vh,calc(100dvh-5rem))] flex-col gap-0.5 overflow-y-auto px-3 py-3"
           aria-label="Mobilmeny"
         >
           {LANDING_NAV_PRIMARY_LINKS.map((item) => (
             <Link
               key={item.name}
               href={item.href}
+              onClick={() => setOpen(false)}
               className={cn(
-                "rounded-xl px-3 py-3 text-base font-medium",
-                effectiveIsDark
-                  ? "text-[#d0d6e0] hover:bg-white/[0.07] hover:text-[#f7f8f8]"
+                "rounded-xl px-3 py-3 text-[14px] font-medium",
+                isDark
+                  ? "text-[#d1d5db] hover:bg-white/[0.07] hover:text-[#f9fafb]"
                   : "text-foreground hover:bg-muted",
               )}
-              onClick={() => setOpen(false)}
             >
               {item.name}
             </Link>
           ))}
-          <div
-            className={cn(
-              "mt-3 flex flex-col gap-2 border-t pt-4",
-              effectiveIsDark ? "border-[#23252a]" : "border-border",
-            )}
-          >
+          <div className={cn("mt-2 flex flex-col gap-2 border-t pt-3", isDark ? "border-[#2a2a2a]" : "border-border")}>
             {isLoaded && user ? (
-              <Button variant="outline" className="w-full rounded-xl" asChild>
-                <Link href={LANDING_AUTH_PATHS.appHome}>Dashboard</Link>
-              </Button>
+              <Link
+                href={LANDING_AUTH_PATHS.appHome}
+                onClick={() => setOpen(false)}
+                className={cn(
+                  "flex h-9 items-center justify-center rounded-xl text-[13px] font-medium",
+                  isDark ? "border border-[#2a2a2a] text-[#d1d5db] hover:bg-white/[0.07]" : "border border-border text-foreground",
+                )}
+              >
+                Dashboard
+              </Link>
             ) : isLoaded ? (
               <>
-                <Button variant="outline" className="w-full rounded-xl" asChild>
-                  <Link href={LANDING_AUTH_PATHS.signIn}>Logg inn</Link>
-                </Button>
-                <Button
-                  className="w-full rounded-[8px] bg-[#f7f8f8] text-[13px] font-medium text-[#010102] hover:bg-white"
-                  asChild
+                <Link
+                  href={LANDING_AUTH_PATHS.signIn}
+                  onClick={() => setOpen(false)}
+                  className={cn(
+                    "flex h-9 items-center justify-center rounded-xl border text-[13px] font-medium",
+                    isDark ? "border-[#2a2a2a] text-[#d1d5db] hover:bg-white/[0.07]" : "border-border text-foreground",
+                  )}
                 >
-                  <AuthAwareLink
-                    href={LANDING_AUTH_PATHS.signUp}
-                    loggedInHref={LANDING_AUTH_PATHS.marketingLoggedInCta}
-                  >
-                    Opprett konto
-                  </AuthAwareLink>
-                </Button>
+                  Logg inn
+                </Link>
+                <AuthAwareLink
+                  href={LANDING_AUTH_PATHS.signUp}
+                  loggedInHref={LANDING_AUTH_PATHS.marketingLoggedInCta}
+                  onClick={() => setOpen(false)}
+                  className={cn(
+                    "flex h-9 items-center justify-center rounded-xl border text-[13px] font-semibold",
+                    isDark
+                      ? "border-[#e5e7eb]/25 text-[#e5e7eb] hover:border-[#e5e7eb]/50 hover:bg-white/[0.07]"
+                      : "bg-foreground text-background hover:bg-foreground/90",
+                  )}
+                >
+                  Kom i gang
+                </AuthAwareLink>
               </>
             ) : null}
           </div>

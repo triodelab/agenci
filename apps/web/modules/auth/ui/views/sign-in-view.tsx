@@ -29,7 +29,7 @@ function MicrosoftIcon() {
 }
 
 const inputCls =
-  "h-10 w-full rounded-lg border border-zinc-200 bg-white px-3.5 text-sm text-zinc-900 placeholder-zinc-400 outline-none transition focus:border-zinc-400 focus:ring-2 focus:ring-zinc-900/10 disabled:opacity-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:placeholder-zinc-500 dark:focus:border-zinc-600";
+  "h-10 w-full rounded-[8px] border border-[#d4d0cb] bg-white px-3.5 text-[14px] text-[#1C1C1C] placeholder-[#a09d98] outline-none transition focus:border-[#b8b3ae] focus:ring-2 focus:ring-[#1C1C1C]/8 disabled:opacity-50";
 
 function clerkErrMsg(err: unknown): string {
   const e = err as { errors?: Array<{ code?: string; message?: string; longMessage?: string }> } | null;
@@ -43,7 +43,6 @@ function clerkErrMsg(err: unknown): string {
   if (code === "too_many_requests")
     return "For mange forsøk. Vent litt og prøv igjen.";
 
-  // Fall back to the raw message (already in Norwegian from Clerk if locale is set)
   return first?.longMessage ?? first?.message ?? "Innlogging mislyktes. Prøv igjen.";
 }
 
@@ -59,7 +58,6 @@ export const SignInView = () => {
   const [oauthLoading, setOauthLoading] = useState<"google" | "microsoft" | null>(null);
   const [error,        setError]        = useState<string | null>(null);
 
-  // Already authenticated → go straight to dashboard
   useEffect(() => {
     if (userId) router.replace("/agents");
   }, [userId, router]);
@@ -87,8 +85,6 @@ export const SignInView = () => {
     setError(null);
 
     try {
-      // Attempt sign-in — Clerk may return "complete" immediately (most configs)
-      // or "needs_first_factor" when the password must be submitted as a separate step.
       const attempt = await signIn.create({ identifier: email, password });
 
       if (attempt.status === "complete") {
@@ -122,10 +118,10 @@ export const SignInView = () => {
   return (
     <div className="space-y-5">
       <div className="space-y-1">
-        <h2 className="text-[22px] font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+        <h2 className="text-[22px] font-semibold tracking-[-0.03em] text-[#1C1C1C]">
           Logg inn
         </h2>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">
+        <p className="text-[14px] text-[#6b7280]">
           Velkommen tilbake til Agenci
         </p>
       </div>
@@ -142,7 +138,7 @@ export const SignInView = () => {
                 p === "google" ? "oauth_google" : "oauth_microsoft",
               )
             }
-            className="flex h-10 items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white text-sm font-medium text-zinc-700 transition hover:bg-zinc-50 disabled:opacity-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
+            className="flex h-10 items-center justify-center gap-2 rounded-[8px] border border-[#d4d0cb] bg-white text-[13px] font-medium text-[#4b5563] transition hover:border-[#b8b3ae] hover:text-[#1C1C1C] disabled:opacity-50"
           >
             {oauthLoading === p ? (
               <Loader2Icon className="h-4 w-4 animate-spin" />
@@ -157,17 +153,14 @@ export const SignInView = () => {
       </div>
 
       <div className="flex items-center gap-3">
-        <div className="h-px flex-1 bg-zinc-100 dark:bg-zinc-800" />
-        <span className="text-[11px] text-zinc-400">eller</span>
-        <div className="h-px flex-1 bg-zinc-100 dark:bg-zinc-800" />
+        <div className="h-px flex-1 bg-[#d4d0cb]" />
+        <span className="text-[11px] text-[#a09d98]">eller</span>
+        <div className="h-px flex-1 bg-[#d4d0cb]" />
       </div>
 
       <form onSubmit={(e) => void handleSubmit(e)} className="space-y-3.5">
         <div className="space-y-1.5">
-          <label
-            htmlFor="si-email"
-            className="text-[13px] font-medium text-zinc-700 dark:text-zinc-300"
-          >
+          <label htmlFor="si-email" className="text-[13px] font-medium text-[#4b5563]">
             E-post
           </label>
           <input
@@ -185,15 +178,12 @@ export const SignInView = () => {
 
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
-            <label
-              htmlFor="si-pwd"
-              className="text-[13px] font-medium text-zinc-700 dark:text-zinc-300"
-            >
+            <label htmlFor="si-pwd" className="text-[13px] font-medium text-[#4b5563]">
               Passord
             </label>
             <Link
               href="/sign-in/forgot-password"
-              className="text-[12px] text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200"
+              className="text-[12px] text-[#a09d98] transition-colors hover:text-[#1C1C1C]"
             >
               Glemt passord?
             </Link>
@@ -214,7 +204,7 @@ export const SignInView = () => {
               type="button"
               onClick={() => setShowPwd((v) => !v)}
               tabIndex={-1}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#a09d98] hover:text-[#4b5563]"
             >
               {showPwd ? (
                 <EyeOffIcon className="h-4 w-4" />
@@ -226,7 +216,7 @@ export const SignInView = () => {
         </div>
 
         {error && (
-          <p className="rounded-lg border border-red-200 bg-red-50 px-3.5 py-2.5 text-[13px] text-red-600 dark:border-red-900/40 dark:bg-red-900/15 dark:text-red-400">
+          <p className="rounded-[8px] border border-red-200 bg-red-50 px-3.5 py-2.5 text-[13px] text-red-600">
             {error}
           </p>
         )}
@@ -234,18 +224,18 @@ export const SignInView = () => {
         <button
           type="submit"
           disabled={busy}
-          className="flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-zinc-900 text-sm font-semibold text-white transition hover:bg-zinc-800 disabled:opacity-50 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+          className="flex h-10 w-full items-center justify-center gap-2 rounded-[8px] bg-[#1C1C1C] text-[14px] font-semibold text-white transition hover:bg-[#2a2a2a] disabled:opacity-50"
         >
           {loading && <Loader2Icon className="h-4 w-4 animate-spin" />}
           Logg inn
         </button>
       </form>
 
-      <p className="text-center text-[13px] text-zinc-500 dark:text-zinc-400">
+      <p className="text-center text-[13px] text-[#6b7280]">
         Ny bruker?{" "}
         <Link
           href="/sign-up"
-          className="font-semibold text-zinc-900 hover:text-zinc-700 dark:text-zinc-100 dark:hover:text-zinc-300"
+          className="font-semibold text-[#1C1C1C] transition-colors hover:text-[#2a2a2a]"
         >
           Opprett konto
         </Link>

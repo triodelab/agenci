@@ -90,7 +90,12 @@ export function AgenciNavWordmark({
           priority
         />
       </span>
-      <span className="-ml-[0.07em] pl-0">genci</span>
+      <span
+        className={cn(
+          "-ml-[0.07em] pl-0",
+          surface === "dark" ? "text-white" : "text-[#1C1C1C]",
+        )}
+      >genci</span>
     </span>
   );
 }
