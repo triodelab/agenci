@@ -64,9 +64,9 @@ const ROWS = [
   {
     id: "rask",
     Icon: CubeSpeed,
-    title: "I drift på 10 minutter — ingen IT-avdeling nødvendig",
+    title: "I drift på 5 minutter — ingen IT-avdeling nødvendig",
     lead: "Lim inn én kodelinje på nettsiden. Resten gjør du i dashboardet, uten teknisk hjelp.",
-    body: "De fleste løsninger tar dager å konfigurere og krever en utvikler. Agenci er klar på under én time. Gjør endringer i dashboardet — de trer i kraft med én gang. Prisen endrer seg heller ikke selv om volumet firedobles.",
+    body: "De fleste løsninger tar dager å konfigurere og krever en utvikler. Med Agenci er du live på under 5 minutter. Gjør endringer i dashboardet — de trer i kraft med én gang. Prisen endrer seg heller ikke selv om volumet firedobles.",
   },
   {
     id: "verdi",

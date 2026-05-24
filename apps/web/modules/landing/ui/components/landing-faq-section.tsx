@@ -17,7 +17,7 @@ const faqs = [
   },
   {
     q: "Hvor lang tid tar det å sette opp?",
-    a: "Under 10 minutter for det grunnleggende. Last opp FAQ-en din, lim inn én kodelinje på nettsiden, og du er live. Ingen utvikler nødvendig. Juster utseende og tone i dashboardet etterpå.",
+    a: "Under 5 minutter for det grunnleggende. Last opp FAQ-en din, lim inn én kodelinje på nettsiden, og du er live. Ingen utvikler nødvendig. Juster utseende og tone i dashboardet etterpå.",
   },
   {
     q: "Hva skjer hvis agenten svarer feil?",

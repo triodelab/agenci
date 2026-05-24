@@ -7,7 +7,7 @@ import { CheckIcon } from "lucide-react";
 const BULLETS = [
   "PDF-er, nettsider, fritekst og FAQ-filer",
   "Automatisk re-indeksering når innholdet endres",
-  "Klar til bruk på under 10 minutter",
+  "Klar til bruk på under 5 minutter",
 ];
 
 export function LandingFeatureKnowledgeSection() {
@@ -79,7 +79,7 @@ export function LandingFeatureKnowledgeSection() {
               className="text-[1.85rem] font-bold leading-[1.08] tracking-[-0.038em] text-[#1C1C1C] sm:text-[2.2rem] md:text-[2.8rem]"
             >
               Lær opp agenten med ditt innhold.{" "}
-              <span className="text-[#a8987e]">På 10 minutter.</span>
+              <span className="text-[#a8987e]">På 5 minutter.</span>
             </h2>
             <p className="mt-5 text-[15px] leading-[1.75] text-[#6B6B6B]">
               Last opp dokumenter, pek på nettsider, lim inn FAQ. Agenci indekserer alt automatisk
