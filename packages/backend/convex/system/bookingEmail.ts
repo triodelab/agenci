@@ -37,7 +37,7 @@ export const sendBookingEmails = internalAction({
   args: {
     customerEmail: v.string(),
     customerName: v.string(),
-    businessEmail: v.string(),
+    businessEmail: v.optional(v.string()),
     businessName: v.string(),
     serviceName: v.string(),
     dateString: v.string(),
@@ -82,27 +82,29 @@ export const sendBookingEmails = internalAction({
       `,
     });
 
-    // Email to business
-    await sendEmail({
-      apiKey,
-      from,
-      to: args.businessEmail,
-      subject: `Ny bestilling: ${args.customerName} — ${args.serviceName} ${formattedDate} kl. ${args.timeString}`,
-      html: `
-        <div style="font-family:sans-serif;max-width:520px;margin:0 auto;color:#18181b">
-          <h2 style="margin-bottom:8px">Ny bestilling mottatt 📅</h2>
-          <table style="width:100%;border-collapse:collapse;margin:20px 0">
-            <tr><td style="padding:8px 0;color:#52525b;font-size:14px">Kunde</td><td style="font-weight:600">${args.customerName}</td></tr>
-            <tr><td style="padding:8px 0;color:#52525b;font-size:14px">E-post</td><td style="font-weight:600">${args.customerEmail}</td></tr>
-            <tr><td style="padding:8px 0;color:#52525b;font-size:14px">Tjeneste</td><td style="font-weight:600">${args.serviceName}</td></tr>
-            <tr><td style="padding:8px 0;color:#52525b;font-size:14px">Dato</td><td style="font-weight:600">${formattedDate}</td></tr>
-            <tr><td style="padding:8px 0;color:#52525b;font-size:14px">Tidspunkt</td><td style="font-weight:600">kl. ${args.timeString}</td></tr>
-            ${args.notes ? `<tr><td style="padding:8px 0;color:#52525b;font-size:14px">Notater</td><td>${args.notes}</td></tr>` : ""}
-          </table>
-          <p style="font-size:12px;color:#a1a1aa">Administrer bestillinger i Agenci-dashboardet.</p>
-        </div>
-      `,
-    });
+    // Email to business (only if notification email is configured)
+    if (args.businessEmail) {
+      await sendEmail({
+        apiKey,
+        from,
+        to: args.businessEmail,
+        subject: `Ny bestilling: ${args.customerName} — ${args.serviceName} ${formattedDate} kl. ${args.timeString}`,
+        html: `
+          <div style="font-family:sans-serif;max-width:520px;margin:0 auto;color:#18181b">
+            <h2 style="margin-bottom:8px">Ny bestilling mottatt 📅</h2>
+            <table style="width:100%;border-collapse:collapse;margin:20px 0">
+              <tr><td style="padding:8px 0;color:#52525b;font-size:14px">Kunde</td><td style="font-weight:600">${args.customerName}</td></tr>
+              <tr><td style="padding:8px 0;color:#52525b;font-size:14px">E-post</td><td style="font-weight:600">${args.customerEmail}</td></tr>
+              <tr><td style="padding:8px 0;color:#52525b;font-size:14px">Tjeneste</td><td style="font-weight:600">${args.serviceName}</td></tr>
+              <tr><td style="padding:8px 0;color:#52525b;font-size:14px">Dato</td><td style="font-weight:600">${formattedDate}</td></tr>
+              <tr><td style="padding:8px 0;color:#52525b;font-size:14px">Tidspunkt</td><td style="font-weight:600">kl. ${args.timeString}</td></tr>
+              ${args.notes ? `<tr><td style="padding:8px 0;color:#52525b;font-size:14px">Notater</td><td>${args.notes}</td></tr>` : ""}
+            </table>
+            <p style="font-size:12px;color:#a1a1aa">Administrer bestillinger i Agenci-dashboardet.</p>
+          </div>
+        `,
+      });
+    }
 
     return { sent: true };
   },

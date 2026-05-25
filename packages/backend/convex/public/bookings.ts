@@ -338,25 +338,22 @@ export const create = mutation({
         .first();
     }
 
-    const notificationEmail = ws?.bookingNotificationEmail;
-    if (notificationEmail) {
-      let businessName = "Agenci";
-      if (args.agentId) {
-        const agent = await ctx.db.get(args.agentId);
-        if (agent) businessName = agent.name;
-      }
-      await ctx.scheduler.runAfter(0, internal.system.bookingEmail.sendBookingEmails, {
-        customerEmail: session.email,
-        customerName: session.name,
-        businessEmail: notificationEmail,
-        businessName,
-        serviceName: service.name,
-        dateString: args.dateString,
-        timeString: args.timeString,
-        cancellationToken,
-        notes: args.notes,
-      });
+    let businessName = "Agenci";
+    if (args.agentId) {
+      const agent = await ctx.db.get(args.agentId);
+      if (agent) businessName = agent.name;
     }
+    await ctx.scheduler.runAfter(0, internal.system.bookingEmail.sendBookingEmails, {
+      customerEmail: session.email,
+      customerName: session.name,
+      businessEmail: ws?.bookingNotificationEmail,
+      businessName,
+      serviceName: service.name,
+      dateString: args.dateString,
+      timeString: args.timeString,
+      cancellationToken,
+      notes: args.notes,
+    });
 
     return {
       bookingId,
