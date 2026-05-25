@@ -310,18 +310,18 @@ export function DashboardTopNav() {
   const { toggleSidebar } = useSidebar();
 
   return (
-    <header className="dash-topnav flex h-[60px] shrink-0 items-center justify-between gap-4 border-b border-border/70 bg-card px-4 lg:px-5">
-      {/* Left: toggle + logo + plan badge */}
+    <header className="dash-topnav flex h-[60px] shrink-0 items-center justify-between gap-4 border-b border-border/70 bg-background px-4 lg:px-5">
+      {/* Left: mobile-only toggle + logo; desktop shows plan badge only */}
       <div className="flex items-center gap-3 min-w-0">
         <button
           onClick={toggleSidebar}
-          className="flex size-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+          className="flex lg:hidden size-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
           aria-label="Toggle sidebar"
         >
           <SidebarIcon className="size-4" strokeWidth={1.75} />
         </button>
 
-        <Link href="/dashboard" className="flex items-center gap-2 shrink-0">
+        <Link href="/dashboard" className="flex lg:hidden items-center gap-2 shrink-0">
           <LogoIcon className="size-7 rounded-lg brightness-0 dark:invert" />
           <span className="font-semibold text-[15px] tracking-tight text-foreground hidden sm:block">
             Agenci

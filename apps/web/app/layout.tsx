@@ -55,9 +55,7 @@ export default function RootLayout({
         className={`${fontSans.variable} ${fontMono.variable} ${fontDisplay.variable} font-sans antialiased`}
       >
         <Providers>
-          <div className="overflow-x-hidden">
-            {children}
-          </div>
+          {children}
           <Toaster />
         </Providers>
       </body>

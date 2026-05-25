@@ -344,85 +344,127 @@
 }
 
 /**
+ * Pull the shadcn sidebar panel out of fixed positioning so it participates
+ * in the flex layout naturally — starts at the very top alongside the content column.
+ * Hide the gap spacer since the panel is now in-flow.
+ */
+.dashboard-app-shell [data-slot="sidebar"] {
+  flex-shrink: 0 !important;
+  height: 100% !important;
+}
+
+.dashboard-app-shell [data-slot="sidebar-container"] {
+  position: relative !important;
+  inset: auto !important;
+  height: 100% !important;
+  overflow-y: auto !important;
+}
+
+.dashboard-app-shell [data-slot="sidebar-gap"] {
+  display: none !important;
+}
+
+/**
  * Dashboard — Chatbase-lignende: dot-grid, svarte primærknapper.
  * Svart «filled» valg kun i hovedsidebar; andre lister bruker --dash-nav-* (grå + sort kant).
  * Marketing/landing uendret.
  */
 .dashboard-app-shell {
-  /* Lister (konversasjon, knowledge, …): diskret valgt */
-  --dash-nav-active-bg: oklch(0.94 0 0);
-  --dash-nav-active-surface: oklch(0.94 0 0);
-  --dash-nav-active-border: oklch(0.15 0 0);
+  /* Active list items — subtle on dark sidebar */
+  --dash-nav-active-bg: #2a2a2a;
+  --dash-nav-active-surface: #2a2a2a;
+  --dash-nav-active-border: #f2f3f5;
   --dash-inbox-active: var(--dash-nav-active-bg);
   --dash-inbox-active-border: var(--dash-nav-active-border);
   --dash-knowledge-active: var(--dash-nav-active-bg);
-  --dash-knowledge-folder: oklch(0.97 0 0);
-  /* Overflater — ren hvit bakgrunn (matcher screenshot) */
-  --background: oklch(0.965 0.003 264);   /* Lys grå canvas */
-  --foreground: oklch(0.13 0 0);
-  --card: oklch(1 0 0);                    /* Hvite kort */
-  --card-foreground: oklch(0.13 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.13 0 0);
-  --primary: oklch(0.13 0 0);             /* Svart primær */
-  --primary-foreground: oklch(0.99 0 0);
-  --secondary: oklch(0.96 0.003 264);
-  --secondary-foreground: oklch(0.18 0 0);
-  --muted: oklch(0.955 0.004 264);
-  --muted-foreground: oklch(0.50 0.015 264);
-  --accent: oklch(0.955 0 0);
-  --accent-foreground: oklch(0.18 0 0);
+  --dash-knowledge-folder: #262626;
+  /* Surfaces — warm palette */
+  --background: #FAFAF9;
+  --foreground: #1C1C1C;
+  --card: #FFFFFF;
+  --card-foreground: #1C1C1C;
+  --popover: #FFFFFF;
+  --popover-foreground: #1C1C1C;
+  --primary: #1C1C1C;
+  --primary-foreground: #FAFAF9;
+  --secondary: #F4F1EE;
+  --secondary-foreground: #1C1C1C;
+  --muted: #F4F1EE;
+  --muted-foreground: #6B6560;
+  --accent: #F4F1EE;
+  --accent-foreground: #1C1C1C;
   --destructive: oklch(0.58 0.22 27);
-  --border: oklch(0.895 0.005 264);
-  --input: oklch(0.895 0.005 264);
-  --ring: oklch(0.45 0.02 264);
+  --border: #E8E4DF;
+  --input: #E8E4DF;
+  --ring: #1C1C1C;
   --radius: 0.625rem;
-  /* Sidebar: hvit (som i screenshot) */
-  --sidebar: oklch(1 0 0);
-  --sidebar-foreground: oklch(0.13 0 0);
-  --sidebar-primary: oklch(0.13 0 0);
-  --sidebar-primary-foreground: oklch(0.99 0 0);
-  --sidebar-accent: oklch(0.955 0 0);
-  --sidebar-accent-foreground: oklch(0.18 0 0);
-  --sidebar-border: oklch(0.895 0.005 264);
-  --sidebar-ring: oklch(0.45 0.02 264);
+  /* Sidebar: dark — matches landing nav */
+  --sidebar: #1C1C1C;
+  --sidebar-foreground: #F2F3F5;
+  --sidebar-primary: #FFFFFF;
+  --sidebar-primary-foreground: #1C1C1C;
+  --sidebar-accent: #2A2A2A;
+  --sidebar-accent-foreground: #F2F3F5;
+  --sidebar-border: #2A2A2A;
+  --sidebar-ring: #F2F3F5;
+}
+
+/* Dark-chrome scope: remaps generic tokens so sidebar elements work on #1C1C1C */
+.dash-sidebar-scope {
+  --foreground: #F2F3F5;
+  --background: #1C1C1C;
+  --muted: #2A2A2A;
+  --muted-foreground: #9ca3af;
+  --card: #262626;
+  --border: #2A2A2A;
+  --input: #2A2A2A;
+}
+
+/* Dark mode sidebar scope — matches warm dark sidebar */
+.dark .dash-sidebar-scope {
+  --foreground: #e8e6e3;
+  --background: #111110;
+  --muted: #222220;
+  --muted-foreground: #8c8880;
+  --card: #1e1e1c;
+  --border: #2a2a28;
+  --input: #2a2a28;
 }
 
 .dark .dashboard-app-shell {
-  --brand: #2dd4bf;
-  --brand-muted: color-mix(in oklch, #2dd4bf 12%, transparent);
-  /* Canvas #09090b + kort #121214 — samme par som widget-referansen (zinc-950 / mørk charcoal) */
-  --dash-nav-active-bg: color-mix(in oklch, var(--foreground) 12%, transparent);
-  --dash-nav-active-surface: color-mix(in oklch, #2dd4bf 12%, var(--card));
-  --dash-nav-active-border: oklch(0.92 0 0);
-  --background: #09090b;
-  --foreground: #fafafa;
-  --card: #121214;
-  --card-foreground: #fafafa;
-  --dash-knowledge-folder: color-mix(in oklch, var(--foreground) 8%, var(--card));
-  --popover: #121214;
-  --popover-foreground: #fafafa;
-  /* Primærknapp: tydelig kontrast uten ekstra grå flate */
-  --primary: oklch(0.97 0 0);
-  --primary-foreground: #09090b;
-  --secondary: color-mix(in oklch, var(--foreground) 12%, var(--card));
-  --secondary-foreground: #fafafa;
-  --muted: color-mix(in oklch, var(--foreground) 10%, var(--card));
-  --muted-foreground: #a1a1aa;
-  --accent: color-mix(in oklch, var(--foreground) 12%, var(--card));
-  --accent-foreground: #fafafa;
+  /* Active list items in dark sidebar */
+  --dash-nav-active-bg: #2a2a2a;
+  --dash-nav-active-surface: #2a2a2a;
+  --dash-nav-active-border: #e4e4e7;
+  --dash-knowledge-folder: #1e1e1e;
+  /* Content area — warm dark, slightly lighter than sidebar so cards lift off */
+  --background: #191917;
+  --foreground: #F2F3F5;
+  --card: #222220;
+  --card-foreground: #F2F3F5;
+  --popover: #222220;
+  --popover-foreground: #F2F3F5;
+  --primary: #F2F3F5;
+  --primary-foreground: #191917;
+  --secondary: #272725;
+  --secondary-foreground: #F2F3F5;
+  --muted: #272725;
+  --muted-foreground: #9c9890;
+  --accent: #272725;
+  --accent-foreground: #F2F3F5;
   --destructive: oklch(0.704 0.191 22.216);
-  --border: #1f1f22;
-  --input: #1f1f22;
-  --ring: oklch(0.65 0.02 264);
-  --sidebar: #09090b;
-  --sidebar-foreground: #fafafa;
-  --sidebar-primary: oklch(0.97 0 0);
-  --sidebar-primary-foreground: #09090b;
-  --sidebar-accent: color-mix(in oklch, var(--foreground) 10%, var(--card));
-  --sidebar-accent-foreground: #fafafa;
-  --sidebar-border: #1f1f22;
-  --sidebar-ring: oklch(0.65 0.02 264);
+  --border: #2e2d2b;
+  --input: #2e2d2b;
+  --ring: #F2F3F5;
+  /* Sidebar — deepest warm dark */
+  --sidebar: #111110;
+  --sidebar-foreground: #F2F3F5;
+  --sidebar-primary: #F2F3F5;
+  --sidebar-primary-foreground: #111110;
+  --sidebar-accent: #222220;
+  --sidebar-accent-foreground: #F2F3F5;
+  --sidebar-border: #2a2a28;
+  --sidebar-ring: #F2F3F5;
 }
 
 /* Sidetitler — felles hierarki på alle dashboard-sider */

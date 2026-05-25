@@ -9,6 +9,7 @@ import {
   LibraryBigIcon,
   Mic,
   PaletteIcon,
+  PanelLeftIcon,
   PlugIcon,
   ZapIcon,
   GemIcon,
@@ -41,6 +42,7 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -53,6 +55,7 @@ import {
   TooltipTrigger,
 } from "@workspace/ui/components/tooltip";
 import { cn } from "@workspace/ui/lib/utils";
+import { AgenciNavWordmark } from "@/components/logo";
 
 // ─── Nav items ────────────────────────────────────────────────────────────────
 
@@ -239,7 +242,7 @@ function PlanCard({ collapsed }: { collapsed: boolean }) {
 export const DashboardSidebar = () => {
   const pathname = usePathname();
   const params = useParams();
-  const { state, isMobile } = useSidebar();
+  const { state, isMobile, toggleSidebar } = useSidebar();
   const collapsed = state === "collapsed" && !isMobile;
 
   const agentId =
@@ -271,10 +274,29 @@ export const DashboardSidebar = () => {
 
   return (
     <Sidebar
-      className="group z-20 border-r border-sidebar-border bg-sidebar"
+      className="!relative !inset-auto !h-full border-r border-sidebar-border bg-sidebar dash-sidebar-scope"
       collapsible="icon"
     >
-      <SidebarContent className="px-2 pt-4 pb-2 gap-0">
+      {/* Header: toggle + wordmark — matches TopNav height (60px) */}
+      <SidebarHeader className="border-b border-sidebar-border p-0">
+        <div className="flex h-[60px] items-center gap-1 px-3">
+          <button
+            onClick={toggleSidebar}
+            className="flex size-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+            aria-label="Toggle sidebar"
+          >
+            <PanelLeftIcon className="size-4" strokeWidth={1.75} />
+          </button>
+          <Link
+            href="/agents"
+            className="group-data-[collapsible=icon]:hidden flex items-center"
+          >
+            <AgenciNavWordmark surface="dark" />
+          </Link>
+        </div>
+      </SidebarHeader>
+
+      <SidebarContent className="px-2 pt-3 pb-2 gap-0">
         {agentId ? (
           <>
             {/* Back to all agents */}
