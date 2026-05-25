@@ -4,7 +4,7 @@ import { useAction, useMutation, useQuery } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
 import { Id } from "@workspace/backend/_generated/dataModel";
 import { useOrganization } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import {
@@ -734,6 +734,8 @@ function Step4({
 // ─── Main view ────────────────────────────────────────────────────────────────
 export const OnboardingView = () => {
   const router       = useRouter();
+  const searchParams = useSearchParams();
+  const isNewIntent  = searchParams.get("new") === "1";
   const { organization } = useOrganization();
   const agents       = useQuery(api.private.agents.list);
 
@@ -742,14 +744,14 @@ export const OnboardingView = () => {
   const [agentId,   setAgentId]   = useState<Id<"agents"> | null>(null);
   const [agentName, setAgentName] = useState("");
 
-  // Only redirect if we haven't started the wizard yet (agentId === null means
-  // the user hasn't created an agent in this session — so they already had one).
+  // Redirect back if user already has agents — unless they explicitly navigated
+  // here to create a new one (?new=1) or have already started the wizard.
   useEffect(() => {
-    if (agentId !== null) return;
+    if (isNewIntent || agentId !== null) return;
     if (agents !== undefined && agents !== null && agents.length > 0) {
       router.replace("/agents");
     }
-  }, [agents, router, agentId]);
+  }, [agents, router, agentId, isNewIntent]);
 
   const done = (s: StepId) =>
     setCompleted((prev) => new Set([...prev, s]));

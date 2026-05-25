@@ -49,39 +49,70 @@ export function clampWebsiteSyncIntervalMinutes(
   return normalized;
 }
 
+const BROWSER_HEADERS = {
+  Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+  "Accept-Language": "nb-NO,nb;q=0.9,no;q=0.8,en;q=0.7",
+  "Accept-Encoding": "gzip, deflate, br",
+  "User-Agent":
+    "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
+  "Cache-Control": "no-cache",
+};
+
+async function doFetch(url: string): Promise<Response> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 25_000);
+  try {
+    return await fetch(url, {
+      redirect: "follow",
+      signal: controller.signal,
+      headers: BROWSER_HEADERS,
+    });
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
 export async function fetchWebpageHtml(
   url: string,
 ): Promise<{ normalizedUrl: string; html: string }> {
   const publicUrl = assertPublicHttpUrl(url);
   const requestedUrl = publicUrl.toString();
 
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 25_000);
-
   let response: Response;
   try {
-    response = await fetch(requestedUrl, {
-      redirect: "follow",
-      signal: controller.signal,
-      headers: {
-        Accept:
-          "text/html,application/xhtml+xml,application/xml;q=0.9,text/plain;q=0.8,*/*;q=0.5",
-        "User-Agent": "AgenciKnowledgeBot/1.0",
-      },
-    });
+    response = await doFetch(requestedUrl);
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     const isRedirectLoop =
       msg.toLowerCase().includes("too many redirects") ||
       msg.toLowerCase().includes("maximum redirect");
-    throw new ConvexError({
-      code: "BAD_REQUEST",
-      message: isRedirectLoop
-        ? "Nettsiden har for mange omdirigeringer. Prøv uten www (f.eks. https://agenci.no/) eller legg til en spesifikk underside i stedet."
-        : `Kunne ikke hente siden: ${msg}`,
-    });
-  } finally {
-    clearTimeout(timeoutId);
+
+    // Auto-retry: strip www. and try again
+    if (isRedirectLoop) {
+      const withoutWww = requestedUrl.replace(/^(https?:\/\/)www\./i, "$1");
+      if (withoutWww !== requestedUrl) {
+        try {
+          response = await doFetch(withoutWww);
+        } catch {
+          throw new ConvexError({
+            code: "BAD_REQUEST",
+            message:
+              "Nettsiden har for mange omdirigeringer. Prøv en spesifikk underside i stedet (f.eks. https://agenci.no/om-oss).",
+          });
+        }
+      } else {
+        throw new ConvexError({
+          code: "BAD_REQUEST",
+          message:
+            "Nettsiden har for mange omdirigeringer. Prøv en spesifikk underside i stedet.",
+        });
+      }
+    } else {
+      throw new ConvexError({
+        code: "BAD_REQUEST",
+        message: `Kunne ikke hente siden: ${msg}`,
+      });
+    }
   }
 
   if (!response.ok) {

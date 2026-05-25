@@ -196,7 +196,7 @@ export function AgentsHomeView() {
           </p>
         </div>
         <DashboardAccentButton asChild className="w-full sm:w-auto shrink-0 gap-2">
-          <Link href="/onboarding">
+          <Link href="/onboarding?new=1">
             <PlusIcon className="size-4" />
             Ny agent
           </Link>
