@@ -39,7 +39,7 @@ export function DashboardPageShell({
     >
       <div
         className={cn(
-          "dash-workspace-inner mx-auto w-full flex-1 px-5 py-8 sm:px-8 lg:px-10 xl:px-12 2xl:px-16",
+          "dash-workspace-inner mx-auto w-full flex-1 px-4 py-5 sm:px-6 sm:py-7 lg:px-10 lg:py-8 xl:px-12 2xl:px-16",
           contentClassName,
         )}
       >

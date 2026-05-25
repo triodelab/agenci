@@ -7,7 +7,8 @@ import { api } from "@workspace/backend/_generated/api";
 import { Id } from "@workspace/backend/_generated/dataModel";
 import { Button } from "@workspace/ui/components/button";
 import { useAction, useMutation, useQuery } from "convex/react";
-import { ClipboardListIcon, Wand2Icon } from "lucide-react";
+import { ClipboardListIcon, Wand2Icon, ChevronLeftIcon } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
 import {
   AIConversation,
   AIConversationContent,
@@ -61,6 +62,11 @@ export const ConversationIdView = ({
 }: {
   conversationId: Id<"conversations">;
 }) => {
+  const router = useRouter();
+  const params = useParams();
+  const agentId = typeof params?.agentId === "string" ? params.agentId : undefined;
+  const backUrl = agentId ? `/agents/${agentId}/conversations` : "/conversations";
+
   const conversation = useQuery(api.private.conversations.getOne, {
     conversationId,
   });
@@ -226,6 +232,14 @@ export const ConversationIdView = ({
           </div>
           <div className="flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:px-5 sm:pt-0">
             <div className="flex min-w-0 items-center gap-3">
+              {/* Back button — mobile only */}
+              <button
+                onClick={() => router.push(backUrl)}
+                className="lg:hidden flex size-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                aria-label="Tilbake"
+              >
+                <ChevronLeftIcon className="size-5" strokeWidth={2} />
+              </button>
               <ContactAvatar name={contact.name || "?"} size={40} />
               <div className="min-w-0">
                 <h1 className="truncate text-[15px] font-semibold tracking-tight text-foreground sm:text-[16px]">

@@ -119,9 +119,39 @@ export const CustomizationView = ({ agentId }: { agentId?: import("@workspace/ba
 
   const meta = SECTION_COPY[section];
 
+  const navItems = [
+    { key: "agent" as const, label: "Agent", icon: BotIcon },
+    { key: "messages" as const, label: "Åpningsmelding", icon: MessageSquareIcon },
+    { key: "suggestions" as const, label: "Hurtigvalg", icon: ListTreeIcon },
+    { key: "appearance" as const, label: "Utseende", icon: PaletteIcon },
+    ...(hasVapi ? [{ key: "voice" as const, label: "Stemme", icon: MicIcon }] : []),
+  ];
+
   return (
-    <div className="flex h-full min-h-0 w-full flex-1 bg-transparent">
-      <aside className="dash-subpane-rail flex w-[288px] shrink-0 flex-col">
+    <div className="flex h-full min-h-0 w-full flex-1 flex-col lg:flex-row bg-transparent">
+
+      {/* Mobile: horizontal scrollable tab bar */}
+      <div className="lg:hidden flex shrink-0 overflow-x-auto border-b border-border/60 bg-background px-3 py-2 gap-1 scrollbar-none">
+        {navItems.map(({ key, label, icon: Icon }) => (
+          <button
+            key={key}
+            onClick={() => setSection(key)}
+            className={cn(
+              "flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-[12px] font-medium transition-colors whitespace-nowrap",
+              section === key
+                ? "bg-foreground text-background"
+                : "text-muted-foreground hover:bg-muted hover:text-foreground",
+            )}
+            type="button"
+          >
+            <Icon className="size-3.5 shrink-0" strokeWidth={1.75} />
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {/* Desktop: left sidebar */}
+      <aside className="dash-subpane-rail hidden lg:flex w-[288px] shrink-0 flex-col">
         <header className="border-border/60 border-b px-5 pb-4 pt-6">
           <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
             Utseende
@@ -138,63 +168,14 @@ export const CustomizationView = ({ agentId }: { agentId?: import("@workspace/ba
             aria-label="Widget-innstillinger"
             className="flex flex-col gap-px px-2 py-3"
           >
-            <NavRow
-              active={section === "agent"}
-              onClick={() => setSection("agent")}
-            >
-              <NavGlyph active={section === "agent"}>
-                <BotIcon className="size-[15px]" strokeWidth={1.65} />
-              </NavGlyph>
-              <span className="min-w-0 flex-1 truncate leading-snug">
-                Agent
-              </span>
-            </NavRow>
-            <NavRow
-              active={section === "messages"}
-              onClick={() => setSection("messages")}
-            >
-              <NavGlyph active={section === "messages"}>
-                <MessageSquareIcon className="size-[15px]" strokeWidth={1.65} />
-              </NavGlyph>
-              <span className="min-w-0 flex-1 truncate leading-snug">
-                Åpningsmelding
-              </span>
-            </NavRow>
-            <NavRow
-              active={section === "suggestions"}
-              onClick={() => setSection("suggestions")}
-            >
-              <NavGlyph active={section === "suggestions"}>
-                <ListTreeIcon className="size-[15px]" strokeWidth={1.65} />
-              </NavGlyph>
-              <span className="min-w-0 flex-1 truncate leading-snug">
-                Hurtigvalg
-              </span>
-            </NavRow>
-            <NavRow
-              active={section === "appearance"}
-              onClick={() => setSection("appearance")}
-            >
-              <NavGlyph active={section === "appearance"}>
-                <PaletteIcon className="size-[15px]" strokeWidth={1.65} />
-              </NavGlyph>
-              <span className="min-w-0 flex-1 truncate leading-snug">
-                Utseende
-              </span>
-            </NavRow>
-            {hasVapi ? (
-              <NavRow
-                active={section === "voice"}
-                onClick={() => setSection("voice")}
-              >
-                <NavGlyph active={section === "voice"}>
-                  <MicIcon className="size-[15px]" strokeWidth={1.65} />
+            {navItems.map(({ key, label, icon: Icon }) => (
+              <NavRow key={key} active={section === key} onClick={() => setSection(key)}>
+                <NavGlyph active={section === key}>
+                  <Icon className="size-[15px]" strokeWidth={1.65} />
                 </NavGlyph>
-                <span className="min-w-0 flex-1 truncate leading-snug">
-                  Stemme
-                </span>
+                <span className="min-w-0 flex-1 truncate leading-snug">{label}</span>
               </NavRow>
-            ) : null}
+            ))}
           </nav>
         </ScrollArea>
       </aside>

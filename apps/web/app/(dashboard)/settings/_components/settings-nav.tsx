@@ -23,7 +23,7 @@ export function SettingsNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="w-52 shrink-0">
+    <nav className="hidden lg:block w-52 shrink-0">
       <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground/50">
         Innstillinger
       </p>

@@ -344,6 +344,81 @@
 }
 
 /**
+ * Mobile sidebar sheet — Radix renders SheetContent into a portal at document.body,
+ * completely outside .dashboard-app-shell. We must redeclare all dashboard tokens
+ * directly on the element so it gets the dark sidebar + warm palette.
+ */
+[data-mobile="true"][data-sidebar="sidebar"] {
+  /* Warm dashboard palette */
+  --background: #1C1C1C;
+  --foreground: #F2F3F5;
+  --card: #262626;
+  --card-foreground: #F2F3F5;
+  --popover: #262626;
+  --popover-foreground: #F2F3F5;
+  --primary: #FFFFFF;
+  --primary-foreground: #1C1C1C;
+  --secondary: #2A2A2A;
+  --secondary-foreground: #F2F3F5;
+  --muted: #2A2A2A;
+  --muted-foreground: #9ca3af;
+  --accent: #2A2A2A;
+  --accent-foreground: #F2F3F5;
+  --border: #2A2A2A;
+  --input: #2A2A2A;
+  --ring: #F2F3F5;
+  --radius: 0.625rem;
+  /* Sidebar-specific tokens */
+  --sidebar: #1C1C1C;
+  --sidebar-foreground: #F2F3F5;
+  --sidebar-primary: #FFFFFF;
+  --sidebar-primary-foreground: #1C1C1C;
+  --sidebar-accent: #2A2A2A;
+  --sidebar-accent-foreground: #F2F3F5;
+  --sidebar-border: #2A2A2A;
+  --sidebar-ring: #F2F3F5;
+  /* Dashboard nav tokens */
+  --dash-nav-active-bg: #2a2a2a;
+  --dash-nav-active-surface: #2a2a2a;
+  --dash-nav-active-border: #f2f3f5;
+  --dash-knowledge-folder: #262626;
+  /* Destructive */
+  --destructive: oklch(0.58 0.22 27);
+}
+
+.dark [data-mobile="true"][data-sidebar="sidebar"] {
+  --background: #111110;
+  --foreground: #e8e6e3;
+  --card: #1e1e1c;
+  --card-foreground: #e8e6e3;
+  --popover: #1e1e1c;
+  --popover-foreground: #e8e6e3;
+  --primary: #F2F3F5;
+  --primary-foreground: #111110;
+  --secondary: #222220;
+  --secondary-foreground: #e8e6e3;
+  --muted: #222220;
+  --muted-foreground: #8c8880;
+  --accent: #222220;
+  --accent-foreground: #e8e6e3;
+  --border: #2a2a28;
+  --input: #2a2a28;
+  --ring: #F2F3F5;
+  --sidebar: #111110;
+  --sidebar-foreground: #F2F3F5;
+  --sidebar-primary: #F2F3F5;
+  --sidebar-primary-foreground: #111110;
+  --sidebar-accent: #222220;
+  --sidebar-accent-foreground: #F2F3F5;
+  --sidebar-border: #2a2a28;
+  --sidebar-ring: #F2F3F5;
+  --dash-nav-active-bg: #2a2a2a;
+  --dash-nav-active-border: #e4e4e7;
+  --dash-knowledge-folder: #1e1e1e;
+  --destructive: oklch(0.704 0.191 22.216);
+}
+
+/**
  * Pull the shadcn sidebar panel out of fixed positioning so it participates
  * in the flex layout naturally — starts at the very top alongside the content column.
  * Hide the gap spacer since the panel is now in-flow.
