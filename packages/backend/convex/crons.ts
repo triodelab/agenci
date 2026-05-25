@@ -15,4 +15,10 @@ crons.interval(
   internal.system.websites.scheduleDueRuns,
 );
 
+crons.daily(
+  "purge-expired-bookings",
+  { hourUTC: 3, minuteUTC: 0 },
+  internal.private.bookings.purgeExpiredBookings,
+);
+
 export default crons;

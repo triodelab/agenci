@@ -3,6 +3,8 @@
 import {
   ArrowLeftIcon,
   BotIcon,
+  CalendarCheckIcon,
+  CalendarIcon,
   CreditCardIcon,
   HomeIcon,
   InboxIcon,
@@ -66,6 +68,8 @@ function agentNavItems(agentId: string) {
     { title: "Kunnskapsbase", url: `/agents/${agentId}/files`, icon: LibraryBigIcon, badge: false, exact: false },
     { title: "Widget-tilpasning", url: `/agents/${agentId}/customization`, icon: PaletteIcon, badge: false, exact: false },
     { title: "Integrasjoner", url: `/agents/${agentId}/integrations`, icon: PlugIcon, badge: false, exact: false },
+    { title: "Bestillinger", url: `/agents/${agentId}/bookings`, icon: CalendarIcon, badge: false, exact: true },
+    { title: "Bestilling-innst.", url: `/agents/${agentId}/bookings/settings`, icon: CalendarCheckIcon, badge: false, exact: false },
     { title: "Stemmeassistent", url: `/agents/${agentId}/plugins/vapi`, icon: Mic, badge: false, exact: false },
     { title: "Plan og faktura", url: `/agents/${agentId}/billing`, icon: CreditCardIcon, badge: false, exact: false },
   ] as const;

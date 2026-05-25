@@ -17,6 +17,7 @@ import { WidgetChatScreen } from "@/modules/widget/ui/screens/widget-chat-screen
 import { WidgetInboxScreen } from "../screens/widget-inbox-screen";
 import { WidgetVoiceScreen } from "../screens/widget-voice-screen";
 import { WidgetContactScreen } from "../screens/widget-contact-screen";
+import { WidgetBookingScreen } from "../screens/widget-booking-screen";
 
 interface Props {
   organizationId: string | null;
@@ -58,6 +59,7 @@ export const WidgetView = ({ organizationId, agentId }: Props) => {
     selection: <WidgetSelectionScreen />,
     chat: <WidgetChatScreen />,
     contact: <WidgetContactScreen />,
+    booking: <WidgetBookingScreen />,
   }
 
   return (

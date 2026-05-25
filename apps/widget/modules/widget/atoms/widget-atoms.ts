@@ -25,3 +25,13 @@ export const vapiSecretsAtom = atom<{
 } | null>(null);
 export const hasVapiSecretsAtom = atom((get) => get(vapiSecretsAtom) !== null);
 
+export type BookingDraft = {
+  serviceId?: string;
+  serviceName?: string;
+  serviceDurationMinutes?: number;
+  dateString?: string;
+  timeString?: string;
+};
+
+export const bookingDraftAtom = atom<BookingDraft>({});
+
