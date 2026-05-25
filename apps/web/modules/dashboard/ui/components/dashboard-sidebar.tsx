@@ -73,7 +73,7 @@ function agentNavItems(agentId: string) {
 
 const globalNavItems = [
   { title: "Agenter", url: "/agents", icon: BotIcon, badge: false, exact: true },
-  { title: "Innstillinger", url: "/settings", icon: SettingsIcon, badge: false, exact: true },
+  { title: "Innstillinger", url: "/settings", icon: SettingsIcon, badge: false, exact: false },
 ] as const;
 
 // ─── NavItem ─────────────────────────────────────────────────────────────────
