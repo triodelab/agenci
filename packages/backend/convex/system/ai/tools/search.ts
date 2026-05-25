@@ -2,7 +2,6 @@ import { openai } from "@ai-sdk/openai";
 import { createTool } from "@convex-dev/agent";
 import { generateText, jsonSchema } from "ai";
 import { internal } from "../../../_generated/api";
-import { supportAgent } from "../agents/supportAgent";
 import rag from "../rag";
 import { SEARCH_INTERPRETER_PROMPT } from "../constants";
 
@@ -80,14 +79,6 @@ export const search = createTool({
         },
       ],
       model: openai.chat("gpt-4o-mini"),
-    });
-
-    await supportAgent.saveMessage(ctx, {
-      threadId: ctx.threadId,
-      message: {
-        role: "assistant",
-        content: response.text,
-      },
     });
 
     return response.text;
