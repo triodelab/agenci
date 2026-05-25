@@ -95,6 +95,7 @@ export const create = action({
         {
           prompt: args.prompt,
           system: systemWithTime,
+          maxSteps: 10,
           tools: {
             escalateConversationTool: escalateConversation,
             resolveConversationTool: resolveConversation,

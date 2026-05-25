@@ -178,14 +178,27 @@ export const createBooking = createTool({
       return "Kunden er anonym og kan ikke booke time. Be dem logge inn med navn og e-post.";
     }
 
+    // Resolve serviceId — fall back to name lookup if the model passed an invalid ID
+    const allServices: ServiceRow[] = await ctx.runQuery(
+      internal.system.bookings.getServicesInternal,
+      { organizationId: conversation.organizationId, agentId: conversation.agentId },
+    );
+    const byId: ServiceRow | undefined = allServices.find((s) => s._id === (args.serviceId as Id<"bookingServices">));
+    const resolvedService: ServiceRow | undefined = byId ?? allServices.find(
+      (s) => s.isActive && s.name.toLowerCase().includes(args.serviceName.toLowerCase()),
+    );
+    if (!resolvedService) {
+      return `Fant ikke tjenesten "${args.serviceName}". Tilgjengelige: ${allServices.filter((s) => s.isActive).map((s) => s.name).join(", ")}`;
+    }
+
     const result: { success: boolean; error?: string } = await ctx.runMutation(
       internal.system.bookings.createBookingInternal,
       {
         organizationId: conversation.organizationId,
         agentId: conversation.agentId,
         contactSessionId: conversation.contactSessionId,
-        serviceId: args.serviceId as Id<"bookingServices">,
-        serviceName: args.serviceName,
+        serviceId: resolvedService._id,
+        serviceName: resolvedService.name,
         dateString: args.dateString,
         timeString: args.timeString,
         notes: args.notes,
