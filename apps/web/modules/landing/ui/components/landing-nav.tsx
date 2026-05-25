@@ -169,10 +169,8 @@ export function LandingNav({ variant = "dark" }: LandingNavProps) {
       <div
         id="landing-nav-mobile"
         className={cn(
-          "absolute right-4 top-[4.25rem] z-50 w-60 rounded-xl border shadow-xl lg:hidden",
-          isDark
-            ? "border-[#2a2a2a] bg-[#1C1C1C]/97 backdrop-blur-xl"
-            : "border-border bg-background",
+          "absolute right-4 top-[4.25rem] z-50 w-60 rounded-xl border shadow-2xl lg:hidden",
+          "bg-[#1a1a1a] border-[#2a2a2a]",
           open ? "block" : "hidden",
         )}
       >
@@ -185,25 +183,17 @@ export function LandingNav({ variant = "dark" }: LandingNavProps) {
               key={item.name}
               href={item.href}
               onClick={() => setOpen(false)}
-              className={cn(
-                "rounded-xl px-3 py-3 text-[14px] font-medium",
-                isDark
-                  ? "text-[#d1d5db] hover:bg-white/[0.07] hover:text-[#f9fafb]"
-                  : "text-foreground hover:bg-muted",
-              )}
+              className="rounded-xl px-3 py-3 text-[14px] font-medium text-[#d1d5db] hover:bg-white/[0.07] hover:text-white"
             >
               {item.name}
             </Link>
           ))}
-          <div className={cn("mt-2 flex flex-col gap-2 border-t pt-3", isDark ? "border-[#2a2a2a]" : "border-border")}>
+          <div className="mt-2 flex flex-col gap-2 border-t border-[#2a2a2a] pt-3">
             {isLoaded && user ? (
               <Link
                 href={LANDING_AUTH_PATHS.appHome}
                 onClick={() => setOpen(false)}
-                className={cn(
-                  "flex h-9 items-center justify-center rounded-xl text-[13px] font-medium",
-                  isDark ? "border border-[#2a2a2a] text-[#d1d5db] hover:bg-white/[0.07]" : "border border-border text-foreground",
-                )}
+                className="flex h-9 items-center justify-center rounded-xl border border-[#2a2a2a] text-[13px] font-medium text-[#d1d5db] hover:bg-white/[0.07]"
               >
                 Dashboard
               </Link>
@@ -212,10 +202,7 @@ export function LandingNav({ variant = "dark" }: LandingNavProps) {
                 <Link
                   href={LANDING_AUTH_PATHS.signIn}
                   onClick={() => setOpen(false)}
-                  className={cn(
-                    "flex h-9 items-center justify-center rounded-xl border text-[13px] font-medium",
-                    isDark ? "border-[#2a2a2a] text-[#d1d5db] hover:bg-white/[0.07]" : "border-border text-foreground",
-                  )}
+                  className="flex h-9 items-center justify-center rounded-xl border border-[#2a2a2a] text-[13px] font-medium text-[#d1d5db] hover:bg-white/[0.07]"
                 >
                   Logg inn
                 </Link>
@@ -223,12 +210,7 @@ export function LandingNav({ variant = "dark" }: LandingNavProps) {
                   href={LANDING_AUTH_PATHS.signUp}
                   loggedInHref={LANDING_AUTH_PATHS.marketingLoggedInCta}
                   onClick={() => setOpen(false)}
-                  className={cn(
-                    "flex h-9 items-center justify-center rounded-xl border text-[13px] font-semibold",
-                    isDark
-                      ? "border-[#e5e7eb]/25 text-[#e5e7eb] hover:border-[#e5e7eb]/50 hover:bg-white/[0.07]"
-                      : "bg-foreground text-background hover:bg-foreground/90",
-                  )}
+                  className="flex h-9 items-center justify-center rounded-xl bg-white text-[13px] font-semibold text-[#1C1C1C] hover:bg-[#f2f3f5]"
                 >
                   Kom i gang
                 </AuthAwareLink>

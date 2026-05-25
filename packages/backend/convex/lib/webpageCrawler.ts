@@ -73,11 +73,11 @@ export async function fetchWebpageHtml(
     const msg = e instanceof Error ? e.message : String(e);
     const isRedirectLoop =
       msg.toLowerCase().includes("too many redirects") ||
-      msg.toLowerCase().includes("redirect");
+      msg.toLowerCase().includes("maximum redirect");
     throw new ConvexError({
       code: "BAD_REQUEST",
       message: isRedirectLoop
-        ? "Nettsiden har for mange omdirigeringer og kan ikke hentes. Prøv en mer direkte URL (f.eks. uten www, eller bruk https:// direkte), eller last opp innholdet som en fil i stedet."
+        ? "Nettsiden har for mange omdirigeringer. Prøv uten www (f.eks. https://agenci.no/) eller legg til en spesifikk underside i stedet."
         : `Kunne ikke hente siden: ${msg}`,
     });
   } finally {

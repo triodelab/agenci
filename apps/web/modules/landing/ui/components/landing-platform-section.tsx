@@ -120,38 +120,69 @@ export function LandingPlatformSection() {
         </motion.div>
 
         {/* Tab bar */}
-        <div
-          className="mb-10 grid border-b border-white/[0.07]"
-          style={{ gridTemplateColumns: `repeat(${FEATURES.length}, minmax(0, 1fr))` }}
-        >
-          {FEATURES.map((f, i) => {
-            const isActive = i === activeIndex;
-            return (
-              <button
-                key={f.id}
-                onClick={() => goTo(i)}
-                className="relative pb-5 pr-4 text-left transition-opacity"
-                style={{ opacity: isActive ? 1 : 0.35 }}
-              >
-                <span className="mb-1 block text-[11px] font-semibold tracking-[0.08em] text-[#9ca3af]">
-                  {f.step}
-                </span>
-                <span className="block text-[13px] font-semibold text-white">
-                  {f.label}
-                </span>
+        <div className="mb-10 border-b border-white/[0.07]">
+          {/* Mobile: horizontal scroll */}
+          <div className="flex gap-0 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:hidden">
+            {FEATURES.map((f, i) => {
+              const isActive = i === activeIndex;
+              return (
+                <button
+                  key={f.id}
+                  onClick={() => goTo(i)}
+                  className="relative shrink-0 pb-4 pr-5 text-left transition-opacity"
+                  style={{ opacity: isActive ? 1 : 0.35 }}
+                >
+                  <span className="mb-1 block text-[10px] font-semibold tracking-[0.08em] text-[#9ca3af]">
+                    {f.step}
+                  </span>
+                  <span className="block whitespace-nowrap text-[12px] font-semibold text-white">
+                    {f.label}
+                  </span>
+                  <div className="absolute bottom-0 left-0 right-5 h-[2px] bg-white/[0.06]">
+                    {isActive && (
+                      <div
+                        className="h-full bg-white/70 transition-none"
+                        style={{ width: `${tabProgress * 100}%` }}
+                      />
+                    )}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
 
-                {/* Progress indicator */}
-                <div className="absolute bottom-0 left-0 right-4 h-[2px] bg-white/[0.06]">
-                  {isActive && (
-                    <div
-                      className="h-full bg-white/70 transition-none"
-                      style={{ width: `${tabProgress * 100}%` }}
-                    />
-                  )}
-                </div>
-              </button>
-            );
-          })}
+          {/* Desktop: grid */}
+          <div
+            className="hidden md:grid"
+            style={{ gridTemplateColumns: `repeat(${FEATURES.length}, minmax(0, 1fr))` }}
+          >
+            {FEATURES.map((f, i) => {
+              const isActive = i === activeIndex;
+              return (
+                <button
+                  key={f.id}
+                  onClick={() => goTo(i)}
+                  className="relative pb-5 pr-4 text-left transition-opacity"
+                  style={{ opacity: isActive ? 1 : 0.35 }}
+                >
+                  <span className="mb-1 block text-[11px] font-semibold tracking-[0.08em] text-[#9ca3af]">
+                    {f.step}
+                  </span>
+                  <span className="block text-[13px] font-semibold text-white">
+                    {f.label}
+                  </span>
+                  <div className="absolute bottom-0 left-0 right-4 h-[2px] bg-white/[0.06]">
+                    {isActive && (
+                      <div
+                        className="h-full bg-white/70 transition-none"
+                        style={{ width: `${tabProgress * 100}%` }}
+                      />
+                    )}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Content panel */}
