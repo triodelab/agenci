@@ -4,7 +4,7 @@ import { mutation, query } from "../_generated/server";
 // Helper: time string "HH:mm" → minutes from midnight
 function timeToMin(t: string): number {
   const [h, m] = t.split(":").map(Number);
-  return h * 60 + (m ?? 0);
+  return (h ?? 0) * 60 + (m ?? 0);
 }
 
 // Helper: minutes from midnight → "HH:mm"
