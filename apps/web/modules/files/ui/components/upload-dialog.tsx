@@ -1,6 +1,6 @@
 "use client";
 
-import { useAction } from "convex/react";
+import { useAction, useMutation } from "convex/react";
 import { UploadIcon, XIcon } from "lucide-react";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
@@ -43,7 +43,8 @@ export const UploadDialog = ({
   presetFile = null,
   agentId,
 }: UploadDialogProps) => {
-  const addFile = useAction(api.private.files.addFile);
+  const generateUploadUrl = useMutation(api.private.files.generateUploadUrl);
+  const addFileByStorageId = useAction(api.private.files.addFileByStorageId);
 
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [isUploading, setIsUploading] = useState(false);
@@ -76,20 +77,33 @@ export const UploadDialog = ({
   };
 
   const handleUpload = async () => {
+    const blob = uploadedFiles[0];
+    if (!blob) return;
+
     setIsUploading(true);
     try {
-      const blob = uploadedFiles[0];
-
-      if (!blob) {
-        return;
-      }
-
       const filename = uploadForm.filename || blob.name;
+      const mimeType = blob.type || "text/plain";
 
-      await addFile({
-        bytes: await blob.arrayBuffer(),
+      // 1. Get a pre-signed upload URL (small mutation over WebSocket)
+      const uploadUrl = await generateUploadUrl();
+
+      // 2. POST the file directly to Convex storage (HTTP, not WebSocket)
+      const uploadResponse = await fetch(uploadUrl, {
+        method: "POST",
+        headers: { "Content-Type": mimeType },
+        body: blob,
+      });
+      if (!uploadResponse.ok) {
+        throw new Error(`Opplasting feilet: HTTP ${uploadResponse.status}`);
+      }
+      const { storageId } = await uploadResponse.json() as { storageId: string };
+
+      // 3. Trigger text extraction + indexing with just the storageId
+      await addFileByStorageId({
+        storageId: storageId as any,
         filename,
-        mimeType: blob.type || "text/plain",
+        mimeType,
         category: uploadForm.category,
         agentId,
       });

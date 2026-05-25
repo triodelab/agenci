@@ -269,8 +269,9 @@ function Step2({
   agentId: Id<"agents">;
   onDone: () => void;
 }) {
-  const addWebpage = useAction(api.private.files.addWebpage);
-  const addFile    = useAction(api.private.files.addFile);
+  const addWebpage         = useAction(api.private.files.addWebpage);
+  const generateUploadUrl  = useMutation(api.private.files.generateUploadUrl);
+  const addFileByStorageId = useAction(api.private.files.addFileByStorageId);
 
   const [tab, setTab]                     = useState<"url" | "file">("url");
   const [url, setUrl]                     = useState("");
@@ -320,10 +321,19 @@ function Step2({
     setError(null);
     setPlanError(false);
     try {
-      await addFile({
-        bytes: await file.arrayBuffer(),
+      const mimeType = file.type || "text/plain";
+      const uploadUrl = await generateUploadUrl();
+      const res = await fetch(uploadUrl, {
+        method: "POST",
+        headers: { "Content-Type": mimeType },
+        body: file,
+      });
+      if (!res.ok) throw new Error(`Opplasting feilet: HTTP ${res.status}`);
+      const { storageId } = await res.json() as { storageId: string };
+      await addFileByStorageId({
+        storageId: storageId as any,
         filename: file.name,
-        mimeType: file.type || "text/plain",
+        mimeType,
         agentId,
       });
       onDone();
