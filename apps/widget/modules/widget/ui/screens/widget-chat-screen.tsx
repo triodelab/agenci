@@ -242,7 +242,7 @@ export const WidgetChatScreen = () => {
             onLoadMore={handleLoadMore}
             ref={topElementRef}
           />
-          {toUIMessages(messages.results ?? [])?.map((message) => {
+          {toUIMessages(messages.results ?? []).filter((m) => m.content?.trim())?.map((message) => {
             return (
               <AIMessage
                 from={message.role === "user" ? "user" : "assistant"}
