@@ -120,6 +120,12 @@ export const WidgetChatScreen = () => {
   const createMessage = useAction(api.public.messages.create);
   const deleteMySession = useMutation(api.public.contactSessions.deleteMySession);
   const [isAwaitingAssistant, setIsAwaitingAssistant] = useState(false);
+  const uiMessages = useMemo(
+    () => toUIMessages(messages.results ?? []).filter((m) => m.content?.trim()),
+    [messages.results],
+  );
+  const lastUiMessage = uiMessages[uiMessages.length - 1];
+  const showTypingIndicator = isAwaitingAssistant && lastUiMessage?.role !== "assistant";
   const [showPrivacyPanel, setShowPrivacyPanel] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -242,7 +248,7 @@ export const WidgetChatScreen = () => {
             onLoadMore={handleLoadMore}
             ref={topElementRef}
           />
-          {toUIMessages(messages.results ?? []).filter((m) => m.content?.trim())?.map((message) => {
+          {uiMessages.map((message) => {
             return (
               <AIMessage
                 from={message.role === "user" ? "user" : "assistant"}
@@ -267,7 +273,7 @@ export const WidgetChatScreen = () => {
               </AIMessage>
             )
           })}
-          {isAwaitingAssistant ? (
+          {showTypingIndicator ? (
             <AIMessage from="assistant" key="__typing">
               <AIMessageContent
                 className={cn(
@@ -297,7 +303,7 @@ export const WidgetChatScreen = () => {
           ) : null}
         </AIConversationContent>
       </AIConversation>
-      {toUIMessages(messages.results ?? [])?.length === 1 && (
+      {uiMessages.length === 1 && (
         <AISuggestions className="flex w-full flex-col items-end gap-1.5 px-3 pb-2 sm:px-4">
           {suggestions.map((suggestion) => {
             if (!suggestion) {
