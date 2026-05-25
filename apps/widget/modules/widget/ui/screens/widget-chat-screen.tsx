@@ -124,6 +124,17 @@ export const WidgetChatScreen = () => {
     () => toUIMessages(messages.results ?? []).filter((m) => m.content?.trim()),
     [messages.results],
   );
+  // While an action is in-flight, collapse consecutive trailing assistant messages
+  // into just the last one — prevents double bubbles from multi-step tool call sequences.
+  const displayMessages = useMemo(() => {
+    if (!isAwaitingAssistant) return uiMessages;
+    let i = uiMessages.length - 1;
+    while (i > 0 && uiMessages[i]?.role === "assistant" && uiMessages[i - 1]?.role === "assistant") {
+      i--;
+    }
+    if (i === uiMessages.length - 1) return uiMessages;
+    return [...uiMessages.slice(0, i), uiMessages[uiMessages.length - 1]!];
+  }, [uiMessages, isAwaitingAssistant]);
   const lastUiMessage = uiMessages[uiMessages.length - 1];
   const showTypingIndicator = isAwaitingAssistant && lastUiMessage?.role !== "assistant";
   const [showPrivacyPanel, setShowPrivacyPanel] = useState(false);
@@ -248,7 +259,7 @@ export const WidgetChatScreen = () => {
             onLoadMore={handleLoadMore}
             ref={topElementRef}
           />
-          {uiMessages.map((message) => {
+          {displayMessages.map((message) => {
             return (
               <AIMessage
                 from={message.role === "user" ? "user" : "assistant"}
