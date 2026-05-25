@@ -8,7 +8,7 @@ import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
 import { toast } from "sonner";
-import { PlusIcon, Trash2Icon, ClockIcon } from "lucide-react";
+import { PlusIcon, Trash2Icon } from "lucide-react";
 import { cn } from "@workspace/ui/lib/utils";
 
 interface BookingSettingsViewProps {
@@ -34,6 +34,12 @@ function timeToMinutes(t: string): number {
   return (h ?? 0) * 60 + (m ?? 0);
 }
 
+function slotCount(startMinutes: number, endMinutes: number, durationMinutes: number): number {
+  let count = 0;
+  for (let s = startMinutes; s + durationMinutes <= endMinutes; s += 30) count++;
+  return count;
+}
+
 export const BookingSettingsView = ({ agentId }: BookingSettingsViewProps) => {
   const widgetSettings = useQuery(api.private.widgetSettings.getOne, { agentId });
   const services = useQuery(api.private.bookings.listServices, { agentId });
@@ -45,11 +51,8 @@ export const BookingSettingsView = ({ agentId }: BookingSettingsViewProps) => {
   const updateService = useMutation(api.private.bookings.updateService);
   const setAvailabilityDay = useMutation(api.private.bookings.setAvailabilityDay);
 
-  // Booking settings state
   const [notifEmail, setNotifEmail] = useState("");
   const [savingSettings, setSavingSettings] = useState(false);
-
-  // New service form
   const [newService, setNewService] = useState({
     name: "",
     durationMinutes: "30",
@@ -59,6 +62,9 @@ export const BookingSettingsView = ({ agentId }: BookingSettingsViewProps) => {
   const [addingService, setAddingService] = useState(false);
 
   const isBookingEnabled = widgetSettings?.bookingEnabled ?? false;
+  const minServiceDuration = services && services.length > 0
+    ? Math.min(...services.filter((s) => s.isActive).map((s) => s.durationMinutes))
+    : 30;
 
   const handleToggleBooking = async (enabled: boolean) => {
     setSavingSettings(true);
@@ -121,10 +127,7 @@ export const BookingSettingsView = ({ agentId }: BookingSettingsViewProps) => {
     }
   };
 
-  const handleToggleServiceActive = async (
-    serviceId: Id<"bookingServices">,
-    isActive: boolean,
-  ) => {
+  const handleToggleServiceActive = async (serviceId: Id<"bookingServices">, isActive: boolean) => {
     try {
       await updateService({ serviceId, isActive });
     } catch {
@@ -145,59 +148,53 @@ export const BookingSettingsView = ({ agentId }: BookingSettingsViewProps) => {
     }
   };
 
-  const getAvailabilityForDay = (weekday: number) => {
-    return availability?.find((a) => a.weekday === weekday);
-  };
+  const getAvailabilityForDay = (weekday: number) =>
+    availability?.find((a) => a.weekday === weekday);
 
   return (
-    <div className="flex flex-col gap-8 p-6 max-w-3xl">
+    <div className="flex flex-col gap-6 p-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Timebestilling-innstillinger</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Konfigurer tjenester, åpningstider og e-postvarsler
+          Konfigurer tjenester, åpningstider og e-postvarsler for agenten
         </p>
       </div>
 
-      {/* Section 1: Enable/disable */}
-      <div className="rounded-xl border border-border bg-card p-5 space-y-4">
-        <h2 className="font-semibold text-base">Aktiver timebestilling</h2>
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium">Vis «Book time» i widgeten</p>
-            <p className="text-[12px] text-muted-foreground">
-              Kundene kan bestille time direkte i chat-widgeten
-            </p>
-          </div>
-          <button
-            type="button"
-            disabled={savingSettings}
-            onClick={() => handleToggleBooking(!isBookingEnabled)}
-            className={cn(
-              "relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors",
-              isBookingEnabled ? "bg-foreground" : "bg-muted",
-            )}
-          >
-            <span
+      {/* Top bar: toggle + email */}
+      <div className="rounded-xl border border-border bg-card p-5">
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-4">
+            <button
+              type="button"
+              disabled={savingSettings}
+              onClick={() => handleToggleBooking(!isBookingEnabled)}
               className={cn(
-                "pointer-events-none inline-block size-5 rounded-full bg-white shadow-sm transition-transform",
-                isBookingEnabled ? "translate-x-5" : "translate-x-0",
+                "relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors",
+                isBookingEnabled ? "bg-foreground" : "bg-muted",
               )}
-            />
-          </button>
-        </div>
+            >
+              <span
+                className={cn(
+                  "pointer-events-none inline-block size-5 rounded-full bg-white shadow-sm transition-transform",
+                  isBookingEnabled ? "translate-x-5" : "translate-x-0",
+                )}
+              />
+            </button>
+            <div>
+              <p className="text-sm font-medium">Aktiver timebestilling</p>
+              <p className="text-[12px] text-muted-foreground">
+                Kundene kan bestille time direkte i chat-widgeten
+              </p>
+            </div>
+          </div>
 
-        {/* Notification email */}
-        <div className="space-y-2 pt-2 border-t border-border">
-          <Label className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-            E-post for varsler
-          </Label>
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2 sm:w-80">
             <Input
               type="email"
-              placeholder={widgetSettings?.bookingNotificationEmail || "din@epost.no"}
+              placeholder={widgetSettings?.bookingNotificationEmail || "varselepost@bedrift.no"}
               value={notifEmail}
               onChange={(e) => setNotifEmail(e.target.value)}
-              className="h-9"
+              className="h-9 text-sm"
             />
             <Button
               size="sm"
@@ -209,216 +206,227 @@ export const BookingSettingsView = ({ agentId }: BookingSettingsViewProps) => {
               Lagre
             </Button>
           </div>
-          {widgetSettings?.bookingNotificationEmail && (
-            <p className="text-[12px] text-muted-foreground">
-              Varsler sendes til:{" "}
-              <strong>{widgetSettings.bookingNotificationEmail}</strong>
+        </div>
+        {widgetSettings?.bookingNotificationEmail && (
+          <p className="mt-3 text-[12px] text-muted-foreground border-t border-border pt-3">
+            Varsler sendes til:{" "}
+            <strong>{widgetSettings.bookingNotificationEmail}</strong>
+          </p>
+        )}
+      </div>
+
+      {/* Main grid: services left, availability right */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+
+        {/* Services */}
+        <div className="rounded-xl border border-border bg-card p-5 space-y-4">
+          <div>
+            <h2 className="font-semibold text-base">Tjenester</h2>
+            <p className="text-[12px] text-muted-foreground mt-0.5">
+              Tjenestene som er tilgjengelige for bestilling
+            </p>
+          </div>
+
+          {/* Add service form */}
+          <div className="rounded-lg border border-dashed border-border bg-muted/20 p-4 space-y-3">
+            <p className="text-sm font-medium text-muted-foreground">Ny tjeneste</p>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="col-span-2 space-y-1">
+                <Label className="text-[11px]">Navn</Label>
+                <Input
+                  placeholder="f.eks. Konsultasjon, Behandling"
+                  value={newService.name}
+                  onChange={(e) => setNewService((p) => ({ ...p, name: e.target.value }))}
+                  className="h-9"
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-[11px]">Varighet (min)</Label>
+                <Input
+                  type="number"
+                  min={15}
+                  step={15}
+                  placeholder="30"
+                  value={newService.durationMinutes}
+                  onChange={(e) => setNewService((p) => ({ ...p, durationMinutes: e.target.value }))}
+                  className="h-9"
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-[11px]">Pris (kr, valgfritt)</Label>
+                <Input
+                  type="number"
+                  placeholder="499"
+                  value={newService.priceNok}
+                  onChange={(e) => setNewService((p) => ({ ...p, priceNok: e.target.value }))}
+                  className="h-9"
+                />
+              </div>
+              <div className="col-span-2 space-y-1">
+                <Label className="text-[11px]">Beskrivelse (valgfritt)</Label>
+                <Input
+                  placeholder="Kort beskrivelse"
+                  value={newService.description}
+                  onChange={(e) => setNewService((p) => ({ ...p, description: e.target.value }))}
+                  className="h-9"
+                />
+              </div>
+            </div>
+            <Button
+              size="sm"
+              onClick={handleAddService}
+              disabled={addingService || !newService.name.trim()}
+              className="gap-1.5"
+            >
+              <PlusIcon className="size-3.5" />
+              Legg til tjeneste
+            </Button>
+          </div>
+
+          {/* Service list */}
+          {services && services.length > 0 ? (
+            <div className="divide-y divide-border rounded-lg border border-border overflow-hidden">
+              {services.map((svc) => (
+                <div key={svc._id} className="flex items-center justify-between px-4 py-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <button
+                      type="button"
+                      onClick={() => handleToggleServiceActive(svc._id, !svc.isActive)}
+                      className={cn(
+                        "relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors",
+                        svc.isActive ? "bg-foreground" : "bg-muted",
+                      )}
+                    >
+                      <span
+                        className={cn(
+                          "pointer-events-none inline-block size-4 rounded-full bg-white shadow-sm transition-transform",
+                          svc.isActive ? "translate-x-4" : "translate-x-0",
+                        )}
+                      />
+                    </button>
+                    <div className="min-w-0">
+                      <p className={cn("text-sm font-medium", !svc.isActive && "text-muted-foreground line-through")}>
+                        {svc.name}
+                      </p>
+                      <p className="text-[11px] text-muted-foreground">
+                        {svc.durationMinutes} min
+                        {svc.priceNok != null ? ` · ${svc.priceNok} kr` : ""}
+                        {svc.description ? ` · ${svc.description}` : ""}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteService(svc._id)}
+                    className="ml-3 shrink-0 p-1.5 text-muted-foreground hover:text-red-600 transition-colors"
+                  >
+                    <Trash2Icon className="size-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground text-center py-6">
+              Ingen tjenester ennå. Legg til den første ovenfor.
             </p>
           )}
         </div>
-      </div>
 
-      {/* Section 2: Services */}
-      <div className="rounded-xl border border-border bg-card p-5 space-y-4">
-        <h2 className="font-semibold text-base">Tjenester</h2>
-
-        {/* Add service form */}
-        <div className="rounded-lg border border-dashed border-border bg-muted/20 p-4 space-y-3">
-          <p className="text-sm font-medium text-muted-foreground">Ny tjeneste</p>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="col-span-2 space-y-1">
-              <Label className="text-[11px]">Navn</Label>
-              <Input
-                placeholder="f.eks. Klipp, Farging, Behandling"
-                value={newService.name}
-                onChange={(e) => setNewService((p) => ({ ...p, name: e.target.value }))}
-                className="h-9"
-              />
-            </div>
-            <div className="space-y-1">
-              <Label className="text-[11px]">Varighet (min)</Label>
-              <Input
-                type="number"
-                min={15}
-                step={15}
-                placeholder="30"
-                value={newService.durationMinutes}
-                onChange={(e) =>
-                  setNewService((p) => ({ ...p, durationMinutes: e.target.value }))
-                }
-                className="h-9"
-              />
-            </div>
-            <div className="space-y-1">
-              <Label className="text-[11px]">Pris (kr, valgfritt)</Label>
-              <Input
-                type="number"
-                placeholder="499"
-                value={newService.priceNok}
-                onChange={(e) => setNewService((p) => ({ ...p, priceNok: e.target.value }))}
-                className="h-9"
-              />
-            </div>
-            <div className="col-span-2 space-y-1">
-              <Label className="text-[11px]">Beskrivelse (valgfritt)</Label>
-              <Input
-                placeholder="Kort beskrivelse"
-                value={newService.description}
-                onChange={(e) =>
-                  setNewService((p) => ({ ...p, description: e.target.value }))
-                }
-                className="h-9"
-              />
-            </div>
+        {/* Availability */}
+        <div className="rounded-xl border border-border bg-card p-5 space-y-4">
+          <div>
+            <h2 className="font-semibold text-base">Ukentlige åpningstider</h2>
+            <p className="text-[12px] text-muted-foreground mt-0.5">
+              Angi hvilke dager og tider du tar imot bestillinger
+            </p>
           </div>
-          <Button
-            size="sm"
-            onClick={handleAddService}
-            disabled={addingService || !newService.name.trim()}
-            className="gap-1.5"
-          >
-            <PlusIcon className="size-3.5" />
-            Legg til tjeneste
-          </Button>
-        </div>
-
-        {/* Service list */}
-        {services && services.length > 0 ? (
           <div className="divide-y divide-border rounded-lg border border-border overflow-hidden">
-            {services.map((svc) => (
-              <div key={svc._id} className="flex items-center justify-between px-4 py-3">
-                <div className="flex items-center gap-3 min-w-0">
+            {WEEKDAYS.map(({ index, label }) => {
+              const avail = getAvailabilityForDay(index);
+              const isActive = avail?.isActive ?? false;
+              const startMin = avail?.startMinutes ?? 540;
+              const endMin = avail?.endMinutes ?? 1020;
+              const startTime = minutesToTime(startMin);
+              const endTime = minutesToTime(endMin);
+              const windowMinutes = endMin - startMin;
+              const slots = isActive ? slotCount(startMin, endMin, minServiceDuration) : 0;
+              const tooNarrow = isActive && slots === 0;
+              const fewSlots = isActive && slots === 1;
+
+              return (
+                <div
+                  key={index}
+                  className={cn(
+                    "flex items-center gap-3 px-4 py-3",
+                    !isActive && "opacity-50",
+                  )}
+                >
                   <button
                     type="button"
-                    onClick={() => handleToggleServiceActive(svc._id, !svc.isActive)}
+                    onClick={() =>
+                      handleAvailabilityChange(index, !isActive, startMin, endMin)
+                    }
                     className={cn(
                       "relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors",
-                      svc.isActive ? "bg-foreground" : "bg-muted",
+                      isActive ? "bg-foreground" : "bg-muted",
                     )}
                   >
                     <span
                       className={cn(
                         "pointer-events-none inline-block size-4 rounded-full bg-white shadow-sm transition-transform",
-                        svc.isActive ? "translate-x-4" : "translate-x-0",
+                        isActive ? "translate-x-4" : "translate-x-0",
                       )}
                     />
                   </button>
-                  <div className="min-w-0">
-                    <p
-                      className={cn(
-                        "text-sm font-medium",
-                        !svc.isActive && "text-muted-foreground line-through",
-                      )}
-                    >
-                      {svc.name}
-                    </p>
-                    <p className="text-[11px] text-muted-foreground">
-                      {svc.durationMinutes} min
-                      {svc.priceNok != null ? ` · ${svc.priceNok} kr` : ""}
-                      {svc.description ? ` · ${svc.description}` : ""}
-                    </p>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => handleDeleteService(svc._id)}
-                  className="ml-3 shrink-0 p-1.5 text-muted-foreground hover:text-red-600 transition-colors"
-                >
-                  <Trash2Icon className="size-4" />
-                </button>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-sm text-muted-foreground text-center py-4">
-            Ingen tjenester ennå. Legg til den første ovenfor.
-          </p>
-        )}
-      </div>
 
-      {/* Section 3: Availability */}
-      <div className="rounded-xl border border-border bg-card p-5 space-y-4">
-        <div>
-          <h2 className="font-semibold text-base">Ukentlige åpningstider</h2>
-          <p className="text-[12px] text-muted-foreground mt-0.5">
-            Angi hvilke dager og tider du tar imot bestillinger
-          </p>
-        </div>
-        <div className="divide-y divide-border rounded-lg border border-border overflow-hidden">
-          {WEEKDAYS.map(({ index, label }) => {
-            const avail = getAvailabilityForDay(index);
-            const isActive = avail?.isActive ?? false;
-            const startTime = avail ? minutesToTime(avail.startMinutes) : "09:00";
-            const endTime = avail ? minutesToTime(avail.endMinutes) : "17:00";
+                  <span className="w-18 shrink-0 text-sm font-medium">{label}</span>
 
-            return (
-              <div
-                key={index}
-                className={cn(
-                  "flex items-center gap-4 px-4 py-3",
-                  !isActive && "opacity-50",
-                )}
-              >
-                <button
-                  type="button"
-                  onClick={() =>
-                    handleAvailabilityChange(
-                      index,
-                      !isActive,
-                      avail?.startMinutes ?? 540,
-                      avail?.endMinutes ?? 1020,
-                    )
-                  }
-                  className={cn(
-                    "relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors",
-                    isActive ? "bg-foreground" : "bg-muted",
+                  {isActive ? (
+                    <div className="flex flex-1 items-center gap-2">
+                      <input
+                        type="time"
+                        defaultValue={startTime}
+                        key={`start-${index}-${startTime}`}
+                        onBlur={(e) =>
+                          handleAvailabilityChange(index, true, timeToMinutes(e.target.value), endMin)
+                        }
+                        className="w-[100px] rounded border border-border bg-background px-2 py-1 text-sm"
+                      />
+                      <span className="text-muted-foreground text-xs">–</span>
+                      <input
+                        type="time"
+                        defaultValue={endTime}
+                        key={`end-${index}-${endTime}`}
+                        onBlur={(e) =>
+                          handleAvailabilityChange(index, true, startMin, timeToMinutes(e.target.value))
+                        }
+                        className="w-[100px] rounded border border-border bg-background px-2 py-1 text-sm"
+                      />
+                      <span
+                        className={cn(
+                          "ml-auto text-[11px] shrink-0",
+                          tooNarrow
+                            ? "text-red-500 font-medium"
+                            : fewSlots
+                            ? "text-amber-500"
+                            : "text-muted-foreground",
+                        )}
+                      >
+                        {tooNarrow
+                          ? "For kort"
+                          : `${slots} time${slots !== 1 ? "r" : ""} · ${windowMinutes} min`}
+                      </span>
+                    </div>
+                  ) : (
+                    <span className="text-sm text-muted-foreground">Stengt</span>
                   )}
-                >
-                  <span
-                    className={cn(
-                      "pointer-events-none inline-block size-4 rounded-full bg-white shadow-sm transition-transform",
-                      isActive ? "translate-x-4" : "translate-x-0",
-                    )}
-                  />
-                </button>
-                <span className="w-20 text-sm font-medium">{label}</span>
-                {isActive ? (
-                  <div className="flex items-center gap-2 text-sm">
-                    <ClockIcon className="size-3.5 text-muted-foreground" />
-                    <input
-                      type="time"
-                      defaultValue={startTime}
-                      onBlur={(e) =>
-                        handleAvailabilityChange(
-                          index,
-                          true,
-                          timeToMinutes(e.target.value),
-                          avail?.endMinutes ?? 1020,
-                        )
-                      }
-                      className="rounded border border-border bg-background px-2 py-1 text-sm"
-                    />
-                    <span className="text-muted-foreground">–</span>
-                    <input
-                      type="time"
-                      defaultValue={endTime}
-                      onBlur={(e) =>
-                        handleAvailabilityChange(
-                          index,
-                          true,
-                          avail?.startMinutes ?? 540,
-                          timeToMinutes(e.target.value),
-                        )
-                      }
-                      className="rounded border border-border bg-background px-2 py-1 text-sm"
-                    />
-                  </div>
-                ) : (
-                  <span className="text-sm text-muted-foreground">Stengt</span>
-                )}
-              </div>
-            );
-          })}
+                </div>
+              );
+            })}
+          </div>
+          <p className="text-[11px] text-muted-foreground">
+            Ledige tider beregnes automatisk basert på tjenestens varighet, med 30 min mellomrom.
+          </p>
         </div>
       </div>
     </div>
