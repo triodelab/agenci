@@ -1,5 +1,6 @@
 import { ConvexError, v } from "convex/values";
 import { internalMutation, internalQuery } from "../_generated/server";
+import { internal } from "../_generated/api";
 import { Id } from "../_generated/dataModel";
 
 function timeToMin(t: string): number {
@@ -235,6 +236,41 @@ export const createBookingInternal = internalMutation({
       deleteAfter: startTime + THIRTY_DAYS_MS,
       createdAt: now,
     });
+
+    // Schedule confirmation emails
+    let ws = args.agentId
+      ? await ctx.db
+          .query("widgetSettings")
+          .withIndex("by_agent_id", (q) => q.eq("agentId", args.agentId!))
+          .first()
+      : null;
+    if (!ws) {
+      ws = await ctx.db
+        .query("widgetSettings")
+        .withIndex("by_organization_id", (q) => q.eq("organizationId", args.organizationId))
+        .filter((q) => q.eq(q.field("agentId"), undefined))
+        .first();
+    }
+
+    const notificationEmail = ws?.bookingNotificationEmail;
+    if (notificationEmail) {
+      let businessName = "Agenci";
+      if (args.agentId) {
+        const agent = await ctx.db.get(args.agentId);
+        if (agent) businessName = agent.name;
+      }
+      await ctx.scheduler.runAfter(0, internal.system.bookingEmail.sendBookingEmails, {
+        customerEmail: args.customerEmail,
+        customerName: args.customerName,
+        businessEmail: notificationEmail,
+        businessName,
+        serviceName: args.serviceName,
+        dateString: args.dateString,
+        timeString: args.timeString,
+        cancellationToken,
+        notes: args.notes,
+      });
+    }
 
     return { success: true, cancellationToken };
   },

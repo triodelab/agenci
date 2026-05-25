@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { action } from "../_generated/server";
+import { internalAction } from "../_generated/server";
 
 async function sendEmail(params: {
   apiKey: string;
@@ -33,7 +33,7 @@ function formatDate(dateString: string): string {
   return `${day}.${month}.${year}`;
 }
 
-export const sendBookingEmails = action({
+export const sendBookingEmails = internalAction({
   args: {
     customerEmail: v.string(),
     customerName: v.string(),
