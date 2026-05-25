@@ -50,12 +50,12 @@ export function clampWebsiteSyncIntervalMinutes(
 }
 
 const BROWSER_HEADERS = {
-  Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-  "Accept-Language": "nb-NO,nb;q=0.9,no;q=0.8,en;q=0.7",
-  "Accept-Encoding": "gzip, deflate, br",
+  Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+  "Accept-Language": "nb-NO,nb;q=0.9,no;q=0.8,en-US;q=0.7,en;q=0.6",
   "User-Agent":
-    "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
   "Cache-Control": "no-cache",
+  "Pragma": "no-cache",
 };
 
 async function doFetch(url: string): Promise<Response> {
@@ -72,45 +72,68 @@ async function doFetch(url: string): Promise<Response> {
   }
 }
 
+// Fallback via Jina Reader — bypasses Cloudflare/bot-protection on most sites.
+// Returns plain-text/markdown content wrapped in a fake HTML response shape.
+async function fetchViaJina(url: string): Promise<{ normalizedUrl: string; html: string }> {
+  const jinaUrl = `https://r.jina.ai/${url}`;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 30_000);
+  let response: Response;
+  try {
+    response = await fetch(jinaUrl, {
+      redirect: "follow",
+      signal: controller.signal,
+      headers: {
+        Accept: "text/plain",
+        "X-Return-Format": "text",
+      },
+    });
+  } finally {
+    clearTimeout(timeoutId);
+  }
+  if (!response.ok) {
+    throw new Error(`Jina feilet med HTTP ${response.status}`);
+  }
+  const text = await response.text();
+  if (!text || text.trim().length < 20) {
+    throw new Error("Jina returnerte tomt innhold");
+  }
+  // Wrap as minimal HTML so downstream HTML-checks pass
+  const html = `<html><body><pre>${text}</pre></body></html>`;
+  return { normalizedUrl: url, html };
+}
+
 export async function fetchWebpageHtml(
   url: string,
 ): Promise<{ normalizedUrl: string; html: string }> {
   const publicUrl = assertPublicHttpUrl(url);
   const requestedUrl = publicUrl.toString();
+  const withoutWww = requestedUrl.replace(/^(https?:\/\/)www\./i, "$1");
+  const hasWww = withoutWww !== requestedUrl;
 
-  let response: Response;
-  try {
-    response = await doFetch(requestedUrl);
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e);
-    const isRedirectLoop =
-      msg.toLowerCase().includes("too many redirects") ||
-      msg.toLowerCase().includes("maximum redirect");
+  let response: Response | null = null;
+  let lastError = "";
 
-    // Auto-retry: strip www. and try again
-    if (isRedirectLoop) {
-      const withoutWww = requestedUrl.replace(/^(https?:\/\/)www\./i, "$1");
-      if (withoutWww !== requestedUrl) {
-        try {
-          response = await doFetch(withoutWww);
-        } catch {
-          throw new ConvexError({
-            code: "BAD_REQUEST",
-            message:
-              "Nettsiden har for mange omdirigeringer. Prøv en spesifikk underside i stedet (f.eks. https://agenci.no/om-oss).",
-          });
-        }
-      } else {
-        throw new ConvexError({
-          code: "BAD_REQUEST",
-          message:
-            "Nettsiden har for mange omdirigeringer. Prøv en spesifikk underside i stedet.",
-        });
-      }
-    } else {
+  // Try original URL first, then non-www fallback if URL has www
+  const urlsToTry = hasWww ? [requestedUrl, withoutWww] : [requestedUrl];
+
+  for (const candidate of urlsToTry) {
+    try {
+      response = await doFetch(candidate);
+      break;
+    } catch (e) {
+      lastError = e instanceof Error ? e.message : String(e);
+    }
+  }
+
+  if (!response) {
+    // Direct fetch failed for all URL variants — try Jina Reader as proxy fallback.
+    try {
+      return await fetchViaJina(requestedUrl);
+    } catch {
       throw new ConvexError({
         code: "BAD_REQUEST",
-        message: `Kunne ikke hente siden: ${msg}`,
+        message: `Kunne ikke hente siden. Nettsiden kan ha bot-beskyttelse som blokkerer henting. Prøv å laste opp innholdet som PDF i stedet.`,
       });
     }
   }
