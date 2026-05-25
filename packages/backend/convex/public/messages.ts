@@ -9,6 +9,7 @@ import { escalateConversation } from "../system/ai/tools/escalateConversation";
 import { resolveConversation } from "../system/ai/tools/resolveConversation";
 import { saveMessage } from "@convex-dev/agent";
 import { search } from "../system/ai/tools/search";
+import { checkAvailability, createBooking } from "../system/ai/tools/booking";
 
 export const create = action({
   args: {
@@ -98,6 +99,8 @@ export const create = action({
             escalateConversationTool: escalateConversation,
             resolveConversationTool: resolveConversation,
             searchTool: search,
+            checkAvailabilityTool: checkAvailability,
+            createBookingTool: createBooking,
           },
         },
       )

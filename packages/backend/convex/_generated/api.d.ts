@@ -46,10 +46,12 @@ import type * as system_ai_agents_supportAgent from "../system/ai/agents/support
 import type * as system_ai_constants from "../system/ai/constants.js";
 import type * as system_ai_pingMini from "../system/ai/pingMini.js";
 import type * as system_ai_rag from "../system/ai/rag.js";
+import type * as system_ai_tools_booking from "../system/ai/tools/booking.js";
 import type * as system_ai_tools_escalateConversation from "../system/ai/tools/escalateConversation.js";
 import type * as system_ai_tools_resolveConversation from "../system/ai/tools/resolveConversation.js";
 import type * as system_ai_tools_search from "../system/ai/tools/search.js";
 import type * as system_bookingEmail from "../system/bookingEmail.js";
+import type * as system_bookings from "../system/bookings.js";
 import type * as system_contactSessions from "../system/contactSessions.js";
 import type * as system_conversations from "../system/conversations.js";
 import type * as system_plugins from "../system/plugins.js";
@@ -103,10 +105,12 @@ declare const fullApi: ApiFromModules<{
   "system/ai/constants": typeof system_ai_constants;
   "system/ai/pingMini": typeof system_ai_pingMini;
   "system/ai/rag": typeof system_ai_rag;
+  "system/ai/tools/booking": typeof system_ai_tools_booking;
   "system/ai/tools/escalateConversation": typeof system_ai_tools_escalateConversation;
   "system/ai/tools/resolveConversation": typeof system_ai_tools_resolveConversation;
   "system/ai/tools/search": typeof system_ai_tools_search;
   "system/bookingEmail": typeof system_bookingEmail;
+  "system/bookings": typeof system_bookings;
   "system/contactSessions": typeof system_contactSessions;
   "system/conversations": typeof system_conversations;
   "system/plugins": typeof system_plugins;
