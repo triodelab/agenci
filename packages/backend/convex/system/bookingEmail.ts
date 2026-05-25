@@ -48,7 +48,7 @@ export const sendBookingEmails = internalAction({
   handler: async (_ctx, args) => {
     const apiKey = process.env.RESEND_API_KEY?.trim();
     const from =
-      process.env.RESEND_FROM_EMAIL?.trim() ?? "Agenci <post@triodelab.no>";
+      process.env.RESEND_FROM_EMAIL?.trim() ?? "Agenci <noreply@agenci.no>";
 
     if (!apiKey) {
       console.info("[bookingEmail] Hopper over — mangler RESEND_API_KEY");
