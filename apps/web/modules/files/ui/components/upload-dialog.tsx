@@ -4,6 +4,7 @@ import { useAction, useMutation } from "convex/react";
 import { UploadIcon, XIcon } from "lucide-react";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
+import { Progress } from "@workspace/ui/components/progress";
 import {
   Dialog,
   DialogClose,
@@ -48,6 +49,7 @@ export const UploadDialog = ({
 
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [uploadForm, setUploadForm] = useState({
     category: "",
     filename: "",
@@ -76,11 +78,40 @@ export const UploadDialog = ({
     }
   };
 
+  const uploadFileWithProgress = (
+    url: string,
+    file: File,
+    mimeType: string,
+  ): Promise<{ storageId: string }> => {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.upload.addEventListener("progress", (e) => {
+        if (e.lengthComputable) {
+          setUploadProgress(Math.round((e.loaded / e.total) * 100));
+        }
+      });
+      xhr.addEventListener("load", () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          resolve(JSON.parse(xhr.responseText) as { storageId: string });
+        } else {
+          reject(new Error(`Opplasting feilet: HTTP ${xhr.status}`));
+        }
+      });
+      xhr.addEventListener("error", () =>
+        reject(new Error("Nettverksfeil under opplasting")),
+      );
+      xhr.open("POST", url);
+      xhr.setRequestHeader("Content-Type", mimeType);
+      xhr.send(file);
+    });
+  };
+
   const handleUpload = async () => {
     const blob = uploadedFiles[0];
     if (!blob) return;
 
     setIsUploading(true);
+    setUploadProgress(0);
     try {
       const filename = uploadForm.filename || blob.name;
       const mimeType = blob.type || "text/plain";
@@ -88,16 +119,9 @@ export const UploadDialog = ({
       // 1. Get a pre-signed upload URL (small mutation over WebSocket)
       const uploadUrl = await generateUploadUrl();
 
-      // 2. POST the file directly to Convex storage (HTTP, not WebSocket)
-      const uploadResponse = await fetch(uploadUrl, {
-        method: "POST",
-        headers: { "Content-Type": mimeType },
-        body: blob,
-      });
-      if (!uploadResponse.ok) {
-        throw new Error(`Opplasting feilet: HTTP ${uploadResponse.status}`);
-      }
-      const { storageId } = await uploadResponse.json() as { storageId: string };
+      // 2. POST the file directly to Convex storage with progress tracking
+      const { storageId } = await uploadFileWithProgress(uploadUrl, blob, mimeType);
+      setUploadProgress(100);
 
       // 3. Trigger text extraction + indexing with just the storageId
       await addFileByStorageId({
@@ -120,12 +144,14 @@ export const UploadDialog = ({
       toast.error(msg);
     } finally {
       setIsUploading(false);
+      setUploadProgress(null);
     }
   };
 
   const handleCancel = () => {
     onOpenChange(false);
     setUploadedFiles([]);
+    setUploadProgress(null);
     setUploadForm({
       category: "",
       filename: "",
@@ -266,27 +292,43 @@ export const UploadDialog = ({
           </div>
         </div>
 
-        <DialogFooter className="gap-3 border-border border-t bg-card px-6 py-5 sm:justify-end sm:px-8">
-          <Button
-            className="h-11 min-w-[6.5rem] rounded-xl"
-            disabled={isUploading}
-            onClick={handleCancel}
-            type="button"
-            variant="outline"
-          >
-            Avbryt
-          </Button>
-          <Button
-            className="h-11 min-w-[7.5rem] rounded-xl font-medium"
-            disabled={
-              uploadedFiles.length === 0 || isUploading
-            }
-            onClick={handleUpload}
-            type="button"
-            variant="default"
-          >
-            {isUploading ? "Laster opp…" : "Last opp"}
-          </Button>
+        <DialogFooter className="flex-col gap-3 border-border border-t bg-card px-6 py-5 sm:px-8">
+          {isUploading && uploadProgress !== null && (
+            <div className="w-full space-y-1.5">
+              <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <span>
+                  {uploadProgress < 100 ? "Laster opp fil…" : "Behandler dokument…"}
+                </span>
+                <span className="tabular-nums font-medium">
+                  {uploadProgress < 100 ? `${uploadProgress}%` : ""}
+                </span>
+              </div>
+              <Progress
+                className={cn("h-1.5", uploadProgress === 100 && "animate-pulse")}
+                value={uploadProgress}
+              />
+            </div>
+          )}
+          <div className="flex w-full justify-end gap-3">
+            <Button
+              className="h-11 min-w-[6.5rem] rounded-xl"
+              disabled={isUploading}
+              onClick={handleCancel}
+              type="button"
+              variant="outline"
+            >
+              Avbryt
+            </Button>
+            <Button
+              className="h-11 min-w-[7.5rem] rounded-xl font-medium"
+              disabled={uploadedFiles.length === 0 || isUploading}
+              onClick={handleUpload}
+              type="button"
+              variant="default"
+            >
+              {isUploading ? "Laster opp…" : "Last opp"}
+            </Button>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>

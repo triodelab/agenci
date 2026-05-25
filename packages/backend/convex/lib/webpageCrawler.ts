@@ -84,8 +84,9 @@ async function fetchViaJina(url: string): Promise<{ normalizedUrl: string; html:
       redirect: "follow",
       signal: controller.signal,
       headers: {
-        Accept: "text/plain",
-        "X-Return-Format": "text",
+        Accept: "text/html",
+        "X-Return-Format": "html",
+        "X-With-Links-Summary": "true",
       },
     });
   } finally {
@@ -94,12 +95,10 @@ async function fetchViaJina(url: string): Promise<{ normalizedUrl: string; html:
   if (!response.ok) {
     throw new Error(`Jina feilet med HTTP ${response.status}`);
   }
-  const text = await response.text();
-  if (!text || text.trim().length < 20) {
+  const html = await response.text();
+  if (!html || html.trim().length < 20) {
     throw new Error("Jina returnerte tomt innhold");
   }
-  // Wrap as minimal HTML so downstream HTML-checks pass
-  const html = `<html><body><pre>${text}</pre></body></html>`;
   return { normalizedUrl: url, html };
 }
 

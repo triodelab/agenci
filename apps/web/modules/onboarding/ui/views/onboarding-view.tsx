@@ -491,7 +491,7 @@ function Step3({
 }) {
   const upsert = useMutation(api.private.widgetSettings.upsert);
   const [title,    setTitle]   = useState(agentName);
-  const [greeting, setGreeting] = useState("Hei! Hvordan kan jeg hjelpe deg i dag?");
+  const [greeting, setGreeting] = useState("Hei! Hvordan kan jeg hjelpe deg? 😊");
   const [color,    setColor]   = useState("#18181b");
   const [busy,     setBusy]    = useState(false);
   const [error,    setError]   = useState<string | null>(null);
