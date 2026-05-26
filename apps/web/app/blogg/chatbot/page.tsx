@@ -576,8 +576,8 @@ function Td({ children, accent }: { children: ReactNode; accent?: boolean }) {
 function FaqItem({ question, answer }: { question: string; answer: string }) {
   return (
     <div className="rounded-[10px] border border-[#2a2a2a] bg-[#161616] p-5">
-      <p className="text-[14px] font-semibold leading-snug text-[#c4c9d4]">{question}</p>
-      <p className="mt-2 text-[13px] leading-[1.6] text-[#6b7280]">{answer}</p>
+      <p className="text-[14px] font-semibold leading-snug text-[#f2f3f5]">{question}</p>
+      <p className="mt-2 text-[13px] leading-[1.65] text-[#9ca3af]">{answer}</p>
     </div>
   );
 }
