@@ -4,7 +4,7 @@
  */
 
 function Bone({ className }: { className: string }) {
-  return <div className={`animate-pulse rounded-lg bg-muted/50 ${className}`} />;
+  return <div className={`animate-pulse rounded-lg bg-[#E5E7EB] ${className}`} />;
 }
 
 /** Full-page skeleton that mimics the dashboard chrome (topnav + sidebar + main). */
