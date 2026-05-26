@@ -124,9 +124,12 @@ export function widgetAppearanceToStandaloneStyle(
   appearance: WidgetAppearance,
 ): CSSProperties {
   return {
-    width: "100%",
-    height: "100%",
+    width: "100dvw",
+    height: "100dvh",
+    maxWidth: "100%",
+    maxHeight: "100%",
     backgroundColor: appearance.backgroundColor,
+    borderRadius: 0,
     ...widgetColorVars(appearance),
   };
 }

@@ -38,7 +38,7 @@ const Page = ({ searchParams }: Props) => {
 
   // Standalone new-tab — fill the full viewport
   return (
-    <div className="h-screen w-screen overflow-hidden bg-background">
+    <div style={{ width: "100dvw", height: "100dvh", overflow: "hidden" }}>
       <WidgetView organizationId={organizationId} agentId={agentId} standalone />
     </div>
   );
