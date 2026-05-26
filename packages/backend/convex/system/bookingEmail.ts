@@ -111,109 +111,77 @@ async function sendEmail(params: {
 
 // ── HTML templates ────────────────────────────────────────────────────────────
 
+const BASE_STYLES = `font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#18181b`;
+
+function detailsTable(rows: Array<{ label: string; value: string }>): string {
+  return `<table style="width:100%;border-collapse:collapse;margin:20px 0">
+    ${rows.map((r, i) => `<tr>
+      <td style="padding:10px 0;color:#52525b;font-size:14px;border-top:${i === 0 ? "none" : "1px solid #e4e4e7"};width:120px">${r.label}</td>
+      <td style="padding:10px 0;font-weight:600;font-size:14px;border-top:${i === 0 ? "none" : "1px solid #e4e4e7"}">${r.value}</td>
+    </tr>`).join("")}
+  </table>`;
+}
+
+function emailWrapper(content: string): string {
+  return `<div style="max-width:520px;margin:0 auto;${BASE_STYLES}">${content}</div>`;
+}
+
 function customerEmailHtml(p: {
   customerName: string;
   businessName: string;
   serviceName: string;
   formattedDateLong: string;
-  formattedDate: string;
   timeString: string;
   endTimeString: string;
   notes?: string;
   cancelUrl: string;
   googleCalUrl: string;
 }): string {
-  const notesRow = p.notes
-    ? `<tr>
-        <td style="padding:10px 0 2px;color:#6b7280;font-size:13px;vertical-align:top;width:110px">Merknad</td>
-        <td style="padding:10px 0 2px;font-size:13px;color:#111827;vertical-align:top">${p.notes}</td>
-       </tr>`
-    : "";
+  const rows = [
+    { label: "Tjeneste", value: p.serviceName },
+    { label: "Dato", value: p.formattedDateLong },
+    { label: "Tidspunkt", value: `kl. ${p.timeString}–${p.endTimeString}` },
+    ...(p.notes ? [{ label: "Merknad", value: p.notes }] : []),
+  ];
 
-  return `<!DOCTYPE html>
-<html lang="no">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#f3f4f6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f3f4f6;padding:40px 16px">
-    <tr><td align="center">
-      <table width="100%" cellpadding="0" cellspacing="0" style="max-width:560px">
+  return emailWrapper(`
+    <!-- Header -->
+    <div style="background:#18181b;padding:20px 28px;border-radius:12px 12px 0 0">
+      <span style="font-size:17px;font-weight:700;color:#fff;letter-spacing:-0.3px">Agenci</span>
+    </div>
 
-        <!-- Header -->
-        <tr><td style="background:#0f0f0f;border-radius:12px 12px 0 0;padding:24px 32px">
-          <span style="font-size:18px;font-weight:700;color:#fff;letter-spacing:-0.3px">Agenci</span>
-        </td></tr>
+    <!-- Body -->
+    <div style="background:#fff;border:1px solid #e4e4e7;border-top:none;padding:28px 28px 24px">
+      <h2 style="margin:0 0 6px;font-size:20px;font-weight:700;color:#18181b">Bestillingen din er bekreftet ✅</h2>
+      <p style="margin:0 0 4px;color:#52525b;font-size:15px">Hei ${p.customerName},</p>
+      <p style="margin:0;color:#52525b;font-size:15px">Din time hos <strong style="color:#18181b">${p.businessName}</strong> er registrert.</p>
 
-        <!-- Body -->
-        <tr><td style="background:#ffffff;padding:36px 32px 28px">
+      ${detailsTable(rows)}
 
-          <!-- Status badge -->
-          <div style="display:inline-block;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:20px;padding:5px 14px;margin-bottom:20px">
-            <span style="font-size:12px;font-weight:600;color:#15803d">✓ Bekreftet</span>
-          </div>
+      <!-- Calendar buttons -->
+      <div style="background:#f4f4f5;border-radius:10px;padding:16px 20px;margin-bottom:20px">
+        <p style="margin:0 0 10px;font-size:13px;font-weight:600;color:#18181b">📅 Legg til i kalenderen din</p>
+        <a href="${p.googleCalUrl}" target="_blank"
+           style="display:inline-block;background:#18181b;color:#fff;padding:9px 18px;border-radius:7px;text-decoration:none;font-size:13px;font-weight:600;margin-right:8px">
+          Google Kalender
+        </a>
+        <span style="font-size:12px;color:#71717a">eller åpne vedlegget <strong>booking.ics</strong> for Apple/Outlook-kalender</span>
+      </div>
 
-          <h1 style="margin:0 0 10px;font-size:22px;font-weight:700;color:#111827;line-height:1.3">
-            Bestillingen din er bekreftet
-          </h1>
-          <p style="margin:0 0 28px;font-size:15px;color:#6b7280;line-height:1.6">
-            Hei ${p.customerName}, din time hos <strong style="color:#111827">${p.businessName}</strong> er klar.
-          </p>
+      <hr style="margin:20px 0;border:none;border-top:1px solid #e4e4e7" />
+      <p style="font-size:13px;color:#71717a;margin:0">
+        Vil du avbestille? <a href="${p.cancelUrl}" style="color:#18181b">Klikk her for å avbestille timen</a>
+      </p>
+    </div>
 
-          <!-- Booking card -->
-          <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:20px 24px;margin-bottom:28px">
-            <table width="100%" cellpadding="0" cellspacing="0">
-              <tr>
-                <td style="padding:6px 0 6px;color:#6b7280;font-size:13px;width:110px">Tjeneste</td>
-                <td style="padding:6px 0 6px;font-size:13px;font-weight:600;color:#111827">${p.serviceName}</td>
-              </tr>
-              <tr>
-                <td style="padding:6px 0 6px;color:#6b7280;font-size:13px;border-top:1px solid #e5e7eb">Dato</td>
-                <td style="padding:6px 0 6px;font-size:13px;font-weight:600;color:#111827;border-top:1px solid #e5e7eb;text-transform:capitalize">${p.formattedDateLong}</td>
-              </tr>
-              <tr>
-                <td style="padding:6px 0 6px;color:#6b7280;font-size:13px;border-top:1px solid #e5e7eb">Tidspunkt</td>
-                <td style="padding:6px 0 6px;font-size:13px;font-weight:600;color:#111827;border-top:1px solid #e5e7eb">kl. ${p.timeString}–${p.endTimeString}</td>
-              </tr>
-              ${notesRow}
-            </table>
-          </div>
-
-          <!-- CTA buttons -->
-          <table cellpadding="0" cellspacing="0" style="margin-bottom:28px">
-            <tr>
-              <td style="padding-right:10px">
-                <a href="${p.googleCalUrl}" target="_blank"
-                   style="display:inline-block;background:#111827;color:#fff;padding:11px 20px;border-radius:8px;text-decoration:none;font-size:13px;font-weight:600">
-                  📅 Legg til i Google Kalender
-                </a>
-              </td>
-            </tr>
-          </table>
-          <p style="margin:0 0 4px;font-size:12px;color:#9ca3af">
-            Et kalendervedlegg (.ics) er lagt ved denne e-posten og åpner automatisk i de fleste kalenderapper.
-          </p>
-
-          <!-- Cancel -->
-          <div style="border-top:1px solid #e5e7eb;margin-top:24px;padding-top:20px">
-            <p style="margin:0;font-size:13px;color:#9ca3af">
-              Trenger du å avbestille?
-              <a href="${p.cancelUrl}" style="color:#6b7280;text-decoration:underline">Klikk her for å avbestille timen</a>
-            </p>
-          </div>
-        </td></tr>
-
-        <!-- Footer -->
-        <tr><td style="background:#f9fafb;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 12px 12px;padding:16px 32px">
-          <p style="margin:0;font-size:11px;color:#9ca3af">
-            Sendt av <strong style="color:#6b7280">Agenci</strong> på vegne av ${p.businessName} &nbsp;·&nbsp;
-            <a href="https://agenci.no/personvern" style="color:#9ca3af">Personvernerklæring</a>
-          </p>
-        </td></tr>
-
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>`;
+    <!-- Footer -->
+    <div style="background:#f4f4f5;border:1px solid #e4e4e7;border-top:none;border-radius:0 0 12px 12px;padding:14px 28px">
+      <p style="margin:0;font-size:11px;color:#a1a1aa">
+        Sendt av <strong style="color:#71717a">Agenci</strong> på vegne av ${p.businessName} &nbsp;·&nbsp;
+        <a href="https://agenci.no/personvern" style="color:#a1a1aa">Personvernerklæring</a>
+      </p>
+    </div>
+  `);
 }
 
 function businessEmailHtml(p: {
@@ -225,89 +193,55 @@ function businessEmailHtml(p: {
   timeString: string;
   endTimeString: string;
   notes?: string;
+  googleCalUrl: string;
 }): string {
-  const notesRow = p.notes
-    ? `<tr>
-        <td style="padding:6px 0 6px;color:#6b7280;font-size:13px;border-top:1px solid #e5e7eb;width:110px">Merknad</td>
-        <td style="padding:6px 0 6px;font-size:13px;color:#111827;border-top:1px solid #e5e7eb">${p.notes}</td>
-       </tr>`
-    : "";
+  const rows = [
+    { label: "Kunde", value: `${p.customerName} &lt;${p.customerEmail}&gt;` },
+    { label: "Tjeneste", value: p.serviceName },
+    { label: "Dato", value: p.formattedDateLong },
+    { label: "Tidspunkt", value: `kl. ${p.timeString}–${p.endTimeString}` },
+    ...(p.notes ? [{ label: "Merknad", value: p.notes }] : []),
+  ];
 
-  return `<!DOCTYPE html>
-<html lang="no">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#f3f4f6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f3f4f6;padding:40px 16px">
-    <tr><td align="center">
-      <table width="100%" cellpadding="0" cellspacing="0" style="max-width:560px">
+  return emailWrapper(`
+    <!-- Header -->
+    <div style="background:#18181b;padding:20px 28px;border-radius:12px 12px 0 0">
+      <span style="font-size:17px;font-weight:700;color:#fff;letter-spacing:-0.3px">Agenci</span>
+      <span style="font-size:12px;color:#a1a1aa;margin-left:10px">for ${p.businessName}</span>
+    </div>
 
-        <!-- Header -->
-        <tr><td style="background:#0f0f0f;border-radius:12px 12px 0 0;padding:24px 32px">
-          <span style="font-size:18px;font-weight:700;color:#fff;letter-spacing:-0.3px">Agenci</span>
-          <span style="font-size:12px;color:#9ca3af;margin-left:10px">for ${p.businessName}</span>
-        </td></tr>
+    <!-- Body -->
+    <div style="background:#fff;border:1px solid #e4e4e7;border-top:none;padding:28px 28px 24px">
+      <h2 style="margin:0 0 6px;font-size:20px;font-weight:700;color:#18181b">Ny bestilling mottatt 📅</h2>
+      <p style="margin:0;color:#52525b;font-size:15px">
+        <strong style="color:#18181b">${p.customerName}</strong> har bestilt time via Agenci-chatten.
+      </p>
 
-        <!-- Body -->
-        <tr><td style="background:#ffffff;padding:36px 32px 28px">
+      ${detailsTable(rows)}
 
-          <!-- Status badge -->
-          <div style="display:inline-block;background:#eff6ff;border:1px solid #bfdbfe;border-radius:20px;padding:5px 14px;margin-bottom:20px">
-            <span style="font-size:12px;font-weight:600;color:#1d4ed8">Ny bestilling</span>
-          </div>
+      <!-- Calendar buttons -->
+      <div style="background:#f4f4f5;border-radius:10px;padding:16px 20px;margin-bottom:20px">
+        <p style="margin:0 0 10px;font-size:13px;font-weight:600;color:#18181b">📅 Legg til i din kalender</p>
+        <a href="${p.googleCalUrl}" target="_blank"
+           style="display:inline-block;background:#18181b;color:#fff;padding:9px 18px;border-radius:7px;text-decoration:none;font-size:13px;font-weight:600;margin-right:8px">
+          Google Kalender
+        </a>
+        <span style="font-size:12px;color:#71717a">eller åpne vedlegget <strong>booking.ics</strong> for Apple/Outlook-kalender</span>
+      </div>
 
-          <h1 style="margin:0 0 10px;font-size:22px;font-weight:700;color:#111827;line-height:1.3">
-            Du har fått en ny bestilling
-          </h1>
-          <p style="margin:0 0 28px;font-size:15px;color:#6b7280;line-height:1.6">
-            <strong style="color:#111827">${p.customerName}</strong> har bestilt time via Agenci-chatten.
-          </p>
+      <p style="font-size:12px;color:#a1a1aa;margin:0">
+        Administrer bestillinger i <a href="https://agenci.no/dashboard" style="color:#71717a">Agenci-dashboardet</a>.
+      </p>
+    </div>
 
-          <!-- Customer card -->
-          <p style="margin:0 0 8px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:#9ca3af">Kunde</p>
-          <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:16px 20px;margin-bottom:20px">
-            <p style="margin:0;font-size:14px;font-weight:600;color:#111827">${p.customerName}</p>
-            <p style="margin:4px 0 0;font-size:13px;color:#6b7280">${p.customerEmail}</p>
-          </div>
-
-          <!-- Booking card -->
-          <p style="margin:0 0 8px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:#9ca3af">Bestilling</p>
-          <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:20px 24px;margin-bottom:28px">
-            <table width="100%" cellpadding="0" cellspacing="0">
-              <tr>
-                <td style="padding:6px 0;color:#6b7280;font-size:13px;width:110px">Tjeneste</td>
-                <td style="padding:6px 0;font-size:13px;font-weight:600;color:#111827">${p.serviceName}</td>
-              </tr>
-              <tr>
-                <td style="padding:6px 0;color:#6b7280;font-size:13px;border-top:1px solid #e5e7eb">Dato</td>
-                <td style="padding:6px 0;font-size:13px;font-weight:600;color:#111827;border-top:1px solid #e5e7eb;text-transform:capitalize">${p.formattedDateLong}</td>
-              </tr>
-              <tr>
-                <td style="padding:6px 0;color:#6b7280;font-size:13px;border-top:1px solid #e5e7eb">Tidspunkt</td>
-                <td style="padding:6px 0;font-size:13px;font-weight:600;color:#111827;border-top:1px solid #e5e7eb">kl. ${p.timeString}–${p.endTimeString}</td>
-              </tr>
-              ${notesRow}
-            </table>
-          </div>
-
-          <p style="margin:0;font-size:13px;color:#9ca3af">
-            Administrer bestillinger i
-            <a href="https://agenci.no/dashboard" style="color:#6b7280;text-decoration:underline">Agenci-dashboardet</a>
-          </p>
-        </td></tr>
-
-        <!-- Footer -->
-        <tr><td style="background:#f9fafb;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 12px 12px;padding:16px 32px">
-          <p style="margin:0;font-size:11px;color:#9ca3af">
-            Sendt av <strong style="color:#6b7280">Agenci</strong> &nbsp;·&nbsp;
-            <a href="https://agenci.no/personvern" style="color:#9ca3af">Personvernerklæring</a>
-          </p>
-        </td></tr>
-
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>`;
+    <!-- Footer -->
+    <div style="background:#f4f4f5;border:1px solid #e4e4e7;border-top:none;border-radius:0 0 12px 12px;padding:14px 28px">
+      <p style="margin:0;font-size:11px;color:#a1a1aa">
+        Sendt av <strong style="color:#71717a">Agenci</strong> &nbsp;·&nbsp;
+        <a href="https://agenci.no/personvern" style="color:#a1a1aa">Personvernerklæring</a>
+      </p>
+    </div>
+  `);
 }
 
 // ── Action ────────────────────────────────────────────────────────────────────
@@ -375,7 +309,6 @@ export const sendBookingEmails = internalAction({
         businessName: args.businessName,
         serviceName: args.serviceName,
         formattedDateLong,
-        formattedDate,
         timeString: args.timeString,
         endTimeString,
         notes: args.notes,
@@ -401,6 +334,7 @@ export const sendBookingEmails = internalAction({
           timeString: args.timeString,
           endTimeString,
           notes: args.notes,
+          googleCalUrl: gcalUrl,
         }),
         attachments: [icsAttachment],
       });
