@@ -140,9 +140,10 @@ export default function ChatbotBloggPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdFaq) }}
       />
 
-      <div className="bg-[#1C1C1C]">
+      <div>
 
         {/* ── HERO ── */}
+        <div className="bg-[#1C1C1C]">
         <header className="border-b border-[#2a2a2a]">
           <div className="mx-auto max-w-[900px] px-6 py-16 md:py-20 xl:px-8">
             <p className="text-[12px] font-semibold uppercase tracking-[0.5px] text-[#6b7280]">
@@ -187,34 +188,36 @@ export default function ChatbotBloggPage() {
             </div>
           </div>
         </header>
+        </div>{/* end dark hero */}
 
         {/* ── BODY ── */}
+        <div className="bg-[#F9F9F9]">
         <div className="mx-auto max-w-[900px] px-6 py-14 xl:px-8">
           <div className="flex gap-12 lg:gap-16">
 
             {/* Sticky ToC — desktop */}
             <aside className="hidden w-[200px] shrink-0 lg:block">
               <div className="sticky top-24 space-y-1">
-                <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.5px] text-[#4b5563]">
+                <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.5px] text-[#9ca3af]">
                   Innhold
                 </p>
                 {toc.map((item) => (
                   <a
                     key={item.id}
                     href={`#${item.id}`}
-                    className="block py-1 text-[13px] leading-snug text-[#6b7280] transition-colors hover:text-[#9ca3af]"
+                    className="block py-1 text-[13px] leading-snug text-[#6b7280] transition-colors hover:text-[#1C1C1C]"
                   >
                     {item.label}
                   </a>
                 ))}
-                <div className="mt-8 rounded-[10px] border border-[#2a2a2a] bg-[#161616] p-4">
-                  <p className="text-[12px] font-medium text-[#9ca3af]">Prøv gratis</p>
-                  <p className="mt-1 text-[11px] leading-snug text-[#4b5563]">
+                <div className="mt-8 rounded-[10px] border border-[#E4DFD9] bg-white p-4">
+                  <p className="text-[12px] font-medium text-[#374151]">Prøv gratis</p>
+                  <p className="mt-1 text-[11px] leading-snug text-[#6b7280]">
                     50 samtaler/mnd. Ingen bindingstid.
                   </p>
                   <Link
                     href="/kontakt"
-                    className="mt-3 block rounded-[8px] bg-white px-3 py-2 text-center text-[12px] font-semibold text-[#1C1C1C] transition-opacity hover:opacity-90"
+                    className="mt-3 block rounded-[8px] bg-[#1C1C1C] px-3 py-2 text-center text-[12px] font-semibold text-white transition-opacity hover:opacity-80"
                   >
                     Kom i gang →
                   </Link>
@@ -226,8 +229,8 @@ export default function ChatbotBloggPage() {
             <article className="min-w-0 flex-1 space-y-12">
 
               {/* Intro ToC — mobil */}
-              <nav className="rounded-[12px] border border-[#2a2a2a] bg-[#161616] p-5 lg:hidden">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.5px] text-[#4b5563]">
+              <nav className="rounded-[12px] border border-[#E4DFD9] bg-white p-5 lg:hidden">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.5px] text-[#9ca3af]">
                   Innhold
                 </p>
                 <ol className="mt-3 space-y-1.5">
@@ -235,7 +238,7 @@ export default function ChatbotBloggPage() {
                     <li key={item.id}>
                       <a
                         href={`#${item.id}`}
-                        className="text-[13px] text-[#9ca3af] transition-colors hover:text-[#f2f3f5]"
+                        className="text-[13px] text-[#6b7280] transition-colors hover:text-[#1C1C1C]"
                       >
                         {i + 1}. {item.label}
                       </a>
@@ -335,7 +338,7 @@ export default function ChatbotBloggPage() {
                   oppgaver.
                 </p>
 
-                <h3 className="mt-8 text-[17px] font-semibold tracking-[-0.3px] text-[#f2f3f5]">
+                <h3 className="mt-8 text-[17px] font-semibold tracking-[-0.3px] text-[#111827]">
                   Økt effektivitet og tidsbesparelser
                 </h3>
                 <p className="mt-3">
@@ -345,7 +348,7 @@ export default function ChatbotBloggPage() {
                   innsikt.
                 </p>
 
-                <h3 className="mt-8 text-[17px] font-semibold tracking-[-0.3px] text-[#f2f3f5]">
+                <h3 className="mt-8 text-[17px] font-semibold tracking-[-0.3px] text-[#111827]">
                   Forbedret kundetilfredshet
                 </h3>
                 <p className="mt-3">
@@ -355,7 +358,7 @@ export default function ChatbotBloggPage() {
                   til et menneske dersom chatboten støter på en kompleks henvendelse.
                 </p>
 
-                <h3 className="mt-8 text-[17px] font-semibold tracking-[-0.3px] text-[#f2f3f5]">
+                <h3 className="mt-8 text-[17px] font-semibold tracking-[-0.3px] text-[#111827]">
                   Kostnadsreduksjon
                 </h3>
                 <p className="mt-3">
@@ -364,7 +367,7 @@ export default function ChatbotBloggPage() {
                   tilbake.
                 </p>
 
-                <div className="mt-8 overflow-hidden rounded-[12px] border border-[#2a2a2a]">
+                <div className="mt-8 overflow-hidden rounded-[12px] border border-[#E4DFD9]">
                   <table className="w-full text-[13px]">
                     <thead>
                       <tr className="border-b border-[#2a2a2a] bg-[#161616]">
@@ -434,7 +437,7 @@ export default function ChatbotBloggPage() {
                   </NumberedPoint>
                 </div>
 
-                <div className="mt-8 overflow-hidden rounded-[12px] border border-[#2a2a2a]">
+                <div className="mt-8 overflow-hidden rounded-[12px] border border-[#E4DFD9]">
                   <table className="w-full text-[13px]">
                     <thead>
                       <tr className="border-b border-[#2a2a2a] bg-[#161616]">
@@ -473,7 +476,7 @@ export default function ChatbotBloggPage() {
 
               {/* FAQ */}
               <section id="faq" className="scroll-mt-24">
-                <h2 className="text-[22px] font-semibold leading-[1.25] tracking-[-0.5px] text-[#f2f3f5]">
+                <h2 className="text-[22px] font-semibold leading-[1.25] tracking-[-0.5px] text-[#111827]">
                   Ofte stilte spørsmål om chatbot
                 </h2>
                 <div className="mt-6 space-y-3">
@@ -486,6 +489,7 @@ export default function ChatbotBloggPage() {
             </article>
           </div>
         </div>
+        </div>{/* end bg-F9F9F9 */}
 
         <MarketingSubpageCta />
       </div>
@@ -498,20 +502,20 @@ export default function ChatbotBloggPage() {
 function Section({ id, title, children }: { id: string; title: string; children: ReactNode }) {
   return (
     <section id={id} className="scroll-mt-24">
-      <h2 className="text-[22px] font-semibold leading-[1.25] tracking-[-0.5px] text-[#f2f3f5]">
+      <h2 className="text-[22px] font-semibold leading-[1.25] tracking-[-0.5px] text-[#111827]">
         {title}
       </h2>
-      <div className="mt-4 space-y-4 text-[15px] leading-[1.7] text-[#9ca3af]">{children}</div>
+      <div className="mt-4 space-y-4 text-[15px] leading-[1.7] text-[#374151]">{children}</div>
     </section>
   );
 }
 
 function BulletItem({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <li className="flex items-start gap-3 text-[14px] leading-[1.6] text-[#9ca3af]">
-      <span aria-hidden className="mt-[8px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#374151]" />
+    <li className="flex items-start gap-3 text-[14px] leading-[1.6] text-[#374151]">
+      <span aria-hidden className="mt-[8px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#d1d5db]" />
       <span>
-        <span className="font-medium text-[#c4c9d4]">{label}: </span>
+        <span className="font-medium text-[#111827]">{label}: </span>
         {children}
       </span>
     </li>
@@ -520,7 +524,7 @@ function BulletItem({ label, children }: { label: string; children: ReactNode })
 
 function Callout({ children }: { children: ReactNode }) {
   return (
-    <blockquote className="my-2 rounded-r-[8px] border-l-2 border-[#374151] pl-4 text-[14px] leading-[1.6] text-[#6b7280] italic">
+    <blockquote className="my-2 rounded-r-[8px] border-l-2 border-[#E4DFD9] pl-4 text-[14px] leading-[1.6] text-[#6b7280] italic">
       {children}
     </blockquote>
   );
@@ -528,8 +532,8 @@ function Callout({ children }: { children: ReactNode }) {
 
 function TechCard({ title, children, highlight }: { title: string; children: ReactNode; highlight?: boolean }) {
   return (
-    <div className={`rounded-[10px] border p-4 ${highlight ? "border-[#374151] bg-[#1a1f2e]" : "border-[#2a2a2a] bg-[#161616]"}`}>
-      <p className={`text-[13px] font-semibold ${highlight ? "text-[#818cf8]" : "text-[#9ca3af]"}`}>{title}</p>
+    <div className={`rounded-[10px] border p-4 ${highlight ? "border-[#c7d2fe] bg-[#eef2ff]" : "border-[#E4DFD9] bg-white"}`}>
+      <p className={`text-[13px] font-semibold ${highlight ? "text-[#4f46e5]" : "text-[#374151]"}`}>{title}</p>
       <p className="mt-1.5 text-[13px] leading-[1.6] text-[#6b7280]">{children}</p>
     </div>
   );
@@ -538,11 +542,11 @@ function TechCard({ title, children, highlight }: { title: string; children: Rea
 function NumberedPoint({ n, title, children }: { n: number; title: string; children: ReactNode }) {
   return (
     <div className="flex gap-4">
-      <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#1f2937] text-[12px] font-semibold text-[#6b7280]">
+      <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#f3f4f6] text-[12px] font-semibold text-[#6b7280]">
         {n}
       </span>
       <div>
-        <p className="text-[14px] font-semibold text-[#c4c9d4]">{title}</p>
+        <p className="text-[14px] font-semibold text-[#111827]">{title}</p>
         <p className="mt-1 text-[13px] leading-[1.6] text-[#6b7280]">{children}</p>
       </div>
     </div>
@@ -551,7 +555,7 @@ function NumberedPoint({ n, title, children }: { n: number; title: string; child
 
 function Th({ children }: { children: ReactNode }) {
   return (
-    <th className="px-4 py-3 text-left text-[12px] font-semibold uppercase tracking-[0.3px] text-[#4b5563]">
+    <th className="bg-[#F9F9F9] px-4 py-3 text-left text-[12px] font-semibold uppercase tracking-[0.3px] text-[#6b7280]">
       {children}
     </th>
   );
@@ -559,7 +563,7 @@ function Th({ children }: { children: ReactNode }) {
 
 function Tr({ children, last }: { children: ReactNode; last?: boolean }) {
   return (
-    <tr className={`${last ? "" : "border-b border-[#1f1f1f]"}`}>
+    <tr className={`bg-white ${last ? "" : "border-b border-[#f3f4f6]"}`}>
       {children}
     </tr>
   );
@@ -567,7 +571,7 @@ function Tr({ children, last }: { children: ReactNode; last?: boolean }) {
 
 function Td({ children, accent }: { children: ReactNode; accent?: boolean }) {
   return (
-    <td className={`px-4 py-3 ${accent ? "font-medium text-[#9ca3af]" : "text-[#4b5563]"}`}>
+    <td className={`px-4 py-3 ${accent ? "font-medium text-[#111827]" : "text-[#6b7280]"}`}>
       {children}
     </td>
   );
@@ -575,9 +579,9 @@ function Td({ children, accent }: { children: ReactNode; accent?: boolean }) {
 
 function FaqItem({ question, answer }: { question: string; answer: string }) {
   return (
-    <div className="rounded-[10px] border border-[#2a2a2a] bg-[#161616] p-5">
-      <p className="text-[14px] font-semibold leading-snug text-[#f2f3f5]">{question}</p>
-      <p className="mt-2 text-[13px] leading-[1.65] text-[#9ca3af]">{answer}</p>
+    <div className="rounded-[10px] border border-[#E4DFD9] bg-white p-5">
+      <p className="text-[14px] font-semibold leading-snug text-[#111827]">{question}</p>
+      <p className="mt-2 text-[13px] leading-[1.65] text-[#6b7280]">{answer}</p>
     </div>
   );
 }
