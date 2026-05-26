@@ -53,6 +53,14 @@ const FEATURES = [
     description: "Koble Agenci til CRM, e-post og nettbutikk slik at data flyter dit det trengs. Starter med widget — vokser med bedriften.",
     image: "/Produktet/integregring.png",
   },
+  {
+    id: "timebestilling",
+    step: "06",
+    label: "Timebestilling",
+    heading: "Kundene booker time direkte i chatten",
+    description: "Agenci håndterer hele bookingflyten automatisk — velger tjeneste, dato og tid, og sender bekreftelse på e-post. Du ser og administrerer alle bestillinger i dashboardet.",
+    image: "/Produktet/oversikt.png",
+  },
 ];
 
 /* ─────────────────────────────────────────────────────────────────

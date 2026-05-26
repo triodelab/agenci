@@ -38,6 +38,7 @@ const PLANS: Plan[] = [
     cta: "Start gratis",
     bullets: [
       { text: "1 AI-agent", included: true },
+      { text: "Timebestilling i chatten", included: false },
       { text: "Chat-widget på nettsiden", included: true },
       { text: "1 teammedlem", included: true },
       { text: "Grunnleggende analyser", included: true },
@@ -56,6 +57,7 @@ const PLANS: Plan[] = [
     cta: "Kom i gang",
     bullets: [
       { text: "1 AI-agent", included: true },
+      { text: "Timebestilling i chatten", included: true },
       { text: "Chat-widget på nettsiden", included: true },
       { text: "2 teammedlemmer", included: true },
       { text: "Grunnleggende analyser", included: true },
@@ -74,6 +76,7 @@ const PLANS: Plan[] = [
     cta: "Kom i gang",
     bullets: [
       { text: "3 AI-agenter", included: true },
+      { text: "Timebestilling i chatten", included: true },
       { text: "Chat-widget på nettsiden", included: true },
       { text: "5 teammedlemmer", included: true },
       { text: "Full analyse og rapporter", included: true },
@@ -92,6 +95,7 @@ const PLANS: Plan[] = [
     cta: "Kom i gang",
     bullets: [
       { text: "10 AI-agenter", included: true },
+      { text: "Timebestilling i chatten", included: true },
       { text: "Alle integrasjoner", included: true },
       { text: "Ubegrenset teammedlemmer", included: true },
       { text: "Full analyse + CSV-eksport", included: true },

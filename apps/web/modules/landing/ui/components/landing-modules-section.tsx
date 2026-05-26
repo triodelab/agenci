@@ -118,6 +118,19 @@ function IconPrivacy() {
   );
 }
 
+function IconBooking() {
+  return (
+    <svg width="32" height="28" viewBox="0 0 32 28" fill="none" aria-hidden>
+      <rect x="4" y="5" width="24" height="20" rx="2" stroke="#888" strokeWidth="0.85" fill="none" />
+      <line x1="4" y1="11" x2="28" y2="11" stroke="#bbb" strokeWidth="0.7" />
+      <line x1="10" y1="5" x2="10" y2="8" stroke="#999" strokeWidth="1" strokeLinecap="round" />
+      <line x1="22" y1="5" x2="22" y2="8" stroke="#999" strokeWidth="1" strokeLinecap="round" />
+      <rect x="8" y="14" width="5" height="4" rx="0.8" stroke="#aaa" strokeWidth="0.7" fill="none" />
+      <rect x="15" y="14" width="5" height="4" rx="0.8" stroke="#aaa" strokeWidth="0.7" fill="none" />
+    </svg>
+  );
+}
+
 function IconCustomSetup() {
   return (
     <svg width="32" height="28" viewBox="0 0 32 28" fill="none" aria-hidden>
@@ -133,6 +146,7 @@ function IconCustomSetup() {
 }
 
 const MODULES = [
+  { id: "timebestilling", label: "Timebestilling", desc: "La kunder booke time direkte i chat-widgeten", Icon: IconBooking },
   { id: "konversjoner", label: "Konversjoner", desc: "Gjør besøkende til kunder — automatisk", Icon: IconConversions },
   { id: "kunnskapsbase", label: "Kunnskapsbase", desc: "Last opp PDF, nettside og FAQ som kilde", Icon: IconKnowledge },
   { id: "live-samtaler", label: "Live-samtaler", desc: "Se alle samtaler i sanntid fra dashboardet", Icon: IconLiveChat },
@@ -149,9 +163,9 @@ export function LandingModulesSection() {
   const reduceMotion = useReducedMotion();
   const ease = [0.22, 1, 0.36, 1] as const;
 
-  // First 9 are regular cards, last 1 goes with a CTA card spanning 2 cols
-  const regularModules = MODULES.slice(0, 9);
-  const lastModule = MODULES[9];
+  // First 10 are regular cards, last 1 goes with a CTA card spanning 2 cols
+  const regularModules = MODULES.slice(0, 10);
+  const lastModule = MODULES[10];
 
   return (
     <section

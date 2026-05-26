@@ -14,11 +14,11 @@ import {
 const HEADLINE = ["En chatbot", "som kjenner", "bedriften din —", "og svarer for deg, hele døgnet."];
 
 const HERO_IMAGES = [
-  { src: "/Produktet/chatwidget.png", alt: "Chat-widget", label: "Chat-widget" },
-  { src: "/Produktet/oppsett.png", alt: "Oppsett", label: "Oppsett" },
-  { src: "/Produktet/kunnskap.png", alt: "Kunnskapsbase", label: "Kunnskapsbase" },
-  { src: "/Produktet/tilpassning.png", alt: "Tilpasning", label: "Tilpasning" },
-  { src: "/Produktet/integregring.png", alt: "Integrasjoner", label: "Integrasjoner" },
+  { src: "/Produktet/chatwidget.png", alt: "Chat-widget", label: "Chat-widget", position: "[object-position:center_30%]" },
+  { src: "/Produktet/oppsett.png", alt: "Oppsett", label: "Oppsett", position: "object-top" },
+  { src: "/Produktet/kunnskap.png", alt: "Kunnskapsbase", label: "Kunnskapsbase", position: "object-top" },
+  { src: "/Produktet/tilpassning.png", alt: "Tilpasning", label: "Tilpasning", position: "object-top" },
+  { src: "/Produktet/integregring.png", alt: "Integrasjoner", label: "Integrasjoner", position: "object-top" },
 ];
 
 export function LandingHeroSection() {
@@ -185,23 +185,27 @@ export function LandingHeroSection() {
           </div>
           <div className="relative h-[min(50vh,520px)] w-full overflow-hidden">
             <AnimatePresence mode="wait">
-              <motion.div
-                key={activeImage}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.7, ease: "easeInOut" }}
-                className="absolute inset-0"
-              >
-                <Image
-                  src={HERO_IMAGES[activeImage].src}
-                  alt={HERO_IMAGES[activeImage].alt}
-                  fill
-                  sizes="(max-width: 1200px) 100vw, 1200px"
-                  className="object-cover object-top"
-                  priority={activeImage === 0}
-                />
-              </motion.div>
+              {HERO_IMAGES.map((img, i) =>
+                i === activeImage ? (
+                  <motion.div
+                    key={img.src}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.7, ease: "easeInOut" }}
+                    className="absolute inset-0"
+                  >
+                    <Image
+                      src={img.src}
+                      alt={img.alt}
+                      fill
+                      sizes="(max-width: 1200px) 100vw, 1200px"
+                      className={`object-cover ${img.position}`}
+                      priority={i === 0}
+                    />
+                  </motion.div>
+                ) : null
+              )}
             </AnimatePresence>
             <div
               aria-hidden

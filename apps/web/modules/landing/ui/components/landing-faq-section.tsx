@@ -16,6 +16,10 @@ const faqs = [
     a: "Nei. Vanlige chatboter gir forhåndsdefinerte svar på forhåndsdefinerte spørsmål — og krasjer med alt annet. Agenci leser innholdet ditt og svarer fritt basert på det. Stiller kunden et spørsmål du ikke har dekket, sier den fra og tilbyr å koble til deg — i stedet for å gjette.",
   },
   {
+    q: "Kan kundene mine booke time gjennom chatten?",
+    a: "Ja. Agenci håndterer hele bookingflyten i samtalen — kunden velger tjeneste, dato og tid, og får bekreftelse på e-post automatisk. Du administrerer alle bestillinger i dashboardet uten å måtte gjøre noe manuelt.",
+  },
+  {
     q: "Hvor lang tid tar det å sette opp?",
     a: "Under 5 minutter for det grunnleggende. Last opp FAQ-en din, lim inn én kodelinje på nettsiden, og du er live. Ingen utvikler nødvendig. Juster utseende og tone i dashboardet etterpå.",
   },
