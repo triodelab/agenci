@@ -12,6 +12,7 @@ import {
   hasVapiSecretsAtom,
   organizationIdAtom,
   screenAtom,
+  sessionIsAnonymousAtomFamily,
   widgetSettingsAtom,
 } from "../../atoms/widget-atoms";
 import { useMutation } from "convex/react";
@@ -33,6 +34,9 @@ export const WidgetSelectionScreen = () => {
   const agentId = useAtomValue(agentIdAtom);
   const contactSessionId = useAtomValue(
     contactSessionIdAtomFamily(organizationId || "")
+  );
+  const sessionIsAnonymous = useAtomValue(
+    sessionIsAnonymousAtomFamily(organizationId || "")
   );
 
   const createConversation = useMutation(api.public.conversations.create);
@@ -112,7 +116,7 @@ export const WidgetSelectionScreen = () => {
           </div>
           <ChevronRightIcon className="size-4 shrink-0 opacity-50" />
         </button>
-        {widgetSettings?.bookingEnabled && (
+        {widgetSettings?.bookingEnabled && !sessionIsAnonymous && (
           <button
             type="button"
             className="flex h-16 w-full items-center justify-between rounded-xl border px-4 text-[14px] font-medium transition-opacity hover:opacity-80 disabled:opacity-40"

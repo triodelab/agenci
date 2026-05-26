@@ -53,6 +53,24 @@ export const validate = mutation({
   },
 });
 
+/** Oppdaterer en anonym sesjon med ekte navn og e-post etter at brukeren har identifisert seg i chatten. */
+export const updateIdentity = mutation({
+  args: {
+    contactSessionId: v.id("contactSessions"),
+    name: v.string(),
+    email: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const session = await ctx.db.get(args.contactSessionId);
+    if (!session) return { success: false };
+    await ctx.db.patch(args.contactSessionId, {
+      name: args.name,
+      email: args.email,
+    });
+    return { success: true };
+  },
+});
+
 /** GDPR art. 17 — visitor-initiated erasure. Anonymises the session immediately. */
 export const deleteMySession = mutation({
   args: {

@@ -1,7 +1,7 @@
 import { atom } from "jotai";
 import { atomFamily, atomWithStorage } from "jotai/utils";
 import { WidgetScreen } from "@/modules/widget/types";
-import { CONTACT_SESSION_KEY, CONVERSATION_KEY } from "../constants";
+import { CONTACT_SESSION_KEY, CONVERSATION_KEY, SESSION_ANONYMOUS_KEY } from "../constants";
 import { Doc, Id } from "@workspace/backend/_generated/dataModel";
 
 export const screenAtom = atom<WidgetScreen>("loading");
@@ -34,4 +34,8 @@ export type BookingDraft = {
 };
 
 export const bookingDraftAtom = atom<BookingDraft>({});
+
+export const sessionIsAnonymousAtomFamily = atomFamily((organizationId: string) =>
+  atomWithStorage<boolean>(`${SESSION_ANONYMOUS_KEY}_${organizationId}`, false),
+);
 

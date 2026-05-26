@@ -18,6 +18,7 @@ import {
   conversationIdAtomFamily,
   organizationIdAtom,
   screenAtom,
+  sessionIsAnonymousAtomFamily,
   widgetSettingsAtom,
 } from "../../atoms/widget-atoms";
 import { useAction, useQuery, useMutation } from "convex/react";
@@ -119,6 +120,7 @@ export const WidgetChatScreen = () => {
 
   const createMessage = useAction(api.public.messages.create);
   const deleteMySession = useMutation(api.public.contactSessions.deleteMySession);
+  const updateIdentity = useMutation(api.public.contactSessions.updateIdentity);
   const [isAwaitingAssistant, setIsAwaitingAssistant] = useState(false);
   const uiMessages = useMemo(
     () => toUIMessages(messages.results ?? []).filter((m) => m.content?.trim()),
@@ -137,8 +139,39 @@ export const WidgetChatScreen = () => {
   }, [uiMessages, isAwaitingAssistant]);
   const lastUiMessage = uiMessages[uiMessages.length - 1];
   const showTypingIndicator = isAwaitingAssistant && lastUiMessage?.role !== "assistant";
+  const sessionIsAnonymous = useAtomValue(
+    sessionIsAnonymousAtomFamily(organizationId || "")
+  );
+  const setSessionIsAnonymous = useSetAtom(
+    sessionIsAnonymousAtomFamily(organizationId || "")
+  );
   const [showPrivacyPanel, setShowPrivacyPanel] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showIdentityForm, setShowIdentityForm] = useState(false);
+  const [identityName, setIdentityName] = useState("");
+  const [identityEmail, setIdentityEmail] = useState("");
+  const [isIdentitySubmitting, setIsIdentitySubmitting] = useState(false);
+  const [identityDismissed, setIdentityDismissed] = useState(false);
+
+  const showIdentityBanner = sessionIsAnonymous && !identityDismissed;
+
+  const handleIdentitySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!contactSessionId || !identityName.trim() || !identityEmail.trim()) return;
+    setIsIdentitySubmitting(true);
+    try {
+      await updateIdentity({
+        contactSessionId,
+        name: identityName.trim(),
+        email: identityEmail.trim(),
+      });
+      setSessionIsAnonymous(false);
+      setIdentityDismissed(true);
+      setShowIdentityForm(false);
+    } finally {
+      setIsIdentitySubmitting(false);
+    }
+  };
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (!conversation || !contactSessionId) {
@@ -337,6 +370,95 @@ export const WidgetChatScreen = () => {
             )
           })}
         </AISuggestions>
+      )}
+      {showIdentityBanner && (
+        <div
+          className="shrink-0 border-t border-[var(--widget-input-border)] px-3 py-2.5"
+          style={{ backgroundColor: "var(--widget-input-bg, #fff)" }}
+        >
+          {!showIdentityForm ? (
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-[12px] leading-snug" style={{ color: "var(--widget-input-placeholder, #8a8f98)" }}>
+                Legg til kontaktinfo for å motta bekreftelser
+              </p>
+              <div className="flex shrink-0 items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowIdentityForm(true)}
+                  className="rounded-lg px-2.5 py-1 text-[12px] font-semibold transition-opacity hover:opacity-80"
+                  style={{
+                    backgroundColor: "var(--widget-header-bg, #5e6ad2)",
+                    color: "var(--widget-header-text, #fff)",
+                  }}
+                >
+                  Legg til
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIdentityDismissed(true)}
+                  className="text-[12px] transition-opacity hover:opacity-60"
+                  style={{ color: "var(--widget-input-placeholder, #8a8f98)" }}
+                  aria-label="Lukk"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+          ) : (
+            <form onSubmit={(e) => void handleIdentitySubmit(e)} className="flex flex-col gap-1.5">
+              <input
+                type="text"
+                placeholder="Ditt navn"
+                value={identityName}
+                onChange={(e) => setIdentityName(e.target.value)}
+                required
+                className="h-9 w-full rounded-lg border px-3 text-[13px] outline-none focus:ring-1"
+                style={{
+                  backgroundColor: "var(--widget-bg, #fff)",
+                  borderColor: "var(--widget-input-border, #e4e4e7)",
+                  color: "var(--widget-input-text, #18181b)",
+                }}
+              />
+              <input
+                type="email"
+                placeholder="din@epost.no"
+                value={identityEmail}
+                onChange={(e) => setIdentityEmail(e.target.value)}
+                required
+                className="h-9 w-full rounded-lg border px-3 text-[13px] outline-none focus:ring-1"
+                style={{
+                  backgroundColor: "var(--widget-bg, #fff)",
+                  borderColor: "var(--widget-input-border, #e4e4e7)",
+                  color: "var(--widget-input-text, #18181b)",
+                }}
+              />
+              <div className="flex gap-2">
+                <button
+                  type="submit"
+                  disabled={isIdentitySubmitting || !identityName.trim() || !identityEmail.trim()}
+                  className="flex-1 rounded-lg py-1.5 text-[13px] font-semibold transition-opacity hover:opacity-80 disabled:opacity-40"
+                  style={{
+                    backgroundColor: "var(--widget-header-bg, #5e6ad2)",
+                    color: "var(--widget-header-text, #fff)",
+                  }}
+                >
+                  {isIdentitySubmitting ? "Lagrer…" : "Lagre"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowIdentityForm(false)}
+                  className="rounded-lg px-3 py-1.5 text-[13px] transition-opacity hover:opacity-70"
+                  style={{
+                    color: "var(--widget-input-placeholder, #8a8f98)",
+                    border: "1px solid var(--widget-input-border, #e4e4e7)",
+                  }}
+                >
+                  Avbryt
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
       )}
       <Form {...form}>
         <AIInput
