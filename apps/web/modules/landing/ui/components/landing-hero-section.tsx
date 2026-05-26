@@ -10,7 +10,7 @@ import {
   landingSectionHref,
 } from "@/modules/landing/constants";
 
-const HEADLINE = ["Kundestøtte", "som", "aldri", "sover"];
+const HEADLINE = ["En chatbot", "som kjenner", "bedriften din —", "og svarer for deg, hele døgnet."];
 
 export function LandingHeroSection() {
   const reduceMotion = useReducedMotion();
@@ -65,7 +65,7 @@ export function LandingHeroSection() {
         <h1
           id="landing-hero-heading"
           className="mb-7"
-          aria-label="Kundestøtte som aldri sover"
+          aria-label="En chatbot som kjenner bedriften din — og svarer for deg, hele døgnet."
         >
           {HEADLINE.map((word, i) => (
             <motion.span
