@@ -3,10 +3,10 @@
 import { useAtomValue } from "jotai";
 import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
-import { cn } from "@workspace/ui/lib/utils";
 import {
   mergeWidgetAppearance,
   widgetAppearanceToRootStyle,
+  widgetAppearanceToStandaloneStyle,
 } from "@workspace/ui/lib/widget-appearance";
 import { WidgetAuthScreen } from "@/modules/widget/ui/screens/widget-auth-screen";
 import { screenAtom, widgetSettingsAtom } from "@/modules/widget/atoms/widget-atoms";
@@ -22,9 +22,10 @@ import { WidgetBookingScreen } from "../screens/widget-booking-screen";
 interface Props {
   organizationId: string | null;
   agentId?: string | null;
+  standalone?: boolean;
 }
 
-export const WidgetView = ({ organizationId, agentId }: Props) => {
+export const WidgetView = ({ organizationId, agentId, standalone = false }: Props) => {
   const searchParams = useSearchParams();
   const embedPlayground =
     searchParams.get("playground") === "1" ||
@@ -33,7 +34,9 @@ export const WidgetView = ({ organizationId, agentId }: Props) => {
   const screen = useAtomValue(screenAtom);
   const widgetSettings = useAtomValue(widgetSettingsAtom);
   const appearance = mergeWidgetAppearance(widgetSettings?.appearance ?? undefined);
-  const rootStyle = widgetAppearanceToRootStyle(appearance);
+  const rootStyle = standalone
+    ? widgetAppearanceToStandaloneStyle(appearance)
+    : widgetAppearanceToRootStyle(appearance);
 
   useEffect(() => {
     if (!widgetSettings || window.parent === window) return;
@@ -60,7 +63,7 @@ export const WidgetView = ({ organizationId, agentId }: Props) => {
     chat: <WidgetChatScreen />,
     contact: <WidgetContactScreen />,
     booking: <WidgetBookingScreen />,
-  }
+  };
 
   return (
     <main

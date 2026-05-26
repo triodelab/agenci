@@ -36,10 +36,10 @@ const Page = ({ searchParams }: Props) => {
     );
   }
 
-  // Embedded in iframe — fill the full frame, let the container handle clipping
+  // Standalone new-tab — fill the full viewport
   return (
     <div className="h-screen w-screen overflow-hidden bg-background">
-      <WidgetView organizationId={organizationId} agentId={agentId} />
+      <WidgetView organizationId={organizationId} agentId={agentId} standalone />
     </div>
   );
 };
