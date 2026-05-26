@@ -49,6 +49,7 @@ export const LANDING_NAV_PRIMARY_LINKS = [
   { name: "Produktet", href: hash(LANDING_SECTION_IDS.workflow) },
   { name: "Priser", href: hash(LANDING_SECTION_IDS.pricing) },
   { name: "Slik det fungerer", href: "/hvordan-det-virker" },
+  { name: "Blogg", href: "/blogg" },
   { name: "Kontakt", href: LANDING_CONTACT_PAGE_PATH },
 ] as const;
 
@@ -88,6 +89,7 @@ export const LANDING_FOOTER_PRODUCT_LINKS = [
 export const LANDING_FOOTER_EXPLORE_LINKS = [
   { href: "/integrasjoner", label: "Integrasjoner" },
   { href: "/hvordan-det-virker", label: "Slik fungerer det" },
+  { href: "/blogg", label: "Blogg" },
 ] as const;
 
 /** Juridikk — footer + sitemap */
