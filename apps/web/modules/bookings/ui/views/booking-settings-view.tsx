@@ -11,6 +11,47 @@ import { toast } from "sonner";
 import { PlusIcon, Trash2Icon } from "lucide-react";
 import { cn } from "@workspace/ui/lib/utils";
 
+function TimePicker24h({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  const [hStr, mStr] = value.split(":");
+  const h = parseInt(hStr ?? "9", 10);
+  const m = Math.round(parseInt(mStr ?? "0", 10) / 15) * 15 % 60;
+  const selectClass = "rounded border border-border bg-background px-1.5 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-ring";
+
+  return (
+    <div className="flex items-center gap-0.5">
+      <select
+        value={h}
+        onChange={(e) =>
+          onChange(`${String(e.target.value).padStart(2, "0")}:${String(m).padStart(2, "0")}`)
+        }
+        className={selectClass}
+      >
+        {Array.from({ length: 24 }, (_, i) => (
+          <option key={i} value={i}>{String(i).padStart(2, "0")}</option>
+        ))}
+      </select>
+      <span className="px-0.5 text-sm text-muted-foreground font-medium">:</span>
+      <select
+        value={m}
+        onChange={(e) =>
+          onChange(`${String(h).padStart(2, "0")}:${String(e.target.value).padStart(2, "0")}`)
+        }
+        className={selectClass}
+      >
+        {[0, 15, 30, 45].map((min) => (
+          <option key={min} value={min}>{String(min).padStart(2, "0")}</option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
 interface BookingSettingsViewProps {
   agentId: Id<"agents">;
 }
@@ -383,24 +424,18 @@ export const BookingSettingsView = ({ agentId }: BookingSettingsViewProps) => {
 
                   {isActive ? (
                     <div className="flex flex-1 items-center gap-2">
-                      <input
-                        type="time"
-                        defaultValue={startTime}
-                        key={`start-${index}-${startTime}`}
-                        onBlur={(e) =>
-                          handleAvailabilityChange(index, true, timeToMinutes(e.target.value), endMin)
+                      <TimePicker24h
+                        value={startTime}
+                        onChange={(v) =>
+                          handleAvailabilityChange(index, true, timeToMinutes(v), endMin)
                         }
-                        className="w-[100px] rounded border border-border bg-background px-2 py-1 text-sm"
                       />
                       <span className="text-muted-foreground text-xs">–</span>
-                      <input
-                        type="time"
-                        defaultValue={endTime}
-                        key={`end-${index}-${endTime}`}
-                        onBlur={(e) =>
-                          handleAvailabilityChange(index, true, startMin, timeToMinutes(e.target.value))
+                      <TimePicker24h
+                        value={endTime}
+                        onChange={(v) =>
+                          handleAvailabilityChange(index, true, startMin, timeToMinutes(v))
                         }
-                        className="w-[100px] rounded border border-border bg-background px-2 py-1 text-sm"
                       />
                       <span
                         className={cn(
