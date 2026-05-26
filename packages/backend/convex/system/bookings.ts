@@ -263,6 +263,7 @@ export const createBookingInternal = internalMutation({
       businessEmail: ws?.bookingNotificationEmail,
       businessName,
       serviceName: args.serviceName,
+      durationMinutes: service.durationMinutes,
       dateString: args.dateString,
       timeString: args.timeString,
       cancellationToken,

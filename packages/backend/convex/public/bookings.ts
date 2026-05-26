@@ -349,6 +349,7 @@ export const create = mutation({
       businessEmail: ws?.bookingNotificationEmail,
       businessName,
       serviceName: service.name,
+      durationMinutes: service.durationMinutes,
       dateString: args.dateString,
       timeString: args.timeString,
       cancellationToken,
