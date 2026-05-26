@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Geist, Geist_Mono, Space_Grotesk } from "next/font/google"
 
 import "@workspace/ui/globals.css";
@@ -31,6 +32,15 @@ export const metadata: Metadata = {
   },
   description:
     "AI-chatassistent som svarer kunder automatisk — 24/7, basert på din kunnskapsbase. Sett opp på under 5 minutter. Norsk support.",
+  keywords: [
+    "AI chatbot norsk",
+    "chatassistent nettside",
+    "KI kundestøtte",
+    "automatisk kundeservice",
+    "chat widget norsk",
+    "AI agent bedrift",
+    "chatbot norske bedrifter",
+  ],
   openGraph: {
     siteName: "Agenci",
     locale: "nb_NO",
@@ -40,8 +50,38 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     site: "@agenci_no",
   },
-
   robots: { index: true, follow: true },
+};
+
+const jsonLdOrganization = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "Agenci",
+  url: "https://agenci.no",
+  logo: "https://agenci.no/AgenciLogo.png",
+  description:
+    "AI-chatassistent for norske nettsteder — svarer kunder automatisk 24/7.",
+  email: "hei@agenci.no",
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: "Gildevangen 16 B",
+    addressLocality: "Oslo",
+    postalCode: "0657",
+    addressCountry: "NO",
+  },
+  contactPoint: {
+    "@type": "ContactPoint",
+    email: "hei@agenci.no",
+    contactType: "customer support",
+    availableLanguage: "Norwegian",
+  },
+};
+
+const jsonLdWebSite = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "Agenci",
+  url: "https://agenci.no",
 };
 
 export default function RootLayout({
@@ -58,6 +98,16 @@ export default function RootLayout({
           {children}
           <Toaster />
         </Providers>
+        <Script
+          id="json-ld-organization"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdOrganization) }}
+        />
+        <Script
+          id="json-ld-website"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdWebSite) }}
+        />
       </body>
     </html>
   )
