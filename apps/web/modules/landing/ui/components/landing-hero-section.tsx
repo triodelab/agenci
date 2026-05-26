@@ -1,8 +1,9 @@
 "use client";
 
+import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion, useReducedMotion } from "motion/react";
+import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import { AuthAwareLink } from "@/components/auth-aware-link";
 import {
   LANDING_AUTH_PATHS,
@@ -12,9 +13,39 @@ import {
 
 const HEADLINE = ["En chatbot", "som kjenner", "bedriften din —", "og svarer for deg, hele døgnet."];
 
+const HERO_IMAGES = [
+  { src: "/Produktet/chatwidget.png", alt: "Chat-widget", label: "Chat-widget" },
+  { src: "/Produktet/oppsett.png", alt: "Oppsett", label: "Oppsett" },
+  { src: "/Produktet/kunnskap.png", alt: "Kunnskapsbase", label: "Kunnskapsbase" },
+  { src: "/Produktet/tilpassning.png", alt: "Tilpasning", label: "Tilpasning" },
+  { src: "/Produktet/integregring.png", alt: "Integrasjoner", label: "Integrasjoner" },
+];
+
 export function LandingHeroSection() {
   const reduceMotion = useReducedMotion();
   const ease = [0.22, 1, 0.36, 1] as const;
+  const [activeImage, setActiveImage] = useState(0);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const startInterval = useCallback(() => {
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    if (reduceMotion) return;
+    intervalRef.current = setInterval(() => {
+      setActiveImage((i) => (i + 1) % HERO_IMAGES.length);
+    }, 4500);
+  }, [reduceMotion]);
+
+  useEffect(() => {
+    startInterval();
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [startInterval]);
+
+  const handleTabClick = (i: number) => {
+    setActiveImage(i);
+    startInterval();
+  };
 
   return (
     <section
@@ -131,15 +162,47 @@ export function LandingHeroSection() {
             <span className="size-[7px] rounded-full bg-white/[0.10]" />
             <span className="size-[7px] rounded-full bg-white/[0.10]" />
           </div>
+          <div className="flex items-center gap-0 overflow-x-auto border-b border-white/[0.07]">
+            {HERO_IMAGES.map((img, i) => (
+              <button
+                key={img.label}
+                onClick={() => handleTabClick(i)}
+                className={`relative shrink-0 px-4 py-2 text-[11px] font-medium tracking-[0.01em] transition-colors ${
+                  i === activeImage
+                    ? "text-white/80"
+                    : "text-white/25 hover:text-white/50"
+                }`}
+              >
+                {img.label}
+                {i === activeImage && (
+                  <motion.span
+                    layoutId="hero-tab-indicator"
+                    className="absolute inset-x-0 bottom-0 h-[1px] bg-white/40"
+                  />
+                )}
+              </button>
+            ))}
+          </div>
           <div className="relative h-[min(50vh,520px)] w-full overflow-hidden">
-            <Image
-              src="/screenshot1.png"
-              alt="Agenci dashboard"
-              fill
-              sizes="(max-width: 1200px) 100vw, 1200px"
-              className="object-cover object-top"
-              priority
-            />
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeImage}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.7, ease: "easeInOut" }}
+                className="absolute inset-0"
+              >
+                <Image
+                  src={HERO_IMAGES[activeImage].src}
+                  alt={HERO_IMAGES[activeImage].alt}
+                  fill
+                  sizes="(max-width: 1200px) 100vw, 1200px"
+                  className="object-cover object-top"
+                  priority={activeImage === 0}
+                />
+              </motion.div>
+            </AnimatePresence>
             <div
               aria-hidden
               className="pointer-events-none absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-[#F9F9F9] to-transparent"
