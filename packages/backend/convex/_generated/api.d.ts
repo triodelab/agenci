@@ -30,6 +30,7 @@ import type * as private_conversations from "../private/conversations.js";
 import type * as private_dashboard from "../private/dashboard.js";
 import type * as private_files from "../private/files.js";
 import type * as private_messages from "../private/messages.js";
+import type * as private_onboarding from "../private/onboarding.js";
 import type * as private_plugins from "../private/plugins.js";
 import type * as private_secrets from "../private/secrets.js";
 import type * as private_subscription from "../private/subscription.js";
@@ -86,6 +87,7 @@ declare const fullApi: ApiFromModules<{
   "private/dashboard": typeof private_dashboard;
   "private/files": typeof private_files;
   "private/messages": typeof private_messages;
+  "private/onboarding": typeof private_onboarding;
   "private/plugins": typeof private_plugins;
   "private/secrets": typeof private_secrets;
   "private/subscription": typeof private_subscription;

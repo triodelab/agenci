@@ -25,6 +25,7 @@
     "@convex-dev/rag": "^0.3.3",
     "@convex-dev/workflow": "^0.3.0",
     "@convex-dev/workpool": "^0.2.19",
+    "@mendable/firecrawl-js": "^4.24.2",
     "@vapi-ai/server-sdk": "^0.10.0",
     "ai": "^4.3.19",
     "convex": "catalog:",
