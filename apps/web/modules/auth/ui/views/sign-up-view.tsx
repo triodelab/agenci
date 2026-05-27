@@ -304,6 +304,8 @@ export const SignUpView = () => {
           </p>
         )}
 
+        <div id="clerk-captcha" />
+
         <button
           type="submit"
           disabled={busy}
