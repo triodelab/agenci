@@ -73,8 +73,8 @@ export default defineSchema({
     bookingEnabled: v.optional(v.boolean()),
     bookingNotificationEmail: v.optional(v.string()),
   })
-  .index("by_organization_id", ["organizationId"])
-  .index("by_agent_id", ["agentId"]),
+    .index("by_organization_id", ["organizationId"])
+    .index("by_agent_id", ["agentId"]),
   plugins: defineTable({
     organizationId: v.string(),
     service: v.union(v.literal("vapi")),
@@ -90,7 +90,7 @@ export default defineSchema({
     status: v.union(
       v.literal("unresolved"),
       v.literal("escalated"),
-      v.literal("resolved")
+      v.literal("resolved"),
     ),
   })
     .index("by_organization_id", ["organizationId"])
@@ -104,23 +104,25 @@ export default defineSchema({
     email: v.string(),
     organizationId: v.string(),
     expiresAt: v.number(),
-    metadata: v.optional(v.object({
-      userAgent: v.optional(v.string()),
-      language: v.optional(v.string()),
-      languages: v.optional(v.string()),
-      platform: v.optional(v.string()),
-      vendor: v.optional(v.string()),
-      screenResolution: v.optional(v.string()),
-      viewportSize: v.optional(v.string()),
-      timezone: v.optional(v.string()),
-      timezoneOffset: v.optional(v.number()),
-      cookieEnabled: v.optional(v.boolean()),
-      referrer: v.optional(v.string()),
-      currentUrl: v.optional(v.string()),
-    }))
+    metadata: v.optional(
+      v.object({
+        userAgent: v.optional(v.string()),
+        language: v.optional(v.string()),
+        languages: v.optional(v.string()),
+        platform: v.optional(v.string()),
+        vendor: v.optional(v.string()),
+        screenResolution: v.optional(v.string()),
+        viewportSize: v.optional(v.string()),
+        timezone: v.optional(v.string()),
+        timezoneOffset: v.optional(v.number()),
+        cookieEnabled: v.optional(v.boolean()),
+        referrer: v.optional(v.string()),
+        currentUrl: v.optional(v.string()),
+      }),
+    ),
   })
-  .index("by_organization_id", ["organizationId"])
-  .index("by_expires_at", ["expiresAt"]),
+    .index("by_organization_id", ["organizationId"])
+    .index("by_expires_at", ["expiresAt"]),
   users: defineTable({
     name: v.string(),
     email: v.string(),
@@ -217,6 +219,20 @@ export default defineSchema({
     expectedResponse: v.string(),
     createdAt: v.number(),
   }).index("by_organization_id", ["organizationId"]),
+  agentBranding: defineTable({
+    organizationId: v.string(),
+    agentId: v.id("agents"),
+    sourceUrl: v.string(),
+    logoUrl: v.optional(v.string()),
+    colorScheme: v.optional(v.string()),
+    primaryColor: v.optional(v.string()),
+    secondaryColor: v.optional(v.string()),
+    backgroundColor: v.optional(v.string()),
+    textPrimaryColor: v.optional(v.string()),
+    extractedAt: v.number(),
+  })
+    .index("by_agent_id", ["agentId"])
+    .index("by_organization_id", ["organizationId"]),
 
   bookingServices: defineTable({
     organizationId: v.string(),

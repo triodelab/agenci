@@ -38,6 +38,7 @@ export const generateUploadUrl = mutation({
   },
 });
 
+
 export const deleteFile = mutation({
   args: { entryId: vEntryId },
   handler: async (ctx, args) => {
@@ -225,6 +226,7 @@ export const addFileByStorageId = action({
     return { url: await ctx.storage.getUrl(storageId), entryId };
   },
 });
+
 
 export const addWebpage = action({
   args: {

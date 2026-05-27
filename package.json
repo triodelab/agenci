@@ -30,14 +30,14 @@
     "verify": "pnpm exec tsc --noEmit -p apps/web && pnpm exec tsc --noEmit -p apps/widget && pnpm -F @agenci/backend test:openai-mini && pnpm -F @agenci/backend test:openai-mini:convex"
   },
   "devDependencies": {
+    "@types/node": "catalog:",
     "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
     "prettier": "^3.5.1",
-    "@types/node": "catalog:",
     "turbo": "^2.7.5",
     "typescript": "catalog:"
   },
-  "packageManager": "pnpm@10.4.1",
+  "packageManager": "pnpm@11.2.1",
   "engines": {
     "node": ">=20"
   }

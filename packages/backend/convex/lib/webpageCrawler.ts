@@ -102,6 +102,7 @@ async function fetchViaJina(url: string): Promise<{ normalizedUrl: string; html:
   return { normalizedUrl: url, html };
 }
 
+
 export async function fetchWebpageHtml(
   url: string,
 ): Promise<{ normalizedUrl: string; html: string }> {

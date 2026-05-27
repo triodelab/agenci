@@ -294,7 +294,9 @@ export function KnowledgeTrainingPlayground({
     api.private.files.listWebsiteSources,
     agentId !== undefined ? { agentId } : {},
   );
-  const addWebpage = useAction(api.private.files.addWebpage);
+  const kickoffWebsiteOnboarding = useMutation(
+    api.lib.workflow.kickoffAgentOnboarding,
+  );
   const pauseWebsiteSource = useAction(api.private.files.pauseWebsiteSource);
   const resumeWebsiteSource = useAction(api.private.files.resumeWebsiteSource);
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
@@ -370,15 +372,12 @@ export function KnowledgeTrainingPlayground({
   const canAddWebpage = isValidHttpUrl(webUrl) && !isImportingWebpage;
 
   const handleAddWebpage = async () => {
-    if (!canAddWebpage) return;
+    if (!canAddWebpage || !agentId) return;
     setIsImportingWebpage(true);
     try {
-      const result = await addWebpage({ url: webUrl.trim(), agentId });
-      if (result.alreadyQueued) {
-        toast.info(`Nettsiden er allerede i kø: ${result.url}`);
-      } else {
-        toast.success(`Nettside satt i kø: ${result.url}`);
-      }
+      const trimmedUrl = webUrl.trim();
+      await kickoffWebsiteOnboarding({ agentId, url: trimmedUrl });
+      toast.success(`Nettside sendt til behandling: ${trimmedUrl}`);
       setWebUrl("");
     } catch (e) {
       const msg =
