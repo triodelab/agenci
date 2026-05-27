@@ -18,14 +18,21 @@ export const validate = action({
 
     const clerkClient = createClerkClient({ secretKey });
 
-    const organization = await clerkClient.organizations.getOrganization({
-      organizationId: args.organizationId,
-    });
-    
-    if (organization) {
-    return { valid: true }
-    } else {
-      return { valid: false, reason: "Organization not valid" };
+    try {
+      const organization = await clerkClient.organizations.getOrganization({
+        organizationId: args.organizationId,
+      });
+      if (organization) {
+        return { valid: true };
+      }
+      return { valid: false, reason: "Organisasjonen finnes ikke" };
+    } catch (err: unknown) {
+      const status = (err as { status?: number })?.status;
+      if (status === 404) {
+        return { valid: false, reason: "Organisasjonen finnes ikke" };
+      }
+      console.error("[organizations:validate] Clerk error:", err);
+      return { valid: false, reason: "Kunne ikke verifisere organisasjonen" };
     }
   },
 });

@@ -18,6 +18,7 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   const orgId = process.env.NEXT_PUBLIC_WIDGET_ORG_ID;
+  const agentId = process.env.NEXT_PUBLIC_WIDGET_AGENT_ID;
   return (
     <>
       <LandingPageView />
@@ -25,7 +26,7 @@ export default function HomePage() {
         <Script
           src="/widget.iife.js"
           data-organization-id={orgId}
-          data-agent-id="j57c6whw940s0jyg62kmdbph5n869gmz"
+          {...(agentId ? { "data-agent-id": agentId } : {})}
           strategy="afterInteractive"
         />
       )}
