@@ -1,28 +1,29 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import { Geist, Geist_Mono, Space_Grotesk } from "next/font/google"
+import { Geist, Geist_Mono, Space_Grotesk } from "next/font/google";
 
 import "@workspace/ui/globals.css";
 import "@clerk/ui/themes/shadcn.css";
 import "@/styles/tokens.css";
-import { Providers } from "@/components/providers"
+import { Providers } from "@/components/providers";
 import { Toaster } from "@workspace/ui/components/sonner";
+import { ClerkProvider } from "@clerk/nextjs";
 
 const fontSans = Geist({
   subsets: ["latin"],
   variable: "--font-sans",
-})
+});
 
 const fontMono = Geist_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
-})
+});
 
 const fontDisplay = Space_Grotesk({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-display",
-})
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://agenci.no"),
@@ -87,7 +88,7 @@ const jsonLdWebSite = {
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode
+  children: React.ReactNode;
 }>) {
   return (
     <html lang="no" suppressHydrationWarning data-scroll-behavior="smooth">
@@ -101,7 +102,9 @@ export default function RootLayout({
         <Script
           id="json-ld-organization"
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdOrganization) }}
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(jsonLdOrganization),
+          }}
         />
         <Script
           id="json-ld-website"
@@ -110,5 +113,5 @@ export default function RootLayout({
         />
       </body>
     </html>
-  )
+  );
 }
