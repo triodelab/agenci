@@ -192,3 +192,26 @@ html {
     perspective: 2000px;
   }
 }
+
+/* Clerk auth component overrides — make card transparent on cream auth background */
+.cl-rootBox {
+  width: 100% !important;
+}
+.cl-card {
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  padding: 0 !important;
+}
+.cl-cardBox {
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+.cl-footer,
+.cl-footerAction {
+  background-color: transparent !important;
+}
+.cl-internal-b3fm6y {
+  background-color: transparent !important;
+}
