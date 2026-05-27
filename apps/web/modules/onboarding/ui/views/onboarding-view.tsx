@@ -763,6 +763,20 @@ export const OnboardingView = () => {
   const done = (s: StepId) =>
     setCompleted((prev) => new Set([...prev, s]));
 
+  // If org is active in Clerk but Convex JWT still lacks orgId after 3s, do one hard reload.
+  // This refreshes the Clerk-issued JWT which caches stale claims after org creation.
+  useEffect(() => {
+    if (!organization || agents !== null) return;
+    const params = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
+    if (params.get("_r")) return; // already reloaded once — don't loop
+    const timer = setTimeout(() => {
+      const url = new URL(window.location.href);
+      url.searchParams.set("_r", "1");
+      window.location.replace(url.toString());
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [organization, agents]);
+
   // agents === null means Convex JWT doesn't have orgId yet (race condition after org creation)
   // Wait until both Clerk org and Convex JWT are in sync before showing the form
   if (agents == null || !organization) {
