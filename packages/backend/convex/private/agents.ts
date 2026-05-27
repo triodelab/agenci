@@ -114,12 +114,14 @@ export const create = mutation({
     description: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
     const orgId = await getOrgIdOrNull(ctx);
     if (!orgId) {
+      const claims = identity ? JSON.stringify(identity) : "no identity";
+      console.error("[agents:create] orgId missing. JWT claims:", claims);
       throw new ConvexError({
         code: "BAD_REQUEST",
-        message:
-          "Ingen organisasjon funnet i sesjonen. Logg ut og inn igjen, eller kontakt support hvis problemet vedvarer.",
+        message: `Ingen organisasjon i sesjonen. JWT claims: ${claims}`,
       });
     }
 

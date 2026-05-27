@@ -174,15 +174,9 @@ function Step1({
       });
       return agentId;
     } catch (err: unknown) {
-      const msg = err instanceof Error
-        ? err.message
-        : typeof err === "object" && err && "message" in err
-          ? String((err as { message: unknown }).message)
-          : "";
-      // JWT may not have been refreshed yet after org creation — retry once
-      const isOrgError = msg.toLowerCase().includes("organisasjon") || msg.toLowerCase().includes("organization");
-      if (isOrgError && attempt < 2) {
-        await new Promise((r) => setTimeout(r, 1500));
+      if (attempt < 3) {
+        // JWT refresh race condition after org creation — always retry with increasing delay
+        await new Promise((r) => setTimeout(r, 1000 * (attempt + 1)));
         return attemptCreate(nameVal, descVal, attempt + 1);
       }
       throw err;
