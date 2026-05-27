@@ -276,7 +276,10 @@ export function KnowledgeTrainingPlayground({
     api.private.dashboard.getAgentOverview,
     agentId ? { agentId } : "skip",
   );
-  const widgetSettings = useQuery(api.private.widgetSettings.getOne, {});
+  const widgetSettings = useQuery(
+    api.private.widgetSettings.getOne,
+    agentId !== undefined ? { agentId } : {},
+  );
   const saveSystemPromptMutation = useMutation(
     api.private.widgetSettings.saveSystemPrompt,
   );
@@ -338,7 +341,7 @@ export function KnowledgeTrainingPlayground({
   const handleSavePrompt = useCallback(async () => {
     setIsSavingPrompt(true);
     try {
-      await saveSystemPromptMutation({ systemPrompt: instructions });
+      await saveSystemPromptMutation({ systemPrompt: instructions, ...(agentId !== undefined ? { agentId } : {}) });
       toast.success("Instruksjoner lagret — gjelder for nye samtaler.");
     } catch (e) {
       const msg =
@@ -357,7 +360,7 @@ export function KnowledgeTrainingPlayground({
     setInstructions("");
     setIsSavingPrompt(true);
     try {
-      await saveSystemPromptMutation({ systemPrompt: "" });
+      await saveSystemPromptMutation({ systemPrompt: "", ...(agentId !== undefined ? { agentId } : {}) });
       toast.success("Instruksjoner tilbakestilt til standard.");
     } catch {
       toast.error("Kunne ikke tilbakestille.");

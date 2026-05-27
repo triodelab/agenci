@@ -3,77 +3,82 @@
 import { motion, useReducedMotion } from "motion/react";
 import { LANDING_SECTION_IDS } from "@/modules/landing/constants";
 
-const features = [
+const STEPS = [
   {
     n: "01",
-    title: "Svar på sekunder, ikke timer",
-    body: "Besøkende spør — assistenten svarer umiddelbart. Pris, leveringstid, returpolicy, åpningstider. Ingen ventetid, ingen tapte kunder.",
+    title: "Last opp din kunnskap",
+    body: "Koble nettsiden din, last opp PDF-er, FAQ og retningslinjer. Agenci indekserer innholdet automatisk — ingen manuell konfigurasjon.",
   },
   {
     n: "02",
-    title: "Dine svar, ikke generelle fraser",
-    body: "Last opp det du allerede har — FAQ, produktbeskrivelser, retningslinjer. Assistenten svarer bare ut fra dette. Ingen hallusinasjoner.",
+    title: "AI-agenten lærer seg bedriften din",
+    body: "Agenten svarer kun basert på det du har lastet opp. Ingen generelle fraser, ingen hallusinasjoner. Presist og pålitelig.",
   },
   {
     n: "03",
-    title: "Et menneske når det trengs",
-    body: "Se alle samtaler live i dashboardet. Ta over når som helst. Kunden slipper å forklare alt på nytt — historikken er der.",
+    title: "Lim inn én linje — du er live",
+    body: "Kopier én kodelinje inn på siden. Chat-widgeten er aktiv. Besøkende får svar umiddelbart, 24/7, uten at du trenger å være tilgjengelig.",
   },
 ] as const;
 
 export function LandingWorkflowSection() {
   const reduceMotion = useReducedMotion();
+  const ease = [0.22, 1, 0.36, 1] as const;
 
   return (
     <section
       id={LANDING_SECTION_IDS.workflow}
       data-landing-nav-surface="dark"
-      className="bg-[#010102]"
+      className="border-t border-[#2a2a2a] bg-[#161616]"
       aria-labelledby="workflow-heading"
     >
-      <div className="mx-auto max-w-[1200px] px-6 py-20 md:py-28 xl:px-8">
+      <div className="mx-auto max-w-[1200px] px-6 py-24 md:py-32 xl:px-8">
 
-        {/* Large split statement — Linear style: bright + muted in one headline */}
+        {/* Heading */}
         <motion.div
           initial={reduceMotion ? false : { opacity: 0, y: 16 }}
           whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.6, ease }}
         >
+          <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-[#6b7280]">
+            Slik fungerer det
+          </p>
           <h2
             id="workflow-heading"
-            className="max-w-5xl text-[2rem] font-semibold leading-[1.06] tracking-[-0.055em] sm:text-[2.6rem] md:text-[3.2rem] lg:text-[3.8rem]"
+            className="max-w-2xl text-[2rem] font-bold leading-[1.07] tracking-[-0.038em] text-[#f2f3f5] sm:text-[2.6rem] md:text-[3.2rem]"
           >
-            <span className="text-[#f7f8f8]">Ikke en generisk chatbot.{" "}</span>
-            <span className="text-[#8a8f98]">En assistent som faktisk kan bedriften din.</span>
+            Kom i gang på 5 minutter.{" "}
+            <span className="text-[#6b7280]">Ingen utvikler nødvendig.</span>
           </h2>
         </motion.div>
 
-        {/* Horizontal rule */}
-        <div className="mt-16 h-px w-full bg-[#23252a] md:mt-20" />
-
-        {/* Feature list — no cards, just text columns like Linear */}
-        <div className="mt-14 grid gap-10 sm:grid-cols-3 md:mt-16 md:gap-14">
-          {features.map((f, i) => (
+        {/* Steps */}
+        <div className="mt-16 md:mt-20">
+          {STEPS.map((step, i) => (
             <motion.div
-              key={f.n}
-              initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+              key={step.n}
+              initial={reduceMotion ? false : { opacity: 0, y: 14 }}
               whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-40px" }}
-              transition={{ duration: 0.5, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
+              viewport={{ once: true, margin: "-30px" }}
+              transition={{ duration: 0.5, delay: i * 0.08, ease }}
+              className="flex items-start gap-8 border-t border-[#2a2a2a] py-10 first:border-t-0 md:gap-16"
             >
-              <p className="mb-5 text-[13px] font-medium text-[#5e6ad2]">
-                {f.n}
-              </p>
-              <h3 className="text-[15px] font-semibold leading-snug tracking-[-0.02em] text-[#f7f8f8]">
-                {f.title}
-              </h3>
-              <p className="mt-3 text-[14px] leading-[1.7] text-[#d0d6e0]">
-                {f.body}
-              </p>
+              <span className="w-10 shrink-0 pt-1 text-[13px] font-semibold tabular-nums text-[#3d4149]">
+                {step.n}
+              </span>
+              <div className="grid flex-1 gap-4 sm:grid-cols-[1fr_1.4fr] sm:gap-10 sm:items-start">
+                <h3 className="text-[1.15rem] font-semibold leading-snug tracking-[-0.022em] text-[#f2f3f5] sm:text-[1.25rem]">
+                  {step.title}
+                </h3>
+                <p className="text-[15px] leading-[1.75] text-[#6b7280]">
+                  {step.body}
+                </p>
+              </div>
             </motion.div>
           ))}
         </div>
+
       </div>
     </section>
   );

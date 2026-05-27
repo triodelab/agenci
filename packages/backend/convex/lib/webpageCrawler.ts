@@ -49,39 +49,93 @@ export function clampWebsiteSyncIntervalMinutes(
   return normalized;
 }
 
+const BROWSER_HEADERS = {
+  Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+  "Accept-Language": "nb-NO,nb;q=0.9,no;q=0.8,en-US;q=0.7,en;q=0.6",
+  "User-Agent":
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+  "Cache-Control": "no-cache",
+  "Pragma": "no-cache",
+};
+
+async function doFetch(url: string): Promise<Response> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 25_000);
+  try {
+    return await fetch(url, {
+      redirect: "follow",
+      signal: controller.signal,
+      headers: BROWSER_HEADERS,
+    });
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
+// Fallback via Jina Reader — bypasses Cloudflare/bot-protection on most sites.
+// Returns plain-text/markdown content wrapped in a fake HTML response shape.
+async function fetchViaJina(url: string): Promise<{ normalizedUrl: string; html: string }> {
+  const jinaUrl = `https://r.jina.ai/${url}`;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 30_000);
+  let response: Response;
+  try {
+    response = await fetch(jinaUrl, {
+      redirect: "follow",
+      signal: controller.signal,
+      headers: {
+        Accept: "text/html",
+        "X-Return-Format": "html",
+        "X-With-Links-Summary": "true",
+      },
+    });
+  } finally {
+    clearTimeout(timeoutId);
+  }
+  if (!response.ok) {
+    throw new Error(`Jina feilet med HTTP ${response.status}`);
+  }
+  const html = await response.text();
+  if (!html || html.trim().length < 20) {
+    throw new Error("Jina returnerte tomt innhold");
+  }
+  return { normalizedUrl: url, html };
+}
+
+
 export async function fetchWebpageHtml(
   url: string,
 ): Promise<{ normalizedUrl: string; html: string }> {
   const publicUrl = assertPublicHttpUrl(url);
   const requestedUrl = publicUrl.toString();
+  const withoutWww = requestedUrl.replace(/^(https?:\/\/)www\./i, "$1");
+  const hasWww = withoutWww !== requestedUrl;
 
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 25_000);
+  let response: Response | null = null;
+  let lastError = "";
 
-  let response: Response;
-  try {
-    response = await fetch(requestedUrl, {
-      redirect: "follow",
-      signal: controller.signal,
-      headers: {
-        Accept:
-          "text/html,application/xhtml+xml,application/xml;q=0.9,text/plain;q=0.8,*/*;q=0.5",
-        "User-Agent": "AgenciKnowledgeBot/1.0",
-      },
-    });
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e);
-    const isRedirectLoop =
-      msg.toLowerCase().includes("too many redirects") ||
-      msg.toLowerCase().includes("redirect");
-    throw new ConvexError({
-      code: "BAD_REQUEST",
-      message: isRedirectLoop
-        ? "Nettsiden har for mange omdirigeringer og kan ikke hentes. Prøv en mer direkte URL (f.eks. uten www, eller bruk https:// direkte), eller last opp innholdet som en fil i stedet."
-        : `Kunne ikke hente siden: ${msg}`,
-    });
-  } finally {
-    clearTimeout(timeoutId);
+  // Try original URL first, then non-www fallback if URL has www
+  const urlsToTry = hasWww ? [requestedUrl, withoutWww] : [requestedUrl];
+
+  for (const candidate of urlsToTry) {
+    try {
+      response = await doFetch(candidate);
+      break;
+    } catch (e) {
+      lastError = e instanceof Error ? e.message : String(e);
+    }
+  }
+
+  if (!response) {
+    // Direct fetch failed for all URL variants — try Jina Reader as proxy fallback.
+    try {
+      return await fetchViaJina(requestedUrl);
+    } catch {
+      throw new ConvexError({
+        code: "BAD_REQUEST",
+        message: `Kunne ikke hente siden. Nettsiden kan ha bot-beskyttelse som blokkerer henting. Prøv å laste opp innholdet som PDF i stedet.`,
+      });
+    }
   }
 
   if (!response.ok) {

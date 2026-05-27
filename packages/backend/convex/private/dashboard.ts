@@ -113,19 +113,25 @@ export const getNotifications = query({
     if (!orgId) return { conversations: [], tips: [] };
 
     // ── Conversation notifications ──────────────────────────────────────────
-    const [escalated, unresolved, allAgents, anyConv, subscription] = await Promise.all([
+    const [escalated, unresolved, pendingBookings, allAgents, anyConv, subscription] = await Promise.all([
       ctx.db
         .query("conversations")
         .withIndex("by_status_and_organization_id", (q) =>
           q.eq("status", "escalated").eq("organizationId", orgId),
         )
         .order("desc")
-        .take(5),
+        .take(8),
       ctx.db
         .query("conversations")
         .withIndex("by_status_and_organization_id", (q) =>
           q.eq("status", "unresolved").eq("organizationId", orgId),
         )
+        .order("desc")
+        .take(8),
+      ctx.db
+        .query("bookings")
+        .withIndex("by_organization_id", (q) => q.eq("organizationId", orgId))
+        .filter((q) => q.eq(q.field("status"), "pending"))
         .order("desc")
         .take(5),
       ctx.db
@@ -143,9 +149,11 @@ export const getNotifications = query({
     ]);
 
     const allConvs = [...escalated, ...unresolved];
-    const conversations = await Promise.all(
+    const hydratedConvs = await Promise.all(
       allConvs.map(async (conv) => {
         const session = await ctx.db.get(conv.contactSessionId);
+        // Filter out anonymous and deleted sessions
+        if (!session || session.email.includes(".local")) return null;
         let agentName: string | null = null;
         if (conv.agentId) {
           const agent = await ctx.db.get(conv.agentId);
@@ -156,8 +164,32 @@ export const getNotifications = query({
           _creationTime: conv._creationTime,
           status: conv.status,
           agentId: conv.agentId ? (conv.agentId as string) : null,
-          contactName: session?.name ?? "Anonym",
-          contactEmail: session?.email ?? null,
+          contactName: session.name,
+          contactEmail: session.email,
+          agentName,
+        };
+      }),
+    );
+    const conversations = hydratedConvs.filter(
+      (c): c is NonNullable<typeof c> => c !== null,
+    );
+
+    // Hydrate pending bookings
+    const bookings = await Promise.all(
+      pendingBookings.map(async (b) => {
+        let agentName: string | null = null;
+        if (b.agentId) {
+          const agent = await ctx.db.get(b.agentId);
+          agentName = agent?.name ?? null;
+        }
+        return {
+          _id: b._id as string,
+          createdAt: b.createdAt,
+          customerName: b.customerName,
+          serviceName: b.serviceName,
+          dateString: b.dateString,
+          timeString: b.timeString,
+          agentId: b.agentId ? (b.agentId as string) : null,
           agentName,
         };
       }),
@@ -222,6 +254,7 @@ export const getNotifications = query({
       conversations: conversations
         .sort((a, b) => b._creationTime - a._creationTime)
         .slice(0, 8),
+      bookings,
       tips,
     };
   },

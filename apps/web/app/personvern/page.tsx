@@ -6,7 +6,7 @@ import { MarketingSubpageCta } from "@/modules/landing/ui/components/marketing-s
 import { LANDING_CONTACT_PAGE_PATH } from "@/modules/landing/constants";
 
 const accentLink =
-  "text-[#5e6ad2] underline-offset-2 decoration-[#5e6ad2]/30 hover:text-[#828fff] hover:underline transition-colors";
+  "text-[#9ca3af] underline-offset-2 decoration-[#9ca3af]/30 hover:text-[#f2f3f5] hover:underline transition-colors";
 
 const updated = new Date("2026-03-27");
 
@@ -20,6 +20,8 @@ export const metadata: Metadata = {
   title: "Personvernerklæring",
   description:
     "Hvordan Agenci samler inn, bruker og beskytter personopplysninger i tråd med GDPR og personopplysningsloven.",
+  alternates: { canonical: "/personvern" },
+  robots: { index: true, follow: true },
 };
 
 const toc = [
@@ -40,21 +42,21 @@ const toc = [
 export default function PersonvernPage() {
   return (
     <MarketingPageLayout>
-      <div className="bg-[#010102]">
+      <div className="bg-[#1C1C1C]">
         <div className="mx-auto max-w-[720px] px-6 py-20 md:py-24 xl:px-8">
 
           {/* Header */}
-          <header className="border-b border-[#23252a] pb-10">
-            <p className="text-[13px] font-medium uppercase tracking-[0.4px] text-[#62666d]">
+          <header className="border-b border-[#2a2a2a] pb-10">
+            <p className="text-[13px] font-medium uppercase tracking-[0.4px] text-[#4b5563]">
               Juridisk
             </p>
-            <h1 className="mt-5 text-[40px] font-semibold leading-[1.15] tracking-[-1px] text-[#f7f8f8]">
+            <h1 className="mt-5 text-[40px] font-semibold leading-[1.15] tracking-[-1px] text-[#f2f3f5]">
               Personvernerklæring
             </h1>
-            <p className="mt-4 text-[15px] leading-[1.5] text-[#d0d6e0]">
+            <p className="mt-4 text-[15px] leading-[1.5] text-[#9ca3af]">
               Gjelder bruk av nettside og tjenester levert av Agenci.
             </p>
-            <dl className="mt-6 flex flex-wrap gap-x-8 gap-y-2 text-[13px] text-[#62666d]">
+            <dl className="mt-6 flex flex-wrap gap-x-8 gap-y-2 text-[13px] text-[#4b5563]">
               <div>
                 <dt className="sr-only">Sist oppdatert</dt>
                 <dd>
@@ -76,12 +78,12 @@ export default function PersonvernPage() {
           {/* TOC */}
           <nav
             aria-label="Innhold i personvernerklæringen"
-            className="my-10 rounded-[12px] border border-[#23252a] bg-[#0f1011] p-6"
+            className="my-10 rounded-[12px] border border-[#2a2a2a] bg-[#161616] p-6"
           >
-            <p className="text-[12px] font-medium uppercase tracking-[0.4px] text-[#62666d]">
+            <p className="text-[12px] font-medium uppercase tracking-[0.4px] text-[#4b5563]">
               Innhold
             </p>
-            <ol className="mt-4 list-decimal space-y-2 pl-5 text-[14px] leading-[1.5] text-[#d0d6e0] marker:font-medium marker:text-[#5e6ad2]">
+            <ol className="mt-4 list-decimal space-y-2 pl-5 text-[14px] leading-[1.5] text-[#9ca3af] marker:font-medium marker:text-[#6b7280]">
               {toc.map((item) => (
                 <li key={item.id}>
                   <a
@@ -113,7 +115,7 @@ export default function PersonvernPage() {
 
             <LegalSection id="behandlingsansvarlig" title="2. Behandlingsansvarlig">
               <p>
-                <strong className="font-medium text-[#d0d6e0]">{COMPANY_LEGAL_LINE}</strong> er
+                <strong className="font-medium text-[#9ca3af]">{COMPANY_LEGAL_LINE}</strong> er
                 behandlingsansvarlig for personopplysninger som behandles i forbindelse med vår
                 markedsføring, kundekontakt og leveranse av tjenesten Agenci, med mindre annet følger av
                 avtale med din arbeidsgiver eller organisasjon.
@@ -331,20 +333,20 @@ function LegalSection({
 }) {
   return (
     <section id={id} className="scroll-mt-24">
-      <h2 className="text-[18px] font-semibold leading-[1.25] tracking-[-0.4px] text-[#f7f8f8]">
+      <h2 className="text-[18px] font-semibold leading-[1.25] tracking-[-0.4px] text-[#f2f3f5]">
         {title}
       </h2>
-      <div className="mt-4 space-y-4 text-[15px] leading-[1.65] text-[#d0d6e0]">{children}</div>
+      <div className="mt-4 space-y-4 text-[15px] leading-[1.65] text-[#9ca3af]">{children}</div>
     </section>
   );
 }
 
 function ListItem({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <li className="flex items-start gap-3 text-[14px] leading-[1.6] text-[#d0d6e0]">
-      <span aria-hidden className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#5e6ad2]" />
+    <li className="flex items-start gap-3 text-[14px] leading-[1.6] text-[#9ca3af]">
+      <span aria-hidden className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#6b7280]" />
       <span>
-        <span className="font-medium text-[#d0d6e0]">{label}:</span> {children}
+        <span className="font-medium text-[#9ca3af]">{label}:</span> {children}
       </span>
     </li>
   );

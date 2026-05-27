@@ -2,12 +2,14 @@ import { ConvexError, v } from "convex/values";
 import { action, query } from "../_generated/server";
 import { components, internal } from "../_generated/api";
 import { supportAgent } from "../system/ai/agents/supportAgent";
+import { SUPPORT_AGENT_PROMPT } from "../system/ai/constants";
 import { paginationOptsValidator } from "convex/server";
 import { hasActiveSubscriptionAccess } from "../lib/subscriptionAccess";
 import { escalateConversation } from "../system/ai/tools/escalateConversation";
 import { resolveConversation } from "../system/ai/tools/resolveConversation";
 import { saveMessage } from "@convex-dev/agent";
 import { search } from "../system/ai/tools/search";
+import { checkAvailability, createBooking } from "../system/ai/tools/booking";
 
 export const create = action({
   args: {
@@ -83,7 +85,7 @@ export const create = action({
         hour12: false,
       });
       const timeContext = `Nåværende tidspunkt i Norge: ${osloTime}. Bruk dette til å si "Ha en fin dag!", "Ha en fin kveld!" eller "Ha en fin natt!" avhengig av tidspunkt (dag = 06–17, kveld = 17–23, natt = 23–06).`;
-      const systemWithTime = [timeContext, widgetSettings?.systemPrompt]
+      const systemWithTime = [SUPPORT_AGENT_PROMPT, timeContext, widgetSettings?.systemPrompt]
         .filter(Boolean)
         .join("\n\n");
 
@@ -93,10 +95,13 @@ export const create = action({
         {
           prompt: args.prompt,
           system: systemWithTime,
+          maxSteps: 10,
           tools: {
             escalateConversationTool: escalateConversation,
             resolveConversationTool: resolveConversation,
             searchTool: search,
+            checkAvailabilityTool: checkAvailability,
+            createBookingTool: createBooking,
           },
         },
       )

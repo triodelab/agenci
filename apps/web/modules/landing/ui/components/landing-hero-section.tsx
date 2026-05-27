@@ -1,189 +1,219 @@
 "use client";
 
+import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { ChevronRight } from "lucide-react";
-import { useReducedMotion } from "motion/react";
-import { Button } from "@workspace/ui/components/button";
+import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import { AuthAwareLink } from "@/components/auth-aware-link";
 import {
   LANDING_AUTH_PATHS,
   LANDING_NAV_TONE_BOUNDARY_ID,
-  LANDING_SECTION_IDS,
   landingSectionHref,
 } from "@/modules/landing/constants";
-import { cn } from "@workspace/ui/lib/utils";
 
-const HERO_ROTATE_MS = 2400;
+const HEADLINE = ["En chatbot", "som kjenner", "bedriften din —", "og svarer for deg, hele døgnet."];
 
-const HERO_DASHBOARD_SLIDES = [
-  { src: "/screenshot1.png", label: "Innsikt: volum, trender og status" },
-  { src: "/screenshot2.png", label: "Samtaler: kø, historikk og overtagelse" },
-  { src: "/screenshot3.png", label: "Oppsett: widget, utseende og snarveier" },
-] as const;
-
-function HeroDashboardRotator({
-  className,
-  sizes,
-}: {
-  className: string;
-  sizes: string;
-}) {
-  const [index, setIndex] = useState(0);
-  const reduceMotion = useReducedMotion();
-
-  useEffect(() => {
-    if (reduceMotion) return;
-    const id = window.setInterval(() => {
-      setIndex((i) => (i + 1) % HERO_DASHBOARD_SLIDES.length);
-    }, HERO_ROTATE_MS);
-    return () => window.clearInterval(id);
-  }, [reduceMotion]);
-
-  return (
-    <div
-      className={cn("relative", className)}
-      role="region"
-      aria-roledescription="karusell"
-      aria-label="Dashboard-forhåndsvisning"
-    >
-      {HERO_DASHBOARD_SLIDES.map((slide, i) => (
-        <Image
-          key={slide.src}
-          src={slide.src}
-          alt=""
-          fill
-          sizes={sizes}
-          priority={i === 0}
-          loading={i === 0 ? undefined : "lazy"}
-          aria-hidden={i !== index}
-          className={cn(
-            "object-cover object-top transition-opacity duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)]",
-            i === index ? "z-[1] opacity-100" : "z-0 opacity-0",
-          )}
-        />
-      ))}
-
-      {/* Edge fades — must match the surface-1 panel bg (#0f1011) */}
-      <div aria-hidden className="pointer-events-none absolute inset-y-0 left-0 z-[2] w-[10%] bg-gradient-to-r from-[#0f1011] to-transparent" />
-      <div aria-hidden className="pointer-events-none absolute inset-y-0 right-0 z-[2] w-[10%] bg-gradient-to-l from-[#0f1011] to-transparent" />
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-1/4 bg-gradient-to-t from-[#0f1011] to-transparent" />
-
-      {/* Slide dots */}
-      <div
-        className="pointer-events-auto absolute bottom-3 left-1/2 z-[5] flex -translate-x-1/2 gap-1.5"
-        role="tablist"
-        aria-label="Velg forhåndsvisning"
-      >
-        {HERO_DASHBOARD_SLIDES.map((slide, i) => (
-          <button
-            key={slide.src}
-            type="button"
-            role="tab"
-            aria-selected={i === index}
-            aria-label={slide.label}
-            tabIndex={i === index ? 0 : -1}
-            className={cn(
-              "h-[3px] rounded-full transition-[width,opacity] duration-500",
-              i === index ? "w-5 bg-[#f7f8f8]/70" : "w-[3px] bg-[#f7f8f8]/20 hover:bg-[#f7f8f8]/35",
-            )}
-            onClick={() => setIndex(i)}
-          />
-        ))}
-      </div>
-    </div>
-  );
-}
+const HERO_IMAGES = [
+  { src: "/Produktet/chatwidget.png", alt: "Chat-widget", label: "Chat-widget", position: "[object-position:center_30%]" },
+  { src: "/Produktet/oppsett.png", alt: "Oppsett", label: "Oppsett", position: "object-top" },
+  { src: "/Produktet/kunnskap.png", alt: "Kunnskapsbase", label: "Kunnskapsbase", position: "object-top" },
+  { src: "/Produktet/tilpassning.png", alt: "Tilpasning", label: "Tilpasning", position: "object-top" },
+  { src: "/Produktet/integregring.png", alt: "Integrasjoner", label: "Integrasjoner", position: "object-top" },
+];
 
 export function LandingHeroSection() {
+  const reduceMotion = useReducedMotion();
+  const ease = [0.22, 1, 0.36, 1] as const;
+  const [activeImage, setActiveImage] = useState(0);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const startInterval = useCallback(() => {
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    if (reduceMotion) return;
+    intervalRef.current = setInterval(() => {
+      setActiveImage((i) => (i + 1) % HERO_IMAGES.length);
+    }, 4500);
+  }, [reduceMotion]);
+
+  useEffect(() => {
+    startInterval();
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [startInterval]);
+
+  const handleTabClick = (i: number) => {
+    setActiveImage(i);
+    startInterval();
+  };
+
   return (
     <section
-      className="relative overflow-hidden bg-[#010102] pt-[4.25rem]"
+      className="relative overflow-hidden bg-[#1C1C1C] pt-[4.25rem]"
       aria-labelledby="landing-hero-heading"
       id={LANDING_NAV_TONE_BOUNDARY_ID}
       data-landing-nav-surface="dark"
     >
-      {/* ── Hero text ── */}
-      <div className="mx-auto max-w-[1200px] px-6 pt-16 md:pt-24 lg:pt-28 xl:px-8">
+      {/* Orthogonal grid */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          backgroundImage: [
+            "repeating-linear-gradient(0deg, rgba(255,255,255,0.020) 0px, rgba(255,255,255,0.020) 1px, transparent 1px, transparent 72px)",
+            "repeating-linear-gradient(90deg, rgba(255,255,255,0.020) 0px, rgba(255,255,255,0.020) 1px, transparent 1px, transparent 72px)",
+          ].join(", "),
+        }}
+      />
 
-        {/*
-          display-xl spec: 80px · weight 600 · line-height 1.05 · letter-spacing -3px
-          -3px at 80px = -0.0375em. Scale down on smaller viewports toward display-md (40px).
-        */}
+      {/* Subtle top vignette */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(ellipse 60% 35% at 50% 0%, rgba(255,255,255,0.04), transparent)",
+        }}
+      />
+
+      <div className="relative mx-auto max-w-[1200px] px-6 xl:px-8">
+        {/* Badge */}
+        <motion.div
+          initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease }}
+          className="pt-16 md:pt-22"
+        >
+          <div className="mb-8 inline-flex items-center gap-2.5 rounded-full border border-white/[0.08] bg-white/[0.04] px-4 py-1.5">
+            <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-white/60" />
+            <span className="text-[12px] font-medium tracking-[0.01em] text-white/48">
+              AI-chat for norske nettsider
+            </span>
+          </div>
+        </motion.div>
+
+        {/* Headline — words stagger in */}
         <h1
           id="landing-hero-heading"
-          className="max-w-4xl text-[2.5rem] font-semibold leading-[1.05] tracking-[-0.038em] text-[#f7f8f8] sm:text-[3.5rem] md:text-[5rem] lg:text-[5.5rem]"
+          className="mb-7"
+          aria-label="En chatbot som kjenner bedriften din — og svarer for deg, hele døgnet."
         >
-          Svarer på kundens spørsmål. Bare fra ditt innhold.
+          {HEADLINE.map((word, i) => (
+            <motion.span
+              key={word}
+              initial={reduceMotion ? false : { opacity: 0, y: 36 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                duration: 0.72,
+                delay: 0.08 + i * 0.10,
+                ease,
+              }}
+              className="mr-[0.22em] inline-block text-[3rem] font-bold leading-[1.04] tracking-[-0.044em] text-white sm:text-[4rem] md:text-[5rem] lg:text-[5.8rem]"
+            >
+              {word}
+            </motion.span>
+          ))}
         </h1>
 
-        {/*
-          Subtext: body-lg spec (18px · weight 400 · -0.1px tracking · #d0d6e0 ink-muted).
-          Announcement link right-side — matches Linear's "Issue tracking is dead →" pattern.
-        */}
-        <div className="mt-7">
-          <p className="max-w-lg text-[18px] leading-[1.5] tracking-[-0.01em] text-[#d0d6e0]">
-            Last opp FAQ, priser eller retningslinjer — Agenci svarer besøkende på nettsiden din, 24/7, med din tone. Ingen gjetning, ingen feil svar.
-          </p>
-        </div>
+        {/* Subtitle */}
+        <motion.p
+          initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.65, delay: 0.45, ease }}
+          className="mb-9 max-w-[450px] text-[17px] leading-[1.62] tracking-[-0.01em] text-[#6B6B6B]"
+        >
+          Kunder som ikke får svar, bytter til konkurrenten. Agenci svarer på spørsmålene dine automatisk — presist, med din kunnskap, hele døgnet.
+        </motion.p>
 
-        {/*
-          CTAs — button-inverse (white) as primary, button-tertiary as ghost.
-          rounded-[8px] = Linear rounded.md. Never rounded-full on CTAs.
-          padding: 8px 14px per spec.
-        */}
-        <div className="mt-8 flex items-center gap-2.5">
-          <Button
-            className="h-9 rounded-[8px] bg-[#f7f8f8] px-[14px] text-[14px] font-medium text-[#010102] transition-colors hover:bg-white"
-            asChild
+        {/* CTAs */}
+        <motion.div
+          initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.53, ease }}
+          className="mb-14 flex flex-wrap items-center gap-3"
+        >
+          <AuthAwareLink
+            href={LANDING_AUTH_PATHS.signUp}
+            loggedInHref={LANDING_AUTH_PATHS.marketingLoggedInCta}
+            className="inline-flex h-11 items-center justify-center rounded-full bg-white px-7 text-[14px] font-semibold text-[#1C1C1C] transition-all hover:bg-white/90 active:scale-[0.98]"
           >
-            <AuthAwareLink
-              href={LANDING_AUTH_PATHS.signUp}
-              loggedInHref={LANDING_AUTH_PATHS.marketingLoggedInCta}
-            >
-              Kom i gang gratis
-            </AuthAwareLink>
-          </Button>
-          <Button
-            variant="ghost"
-            className="h-9 rounded-[8px] px-[14px] text-[14px] font-medium text-[#8a8f98] hover:bg-[#0f1011] hover:text-[#f7f8f8]"
-            asChild
+            Start gratis
+          </AuthAwareLink>
+          <Link
+            href={landingSectionHref("contact")}
+            className="inline-flex h-11 items-center justify-center rounded-full border border-white/[0.10] px-7 text-[14px] font-medium text-white/52 transition-all hover:border-white/[0.20] hover:text-white/78"
           >
-            <Link href={landingSectionHref("contact")}>Book en demo</Link>
-          </Button>
-        </div>
+            Book en demo
+          </Link>
+        </motion.div>
+
       </div>
 
-      {/*
-        ── Screenshot panel ──
-        product-screenshot-card spec: surface-1 bg · rounded-xl (16px) · hairline border.
-        Linear resists drop shadows on dark — no heavy shadows.
-        NO atmospheric gradients per DESIGN.md "Don't" rules.
-      */}
-      <div className="mx-auto mt-14 max-w-[1200px] px-4 md:mt-20 xl:px-8">
-        <div className="overflow-hidden rounded-[16px] border border-[#23252a] bg-[#0f1011]">
-          {/* Minimal window chrome */}
-          <div className="flex h-9 items-center gap-1.5 border-b border-[#23252a] px-4">
-            <span className="size-2 rounded-full bg-[#34343a]" />
-            <span className="size-2 rounded-full bg-[#34343a]" />
-            <span className="size-2 rounded-full bg-[#34343a]" />
+      {/* Product screenshot */}
+      <motion.div
+        initial={reduceMotion ? false : { opacity: 0, y: 28 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.64, ease }}
+        className="relative mx-auto max-w-[1200px]"
+      >
+        <div className="overflow-hidden border border-b-0 border-white/[0.07] bg-[#111]">
+          <div className="flex h-[30px] shrink-0 items-center gap-[6px] border-b border-white/[0.07] px-4">
+            <span className="size-[7px] rounded-full bg-white/[0.10]" />
+            <span className="size-[7px] rounded-full bg-white/[0.10]" />
+            <span className="size-[7px] rounded-full bg-white/[0.10]" />
           </div>
-          <HeroDashboardRotator
-            className="h-[min(48vh,420px)] w-full sm:h-[min(52vh,460px)] md:h-[min(56vh,520px)] lg:h-[min(62vh,600px)]"
-            sizes="(max-width: 960px) 96vw, 1200px"
-          />
+          <div className="flex items-center gap-0 overflow-x-auto border-b border-white/[0.07]">
+            {HERO_IMAGES.map((img, i) => (
+              <button
+                key={img.label}
+                onClick={() => handleTabClick(i)}
+                className={`relative shrink-0 px-4 py-2 text-[11px] font-medium tracking-[0.01em] transition-colors ${
+                  i === activeImage
+                    ? "text-white/80"
+                    : "text-white/25 hover:text-white/50"
+                }`}
+              >
+                {img.label}
+                {i === activeImage && (
+                  <motion.span
+                    layoutId="hero-tab-indicator"
+                    className="absolute inset-x-0 bottom-0 h-[1px] bg-white/40"
+                  />
+                )}
+              </button>
+            ))}
+          </div>
+          <div className="relative h-[min(50vh,520px)] w-full overflow-hidden">
+            <AnimatePresence mode="wait">
+              {HERO_IMAGES.map((img, i) =>
+                i === activeImage ? (
+                  <motion.div
+                    key={img.src}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.7, ease: "easeInOut" }}
+                    className="absolute inset-0"
+                  >
+                    <Image
+                      src={img.src}
+                      alt={img.alt}
+                      fill
+                      sizes="(max-width: 1200px) 100vw, 1200px"
+                      className={`object-cover ${img.position}`}
+                      priority={i === 0}
+                    />
+                  </motion.div>
+                ) : null
+              )}
+            </AnimatePresence>
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-[#F9F9F9] to-transparent"
+            />
+          </div>
         </div>
-      </div>
-
-      {/* Lead text below screenshot */}
-      <div className="mx-auto max-w-[1200px] px-6 pb-20 pt-12 md:pb-28 xl:px-8">
-        <p className="max-w-2xl text-[16px] leading-[1.75] text-[#d0d6e0]">
-          Du svarer sannsynligvis de samme spørsmålene hver eneste dag. Åpningstider, priser,
-          leveringstid, returpolicy. Agenci gjør det for deg — på nettsiden, hele døgnet — med
-          svarene du selv har skrevet.
-        </p>
-      </div>
+      </motion.div>
     </section>
   );
 }

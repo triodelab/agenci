@@ -1,6 +1,9 @@
+import type { Metadata } from "next";
 import { ProPlanGate } from "@/modules/billing/ui/components/pro-plan-gate";
 import { FilesView } from "@/modules/files/ui/views/files-view";
 import { Id } from "@workspace/backend/_generated/dataModel";
+
+export const metadata: Metadata = { title: "Kunnskapsbase" };
 
 const Page = async ({
   params,

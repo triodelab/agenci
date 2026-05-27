@@ -114,19 +114,9 @@ export function HvordanDetVirkerView() {
 function HeroSection({ reduceMotion }: { reduceMotion: boolean }) {
   return (
     <section
-      className="relative overflow-hidden bg-[#010102]"
+      className="relative overflow-hidden bg-[#1C1C1C]"
       aria-labelledby="how-hero-heading"
     >
-      {/* Radial glow behind image */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(ellipse 80% 40% at 50% 110%, rgba(94,106,210,0.18), transparent 70%)",
-        }}
-      />
-
       <div className="relative mx-auto max-w-[1200px] px-6 pb-0 pt-24 text-center md:pt-32 xl:px-8">
         {/* Kicker */}
         <motion.div
@@ -135,23 +125,23 @@ function HeroSection({ reduceMotion }: { reduceMotion: boolean }) {
           transition={{ duration: 0.5, ease }}
           className="mb-7 inline-flex items-center gap-2"
         >
-          <span className="size-1.5 rounded-full bg-[#5e6ad2]" />
-          <span className="font-mono text-[11px] font-medium tracking-[0.18em] text-[#5e6ad2] uppercase">
+          <span className="size-1.5 rounded-full bg-[#6b7280]" />
+          <span className="font-mono text-[11px] font-medium tracking-[0.18em] text-[#6b7280] uppercase">
             Slik fungerer det
           </span>
         </motion.div>
 
-        {/* Headline — editorial split */}
+        {/* Headline */}
         <motion.h1
           id="how-hero-heading"
           initial={reduceMotion ? false : { opacity: 0, y: 22 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.75, delay: 0.07, ease }}
-          className="mx-auto max-w-4xl text-[2.8rem] font-semibold leading-[1.06] tracking-[-0.055em] text-[#f7f8f8] sm:text-[3.6rem] md:text-[4.5rem]"
+          className="mx-auto max-w-4xl text-[2.8rem] font-semibold leading-[1.06] tracking-[-0.055em] text-[#f2f3f5] sm:text-[3.6rem] md:text-[4.5rem]"
         >
           Fra widget på nettsiden
           <br />
-          <span className="text-[#8a8f98]">til full kontroll i dashboardet.</span>
+          <span className="text-[#6b7280]">til full kontroll i dashboardet.</span>
         </motion.h1>
 
         {/* Subtext */}
@@ -159,7 +149,7 @@ function HeroSection({ reduceMotion }: { reduceMotion: boolean }) {
           initial={reduceMotion ? false : { opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.65, delay: 0.16, ease }}
-          className="mx-auto mt-6 max-w-xl text-[17px] leading-[1.65] text-[#8a8f98]"
+          className="mx-auto mt-6 max-w-xl text-[17px] leading-[1.65] text-[#6b7280]"
         >
           Agenci er bygget som en sammenhengende flyt: kunden møter dere på nettsiden,
           assistenten svarer ut fra deres kunnskap, og teamet styrer i dashboardet.
@@ -177,7 +167,7 @@ function HeroSection({ reduceMotion }: { reduceMotion: boolean }) {
             <a
               key={s.id}
               href={`#${s.id}`}
-              className="rounded-full border border-[#23252a] bg-[#0f1011] px-4 py-1.5 text-[12px] font-medium text-[#8a8f98] transition-all duration-150 hover:border-[#34343a] hover:text-[#f7f8f8]"
+              className="rounded-full border border-[#2a2a2a] bg-[#161616] px-4 py-1.5 text-[12px] font-medium text-[#6b7280] transition-all duration-150 hover:border-[#3a3a3a] hover:text-[#f2f3f5]"
             >
               {s.badge}
             </a>
@@ -191,31 +181,22 @@ function HeroSection({ reduceMotion }: { reduceMotion: boolean }) {
           transition={{ duration: 1, delay: 0.36, ease }}
           className="relative mx-auto mt-16 max-w-5xl"
         >
-          {/* Glow behind frame */}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute -inset-1 -top-8 rounded-[20px]"
-            style={{
-              background:
-                "radial-gradient(ellipse 70% 50% at 50% 0%, rgba(94,106,210,0.22), transparent 65%)",
-            }}
-          />
           {/* Browser chrome */}
-          <div className="relative overflow-hidden rounded-t-[14px] border border-b-0 border-[#2a2b30] shadow-[0_-4px_60px_-12px_rgba(94,106,210,0.25)]">
+          <div className="relative overflow-hidden rounded-t-[14px] border border-b-0 border-[#2a2a2a] shadow-[0_-4px_60px_-12px_rgba(0,0,0,0.5)]">
             {/* Chrome bar */}
-            <div className="flex items-center gap-2 border-b border-[#23252a] bg-[#141516] px-4 py-3">
+            <div className="flex items-center gap-2 border-b border-[#2a2a2a] bg-[#1a1a1a] px-4 py-3">
               <div className="flex items-center gap-1.5">
                 <span className="size-2.5 rounded-full bg-[#ff5f57]" />
                 <span className="size-2.5 rounded-full bg-[#febc2e]" />
                 <span className="size-2.5 rounded-full bg-[#28c840]" />
               </div>
-              <div className="mx-auto flex w-52 items-center justify-center gap-1.5 rounded-md bg-[#1e1f22] py-1.5 px-3">
-                <span className="size-2 rounded-full border border-[#34343a] bg-[#2a2b30]" />
-                <span className="text-[10px] tracking-tight text-[#62666d]">app.agenci.no</span>
+              <div className="mx-auto flex w-52 items-center justify-center gap-1.5 rounded-md bg-[#141414] py-1.5 px-3">
+                <span className="size-2 rounded-full border border-[#333] bg-[#2a2a2a]" />
+                <span className="text-[10px] tracking-tight text-[#4b5563]">app.agenci.no</span>
               </div>
             </div>
             {/* Screenshot */}
-            <div className="relative aspect-[16/9] w-full bg-[#0f1011]">
+            <div className="relative aspect-[16/9] w-full bg-[#161616]">
               <Image
                 src="/screenshot1.png"
                 alt="Agenci dashboard oversikt"
@@ -229,7 +210,7 @@ function HeroSection({ reduceMotion }: { reduceMotion: boolean }) {
                 aria-hidden
                 className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3"
                 style={{
-                  background: "linear-gradient(to bottom, transparent, #0f1011)",
+                  background: "linear-gradient(to bottom, transparent, #161616)",
                 }}
               />
             </div>
@@ -250,9 +231,9 @@ const FLOW_STEPS = [
 
 function FlowSection({ reduceMotion }: { reduceMotion: boolean }) {
   return (
-    <section className="border-y border-[#1a1b1e] bg-[#010102]">
+    <section className="border-y border-[#252525] bg-[#1C1C1C]">
       <div className="mx-auto max-w-[1200px] px-6 xl:px-8">
-        <div className="grid divide-y divide-[#1a1b1e] sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+        <div className="grid divide-y divide-[#252525] sm:grid-cols-3 sm:divide-x sm:divide-y-0">
           {FLOW_STEPS.map((step, i) => (
             <motion.div
               key={step.n}
@@ -262,13 +243,13 @@ function FlowSection({ reduceMotion }: { reduceMotion: boolean }) {
               transition={{ duration: 0.5, delay: i * 0.1, ease }}
               className="flex flex-col gap-2 px-8 py-12"
             >
-              <span className="font-mono text-[11px] font-medium tracking-[0.2em] text-[#5e6ad2]">
+              <span className="font-mono text-[11px] font-medium tracking-[0.2em] text-[#6b7280]">
                 {step.n}
               </span>
-              <p className="mt-1 text-[18px] font-semibold tracking-[-0.025em] text-[#f7f8f8]">
+              <p className="mt-1 text-[18px] font-semibold tracking-[-0.025em] text-[#f2f3f5]">
                 {step.label}
               </p>
-              <p className="text-[13px] leading-relaxed text-[#62666d]">
+              <p className="text-[13px] leading-relaxed text-[#4b5563]">
                 {step.sub}
               </p>
             </motion.div>
@@ -300,31 +281,22 @@ function VisualSection({
       transition={{ duration: 0.75, ease }}
       className="relative"
     >
-      {/* Ambient glow */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -inset-12 rounded-[24px]"
-        style={{
-          background:
-            "radial-gradient(ellipse 70% 60% at 50% 50%, rgba(94,106,210,0.1), transparent 70%)",
-        }}
-      />
       {/* Browser frame */}
-      <div className="relative overflow-hidden rounded-[12px] border border-[#2a2b30] shadow-[0_32px_80px_-24px_rgba(0,0,0,0.7),0_0_0_1px_rgba(255,255,255,0.03)]">
+      <div className="relative overflow-hidden rounded-[12px] border border-[#2a2a2a] shadow-[0_32px_80px_-24px_rgba(0,0,0,0.7),0_0_0_1px_rgba(255,255,255,0.03)]">
         {/* Chrome bar */}
-        <div className="flex items-center gap-2 border-b border-[#23252a] bg-[#141516] px-4 py-2.5">
+        <div className="flex items-center gap-2 border-b border-[#2a2a2a] bg-[#1a1a1a] px-4 py-2.5">
           <div className="flex items-center gap-1.5">
             <span className="size-2 rounded-full bg-[#ff5f57]" />
             <span className="size-2 rounded-full bg-[#febc2e]" />
             <span className="size-2 rounded-full bg-[#28c840]" />
           </div>
-          <div className="mx-auto flex w-40 items-center justify-center gap-1 rounded bg-[#1e1f22] py-1 px-3">
-            <span className="size-1.5 rounded-full border border-[#34343a]" />
-            <span className="text-[9px] text-[#62666d]">app.agenci.no</span>
+          <div className="mx-auto flex w-40 items-center justify-center gap-1 rounded bg-[#141414] py-1 px-3">
+            <span className="size-1.5 rounded-full border border-[#333]" />
+            <span className="text-[9px] text-[#4b5563]">app.agenci.no</span>
           </div>
         </div>
         {/* Screenshot */}
-        <div className="relative aspect-[16/10] w-full bg-[#0f1011]">
+        <div className="relative aspect-[16/10] w-full bg-[#161616]">
           <Image
             src={src}
             alt={alt}
@@ -348,20 +320,20 @@ function VisualSection({
     >
       {/* Step badge */}
       <div className="mb-5 flex items-center gap-2.5">
-        <span className="font-mono text-[11px] font-semibold tracking-[0.2em] text-[#5e6ad2]">
+        <span className="font-mono text-[11px] font-semibold tracking-[0.2em] text-[#6b7280]">
           {step}
         </span>
-        <span className="h-px w-5 bg-[#5e6ad2]/40" />
-        <span className="font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-[#5e6ad2]">
+        <span className="h-px w-5 bg-[#6b7280]/40" />
+        <span className="font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-[#6b7280]">
           {badge}
         </span>
       </div>
 
-      <h2 className="text-[2rem] font-semibold leading-[1.1] tracking-[-0.045em] text-[#f7f8f8] md:text-[2.5rem]">
+      <h2 className="text-[2rem] font-semibold leading-[1.1] tracking-[-0.045em] text-[#f2f3f5] md:text-[2.5rem]">
         {title}
       </h2>
 
-      <p className="mt-5 text-[15px] leading-[1.75] text-[#8a8f98]">{lead}</p>
+      <p className="mt-5 text-[15px] leading-[1.75] text-[#6b7280]">{lead}</p>
 
       <ul className="mt-7 space-y-3.5">
         {bullets.map((b, i) => (
@@ -371,11 +343,11 @@ function VisualSection({
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.4, delay: 0.35 + i * 0.09, ease }}
-            className="flex items-start gap-3 text-[14px] leading-[1.65] text-[#d0d6e0]"
+            className="flex items-start gap-3 text-[14px] leading-[1.65] text-[#9ca3af]"
           >
             <span
               aria-hidden
-              className="mt-[7px] size-1.5 shrink-0 rounded-full bg-[#5e6ad2]"
+              className="mt-[7px] size-1.5 shrink-0 rounded-full bg-[#6b7280]"
             />
             {b}
           </motion.li>
@@ -387,13 +359,13 @@ function VisualSection({
   return (
     <section
       id={id}
-      className="relative scroll-mt-20 overflow-hidden border-t border-[#23252a] bg-[#010102]"
+      className="relative scroll-mt-20 overflow-hidden border-t border-[#2a2a2a] bg-[#1C1C1C]"
     >
       {/* Giant decorative step number */}
       <span
         aria-hidden
         className={cn(
-          "pointer-events-none absolute top-0 select-none font-black leading-[0.9] text-[#0c0d0e]",
+          "pointer-events-none absolute top-0 select-none font-black leading-[0.9] text-[#222222]",
           "text-[22vw] sm:text-[18vw]",
           imageFirst ? "right-0" : "left-0",
         )}
@@ -424,7 +396,7 @@ function VisualSection({
 
 function PracticalSection({ reduceMotion }: { reduceMotion: boolean }) {
   return (
-    <section className="border-t border-[#23252a] bg-[#0f1011]">
+    <section className="border-t border-[#2a2a2a] bg-[#161616]">
       <div className="mx-auto max-w-[1200px] px-6 py-24 md:py-32 xl:px-8">
 
         {/* Header */}
@@ -436,20 +408,20 @@ function PracticalSection({ reduceMotion }: { reduceMotion: boolean }) {
           className="mb-16 max-w-xl"
         >
           <div className="mb-5 inline-flex items-center gap-2">
-            <span className="size-1.5 rounded-full bg-[#5e6ad2]" />
-            <span className="font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-[#5e6ad2]">
+            <span className="size-1.5 rounded-full bg-[#6b7280]" />
+            <span className="font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-[#6b7280]">
               I praksis
             </span>
           </div>
-          <h2 className="text-[2.25rem] font-semibold leading-[1.07] tracking-[-0.05em] text-[#f7f8f8] sm:text-[2.6rem]">
+          <h2 className="text-[2.25rem] font-semibold leading-[1.07] tracking-[-0.05em] text-[#f2f3f5] sm:text-[2.6rem]">
             Tre steg — fra tom side
             <br />
-            <span className="text-[#8a8f98]">til levende assistent.</span>
+            <span className="text-[#6b7280]">til levende assistent.</span>
           </h2>
         </motion.div>
 
-        {/* Step grid — seamless joined cards */}
-        <div className="grid gap-px bg-[#23252a] sm:grid-cols-3">
+        {/* Step grid */}
+        <div className="grid gap-px bg-[#2a2a2a] sm:grid-cols-3">
           {PRACTICAL_STEPS.map((step, i) => (
             <motion.div
               key={step.n}
@@ -457,30 +429,20 @@ function PracticalSection({ reduceMotion }: { reduceMotion: boolean }) {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-30px" }}
               transition={{ duration: 0.45, delay: i * 0.1, ease }}
-              className="group relative flex flex-col bg-[#0f1011] p-8 transition-colors duration-200 hover:bg-[#141516]"
+              className="group relative flex flex-col bg-[#161616] p-8 transition-colors duration-200 hover:bg-[#1a1a1a]"
             >
-              {/* Hover glow */}
-              <div
-                aria-hidden
-                className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-                style={{
-                  background:
-                    "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(94,106,210,0.05), transparent 70%)",
-                }}
-              />
-
-              <p className="relative mb-7 font-mono text-[11px] font-medium tracking-[0.2em] text-[#5e6ad2]">
+              <p className="relative mb-7 font-mono text-[11px] font-medium tracking-[0.2em] text-[#6b7280]">
                 {step.n}
               </p>
 
-              <div className="relative mb-6 flex size-11 items-center justify-center rounded-[10px] bg-[#5e6ad2]/10 text-[#5e6ad2] transition-colors duration-200 group-hover:bg-[#5e6ad2]/15">
+              <div className="relative mb-6 flex size-11 items-center justify-center rounded-[10px] bg-white/[0.06] text-[#9ca3af] transition-colors duration-200 group-hover:bg-white/[0.09]">
                 <step.icon className="size-5" strokeWidth={1.75} />
               </div>
 
-              <h3 className="relative text-[19px] font-semibold leading-snug tracking-[-0.025em] text-[#f7f8f8]">
+              <h3 className="relative text-[19px] font-semibold leading-snug tracking-[-0.025em] text-[#f2f3f5]">
                 {step.title}
               </h3>
-              <p className="relative mt-3 text-[13px] leading-[1.7] text-[#8a8f98]">
+              <p className="relative mt-3 text-[13px] leading-[1.7] text-[#6b7280]">
                 {step.body}
               </p>
             </motion.div>
@@ -496,49 +458,40 @@ function PracticalSection({ reduceMotion }: { reduceMotion: boolean }) {
 
 function CTASection({ reduceMotion }: { reduceMotion: boolean }) {
   return (
-    <section className="border-t border-[#23252a] bg-[#010102]">
+    <section className="border-t border-[#2a2a2a] bg-[#1C1C1C]">
       <div className="mx-auto max-w-[1200px] px-6 py-24 md:py-32 xl:px-8">
         <motion.div
           initial={reduceMotion ? false : { opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-60px" }}
           transition={{ duration: 0.65, ease }}
-          className="relative overflow-hidden rounded-[16px] border border-[#23252a] bg-[#0f1011] px-8 py-16 text-center md:px-16 md:py-24"
+          className="relative overflow-hidden rounded-[16px] border border-[#2a2a2a] bg-[#161616] px-8 py-16 text-center md:px-16 md:py-24"
         >
-          {/* Radial glow from top */}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0"
-            style={{
-              background:
-                "radial-gradient(ellipse 70% 50% at 50% 0%, rgba(94,106,210,0.14), transparent 70%)",
-            }}
-          />
-          {/* Edge hairline glow */}
+          {/* Top hairline highlight */}
           <div
             aria-hidden
             className="pointer-events-none absolute inset-x-0 top-0 h-px"
             style={{
               background:
-                "linear-gradient(to right, transparent, rgba(94,106,210,0.4), transparent)",
+                "linear-gradient(to right, transparent, rgba(255,255,255,0.08), transparent)",
             }}
           />
 
           <div className="relative">
             <div className="mb-5 inline-flex items-center gap-2">
-              <span className="size-1.5 rounded-full bg-[#5e6ad2]" />
-              <span className="font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-[#5e6ad2]">
+              <span className="size-1.5 rounded-full bg-[#6b7280]" />
+              <span className="font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-[#6b7280]">
                 Neste steg
               </span>
             </div>
 
-            <h2 className="mx-auto max-w-2xl text-[2rem] font-semibold leading-[1.1] tracking-[-0.045em] text-[#f7f8f8] sm:text-[2.6rem]">
+            <h2 className="mx-auto max-w-2xl text-[2rem] font-semibold leading-[1.1] tracking-[-0.045em] text-[#f2f3f5] sm:text-[2.6rem]">
               Vil dere se Agenci
               <br />
               på deres egen nettside?
             </h2>
 
-            <p className="mx-auto mt-5 max-w-md text-[15px] leading-[1.7] text-[#8a8f98]">
+            <p className="mx-auto mt-5 max-w-md text-[15px] leading-[1.7] text-[#6b7280]">
               Opprett konto for å teste widget og dashboard, eller send oss en melding — vi hjelper med oppsett og nivå som passer volumet deres.
             </p>
 
@@ -546,14 +499,14 @@ function CTASection({ reduceMotion }: { reduceMotion: boolean }) {
               <AuthAwareLink
                 href={LANDING_AUTH_PATHS.signUp}
                 loggedInHref={LANDING_AUTH_PATHS.marketingLoggedInCta}
-                className="inline-flex h-10 items-center gap-2 rounded-lg bg-[#5e6ad2] px-6 text-[14px] font-medium text-white shadow-[0_4px_24px_-4px_rgba(94,106,210,0.45)] transition-all duration-150 hover:bg-[#6b77dd]"
+                className="inline-flex h-10 items-center gap-2 rounded-lg bg-white px-6 text-[14px] font-semibold text-[#1C1C1C] shadow-[0_4px_24px_-4px_rgba(255,255,255,0.2)] transition-all duration-150 hover:bg-[#f2f3f5]"
               >
                 Kom i gang
                 <ArrowRightIcon className="size-3.5" />
               </AuthAwareLink>
               <Link
                 href={LANDING_CONTACT_PAGE_PATH}
-                className="inline-flex h-10 items-center rounded-lg border border-[#34343a] bg-transparent px-6 text-[14px] font-medium text-[#8a8f98] transition-all duration-150 hover:border-[#5e6ad2]/40 hover:text-[#d0d6e0]"
+                className="inline-flex h-10 items-center rounded-lg border border-[#2a2a2a] bg-transparent px-6 text-[14px] font-medium text-[#6b7280] transition-all duration-150 hover:border-[#3a3a3a] hover:text-[#9ca3af]"
               >
                 Kontaktskjema
               </Link>

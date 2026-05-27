@@ -84,22 +84,8 @@ export function mergeWidgetAppearance(
   return { ...DEFAULT_WIDGET_APPEARANCE_LIGHT, ...partial };
 }
 
-/** Inline styles + CSS variables for the widget root (`<main>`). */
-export function widgetAppearanceToRootStyle(
-  appearance: WidgetAppearance,
-): CSSProperties {
-  const a = appearance;
-  const h = a.height;
+function widgetColorVars(a: WidgetAppearance): CSSProperties {
   return {
-    width: `${a.width}px`,
-    maxWidth: "100%",
-    boxSizing: "border-box",
-    /** Respekter valgt høyde, men krymp på små skjermer så alt forblir synlig. */
-    height: `min(${h}px, calc(100dvh - 1.5rem))`,
-    minHeight: `min(${h}px, calc(100dvh - 1.5rem))`,
-    maxHeight: `min(${h}px, calc(100dvh - 1.5rem))`,
-    borderRadius: `${a.borderRadius}px`,
-    backgroundColor: a.backgroundColor,
     ["--widget-bg" as string]: a.backgroundColor,
     ["--widget-header-bg" as string]: a.headerColor,
     ["--widget-header-text" as string]: a.headerTextColor,
@@ -111,5 +97,39 @@ export function widgetAppearanceToRootStyle(
     ["--widget-input-bg" as string]: a.inputBackgroundColor,
     ["--widget-input-text" as string]: a.inputTextColor,
     ["--widget-input-placeholder" as string]: a.inputPlaceholderColor,
+  };
+}
+
+/** Inline styles + CSS variables for the widget root (`<main>`). */
+export function widgetAppearanceToRootStyle(
+  appearance: WidgetAppearance,
+): CSSProperties {
+  const a = appearance;
+  const h = a.height;
+  return {
+    width: `${a.width}px`,
+    maxWidth: "100%",
+    boxSizing: "border-box",
+    height: `min(${h}px, calc(100dvh - 1.5rem))`,
+    minHeight: `min(${h}px, calc(100dvh - 1.5rem))`,
+    maxHeight: `min(${h}px, calc(100dvh - 1.5rem))`,
+    borderRadius: `${a.borderRadius}px`,
+    backgroundColor: a.backgroundColor,
+    ...widgetColorVars(a),
+  };
+}
+
+/** Full-viewport style for standalone / new-tab mode — no size constraints. */
+export function widgetAppearanceToStandaloneStyle(
+  appearance: WidgetAppearance,
+): CSSProperties {
+  return {
+    width: "100dvw",
+    height: "100dvh",
+    maxWidth: "100%",
+    maxHeight: "100%",
+    backgroundColor: appearance.backgroundColor,
+    borderRadius: 0,
+    ...widgetColorVars(appearance),
   };
 }

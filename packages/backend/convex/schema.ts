@@ -70,6 +70,8 @@ export default defineSchema({
         bubbleButtonSize: v.optional(v.number()),
       }),
     ),
+    bookingEnabled: v.optional(v.boolean()),
+    bookingNotificationEmail: v.optional(v.string()),
   })
     .index("by_organization_id", ["organizationId"])
     .index("by_agent_id", ["agentId"]),
@@ -231,4 +233,59 @@ export default defineSchema({
   })
     .index("by_agent_id", ["agentId"])
     .index("by_organization_id", ["organizationId"]),
+
+  bookingServices: defineTable({
+    organizationId: v.string(),
+    agentId: v.optional(v.id("agents")),
+    name: v.string(),
+    durationMinutes: v.number(),
+    priceNok: v.optional(v.number()),
+    description: v.optional(v.string()),
+    isActive: v.boolean(),
+    createdAt: v.number(),
+  })
+    .index("by_organization_id", ["organizationId"])
+    .index("by_agent_id", ["agentId"]),
+
+  bookingAvailability: defineTable({
+    organizationId: v.string(),
+    agentId: v.optional(v.id("agents")),
+    weekday: v.number(), // 0=Sunday, 1=Monday ... 6=Saturday
+    startMinutes: v.number(), // minutes from midnight e.g. 540=09:00
+    endMinutes: v.number(), // minutes from midnight e.g. 1020=17:00
+    isActive: v.boolean(),
+  })
+    .index("by_organization_id", ["organizationId"])
+    .index("by_agent_id", ["agentId"]),
+
+  bookings: defineTable({
+    organizationId: v.string(),
+    agentId: v.optional(v.id("agents")),
+    contactSessionId: v.optional(v.id("contactSessions")),
+    customerName: v.string(),
+    customerEmail: v.string(),
+    serviceId: v.id("bookingServices"),
+    serviceName: v.string(),
+    serviceDurationMinutes: v.number(),
+    dateString: v.string(), // "YYYY-MM-DD"
+    timeString: v.string(), // "HH:mm"
+    startTime: v.number(), // Unix ms timestamp (approximate)
+    status: v.union(
+      v.literal("pending"),
+      v.literal("confirmed"),
+      v.literal("cancelled"),
+      v.literal("completed"),
+    ),
+    notes: v.optional(v.string()),
+    cancellationToken: v.string(),
+    gdprConsentGiven: v.boolean(),
+    gdprConsentAt: v.number(),
+    deleteAfter: v.number(), // GDPR auto-delete timestamp
+    createdAt: v.number(),
+  })
+    .index("by_organization_id", ["organizationId"])
+    .index("by_agent_id", ["agentId"])
+    .index("by_org_and_date", ["organizationId", "dateString"])
+    .index("by_cancellation_token", ["cancellationToken"])
+    .index("by_delete_after", ["deleteAfter"]),
 });

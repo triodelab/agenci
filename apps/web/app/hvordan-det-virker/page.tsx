@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import { HvordanDetVirkerView } from "@/modules/landing/ui/views/hvordan-det-virker-view";
 
 export const metadata: Metadata = {
-  title: "Slik fungerer det",
+  title: "Slik fungerer Agenci",
   description:
-    "Fra chat på nettsiden til dashboard: se hvordan Agenci samler innsikt, samtaler og oppsett — med skjermbilder fra produktet.",
+    "Steg for steg: last opp kunnskap, tilpass chatassistenten og lim inn én kodelinje på nettsiden. Se hele flyten med skjermbilder.",
+  alternates: { canonical: "/hvordan-det-virker" },
 };
 
 export default function HvordanDetVirkerPage() {

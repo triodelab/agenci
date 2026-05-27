@@ -27,6 +27,18 @@ function guessMimeType(filename: string, bytes: ArrayBuffer): string {
   );
 }
 
+export const generateUploadUrl = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const orgId = await getOrgIdOrNull(ctx);
+    if (!orgId) {
+      throw new ConvexError("No organization in session. Select an organization in Clerk.");
+    }
+    return await ctx.storage.generateUploadUrl();
+  },
+});
+
+
 export const deleteFile = mutation({
   args: { entryId: vEntryId },
   handler: async (ctx, args) => {
@@ -139,6 +151,82 @@ export const addFile = action({
     return { url: await ctx.storage.getUrl(storageId), entryId };
   },
 });
+
+// Preferred upload path: file is already stored via generateUploadUrl + HTTP POST.
+// Only the storageId is passed over the network — no large bytes over WebSocket.
+export const addFileByStorageId = action({
+  args: {
+    storageId: v.id("_storage"),
+    filename: v.string(),
+    mimeType: v.string(),
+    category: v.optional(v.string()),
+    agentId: v.optional(v.id("agents")),
+  },
+  handler: async (ctx, args) => {
+    const orgId = await getOrgIdOrNull(ctx);
+    if (!orgId) {
+      throw new ConvexError("No organization in session. Select an organization in Clerk.");
+    }
+
+    const subscription = await ctx.runQuery(
+      internal.system.subscriptions.getByOrganizationId,
+      { organizationId: orgId },
+    );
+    const userEmail = await getUserEmailOrNull(ctx);
+    if (!hasActiveSubscriptionAccess(orgId, subscription, { userEmail })) {
+      await ctx.storage.delete(args.storageId);
+      throw new ConvexError("Du trenger et aktivt abonnement for å laste opp filer. Gå til Fakturering for å velge en plan.");
+    }
+
+    const { storageId, filename, category } = args;
+    const mimeType = args.mimeType || guessMimeTypeFromExtension(filename) || "application/octet-stream";
+
+    let text: string;
+    try {
+      text = await extractTextContent(ctx, { storageId, filename, mimeType });
+    } catch (e) {
+      await ctx.storage.delete(storageId);
+      const msg = e instanceof Error ? e.message : String(e);
+      throw new ConvexError(`Kunne ikke lese filinnhold: ${msg}`);
+    }
+
+    const namespace = agentNamespace(orgId, args.agentId);
+
+    let entryId: string;
+    let created: boolean;
+    try {
+      ({ entryId, created } = await rag.add(ctx, {
+        namespace,
+        text,
+        key: filename,
+        title: filename,
+        metadata: {
+          storageId,
+          uploadedBy: orgId,
+          filename,
+          category: category ?? null,
+          agentId: args.agentId ?? null,
+        } as EntryMetadata,
+      }));
+    } catch (e) {
+      await ctx.storage.delete(storageId);
+      const msg = e instanceof Error ? e.message : String(e);
+      const isKeyMissing = msg.toLowerCase().includes("api key") || msg.toLowerCase().includes("openai");
+      throw new ConvexError(
+        isKeyMissing
+          ? "Mangler OpenAI API-nøkkel på Convex-deploymenten. Sett OPENAI_API_KEY i Convex-dashboardet."
+          : `Kunne ikke prosessere filen (embedding feilet): ${msg}`,
+      );
+    }
+
+    if (!created) {
+      await ctx.storage.delete(storageId);
+    }
+
+    return { url: await ctx.storage.getUrl(storageId), entryId };
+  },
+});
+
 
 export const addWebpage = action({
   args: {

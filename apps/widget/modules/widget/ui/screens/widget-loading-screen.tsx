@@ -201,20 +201,21 @@ export const WidgetLoadingScreen = ({ organizationId, agentId }: { organizationI
       return;
     }
 
-    // Only show selection screen if VAPI voice/phone options are configured
+    // Show selection screen if VAPI voice/phone options or booking is configured
     const hasVapiOptions = Boolean(
       vapiSecrets &&
         (widgetSettings?.vapiSettings?.assistantId ||
           widgetSettings?.vapiSettings?.phoneNumber),
     );
+    const hasBooking = Boolean(widgetSettings?.bookingEnabled);
 
     if (!playgroundEmbed) {
       if (!savedConversationId) {
-        if (hasVapiOptions) {
+        if (hasVapiOptions || hasBooking) {
           setScreen("selection");
           return;
         }
-        // No VAPI — create a new conversation and go straight to chat
+        // No VAPI and no booking — create a new conversation and go straight to chat
       }
 
       let cancelled = false;

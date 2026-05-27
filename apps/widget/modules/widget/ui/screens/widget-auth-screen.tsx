@@ -23,6 +23,7 @@ import {
   conversationIdAtomFamily,
   organizationIdAtom,
   screenAtom,
+  sessionIsAnonymousAtomFamily,
 } from "../../atoms/widget-atoms";
 
 const formSchema = z.object({
@@ -47,6 +48,9 @@ export const WidgetAuthScreen = () => {
   const setConversationId = useSetAtom(
     conversationIdAtomFamily(organizationId || ""),
   );
+  const setSessionIsAnonymous = useSetAtom(
+    sessionIsAnonymousAtomFamily(organizationId || ""),
+  );
 
   const createConversation = useMutation(api.public.conversations.create);
 
@@ -60,7 +64,7 @@ export const WidgetAuthScreen = () => {
 
   const createContactSession = useMutation(api.public.contactSessions.create);
 
-  const startSession = async (name: string, email: string) => {
+  const startSession = async (name: string, email: string, anonymous = false) => {
     if (!organizationId) return;
 
     const metadata: Doc<"contactSessions">["metadata"] = {
@@ -82,6 +86,7 @@ export const WidgetAuthScreen = () => {
     });
 
     setContactSessionId(contactSessionId);
+    setSessionIsAnonymous(anonymous);
 
     if (playgroundEmbed) {
       const conversationId = await createConversation({
@@ -102,7 +107,7 @@ export const WidgetAuthScreen = () => {
 
   const onSkip = async () => {
     const anonId = Math.random().toString(36).slice(2, 10);
-    await startSession("Anonym", `anon_${anonId}@widget.local`);
+    await startSession("Anonym", `anon_${anonId}@widget.local`, true);
   };
 
   return (

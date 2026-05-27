@@ -1,10 +1,7 @@
-import { openai } from "@ai-sdk/openai";
 import { createTool } from "@convex-dev/agent";
-import { generateText, jsonSchema } from "ai";
+import { jsonSchema } from "ai";
 import { internal } from "../../../_generated/api";
-import { supportAgent } from "../agents/supportAgent";
 import rag from "../rag";
-import { SEARCH_INTERPRETER_PROMPT } from "../constants";
 
 type SearchArgs = {
   query: string;
@@ -27,7 +24,7 @@ export const search = createTool({
   handler: async (ctx, args) => {
     const { query } = args as SearchArgs;
     if (!ctx.threadId) {
-      return "Missing thread ID";
+      return "No results found.";
     }
 
     const conversation = await ctx.runQuery(
@@ -36,12 +33,11 @@ export const search = createTool({
     );
 
     if (!conversation) {
-      return "Conversation not found";
+      return "No results found.";
     }
 
     const orgId = conversation.organizationId;
 
-    // Use per-agent namespace when conversation is linked to an agent
     const namespace = conversation.agentId
       ? `${orgId}:${conversation.agentId}`
       : orgId;
@@ -54,42 +50,22 @@ export const search = createTool({
 
     const trainingBlock: string = await ctx.runQuery(
       internal.private.answerTraining.listRecentForAgent,
-      {
-        organizationId: orgId,
-      },
+      { organizationId: orgId },
     );
 
-    const contextText = `Found results in ${searchResult.entries
+    const sources = searchResult.entries
       .map((e: { title?: string | null }) => e.title || null)
       .filter((t: string | null): t is string => t !== null)
-      .join(", ")}. Here is the context:\n\n${searchResult.text}`;
+      .join(", ");
 
     const trainingSection = trainingBlock
-      ? `\n\nOperatør-godkjente eksempler (bruk tone og formulering når det passer spørsmålet; ved motstrid med søkeresultatene gjelder søkeresultatene for fakta):\n\n${trainingBlock}\n`
+      ? `\n\nOperatør-godkjente eksempler:\n${trainingBlock}`
       : "";
 
-    const response = await generateText({
-      messages: [
-        {
-          role: "system",
-          content: SEARCH_INTERPRETER_PROMPT,
-        },
-        {
-          role: "user",
-          content: `User asked: "${query}"${trainingSection}\n\nSearch results: ${contextText}`,
-        },
-      ],
-      model: openai.chat("gpt-4o-mini"),
-    });
+    if (!searchResult.text || searchResult.text.trim().length === 0) {
+      return "Ingen relevante resultater funnet i kunnskapsbasen.";
+    }
 
-    await supportAgent.saveMessage(ctx, {
-      threadId: ctx.threadId,
-      message: {
-        role: "assistant",
-        content: response.text,
-      },
-    });
-
-    return response.text;
+    return `Kilder: ${sources || "kunnskapsbasen"}\n\n${searchResult.text}${trainingSection}`;
   },
 });

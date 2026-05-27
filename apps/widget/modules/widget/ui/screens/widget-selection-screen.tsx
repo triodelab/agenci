@@ -2,7 +2,7 @@
 
 import { WidgetHeader } from "@/modules/widget/ui/components/widget-header";
 import { useAtomValue, useSetAtom } from "jotai";
-import { ChevronRightIcon, MessageSquareTextIcon, MicIcon, PhoneIcon } from "lucide-react";
+import { CalendarIcon, ChevronRightIcon, MessageSquareTextIcon, MicIcon, PhoneIcon } from "lucide-react";
 import { useWidgetDisplayTitle } from "@/lib/widget-display-title";
 import {
   agentIdAtom,
@@ -12,6 +12,7 @@ import {
   hasVapiSecretsAtom,
   organizationIdAtom,
   screenAtom,
+  sessionIsAnonymousAtomFamily,
   widgetSettingsAtom,
 } from "../../atoms/widget-atoms";
 import { useMutation } from "convex/react";
@@ -33,6 +34,9 @@ export const WidgetSelectionScreen = () => {
   const agentId = useAtomValue(agentIdAtom);
   const contactSessionId = useAtomValue(
     contactSessionIdAtomFamily(organizationId || "")
+  );
+  const sessionIsAnonymous = useAtomValue(
+    sessionIsAnonymousAtomFamily(organizationId || "")
   );
 
   const createConversation = useMutation(api.public.conversations.create);
@@ -112,6 +116,25 @@ export const WidgetSelectionScreen = () => {
           </div>
           <ChevronRightIcon className="size-4 shrink-0 opacity-50" />
         </button>
+        {widgetSettings?.bookingEnabled && !sessionIsAnonymous && (
+          <button
+            type="button"
+            className="flex h-16 w-full items-center justify-between rounded-xl border px-4 text-[14px] font-medium transition-opacity hover:opacity-80 disabled:opacity-40"
+            style={{
+              backgroundColor: "var(--widget-input-bg, #fff)",
+              borderColor: "var(--widget-input-border, #e4e4e7)",
+              color: "var(--widget-input-text, #18181b)",
+            }}
+            onClick={() => setScreen("booking")}
+            disabled={isPending}
+          >
+            <div className="flex items-center gap-x-2.5">
+              <CalendarIcon className="size-4 shrink-0" />
+              <span>Book time</span>
+            </div>
+            <ChevronRightIcon className="size-4 shrink-0 opacity-50" />
+          </button>
+        )}
         {hasVapiSecrets && widgetSettings?.vapiSettings?.assistantId && (
           <button
             type="button"

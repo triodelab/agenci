@@ -1,5 +1,8 @@
+import type { Metadata } from "next";
 import { ConversationIdView } from "@/modules/dashboard/ui/views/conversation-id-view";
 import { Id } from "@workspace/backend/_generated/dataModel";
+
+export const metadata: Metadata = { title: "Samtale" };
 
 const Page = async ({
   params,

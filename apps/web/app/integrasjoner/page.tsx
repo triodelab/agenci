@@ -2,98 +2,94 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { MarketingPageLayout } from "@/modules/landing/ui/components/marketing-page-layout";
 import { MarketingSubpageCta } from "@/modules/landing/ui/components/marketing-subpage-cta";
-import { Button, buttonVariants } from "@workspace/ui/components/button";
-import { cn } from "@workspace/ui/lib/utils";
-import {
-  LANDING_AUTH_PATHS,
-  LANDING_MARKETING_EYEBROW_CLASS,
-  LANDING_MARKETING_FEATURE_CARD_CLASS,
-  LANDING_MARKETING_H1_CLASS,
-  LANDING_MARKETING_ICON_TILE_CLASS,
-  LANDING_MARKETING_LEAD_CLASS,
-  LANDING_MARKETING_OUTLINE_CTA_CLASS,
-  LANDING_MARKETING_PRIMARY_CTA_CLASS,
-  landingSectionHref,
-} from "@/modules/landing/constants";
 import { AuthAwareLink } from "@/components/auth-aware-link";
+import { LANDING_AUTH_PATHS, landingSectionHref } from "@/modules/landing/constants";
 import { Plug, Webhook, Database, ArrowRight } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Integrasjoner",
   description:
-    "Koble Agenci-chatten til nettside, kunnskapskilder og CRM/e-post slik at samtaler og leads havner der teamet jobber.",
+    "Koble Agenci til nettsiden din, kunnskapskilder og teamverktøy. Fungerer med WordPress, Webflow, Framer og de fleste CMS.",
+  alternates: { canonical: "/integrasjoner" },
 };
 
 const items = [
   {
     icon: Plug,
     title: "Widget & nettside",
-    text: "Lim inn script-tag eller bruk anbefalt plassering. Fungerer med de fleste CMS og rammeverk.",
+    text: "Lim inn script-tag eller bruk anbefalt plassering. Fungerer med de fleste CMS og rammeverk — WordPress, Webflow, Framer, egenutviklet.",
   },
   {
     icon: Database,
     title: "Kunnskapskilder",
-    text: "Synkroniser eller lim inn innhold fra FAQ, Notion-lignende kilder og interne guider (etter behov i deres oppsett).",
+    text: "Synkroniser eller lim inn innhold fra FAQ, Notion-lignende kilder og interne guider. AI-en svarer kun på det dere setter inn — ingen gjetting.",
   },
   {
     icon: Webhook,
     title: "Utvidelser i appen",
-    text: "I dashboardet finner dere integrasjoner og tilpasninger som teamet kan aktivere steg for steg.",
+    text: "I dashboardet finner dere integrasjoner og tilpasninger teamet kan aktivere steg for steg — uten bistand fra utvikler.",
   },
 ] as const;
 
 export default function IntegrasjonerMarketingPage() {
   return (
     <MarketingPageLayout>
-      <article className="landing-section-mesh border-b border-border/40">
-        <div className="mx-auto max-w-3xl px-4 py-14 md:py-20 md:px-6">
-          <p className={cn("text-sm", LANDING_MARKETING_EYEBROW_CLASS)}>Integrasjoner</p>
-          <h1 className={cn("mt-3", LANDING_MARKETING_H1_CLASS)}>
+      {/* Hero */}
+      <section className="bg-[#1C1C1C]">
+        <div className="mx-auto max-w-[1200px] px-6 py-20 md:py-24 xl:px-8">
+          <p className="text-[13px] font-medium uppercase tracking-[0.4px] text-[#6b7280]">
+            Integrasjoner
+          </p>
+          <h1 className="mt-5 max-w-2xl text-[40px] font-semibold leading-[1.15] tracking-[-1px] text-[#f2f3f5] sm:text-[44px]">
             La chatten snakke med systemene dere allerede bruker
           </h1>
-          <p className={cn("mt-5", LANDING_MARKETING_LEAD_CLASS)}>
-            Start med widget og kunnskap på nettsiden. Når dere er klare, kobler dere Agenci til CRM,
-            e-post og andre verktøy via integrasjonspanelet i appen — uten at hver samtale blir en manuell
-            copy-paste-jobb.
+          <p className="mt-5 max-w-xl text-[17px] leading-[1.65] text-[#9ca3af]">
+            Start med widget og kunnskap på nettsiden. Når dere er klare, kobler dere Agenci til
+            CRM, e-post og andre verktøy via integrasjonspanelet — uten at hver samtale blir en
+            manuell copy-paste-jobb.
           </p>
           <div className="mt-10 flex flex-wrap gap-3">
             <AuthAwareLink
               href={LANDING_AUTH_PATHS.signIn}
               loggedInHref="/integrations"
-              className={cn(
-                buttonVariants({ size: "lg" }),
-                "inline-flex items-center gap-2 border-0",
-                LANDING_MARKETING_PRIMARY_CTA_CLASS,
-              )}
+              className="inline-flex h-10 items-center gap-2 rounded-lg bg-white px-5 text-[14px] font-semibold text-[#1C1C1C] shadow-[0_4px_24px_-4px_rgba(255,255,255,0.2)] transition-colors hover:bg-[#f2f3f5]"
             >
               Åpne integrasjoner
               <ArrowRight className="size-4" />
             </AuthAwareLink>
-            <Button asChild variant="outline" size="lg" className={LANDING_MARKETING_OUTLINE_CTA_CLASS}>
-              <Link href={landingSectionHref("integrations")}>
-                Se partnerlogoer på forsiden
-              </Link>
-            </Button>
+            <Link
+              href={landingSectionHref("integrations")}
+              className="inline-flex h-10 items-center rounded-lg border border-[#2a2a2a] bg-transparent px-5 text-[14px] font-medium text-[#9ca3af] transition-colors hover:border-[#3a3a3a] hover:text-[#f2f3f5]"
+            >
+              Se partnerlogoer på forsiden
+            </Link>
           </div>
         </div>
-        <div className="mx-auto max-w-3xl space-y-6 px-4 md:px-6">
+      </section>
+
+      {/* Feature cards */}
+      <section className="border-t border-[#2a2a2a] bg-[#1C1C1C]">
+        <div className="mx-auto max-w-[1200px] space-y-4 px-6 py-16 md:py-20 xl:px-8">
           {items.map(({ icon: Icon, title, text }) => (
             <div
               key={title}
-              className={cn("flex items-start gap-4 md:gap-5", LANDING_MARKETING_FEATURE_CARD_CLASS)}
+              className="flex items-start gap-5 rounded-[12px] border border-[#2a2a2a] bg-[#161616] p-6 transition-[border-color] duration-200 hover:border-[#3a3a3a]"
             >
-              <div className={cn(LANDING_MARKETING_ICON_TILE_CLASS, "size-11")}>
+              <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-white/[0.08] text-[#9ca3af]">
                 <Icon className="size-5" strokeWidth={2} />
               </div>
               <div>
-                <h2 className="text-lg font-semibold text-foreground">{title}</h2>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{text}</p>
+                <h2 className="text-[17px] font-semibold tracking-[-0.025em] text-[#f2f3f5]">
+                  {title}
+                </h2>
+                <p className="mt-2 text-[14px] leading-[1.65] text-[#6b7280]">{text}</p>
               </div>
             </div>
           ))}
         </div>
-        <MarketingSubpageCta />
-      </article>
+      </section>
+
+      <MarketingSubpageCta />
     </MarketingPageLayout>
   );
 }

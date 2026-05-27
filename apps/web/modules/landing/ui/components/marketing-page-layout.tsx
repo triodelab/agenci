@@ -13,7 +13,7 @@ export function MarketingPageLayout({
   return (
     <>
       <LandingNav variant="dark" />
-      <div className="min-h-[60vh] bg-black pt-[4.25rem] md:pt-[4.5rem]">
+      <div className="marketing-warp min-h-[60vh] bg-[#1C1C1C] pt-[4.25rem] md:pt-[4.5rem]">
         {children}
       </div>
       <LandingFooter />
