@@ -15,6 +15,7 @@ export async function getOrgIdOrNull(ctx: AuthCtx): Promise<string | null> {
     record.org_id,
     record.organizationId,
     record.organization_id,
+    (record.o as Record<string, unknown> | undefined)?.id,
   ];
   for (const c of candidates) {
     if (typeof c === "string" && c.length > 0) {
