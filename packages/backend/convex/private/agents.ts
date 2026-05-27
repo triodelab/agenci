@@ -118,7 +118,8 @@ export const create = mutation({
     if (!orgId) {
       throw new ConvexError({
         code: "BAD_REQUEST",
-        message: "No organization in session.",
+        message:
+          "Ingen organisasjon funnet i sesjonen. Logg ut og inn igjen, eller kontakt support hvis problemet vedvarer.",
       });
     }
 
