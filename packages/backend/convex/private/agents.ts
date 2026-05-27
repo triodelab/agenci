@@ -23,8 +23,12 @@ function slugifyName(name: string): string {
 export const list = query({
   args: {},
   handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
     const orgId = await getOrgIdOrNull(ctx);
-    if (!orgId) return null;
+    if (!orgId) {
+      console.log("[agents:list] null — identity:", identity ? JSON.stringify(identity) : "NO IDENTITY");
+      return null;
+    }
     const rows = await ctx.db
       .query("agents")
       .withIndex("by_organization_id", (q) => q.eq("organizationId", orgId))
