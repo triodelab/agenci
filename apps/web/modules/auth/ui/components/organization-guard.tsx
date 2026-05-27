@@ -1,13 +1,13 @@
 "use client";
 
 import { useOrganization } from "@clerk/nextjs";
-import { useEffect, useRef, useState, Suspense } from "react";
-import { AuthLayout } from "@/modules/auth/ui/layouts/auth-layout";
-import { OrgSelectionView } from "@/modules/auth/ui/views/org-selection-view";
+import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { DashboardFullSkeleton } from "@/modules/dashboard/ui/components/dashboard-skeleton";
 
 export const OrganizationGuard = ({ children }: { children: React.ReactNode }) => {
   const { organization, isLoaded } = useOrganization();
+  const router = useRouter();
 
   // Brief delay after load to allow the JWT to refresh after org creation
   const [stable, setStable] = useState(false);
@@ -25,18 +25,14 @@ export const OrganizationGuard = ({ children }: { children: React.ReactNode }) =
     };
   }, [isLoaded, organization?.id]);
 
-  if (!isLoaded || !stable) {
-    return <DashboardFullSkeleton />;
-  }
+  useEffect(() => {
+    if (stable && !organization) {
+      router.replace("/org-selection");
+    }
+  }, [stable, organization, router]);
 
-  if (!organization) {
-    return (
-      <AuthLayout>
-        <Suspense>
-          <OrgSelectionView />
-        </Suspense>
-      </AuthLayout>
-    );
+  if (!isLoaded || !stable || (!organization && stable)) {
+    return <DashboardFullSkeleton />;
   }
 
   return <>{children}</>;

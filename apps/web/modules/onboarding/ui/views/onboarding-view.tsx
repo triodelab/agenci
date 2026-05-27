@@ -166,30 +166,13 @@ function Step1({
   const [busy, setBusy]   = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const attemptCreate = async (nameVal: string, descVal: string, attempt = 0): Promise<Id<"agents">> => {
-    try {
-      const { agentId } = await createAgent({
-        name: nameVal,
-        description: descVal || undefined,
-      });
-      return agentId;
-    } catch (err: unknown) {
-      if (attempt < 3) {
-        // JWT refresh race condition after org creation — always retry with increasing delay
-        await new Promise((r) => setTimeout(r, 1000 * (attempt + 1)));
-        return attemptCreate(nameVal, descVal, attempt + 1);
-      }
-      throw err;
-    }
-  };
-
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
     setBusy(true);
     setError(null);
     try {
-      const agentId = await attemptCreate(name.trim(), desc.trim());
+      const { agentId } = await createAgent({ name: name.trim(), description: desc.trim() || undefined });
       onDone(agentId, name.trim());
     } catch (err: unknown) {
       const msg =
@@ -780,7 +763,9 @@ export const OnboardingView = () => {
   const done = (s: StepId) =>
     setCompleted((prev) => new Set([...prev, s]));
 
-  if (agents === undefined || !organization) {
+  // agents === null means Convex JWT doesn't have orgId yet (race condition after org creation)
+  // Wait until both Clerk org and Convex JWT are in sync before showing the form
+  if (agents == null || !organization) {
     return (
       <div className="dashboard-app-shell flex min-h-screen items-center justify-center bg-background">
         <Loader2Icon className="size-5 animate-spin text-muted-foreground" />
