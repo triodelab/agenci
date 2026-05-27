@@ -161,10 +161,33 @@ function Step1({
   onDone: (id: Id<"agents">, name: string) => void;
 }) {
   const createAgent = useMutation(api.private.agents.create);
-  const [name, setName]         = useState("");
-  const [desc, setDesc]         = useState("");
-  const [busy, setBusy]         = useState(false);
-  const [error, setError]       = useState<string | null>(null);
+  const [name, setName]   = useState("");
+  const [desc, setDesc]   = useState("");
+  const [busy, setBusy]   = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const attemptCreate = async (nameVal: string, descVal: string, attempt = 0): Promise<Id<"agents">> => {
+    try {
+      const { agentId } = await createAgent({
+        name: nameVal,
+        description: descVal || undefined,
+      });
+      return agentId;
+    } catch (err: unknown) {
+      const msg = err instanceof Error
+        ? err.message
+        : typeof err === "object" && err && "message" in err
+          ? String((err as { message: unknown }).message)
+          : "";
+      // JWT may not have been refreshed yet after org creation — retry once
+      const isOrgError = msg.toLowerCase().includes("organisasjon") || msg.toLowerCase().includes("organization");
+      if (isOrgError && attempt < 2) {
+        await new Promise((r) => setTimeout(r, 1500));
+        return attemptCreate(nameVal, descVal, attempt + 1);
+      }
+      throw err;
+    }
+  };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -172,10 +195,7 @@ function Step1({
     setBusy(true);
     setError(null);
     try {
-      const { agentId } = await createAgent({
-        name: name.trim(),
-        description: desc.trim() || undefined,
-      });
+      const agentId = await attemptCreate(name.trim(), desc.trim());
       onDone(agentId, name.trim());
     } catch (err: unknown) {
       const msg =
@@ -766,7 +786,7 @@ export const OnboardingView = () => {
   const done = (s: StepId) =>
     setCompleted((prev) => new Set([...prev, s]));
 
-  if (agents === undefined) {
+  if (agents === undefined || !organization) {
     return (
       <div className="dashboard-app-shell flex min-h-screen items-center justify-center bg-background">
         <Loader2Icon className="size-5 animate-spin text-muted-foreground" />
