@@ -85,24 +85,16 @@ export const SignInView = () => {
     setError(null);
 
     try {
-      const attempt = await signIn.create({ identifier: email, password });
+      const attempt = await signIn.create({
+        identifier: email,
+        strategy: "password",
+        password,
+      });
 
       if (attempt.status === "complete") {
         await setActive({ session: attempt.createdSessionId });
         router.push("/agents");
         return;
-      }
-
-      if (attempt.status === "needs_first_factor") {
-        const factorResult = await signIn.attemptFirstFactor({
-          strategy: "password",
-          password,
-        });
-        if (factorResult.status === "complete") {
-          await setActive({ session: factorResult.createdSessionId });
-          router.push("/agents");
-          return;
-        }
       }
 
       setError(`Innlogging mislyktes (${attempt.status}). Prøv igjen.`);
