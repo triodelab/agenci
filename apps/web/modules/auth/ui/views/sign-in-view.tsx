@@ -105,12 +105,6 @@ export const SignInView = () => {
         }
       }
 
-      if (attempt.status === "needs_second_factor" || attempt.status === "needs_client_trust") {
-        await setActive({ session: attempt.createdSessionId });
-        router.push("/agents");
-        return;
-      }
-
       setError(`Innlogging mislyktes (${attempt.status}). Prøv igjen.`);
     } catch (err: unknown) {
       setError(clerkErrMsg(err));
