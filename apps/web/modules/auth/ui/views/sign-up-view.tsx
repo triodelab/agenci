@@ -44,6 +44,7 @@ export const SignUpView = () => {
   const [password, setPassword] = useState("");
   const [code, setCode] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [legalAccepted, setLegalAccepted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [oauthLoading, setOauthLoading] = useState<"google" | "microsoft" | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -70,7 +71,7 @@ export const SignUpView = () => {
     setIsLoading(true);
     setError(null);
     try {
-      await signUp.create({ firstName, lastName, emailAddress: email, password });
+      await signUp.create({ firstName, lastName, emailAddress: email, password, legalAccepted: true });
       await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
       setStep("verify");
     } catch (err: unknown) {
@@ -306,24 +307,33 @@ export const SignUpView = () => {
 
         <button
           type="submit"
-          disabled={busy}
+          disabled={busy || !legalAccepted}
           className="flex h-10 w-full items-center justify-center gap-2 rounded-[8px] bg-[#1C1C1C] text-[14px] font-semibold text-white transition hover:bg-[#2a2a2a] disabled:opacity-50"
         >
           {isLoading && <Loader2Icon className="h-4 w-4 animate-spin" />}
           Opprett konto
         </button>
 
-        <p className="text-center text-[11px] leading-relaxed text-[#4b5563]">
-          Ved å opprette konto godtar du våre{" "}
-          <Link href="/vilkar" className="text-[#4b5563] underline underline-offset-2 hover:text-[#1C1C1C]">
-            vilkår
-          </Link>{" "}
-          og{" "}
-          <Link href="/personvern" className="text-[#4b5563] underline underline-offset-2 hover:text-[#1C1C1C]">
-            personvernerklæring
-          </Link>
-          .
-        </p>
+        <label className="flex items-start gap-2.5 cursor-pointer">
+          <input
+            type="checkbox"
+            required
+            checked={legalAccepted}
+            onChange={(e) => setLegalAccepted(e.target.checked)}
+            disabled={busy}
+            className="mt-0.5 h-4 w-4 shrink-0 rounded border border-[#d4d0cb] accent-[#1C1C1C]"
+          />
+          <span className="text-[12px] leading-relaxed text-[#4b5563]">
+            Jeg godtar{" "}
+            <Link href="/vilkar" className="underline underline-offset-2 hover:text-[#1C1C1C]">
+              vilkårene
+            </Link>{" "}
+            og{" "}
+            <Link href="/personvern" className="underline underline-offset-2 hover:text-[#1C1C1C]">
+              personvernerklæringen
+            </Link>
+          </span>
+        </label>
       </form>
 
       <p className="text-center text-[13px] text-[#6b7280]">
