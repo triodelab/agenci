@@ -3,7 +3,7 @@
 import { useAction, useMutation, useQuery } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
 import { Id } from "@workspace/backend/_generated/dataModel";
-import { useOrganization } from "@clerk/nextjs";
+import { useAuth, useOrganization } from "@clerk/nextjs";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
@@ -763,18 +763,21 @@ export const OnboardingView = () => {
   const done = (s: StepId) =>
     setCompleted((prev) => new Set([...prev, s]));
 
-  // If org is active in Clerk but Convex JWT still lacks orgId after 3s, do one hard reload.
-  // This refreshes the Clerk-issued JWT which caches stale claims after org creation.
+  const { getToken } = useAuth();
+
+  // Org is active in Clerk but Convex JWT lacks orgId (token cached without org).
+  // Force Clerk to refresh the template token (skipCache), then reload once so
+  // ConvexProviderWithClerk picks up the fresh token on re-initialization.
   useEffect(() => {
     if (!organization || agents !== null) return;
     const params = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
-    if (params.get("_r")) return; // already reloaded once — don't loop
-    const timer = setTimeout(() => {
+    if (params.get("_r")) return; // already reloaded — don't loop
+    void getToken({ template: "convex", skipCache: true }).then(() => {
       const url = new URL(window.location.href);
       url.searchParams.set("_r", "1");
       window.location.replace(url.toString());
-    }, 3000);
-    return () => clearTimeout(timer);
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [organization, agents]);
 
   // agents === null means Convex JWT doesn't have orgId yet (race condition after org creation)
