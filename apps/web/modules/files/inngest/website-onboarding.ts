@@ -5,7 +5,8 @@ import { api } from "@workspace/backend/_generated/api";
 
 const MIN_MARKDOWN_CHARS = 40;
 
-export const processWebsiteOnboarding = inngest.createFunction(
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const processWebsiteOnboarding: any = inngest.createFunction(
   {
     id: "process-website-onboarding",
     triggers: { event: "app/website-onboarding.created" },
@@ -33,9 +34,12 @@ export const processWebsiteOnboarding = inngest.createFunction(
 
     const { markdown, branding } = scrapeResult;
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const anyApi = api as any;
+
     if (markdown && markdown.length >= MIN_MARKDOWN_CHARS) {
       await step.run("insert-website-markdown", async () => {
-        await convex.action(api.private.onboarding.insertWebsiteMarkdown, {
+        await convex.action(anyApi.private.onboarding.insertWebsiteMarkdown, {
           markdown,
           websiteUrl: url,
           agentId,
@@ -44,7 +48,7 @@ export const processWebsiteOnboarding = inngest.createFunction(
     }
 
     await step.run("insert-website-branding", async () => {
-      await convex.mutation(api.private.onboarding.insertWebsiteBranding, {
+      await convex.mutation(anyApi.private.onboarding.insertWebsiteBranding, {
         agentId,
         websiteUrl: url,
         ...branding,
