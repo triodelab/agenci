@@ -93,7 +93,7 @@ export const SignUpView = () => {
         await setActive({ session: result.createdSessionId });
         router.push("/org-selection");
       } else {
-        setError("Verifisering mislyktes. Prøv igjen.");
+        setError(`Feil (${result.status}): Prøv igjen.`);
       }
     } catch (err: unknown) {
       const clerkError = err as { errors?: { message?: string }[] };
