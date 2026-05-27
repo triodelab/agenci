@@ -57,6 +57,8 @@ export const SignInView = () => {
   const [loading,      setLoading]      = useState(false);
   const [oauthLoading, setOauthLoading] = useState<"google" | "microsoft" | null>(null);
   const [error,        setError]        = useState<string | null>(null);
+  const [step,         setStep]         = useState<"form" | "mfa">("form");
+  const [mfaCode,      setMfaCode]      = useState("");
 
   useEffect(() => {
     if (userId) router.replace("/agents");
@@ -103,6 +105,17 @@ export const SignInView = () => {
           router.push("/agents");
           return;
         }
+        if (factorResult.status === "needs_second_factor") {
+          await signIn.prepareSecondFactor({ strategy: "email_code" });
+          setStep("mfa");
+          return;
+        }
+      }
+
+      if (attempt.status === "needs_second_factor") {
+        await signIn.prepareSecondFactor({ strategy: "email_code" });
+        setStep("mfa");
+        return;
       }
 
       setError(`Innlogging mislyktes (${attempt.status}). Prøv igjen.`);
@@ -113,7 +126,58 @@ export const SignInView = () => {
     }
   };
 
+  const handleMfa = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isLoaded) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const result = await signIn.attemptSecondFactor({ strategy: "email_code", code: mfaCode });
+      if (result.status === "complete") {
+        await setActive({ session: result.createdSessionId });
+        router.push("/agents");
+      } else {
+        setError("Verifisering mislyktes. Prøv igjen.");
+      }
+    } catch (err: unknown) {
+      setError(clerkErrMsg(err));
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const busy = loading || oauthLoading !== null;
+
+  if (step === "mfa") {
+    return (
+      <div className="space-y-6">
+        <div className="space-y-1">
+          <h2 className="text-[22px] font-semibold tracking-[-0.03em] text-[#1C1C1C]">Bekreft identitet</h2>
+          <p className="text-[14px] text-[#6b7280]">Vi sendte en kode til e-posten din.</p>
+        </div>
+        <form onSubmit={(e) => void handleMfa(e)} className="space-y-4">
+          <input
+            type="text"
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            maxLength={6}
+            required
+            value={mfaCode}
+            onChange={(e) => setMfaCode(e.target.value.replace(/\D/g, ""))}
+            placeholder="123456"
+            disabled={loading}
+            className="w-full rounded-[8px] border border-[#d4d0cb] bg-white px-3.5 py-2.5 text-center text-lg font-semibold tracking-[0.3em] text-[#1C1C1C] outline-none transition focus:border-[#b8b3ae] focus:ring-2 focus:ring-[#1C1C1C]/8 disabled:opacity-50"
+          />
+          {error && <p className="rounded-[8px] border border-red-200 bg-red-50 px-3.5 py-2.5 text-[13px] text-red-600">{error}</p>}
+          <button type="submit" disabled={loading || mfaCode.length < 6} className="flex h-10 w-full items-center justify-center gap-2 rounded-[8px] bg-[#1C1C1C] text-[14px] font-semibold text-white transition hover:bg-[#2a2a2a] disabled:opacity-50">
+            {loading && <Loader2Icon className="h-4 w-4 animate-spin" />}
+            Bekreft
+          </button>
+        </form>
+        <button type="button" onClick={() => setStep("form")} className="w-full text-center text-[13px] text-[#6b7280] hover:text-[#4b5563]">← Gå tilbake</button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-5">
