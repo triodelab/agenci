@@ -2,6 +2,7 @@ import { ConvexError, v } from "convex/values";
 import { internalMutation, mutation, query } from "../_generated/server";
 import { getOrgIdOrNull } from "../lib/auth";
 import { paginationOptsValidator } from "convex/server";
+import { getCanUseBookings } from "../lib/subscriptionAccess";
 
 function requireOrg(orgId: string | null): string {
   if (!orgId) throw new ConvexError("No organization in session.");
@@ -245,6 +246,20 @@ export const updateBookingSettings = mutation({
   },
   handler: async (ctx, args) => {
     const orgId = requireOrg(await getOrgIdOrNull(ctx));
+
+    if (args.bookingEnabled) {
+      const subscription = await ctx.db
+        .query("subscriptions")
+        .withIndex("by_organization_id", (q) => q.eq("organizationId", orgId))
+        .unique();
+      if (!getCanUseBookings(orgId, subscription)) {
+        throw new ConvexError({
+          code: "PLAN_RESTRICTED",
+          message:
+            "Timebestilling krever Starter-plan eller høyere. Oppgrader for å aktivere.",
+        });
+      }
+    }
 
     const existing = args.agentId
       ? await ctx.db

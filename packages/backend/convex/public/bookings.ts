@@ -1,6 +1,7 @@
 import { ConvexError, v } from "convex/values";
 import { mutation, query } from "../_generated/server";
 import { internal } from "../_generated/api";
+import { getCanUseBookings } from "../lib/subscriptionAccess";
 
 // Helper: time string "HH:mm" → minutes from midnight
 function timeToMin(t: string): number {
@@ -229,6 +230,20 @@ export const create = mutation({
     }
     if (!args.gdprConsent) {
       throw new ConvexError({ code: "BAD_REQUEST", message: "Samtykke er påkrevd" });
+    }
+
+    // Verify booking is allowed on current plan
+    const subscription = await ctx.db
+      .query("subscriptions")
+      .withIndex("by_organization_id", (q) =>
+        q.eq("organizationId", args.organizationId),
+      )
+      .unique();
+    if (!getCanUseBookings(args.organizationId, subscription)) {
+      throw new ConvexError({
+        code: "PLAN_RESTRICTED",
+        message: "Timebestilling er ikke tilgjengelig på denne planen.",
+      });
     }
 
     // Validate service

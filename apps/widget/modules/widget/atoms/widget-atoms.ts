@@ -19,7 +19,12 @@ export const conversationIdAtomFamily = atomFamily((organizationId: string) =>
   ),
 );
 
-export const widgetSettingsAtom = atom<Doc<"widgetSettings"> | null>(null);
+export type WidgetSettingsPublic = Doc<"widgetSettings"> & {
+  /** Settes av server: true når plan tillater å skjule «Powered by Agenci». */
+  hideBranding?: boolean;
+};
+
+export const widgetSettingsAtom = atom<WidgetSettingsPublic | null>(null);
 export const vapiSecretsAtom = atom<{
   publicApiKey: string;
 } | null>(null);

@@ -5,11 +5,34 @@ import { supportAgent } from "../system/ai/agents/supportAgent";
 import { MessageDoc, saveMessage } from "@convex-dev/agent";
 import { paginationOptsValidator } from "convex/server";
 import type { Doc, Id } from "../_generated/dataModel";
+import { getMaxConversationsPerMonth } from "../lib/subscriptionAccess";
+import { countConversationsThisMonth } from "../lib/conversationUsage";
+
+async function assertWithinMonthlyConversationLimit(
+  ctx: MutationCtx,
+  organizationId: string,
+): Promise<void> {
+  const subscription = await ctx.db
+    .query("subscriptions")
+    .withIndex("by_organization_id", (q) => q.eq("organizationId", organizationId))
+    .unique();
+  const maxConversations = getMaxConversationsPerMonth(organizationId, subscription);
+  const usage = await countConversationsThisMonth(ctx, organizationId, maxConversations);
+  if (usage.count >= maxConversations) {
+    throw new ConvexError({
+      code: "LIMIT_REACHED",
+      message:
+        "Månedens samtale-grense for denne planen er nådd. Prøv igjen neste måned, eller oppgrader for høyere grense.",
+    });
+  }
+}
 
 async function createNewConversation(
   ctx: MutationCtx,
   args: { organizationId: string; session: Doc<"contactSessions">; agentId?: string },
 ) {
+  await assertWithinMonthlyConversationLimit(ctx, args.organizationId);
+
   const widgetSettings = args.agentId
     ? (await ctx.db
         .query("widgetSettings")

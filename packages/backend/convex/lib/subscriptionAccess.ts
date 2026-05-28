@@ -15,6 +15,14 @@ const PLAN_MAX_AGENTS: Record<string, number> = {
   free: 1,
 };
 
+/** Maks samtaler per kalendermåned per plan. Matcher priser på landingssiden. */
+const PLAN_MAX_CONVERSATIONS_PER_MONTH: Record<string, number> = {
+  business: 10000,
+  pro: 2000,
+  starter: 500,
+  free: 50,
+};
+
 /**
  * Returnerer maks antall agenter for en org basert på plan og dev-bypass.
  * Dev-team og org-bypass får Business-grense (10).
@@ -31,6 +39,81 @@ export function getMaxAgents(
   const isActive = subscription?.status === "active" || subscription?.status === "trialing";
   if (!isActive) return PLAN_MAX_AGENTS.free!;
   return PLAN_MAX_AGENTS[subscription?.planKey ?? "free"] ?? PLAN_MAX_AGENTS.free!;
+}
+
+/**
+ * Returnerer maks samtaler per kalendermåned for en org. Dev-bypass gir Business-grense.
+ */
+export function getMaxConversationsPerMonth(
+  organizationId: string,
+  subscription: { status: string; planKey?: string | null } | null | undefined,
+  options?: { userEmail?: string | null },
+): number {
+  if (isDevSubscriptionBypassEnabled()) return PLAN_MAX_CONVERSATIONS_PER_MONTH.business!;
+  if (isDevOrganizationAllowlisted(organizationId)) return PLAN_MAX_CONVERSATIONS_PER_MONTH.business!;
+  if (isDevTeamEmailAllowlisted(options?.userEmail)) return PLAN_MAX_CONVERSATIONS_PER_MONTH.business!;
+
+  const isActive = subscription?.status === "active" || subscription?.status === "trialing";
+  if (!isActive) return PLAN_MAX_CONVERSATIONS_PER_MONTH.free!;
+  return (
+    PLAN_MAX_CONVERSATIONS_PER_MONTH[subscription?.planKey ?? "free"] ??
+    PLAN_MAX_CONVERSATIONS_PER_MONTH.free!
+  );
+}
+
+/** Returnerer ms-tidsstempel for første dag i inneværende kalendermåned (UTC). */
+export function startOfCurrentMonthUtc(now: number = Date.now()): number {
+  const d = new Date(now);
+  return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1, 0, 0, 0, 0);
+}
+
+/** Hvilke plan-nøkler som har tilgang til timebestilling i chatten. */
+const PLAN_CAN_USE_BOOKINGS: Record<string, boolean> = {
+  business: true,
+  pro: true,
+  starter: true,
+  free: false,
+};
+
+/** Hvilke plan-nøkler som kan skjule «Powered by Agenci» i widgeten. */
+const PLAN_CAN_HIDE_BRANDING: Record<string, boolean> = {
+  business: true,
+  pro: true,
+  starter: false,
+  free: false,
+};
+
+function resolvePlanKey(
+  subscription: { status: string; planKey?: string | null } | null | undefined,
+): string {
+  const isActive =
+    subscription?.status === "active" || subscription?.status === "trialing";
+  if (!isActive) return "free";
+  return subscription?.planKey ?? "free";
+}
+
+/** Kan denne organisasjonen bruke timebestilling? Respekterer dev-bypass. */
+export function getCanUseBookings(
+  organizationId: string,
+  subscription: { status: string; planKey?: string | null } | null | undefined,
+  options?: { userEmail?: string | null },
+): boolean {
+  if (isDevSubscriptionBypassEnabled()) return true;
+  if (isDevOrganizationAllowlisted(organizationId)) return true;
+  if (isDevTeamEmailAllowlisted(options?.userEmail)) return true;
+  return PLAN_CAN_USE_BOOKINGS[resolvePlanKey(subscription)] ?? false;
+}
+
+/** Kan denne organisasjonen skjule «Powered by Agenci»? Respekterer dev-bypass. */
+export function getCanHideBranding(
+  organizationId: string,
+  subscription: { status: string; planKey?: string | null } | null | undefined,
+  options?: { userEmail?: string | null },
+): boolean {
+  if (isDevSubscriptionBypassEnabled()) return true;
+  if (isDevOrganizationAllowlisted(organizationId)) return true;
+  if (isDevTeamEmailAllowlisted(options?.userEmail)) return true;
+  return PLAN_CAN_HIDE_BRANDING[resolvePlanKey(subscription)] ?? false;
 }
 
 function parseEmailList(raw: string | undefined): string[] {

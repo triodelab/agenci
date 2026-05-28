@@ -18,6 +18,7 @@ import { WidgetInboxScreen } from "../screens/widget-inbox-screen";
 import { WidgetVoiceScreen } from "../screens/widget-voice-screen";
 import { WidgetContactScreen } from "../screens/widget-contact-screen";
 import { WidgetBookingScreen } from "../screens/widget-booking-screen";
+import { WidgetBranding } from "../components/widget-branding";
 
 interface Props {
   organizationId: string | null;
@@ -70,7 +71,8 @@ export const WidgetView = ({ organizationId, agentId, standalone = false }: Prop
       className="flex h-full min-h-0 w-full flex-col overflow-hidden"
       style={rootStyle}
     >
-      {screenComponents[screen]}
+      <div className="flex min-h-0 flex-1 flex-col">{screenComponents[screen]}</div>
+      <WidgetBranding />
     </main>
   );
 };

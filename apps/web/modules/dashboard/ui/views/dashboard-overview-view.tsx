@@ -194,6 +194,91 @@ function ConvCardSkeleton() {
   );
 }
 
+// ─── Right panel: Usage ───────────────────────────────────────────────────────
+
+const PLAN_LABEL: Record<string, string> = {
+  free: "Gratis",
+  starter: "Starter",
+  pro: "Pro",
+  business: "Business",
+};
+
+function UsagePanel({
+  overview,
+}: {
+  overview:
+    | {
+        usage: {
+          conversationsThisMonth: number;
+          conversationsLimit: number;
+          conversationsCapped: boolean;
+          planKey: string;
+        };
+      }
+    | null
+    | undefined;
+}) {
+  const usage = overview?.usage;
+  const count = usage?.conversationsThisMonth ?? 0;
+  const limit = usage?.conversationsLimit ?? 0;
+  const planLabel = usage ? (PLAN_LABEL[usage.planKey] ?? usage.planKey) : "—";
+  const pct = limit > 0 ? Math.min(100, Math.round((count / limit) * 100)) : 0;
+  const isOverLimit = usage?.conversationsCapped || count >= limit;
+  const isWarning = pct >= 80 && !isOverLimit;
+
+  return (
+    <div className="flex flex-col overflow-hidden rounded-2xl border border-border/60 bg-card shadow-sm">
+      <div className="flex items-center justify-between border-b border-border/60 px-5 py-4">
+        <div>
+          <h3 className="text-[13px] font-semibold text-foreground">Samtaler denne måneden</h3>
+          <p className="mt-0.5 text-[11px] text-muted-foreground">Plan: {planLabel}</p>
+        </div>
+        <Link
+          href="/billing"
+          className="flex items-center gap-1.5 rounded-xl border border-border/60 px-3 py-1.5 text-[11px] font-semibold text-foreground transition-colors hover:bg-muted/40"
+        >
+          Oppgrader
+        </Link>
+      </div>
+      <div className="px-5 py-4">
+        {usage === undefined ? (
+          <div className="h-9 w-32 animate-pulse rounded-lg bg-muted/40" />
+        ) : (
+          <p className="text-[2rem] font-bold tabular-nums tracking-tight leading-none text-foreground">
+            {count.toLocaleString("nb-NO")}
+            <span className="text-[14px] font-medium text-muted-foreground">
+              {" / "}
+              {limit.toLocaleString("nb-NO")}
+            </span>
+          </p>
+        )}
+        <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-muted/50">
+          <div
+            className={cn(
+              "h-full rounded-full transition-all",
+              isOverLimit
+                ? "bg-red-500"
+                : isWarning
+                  ? "bg-amber-500"
+                  : "bg-emerald-500",
+            )}
+            style={{ width: `${pct}%` }}
+          />
+        </div>
+        {isOverLimit ? (
+          <p className="mt-3 text-[11px] font-medium text-red-600 dark:text-red-400">
+            Grensen er nådd. Nye samtaler blokkeres til neste måned eller du oppgraderer.
+          </p>
+        ) : isWarning ? (
+          <p className="mt-3 text-[11px] font-medium text-amber-600 dark:text-amber-400">
+            Nærmer seg grensen. Vurder oppgradering.
+          </p>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
 // ─── Right panel: Knowledge sources ───────────────────────────────────────────
 
 function KnowledgePanel({
@@ -539,6 +624,7 @@ export function DashboardOverviewView() {
 
           {/* Right panel */}
           <div className="flex flex-col gap-4">
+            <UsagePanel overview={overview} />
             <KnowledgePanel overview={overview} />
             <SetupPanel overview={overview} />
           </div>

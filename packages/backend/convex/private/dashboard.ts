@@ -3,6 +3,8 @@ import { v } from "convex/values";
 import { getOrgIdOrNull } from "../lib/auth";
 import rag from "../system/ai/rag";
 import { Id } from "../_generated/dataModel";
+import { getMaxConversationsPerMonth } from "../lib/subscriptionAccess";
+import { countConversationsThisMonth } from "../lib/conversationUsage";
 
 const CONV_COUNT_CAP = 500;
 
@@ -91,6 +93,20 @@ export const getOverview = query({
       )
       .unique();
 
+    const subscription = await ctx.db
+      .query("subscriptions")
+      .withIndex("by_organization_id", (q) => q.eq("organizationId", orgId))
+      .unique();
+    const monthlyConversationLimit = getMaxConversationsPerMonth(orgId, subscription);
+    const monthlyConversations = await countConversationsThisMonth(
+      ctx,
+      orgId,
+      monthlyConversationLimit,
+    );
+    const isActiveSub =
+      subscription?.status === "active" || subscription?.status === "trialing";
+    const currentPlanKey = isActiveSub ? (subscription?.planKey ?? "free") : "free";
+
     return {
       conversations: { unresolved, escalated, resolved },
       knowledge: {
@@ -101,6 +117,12 @@ export const getOverview = query({
       },
       hasWidgetSettings: Boolean(widgetSettings),
       vapiConnected: Boolean(vapiPlugin),
+      usage: {
+        conversationsThisMonth: monthlyConversations.count,
+        conversationsLimit: monthlyConversationLimit,
+        conversationsCapped: monthlyConversations.capped,
+        planKey: currentPlanKey,
+      },
     };
   },
 });
