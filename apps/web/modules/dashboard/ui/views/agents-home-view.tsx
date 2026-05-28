@@ -134,6 +134,78 @@ function AgentCardSkeleton() {
   );
 }
 
+const PLAN_LABEL: Record<string, string> = {
+  free: "Gratis",
+  starter: "Starter",
+  pro: "Pro",
+  business: "Business",
+};
+
+function UsageBanner() {
+  const overview = useQuery(api.private.dashboard.getOverview, {});
+  const usage = overview?.usage;
+  if (!usage) return null;
+  const count = usage.conversationsThisMonth;
+  const limit = usage.conversationsLimit;
+  const pct = limit > 0 ? Math.min(100, Math.round((count / limit) * 100)) : 0;
+  const planLabel = PLAN_LABEL[usage.planKey] ?? usage.planKey;
+  const isOver = usage.conversationsCapped || count >= limit;
+  const isWarn = pct >= 80 && !isOver;
+
+  return (
+    <div className="mb-6 overflow-hidden rounded-2xl border border-border/60 bg-card">
+      <div className="flex flex-col gap-4 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex-1">
+          <div className="flex items-center gap-2">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+              Samtaler denne måneden
+            </p>
+            <span className="rounded-full border border-border/60 bg-muted/30 px-2 py-0.5 text-[10px] font-medium tracking-[0.08em] text-muted-foreground uppercase">
+              {planLabel}
+            </span>
+          </div>
+          <p className="mt-1.5 text-[22px] font-bold tabular-nums leading-none text-foreground">
+            {count.toLocaleString("nb-NO")}
+            <span className="text-[14px] font-medium text-muted-foreground">
+              {" / "}
+              {limit.toLocaleString("nb-NO")}
+            </span>
+          </p>
+        </div>
+        <Link
+          href="/billing"
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-border/60 px-3.5 py-2 text-[12px] font-semibold text-foreground transition-colors hover:bg-muted/40"
+        >
+          Oppgrader plan
+          <ChevronRightIcon className="size-3.5" />
+        </Link>
+      </div>
+      <div className="h-1.5 w-full overflow-hidden bg-muted/40">
+        <div
+          className={cn(
+            "h-full transition-all",
+            isOver
+              ? "bg-red-500"
+              : isWarn
+                ? "bg-amber-500"
+                : "bg-emerald-500",
+          )}
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+      {isOver ? (
+        <p className="px-5 py-2.5 text-[11.5px] font-medium text-red-600 dark:text-red-400 bg-red-500/5">
+          Grensen er nådd — nye samtaler blokkeres til neste måned eller du oppgraderer.
+        </p>
+      ) : isWarn ? (
+        <p className="px-5 py-2.5 text-[11.5px] font-medium text-amber-600 dark:text-amber-400 bg-amber-500/5">
+          Du nærmer deg grensen for denne måneden.
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
 export function AgentsHomeView() {
   const agents = useQuery(api.private.agents.listWithCounts);
   const createAgent = useMutation(api.private.agents.create);
@@ -183,7 +255,7 @@ export function AgentsHomeView() {
     <DashboardPageShell contentClassName="max-w-4xl">
 
       {/* Header */}
-      <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="space-y-1.5">
           <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
             Organisasjon
@@ -202,6 +274,8 @@ export function AgentsHomeView() {
           </Link>
         </DashboardAccentButton>
       </div>
+
+      <UsageBanner />
 
       {/* Agent grid */}
       {agents === undefined ? (
