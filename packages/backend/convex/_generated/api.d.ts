@@ -12,6 +12,7 @@ import type * as constants from "../constants.js";
 import type * as crons from "../crons.js";
 import type * as http from "../http.js";
 import type * as lib_auth from "../lib/auth.js";
+import type * as lib_conversationUsage from "../lib/conversationUsage.js";
 import type * as lib_extractTextContent from "../lib/extractTextContent.js";
 import type * as lib_firecrawl from "../lib/firecrawl.js";
 import type * as lib_htmlToPlainText from "../lib/htmlToPlainText.js";
@@ -74,6 +75,7 @@ declare const fullApi: ApiFromModules<{
   crons: typeof crons;
   http: typeof http;
   "lib/auth": typeof lib_auth;
+  "lib/conversationUsage": typeof lib_conversationUsage;
   "lib/extractTextContent": typeof lib_extractTextContent;
   "lib/firecrawl": typeof lib_firecrawl;
   "lib/htmlToPlainText": typeof lib_htmlToPlainText;

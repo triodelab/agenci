@@ -94,6 +94,7 @@ function Stat({
 export function AgentOverviewView({ agentId }: { agentId: Id<"agents"> }) {
   const agent        = useQuery(api.private.agents.getOne, { agentId });
   const overview     = useQuery(api.private.dashboard.getAgentOverview, { agentId });
+  const orgOverview  = useQuery(api.private.dashboard.getOverview, {});
   const widgetSettings = useQuery(
     api.public.widgetSettings.getByOrganizationId,
     agent?.organizationId ? { organizationId: agent.organizationId } : "skip",
@@ -406,6 +407,72 @@ export function AgentOverviewView({ agentId }: { agentId: Id<"agents"> }) {
               ))}
             </div>
           </div>
+
+          {/* Org-wide monthly usage */}
+          {(() => {
+            const usage = orgOverview?.usage;
+            if (!usage) return null;
+            const count = usage.conversationsThisMonth;
+            const limit = usage.conversationsLimit;
+            const pct = limit > 0 ? Math.min(100, Math.round((count / limit) * 100)) : 0;
+            const planLabel: Record<string, string> = {
+              free: "Gratis",
+              starter: "Starter",
+              pro: "Pro",
+              business: "Business",
+            };
+            const label = planLabel[usage.planKey] ?? usage.planKey;
+            const isOver = usage.conversationsCapped || count >= limit;
+            const isWarn = pct >= 80 && !isOver;
+            return (
+              <div className="rounded-xl border border-border/60 bg-card px-4 py-4">
+                <div className="mb-2 flex items-center justify-between">
+                  <p className="text-[11px] font-semibold text-muted-foreground">
+                    Samtaler denne måneden
+                  </p>
+                  <span className="text-[10px] font-medium uppercase tracking-[0.1em] text-muted-foreground">
+                    {label}
+                  </span>
+                </div>
+                <p className="text-[18px] font-bold tabular-nums leading-none text-foreground">
+                  {count.toLocaleString("nb-NO")}
+                  <span className="text-[12px] font-medium text-muted-foreground">
+                    {" / "}
+                    {limit.toLocaleString("nb-NO")}
+                  </span>
+                </p>
+                <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-muted/50">
+                  <div
+                    className={cn(
+                      "h-full rounded-full transition-all",
+                      isOver
+                        ? "bg-red-500"
+                        : isWarn
+                          ? "bg-amber-500"
+                          : "bg-emerald-500",
+                    )}
+                    style={{ width: `${pct}%` }}
+                  />
+                </div>
+                {isOver ? (
+                  <p className="mt-2 text-[10.5px] font-medium text-red-600 dark:text-red-400">
+                    Grensen er nådd — nye samtaler blokkeres.
+                  </p>
+                ) : isWarn ? (
+                  <p className="mt-2 text-[10.5px] font-medium text-amber-600 dark:text-amber-400">
+                    Nærmer seg grensen.
+                  </p>
+                ) : null}
+                <Link
+                  href="/billing"
+                  className="mt-3 inline-flex items-center gap-1 text-[11px] font-medium text-muted-foreground hover:text-foreground"
+                >
+                  Oppgrader plan
+                  <ArrowRightIcon className="size-3" />
+                </Link>
+              </div>
+            );
+          })()}
 
           {/* Summary numbers */}
           {totalCount > 0 && (
