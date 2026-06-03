@@ -42,7 +42,23 @@ export function getMaxAgents(
 }
 
 /**
- * Returnerer maks samtaler per kalendermåned for en org. Dev-bypass gir Business-grense.
+ * Returnerer den faktiske plan-grensen for samtaler — IGNORERER dev-bypass.
+ * Brukes til UI-visning slik at brukeren ser den ekte planen sin.
+ */
+export function getPlanConversationLimit(
+  subscription: { status: string; planKey?: string | null } | null | undefined,
+): number {
+  const isActive = subscription?.status === "active" || subscription?.status === "trialing";
+  if (!isActive) return PLAN_MAX_CONVERSATIONS_PER_MONTH.free!;
+  return (
+    PLAN_MAX_CONVERSATIONS_PER_MONTH[subscription?.planKey ?? "free"] ??
+    PLAN_MAX_CONVERSATIONS_PER_MONTH.free!
+  );
+}
+
+/**
+ * Returnerer effektiv maks-grense for håndhevelse — RESPEKTERER dev-bypass.
+ * Brukes ved opprettelse av samtaler for å avgjøre om en bruker skal blokkeres.
  */
 export function getMaxConversationsPerMonth(
   organizationId: string,
@@ -52,13 +68,7 @@ export function getMaxConversationsPerMonth(
   if (isDevSubscriptionBypassEnabled()) return PLAN_MAX_CONVERSATIONS_PER_MONTH.business!;
   if (isDevOrganizationAllowlisted(organizationId)) return PLAN_MAX_CONVERSATIONS_PER_MONTH.business!;
   if (isDevTeamEmailAllowlisted(options?.userEmail)) return PLAN_MAX_CONVERSATIONS_PER_MONTH.business!;
-
-  const isActive = subscription?.status === "active" || subscription?.status === "trialing";
-  if (!isActive) return PLAN_MAX_CONVERSATIONS_PER_MONTH.free!;
-  return (
-    PLAN_MAX_CONVERSATIONS_PER_MONTH[subscription?.planKey ?? "free"] ??
-    PLAN_MAX_CONVERSATIONS_PER_MONTH.free!
-  );
+  return getPlanConversationLimit(subscription);
 }
 
 /** Returnerer ms-tidsstempel for første dag i inneværende kalendermåned (UTC). */
