@@ -281,8 +281,8 @@ export const DashboardSidebar = () => {
       className="!relative !inset-auto !h-full border-r border-sidebar-border bg-sidebar dash-sidebar-scope"
       collapsible="icon"
     >
-      {/* Header: toggle + wordmark — matches TopNav height (60px) */}
-      <SidebarHeader className="border-b border-sidebar-border p-0">
+      {/* Header: toggle + wordmark — matches TopNav height (60px) og bakgrunn */}
+      <SidebarHeader className="border-b border-border/70 bg-background p-0">
         <div className="flex h-[60px] items-center gap-1 px-3">
           <button
             onClick={toggleSidebar}
@@ -295,7 +295,7 @@ export const DashboardSidebar = () => {
             href="/agents"
             className="group-data-[collapsible=icon]:hidden flex items-center"
           >
-            <AgenciNavWordmark surface="dark" />
+            <AgenciNavWordmark surface="light" />
           </Link>
         </div>
       </SidebarHeader>
