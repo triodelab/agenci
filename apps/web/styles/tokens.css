@@ -926,14 +926,9 @@
 }
 
 /*
- * Sidebar: fix fixed inset-y-0 overlapping the 60px top-nav.
- * The shadcn Sidebar uses position:fixed + inset-y-0 (top:0, bottom:0).
- * We push it down and clip it so it sits strictly below the header.
+ * Sidebar starter på y=0 og har sin egen 60px header internt (matcher TopNav-høyde).
+ * TopNav vises kun til høyre for sidebaren, ikke over den.
  */
-.dashboard-app-shell [data-slot="sidebar-container"] {
-  top: 60px !important;
-  height: calc(100svh - 60px) !important;
-}
 
 /*
  * Sidebar nav: aktiv state — shadcn setter data-[active=true]:bg-sidebar-accent
