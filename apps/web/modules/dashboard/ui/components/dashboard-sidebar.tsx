@@ -49,7 +49,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarRail,
   useSidebar,
 } from "@workspace/ui/components/sidebar";
 import {
@@ -281,7 +280,7 @@ export const DashboardSidebar = () => {
 
   return (
     <Sidebar
-      className="!relative !inset-auto !h-full border-r border-sidebar-border bg-sidebar dash-sidebar-scope"
+      className="!relative !inset-auto !h-full bg-sidebar dash-sidebar-scope"
       collapsible="icon"
     >
       {/* Header: toggle + wordmark — matcher TopNav-bakgrunn (bypasser dash-sidebar-scope) */}
@@ -428,7 +427,6 @@ export const DashboardSidebar = () => {
         </div>
       </SidebarFooter>
 
-      <SidebarRail />
     </Sidebar>
   );
 };
