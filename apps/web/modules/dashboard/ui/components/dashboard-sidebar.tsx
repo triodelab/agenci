@@ -285,11 +285,11 @@ export const DashboardSidebar = () => {
       collapsible="icon"
     >
       {/* Header: toggle + wordmark — matcher TopNav-bakgrunn (bypasser dash-sidebar-scope) */}
-      <SidebarHeader className="border-b border-border/70 bg-[#FAFAF9] p-0 dark:bg-[#111110]">
+      <SidebarHeader className="bg-[#FAFAF9] p-0 dark:bg-[#111110]">
         <div className="flex h-[60px] items-center gap-1 px-3">
           <button
             onClick={toggleSidebar}
-            className="flex size-8 shrink-0 items-center justify-center rounded-lg text-[#1C1C1C]/70 transition-colors hover:bg-[#1C1C1C]/10 hover:text-[#1C1C1C] dark:text-white/70 dark:hover:bg-white/10 dark:hover:text-white"
+            className="flex size-8 shrink-0 items-center justify-center rounded-lg text-[#1C1C1C] transition-colors hover:bg-[#1C1C1C]/10 dark:text-white dark:hover:bg-white/10"
             aria-label="Toggle sidebar"
           >
             <PanelLeftIcon className="size-4" strokeWidth={1.75} />
