@@ -5,7 +5,7 @@ import { api } from "@workspace/backend/_generated/api";
 import { Id } from "@workspace/backend/_generated/dataModel";
 import { useAuth, useOrganization } from "@clerk/nextjs";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import {
   BotIcon,
@@ -957,7 +957,7 @@ export const OnboardingView = () => {
 
   const orgId = organization?.id ?? "";
 
-  const reloadPreview = () => setPreviewReloadKey((k) => k + 1);
+  const reloadPreview = useCallback(() => setPreviewReloadKey((k) => k + 1), []);
 
   const goBack = step > 1 && step < 4 ? () => setStep((s) => (s - 1) as StepId) : null;
 
@@ -1038,7 +1038,7 @@ export const OnboardingView = () => {
           orgId={orgId}
           agentId={agentId}
           reloadKey={previewReloadKey}
-          active={agentId !== null}
+          active={step === 3 && agentId !== null}
         />
       </div>
     </div>
