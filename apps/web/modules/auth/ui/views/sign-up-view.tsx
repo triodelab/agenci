@@ -6,7 +6,7 @@ export const SignUpView = () => {
       routing="path"
       path="/sign-up"
       signInUrl="/sign-in"
-      forceRedirectUrl="/org-selection"
+      forceRedirectUrl="/onboarding"
       appearance={{
         variables: {
           colorBackground: "transparent",

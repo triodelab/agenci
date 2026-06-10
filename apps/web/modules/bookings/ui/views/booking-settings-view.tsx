@@ -116,8 +116,14 @@ export const BookingSettingsView = ({ agentId }: BookingSettingsViewProps) => {
         bookingNotificationEmail: widgetSettings?.bookingNotificationEmail || undefined,
       });
       toast.success(enabled ? "Timebestilling aktivert" : "Timebestilling deaktivert");
-    } catch {
-      toast.error("Kunne ikke oppdatere innstillingene");
+    } catch (err) {
+      const msg =
+        err && typeof err === "object"
+          ? ((err as { data?: { message?: string }; message?: string }).data?.message ??
+            (err as { message?: string }).message ??
+            "Kunne ikke oppdatere innstillingene")
+          : "Kunne ikke oppdatere innstillingene";
+      toast.error(msg);
     } finally {
       setSavingSettings(false);
     }

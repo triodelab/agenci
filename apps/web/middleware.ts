@@ -29,7 +29,6 @@ const isOrgFreeRoute = createRouteMatcher([
   "/sign-up(.*)",
   "/sso-callback(.*)",
   "/onboarding(.*)",
-  "/org-selection(.*)",
   "/integrasjoner",
   "/hvordan-det-virker",
   "/personvern",
@@ -58,10 +57,7 @@ export default clerkMiddleware(async (auth, req) => {
   const { userId, orgId } = await auth();
 
   if (userId && !orgId && !isOrgFreeRoute(req)) {
-    const searchParams = new URLSearchParams({ redirectUrl: req.url });
-    return NextResponse.redirect(
-      new URL(`/org-selection?${searchParams.toString()}`, req.url),
-    );
+    return NextResponse.redirect(new URL("/onboarding", req.url));
   }
 });
 

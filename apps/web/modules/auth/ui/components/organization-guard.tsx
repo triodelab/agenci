@@ -27,7 +27,7 @@ export const OrganizationGuard = ({ children }: { children: React.ReactNode }) =
 
   useEffect(() => {
     if (stable && !organization) {
-      router.replace("/org-selection");
+      router.replace("/onboarding");
     }
   }, [stable, organization, router]);
 

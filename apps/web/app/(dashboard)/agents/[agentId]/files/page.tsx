@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { ProPlanGate } from "@/modules/billing/ui/components/pro-plan-gate";
 import { FilesView } from "@/modules/files/ui/views/files-view";
 import { Id } from "@workspace/backend/_generated/dataModel";
 
@@ -12,11 +11,9 @@ const Page = async ({
 }) => {
   const { agentId } = await params;
   return (
-    <ProPlanGate>
-      <div className="flex h-full min-h-0 flex-1 flex-col">
-        <FilesView agentId={agentId as Id<"agents">} />
-      </div>
-    </ProPlanGate>
+    <div className="flex h-full min-h-0 flex-1 flex-col">
+      <FilesView agentId={agentId as Id<"agents">} />
+    </div>
   );
 };
 

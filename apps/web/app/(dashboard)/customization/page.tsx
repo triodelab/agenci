@@ -1,17 +1,14 @@
 import type { Metadata } from "next";
-import { ProPlanGate } from "@/modules/billing/ui/components/pro-plan-gate";
 import { CustomizationView } from "@/modules/customization/ui/views/customization-view";
 
 export const metadata: Metadata = { title: "Tilpasning" };
 
 const Page = () => {
   return (
-    <ProPlanGate>
-      <div className="flex h-full min-h-0 flex-1 flex-col">
-        <CustomizationView />
-      </div>
-    </ProPlanGate>
+    <div className="flex h-full min-h-0 flex-1 flex-col">
+      <CustomizationView />
+    </div>
   );
 };
- 
+
 export default Page;
