@@ -5,7 +5,7 @@ import { api } from "@workspace/backend/_generated/api";
 import { Id } from "@workspace/backend/_generated/dataModel";
 import { useAuth, useOrganization } from "@clerk/nextjs";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import {
   BotIcon,
@@ -26,7 +26,10 @@ import { Input } from "@workspace/ui/components/input";
 import { Textarea } from "@workspace/ui/components/textarea";
 import { Label } from "@workspace/ui/components/label";
 import { AgenciNavWordmark } from "@/components/logo";
-import { getWidgetPreviewUrl } from "@/lib/widget-preview-url";
+import { WidgetChatPreviewCard } from "@/modules/customization/ui/components/widget-appearance-fields";
+import {
+  DEFAULT_WIDGET_APPEARANCE_LIGHT,
+} from "@workspace/ui/lib/widget-appearance";
 
 const EMBED_SRC =
   process.env.NEXT_PUBLIC_WIDGET_EMBED_SCRIPT_URL?.trim() ||
@@ -553,17 +556,23 @@ function Step3({
   agentId,
   agentName,
   initialColor,
+  onPreviewChange,
   onDone,
 }: {
   agentId: Id<"agents">;
   agentName: string;
   initialColor: string;
+  onPreviewChange: (color: string, title: string) => void;
   onDone: () => void;
 }) {
   const upsert = useMutation(api.private.widgetSettings.upsert);
   const [title, setTitle] = useState(agentName);
   const [greeting, setGreeting] = useState("Hei! Hvordan kan jeg hjelpe deg? 😊");
   const [color, setColor] = useState(initialColor);
+
+  useEffect(() => {
+    onPreviewChange(color, title);
+  }, [color, title, onPreviewChange]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -825,25 +834,21 @@ function Step4({
   );
 }
 
-// ─── Live preview ──────────────────────────────────────────────────────────
-function LivePreview({
-  orgId,
-  agentId,
-  reloadKey,
-  active,
+// ─── Static widget preview ────────────────────────────────────────────────
+function OnboardingWidgetPreview({
+  color,
+  title,
 }: {
-  orgId: string;
-  agentId: Id<"agents"> | null;
-  reloadKey: number;
-  active: boolean;
+  color: string;
+  title: string;
 }) {
-  const url = useMemo(() => {
-    if (!orgId) return null;
-    return getWidgetPreviewUrl(orgId, {
-      playground: true,
-      agentId: agentId ?? undefined,
-    });
-  }, [orgId, agentId]);
+  const appearance = {
+    ...DEFAULT_WIDGET_APPEARANCE_LIGHT,
+    headerColor: color,
+    headerTextColor: "#ffffff",
+    bubbleUserColor: color,
+    bubbleButtonColor: color,
+  };
 
   return (
     <div className="hidden h-full min-h-0 flex-col border-l border-border/60 bg-gradient-to-b from-muted/20 to-muted/5 xl:flex">
@@ -856,55 +861,18 @@ function LivePreview({
             Slik ser widgeten ut
           </p>
         </div>
-        <span
-          className={cn(
-            "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide",
-            active
-              ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400"
-              : "bg-muted text-muted-foreground",
-          )}
-        >
-          <span
-            className={cn(
-              "size-1.5 rounded-full",
-              active
-                ? "animate-pulse bg-emerald-500"
-                : "bg-muted-foreground/40",
-            )}
-          />
-          {active ? "Live" : "Venter"}
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-emerald-700 dark:text-emerald-400">
+          <span className="size-1.5 animate-pulse rounded-full bg-emerald-500" />
+          Live
         </span>
       </div>
 
       <div className="flex min-h-0 flex-1 items-center justify-center p-8">
-        {url && active ? (
-          <div className="w-full max-w-[400px] overflow-hidden rounded-3xl border border-border/70 bg-background shadow-[0_20px_60px_-20px_rgba(0,0,0,0.25)]">
-            <iframe
-              key={reloadKey}
-              src={url}
-              title="Widget-forhåndsvisning"
-              allow="clipboard-read; clipboard-write; microphone"
-              className="block h-[min(640px,calc(100dvh-12rem))] w-full border-0 bg-background"
-              referrerPolicy="no-referrer-when-downgrade"
-            />
-          </div>
-        ) : (
-          <div className="flex w-full max-w-[400px] flex-col items-center gap-3 rounded-2xl border-2 border-dashed border-border/70 bg-background/40 px-6 py-20 text-center">
-            <div className="flex size-12 items-center justify-center rounded-2xl border border-border/60 bg-background">
-              <BotIcon
-                className="size-5 text-muted-foreground/60"
-                strokeWidth={1.5}
-              />
-            </div>
-            <p className="text-[14px] font-semibold text-foreground">
-              Klar når du er
-            </p>
-            <p className="text-[12px] leading-relaxed text-muted-foreground">
-              Når agenten er opprettet viser vi widgeten her med dine farger,
-              tittel og velkomstmelding.
-            </p>
-          </div>
-        )}
+        <WidgetChatPreviewCard
+          appearance={appearance}
+          title={title.trim() || "Agenci"}
+          className="w-full max-w-[380px]"
+        />
       </div>
     </div>
   );
@@ -923,8 +891,12 @@ export const OnboardingView = () => {
   const [agentId, setAgentId] = useState<Id<"agents"> | null>(null);
   const [agentName, setAgentName] = useState("");
   const [brandColor, setBrandColor] = useState("#18181b");
-  const [previewReloadKey, setPreviewReloadKey] = useState(0);
-  const reloadPreview = useCallback(() => setPreviewReloadKey((k) => k + 1), []);
+  const [previewColor, setPreviewColor] = useState("#18181b");
+  const [previewTitle, setPreviewTitle] = useState("");
+  const handlePreviewChange = useCallback((color: string, title: string) => {
+    setPreviewColor(color);
+    setPreviewTitle(title);
+  }, []);
 
   useEffect(() => {
     if (isNewIntent || agentId !== null) return;
@@ -999,9 +971,9 @@ export const OnboardingView = () => {
                   onDone={(id, name) => {
                     setAgentId(id);
                     setAgentName(name);
+                    setPreviewTitle(name);
                     done(1);
                     setStep(2);
-                    reloadPreview();
                   }}
                 />
               )}
@@ -1009,10 +981,13 @@ export const OnboardingView = () => {
                 <Step2
                   agentId={agentId}
                   onDone={(color) => {
-                    if (color) setBrandColor(color);
+                    if (color) {
+                      setBrandColor(color);
+                      setPreviewColor(color);
+                    }
+                    setPreviewTitle(agentName);
                     done(2);
                     setStep(3);
-                    reloadPreview();
                   }}
                 />
               )}
@@ -1021,6 +996,7 @@ export const OnboardingView = () => {
                   agentId={agentId}
                   agentName={agentName}
                   initialColor={brandColor}
+                  onPreviewChange={handlePreviewChange}
                   onDone={() => {
                     done(3);
                     setStep(4);
@@ -1041,11 +1017,9 @@ export const OnboardingView = () => {
         </div>
 
         {step === 3 && agentId !== null && (
-          <LivePreview
-            orgId={orgId}
-            agentId={agentId}
-            reloadKey={previewReloadKey}
-            active={true}
+          <OnboardingWidgetPreview
+            color={previewColor}
+            title={previewTitle || agentName}
           />
         )}
       </div>

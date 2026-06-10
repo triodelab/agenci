@@ -136,7 +136,7 @@ function previewDimensions(appearance: WidgetAppearance) {
 }
 
 /** Selve chat-kortet (meldinger som ser ekte ut). */
-function WidgetChatPreviewCard({
+export function WidgetChatPreviewCard({
   appearance,
   title,
   className,
