@@ -549,12 +549,10 @@ function Step3({
   agentId,
   agentName,
   onDone,
-  onChange,
 }: {
   agentId: Id<"agents">;
   agentName: string;
   onDone: () => void;
-  onChange: () => void;
 }) {
   const upsert = useMutation(api.private.widgetSettings.upsert);
   const [title, setTitle] = useState(agentName);
@@ -563,7 +561,7 @@ function Step3({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Auto-save + iframe reload on changes (debounced)
+  // Auto-save on changes (debounced, silent)
   useEffect(() => {
     const t = setTimeout(async () => {
       try {
@@ -579,13 +577,12 @@ function Step3({
           vapiSettings: { assistantId: undefined, phoneNumber: undefined },
           appearance: { headerColor: color, headerTextColor: "#ffffff" },
         });
-        onChange();
       } catch {
         // Silent — submit-knappen viser feilen
       }
     }, 500);
     return () => clearTimeout(t);
-  }, [agentId, agentName, color, greeting, title, upsert, onChange]);
+  }, [agentId, agentName, color, greeting, title, upsert]);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -920,6 +917,7 @@ export const OnboardingView = () => {
   const [agentId, setAgentId] = useState<Id<"agents"> | null>(null);
   const [agentName, setAgentName] = useState("");
   const [previewReloadKey, setPreviewReloadKey] = useState(0);
+  const reloadPreview = useCallback(() => setPreviewReloadKey((k) => k + 1), []);
 
   useEffect(() => {
     if (isNewIntent || agentId !== null) return;
@@ -957,8 +955,6 @@ export const OnboardingView = () => {
 
   const orgId = organization?.id ?? "";
 
-  const reloadPreview = useCallback(() => setPreviewReloadKey((k) => k + 1), []);
-
   const goBack = step > 1 && step < 4 ? () => setStep((s) => (s - 1) as StepId) : null;
 
   return (
@@ -970,7 +966,10 @@ export const OnboardingView = () => {
         onSkip={() => router.push("/agents")}
       />
 
-      <div className="grid min-h-0 flex-1 grid-cols-1 xl:grid-cols-[minmax(0,1fr)_minmax(0,560px)]">
+      <div className={cn(
+          "grid min-h-0 flex-1 grid-cols-1",
+          step === 3 && agentId !== null && "xl:grid-cols-[minmax(0,1fr)_minmax(0,560px)]",
+        )}>
         {/* Form column */}
         <div className="flex min-h-0 flex-col overflow-y-auto">
           {/* Mobile header */}
@@ -1013,11 +1012,9 @@ export const OnboardingView = () => {
                 <Step3
                   agentId={agentId}
                   agentName={agentName}
-                  onChange={reloadPreview}
                   onDone={() => {
                     done(3);
                     setStep(4);
-                    reloadPreview();
                   }}
                 />
               )}
@@ -1034,12 +1031,14 @@ export const OnboardingView = () => {
           </div>
         </div>
 
-        <LivePreview
-          orgId={orgId}
-          agentId={agentId}
-          reloadKey={previewReloadKey}
-          active={step === 3 && agentId !== null}
-        />
+        {step === 3 && agentId !== null && (
+          <LivePreview
+            orgId={orgId}
+            agentId={agentId}
+            reloadKey={previewReloadKey}
+            active={true}
+          />
+        )}
       </div>
     </div>
   );
