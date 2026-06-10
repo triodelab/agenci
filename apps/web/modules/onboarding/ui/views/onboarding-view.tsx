@@ -539,7 +539,7 @@ function Step2({
 
       <button
         type="button"
-        onClick={onDone}
+        onClick={() => onDone()}
         className="block w-full text-center text-[12px] text-muted-foreground/70 transition-colors hover:text-foreground"
       >
         Hopp over — legg til kunnskap senere
