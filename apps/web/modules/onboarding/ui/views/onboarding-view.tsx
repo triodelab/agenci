@@ -334,10 +334,10 @@ function Step2({
   onDone,
 }: {
   agentId: Id<"agents">;
-  onDone: (brandColor?: string) => void;
+  onDone: () => void;
 }) {
   const addWebpage = useAction(api.private.files.addWebpage);
-  const extractThemeColor = useAction(api.private.themeColor.extractThemeColor);
+  const kickoffOnboarding = useMutation(api.lib.workflow.kickoffAgentOnboarding);
   const generateUploadUrl = useMutation(api.private.files.generateUploadUrl);
   const addFileByStorageId = useAction(api.private.files.addFileByStorageId);
 
@@ -364,11 +364,10 @@ function Step2({
     setBusy(true);
     setError(null);
     try {
-      const [, colorResult] = await Promise.all([
-        addWebpage({ url: url.trim(), agentId }),
-        extractThemeColor({ url: url.trim() }).catch(() => ({ color: null })),
-      ]);
-      onDone(colorResult.color ?? undefined);
+      await addWebpage({ url: url.trim(), agentId });
+      // Kick off branding extraction in background — don't block the user
+      void kickoffOnboarding({ url: url.trim(), agentId });
+      onDone();
     } catch (err) {
       handleError(err);
     } finally {
@@ -542,7 +541,7 @@ function Step2({
 
       <button
         type="button"
-        onClick={() => onDone()}
+        onClick={onDone}
         className="block w-full text-center text-[12px] text-muted-foreground/70 transition-colors hover:text-foreground"
       >
         Hopp over — legg til kunnskap senere
@@ -893,6 +892,19 @@ export const OnboardingView = () => {
   const [brandColor, setBrandColor] = useState("#18181b");
   const [previewColor, setPreviewColor] = useState("#18181b");
   const [previewTitle, setPreviewTitle] = useState("");
+
+  const agentBranding = useQuery(
+    api.private.onboarding.getAgentBranding,
+    agentId ? { agentId } : "skip",
+  );
+
+  useEffect(() => {
+    const c = agentBranding?.primaryColor;
+    if (c) {
+      setBrandColor(c);
+      setPreviewColor(c);
+    }
+  }, [agentBranding?.primaryColor]);
   const handlePreviewChange = useCallback((color: string, title: string) => {
     setPreviewColor(color);
     setPreviewTitle(title);
@@ -980,11 +992,7 @@ export const OnboardingView = () => {
               {step === 2 && agentId && (
                 <Step2
                   agentId={agentId}
-                  onDone={(color) => {
-                    if (color) {
-                      setBrandColor(color);
-                      setPreviewColor(color);
-                    }
+                  onDone={() => {
                     setPreviewTitle(agentName);
                     done(2);
                     setStep(3);
