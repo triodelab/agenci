@@ -893,18 +893,18 @@ export const OnboardingView = () => {
   const [previewColor, setPreviewColor] = useState("#18181b");
   const [previewTitle, setPreviewTitle] = useState("");
 
-  const agentBranding = useQuery(
-    api.private.onboarding.getAgentBranding,
+  const widgetSettings = useQuery(
+    api.private.widgetSettings.getOne,
     agentId ? { agentId } : "skip",
   );
 
   useEffect(() => {
-    const c = agentBranding?.primaryColor;
+    const c = widgetSettings?.appearance?.headerColor;
     if (c) {
       setBrandColor(c);
       setPreviewColor(c);
     }
-  }, [agentBranding?.primaryColor]);
+  }, [widgetSettings?.appearance?.headerColor]);
   const handlePreviewChange = useCallback((color: string, title: string) => {
     setPreviewColor(color);
     setPreviewTitle(title);

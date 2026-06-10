@@ -5,27 +5,12 @@ import {
   internalMutation,
   internalQuery,
   mutation,
-  query,
 } from "../_generated/server";
 import { internal } from "../_generated/api";
 import { getOrgIdOrNull } from "../lib/auth";
 import { agentNamespace } from "../lib/knowledgeIngestion";
 import rag from "../system/ai/rag";
 import { contentHashFromArrayBuffer } from "@convex-dev/rag";
-
-export const getAgentBranding = query({
-  args: { agentId: v.id("agents") },
-  handler: async (ctx, args) => {
-    const orgId = await getOrgIdOrNull(ctx);
-    if (!orgId) return null;
-    const branding = await ctx.db
-      .query("agentBranding")
-      .withIndex("by_agent_id", (q) => q.eq("agentId", args.agentId))
-      .first();
-    if (!branding || branding.organizationId !== orgId) return null;
-    return branding;
-  },
-});
 
 export const getAgentForOrg = internalQuery({
   args: { agentId: v.id("agents"), orgId: v.string() },
