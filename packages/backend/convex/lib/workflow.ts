@@ -42,15 +42,16 @@ export const supportAgentOnboarding = workflow.define({
       { name: "scrape website", retry: true },
     )) as { markdown: string | null; branding: ScrapedBranding };
 
-    // Step 2: Ingest markdown into RAG (skip if no content returned)
-    //
+    // Step 2: Ingest markdown into RAG (best-effort — don't block branding if content is too short)
     const { markdown, branding } = scrapeResult;
 
-    await step.runAction(
-      internal.private.onboarding.ingestMarkdownFn,
-      { orgId, agentId, url: url, markdown: markdown! },
-      { name: "ingest markdown", retry: true },
-    );
+    if (markdown && markdown.length >= 40) {
+      await step.runAction(
+        internal.private.onboarding.ingestMarkdownFn,
+        { orgId, agentId, url: url, markdown },
+        { name: "ingest markdown", retry: true },
+      );
+    }
 
     // Step 3: Save branding and apply to widget appearance
     const b = branding;

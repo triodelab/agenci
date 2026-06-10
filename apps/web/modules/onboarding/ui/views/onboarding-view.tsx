@@ -334,10 +334,11 @@ function Step2({
   onDone,
 }: {
   agentId: Id<"agents">;
-  onDone: () => void;
+  onDone: (color?: string) => void;
 }) {
   const addWebpage = useAction(api.private.files.addWebpage);
   const kickoffOnboarding = useMutation(api.lib.workflow.kickoffAgentOnboarding);
+  const extractThemeColor = useAction(api.private.themeColor.extractThemeColor);
   const generateUploadUrl = useMutation(api.private.files.generateUploadUrl);
   const addFileByStorageId = useAction(api.private.files.addFileByStorageId);
 
@@ -364,10 +365,12 @@ function Step2({
     setBusy(true);
     setError(null);
     try {
-      await addWebpage({ url: url.trim(), agentId });
-      // Kick off branding extraction in background — don't block the user
+      const [, colorResult] = await Promise.all([
+        addWebpage({ url: url.trim(), agentId }),
+        extractThemeColor({ url: url.trim() }).catch(() => ({ color: null })),
+      ]);
       void kickoffOnboarding({ url: url.trim(), agentId });
-      onDone();
+      onDone(colorResult.color ?? undefined);
     } catch (err) {
       handleError(err);
     } finally {
@@ -541,7 +544,7 @@ function Step2({
 
       <button
         type="button"
-        onClick={onDone}
+        onClick={() => onDone()}
         className="block w-full text-center text-[12px] text-muted-foreground/70 transition-colors hover:text-foreground"
       >
         Hopp over — legg til kunnskap senere
@@ -1007,7 +1010,8 @@ export const OnboardingView = () => {
               {step === 2 && agentId && (
                 <Step2
                   agentId={agentId}
-                  onDone={() => {
+                  onDone={(color) => {
+                    if (color) setBrandColor(color);
                     setPreviewTitle(agentName);
                     done(2);
                     setStep(3);
