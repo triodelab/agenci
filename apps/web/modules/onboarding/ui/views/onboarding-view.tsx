@@ -5,7 +5,7 @@ import { api } from "@workspace/backend/_generated/api";
 import { Id } from "@workspace/backend/_generated/dataModel";
 import { useAuth, useOrganization } from "@clerk/nextjs";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import {
   BotIcon,
@@ -18,6 +18,7 @@ import {
   Paintbrush2Icon,
   CopyIcon,
   ArrowRightIcon,
+  SparklesIcon,
 } from "lucide-react";
 import { cn } from "@workspace/ui/lib/utils";
 import { Button } from "@workspace/ui/components/button";
@@ -25,6 +26,7 @@ import { Input } from "@workspace/ui/components/input";
 import { Textarea } from "@workspace/ui/components/textarea";
 import { Label } from "@workspace/ui/components/label";
 import { AgenciNavWordmark } from "@/components/logo";
+import { getWidgetPreviewUrl } from "@/lib/widget-preview-url";
 
 // ─── Embed script ─────────────────────────────────────────────────────────────
 const EMBED_SRC =
@@ -35,17 +37,16 @@ function buildEmbed(orgId: string, agentId: string) {
   return `<script\n  src="${EMBED_SRC}"\n  data-organization-id="${orgId}"\n  data-agent-id="${agentId}"\n></script>`;
 }
 
-// ─── Step config ──────────────────────────────────────────────────────────────
 const STEPS = [
-  { id: 1 as const, icon: BotIcon,         label: "Din agent",   desc: "Navn og beskrivelse" },
-  { id: 2 as const, icon: DatabaseZapIcon,  label: "Kunnskap",    desc: "Nettside eller dokument" },
-  { id: 3 as const, icon: Paintbrush2Icon,  label: "Utseende",    desc: "Tilpass widgeten" },
-  { id: 4 as const, icon: Code2Icon,        label: "Integrasjon", desc: "Hent koden" },
+  { id: 1 as const, icon: BotIcon, label: "Din agent", desc: "Navn og beskrivelse" },
+  { id: 2 as const, icon: DatabaseZapIcon, label: "Kunnskap", desc: "Nettside eller dokument" },
+  { id: 3 as const, icon: Paintbrush2Icon, label: "Utseende", desc: "Tilpass widgeten" },
+  { id: 4 as const, icon: Code2Icon, label: "Integrasjon", desc: "Hent koden" },
 ];
 type StepId = (typeof STEPS)[number]["id"];
 
-// ─── Left sidebar ─────────────────────────────────────────────────────────────
-function Sidebar({
+// ─── Top progress header ─────────────────────────────────────────────────────
+function ProgressHeader({
   current,
   completed,
   onSkip,
@@ -55,97 +56,56 @@ function Sidebar({
   onSkip: () => void;
 }) {
   return (
-    <aside className="hidden w-72 shrink-0 flex-col justify-between bg-zinc-950 p-8 lg:flex">
-      <div>
-        <AgenciNavWordmark surface="dark" className="text-white" />
+    <header className="sticky top-0 z-30 border-b border-border/60 bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/70">
+      <div className="mx-auto flex w-full max-w-[1440px] items-center gap-6 px-6 py-3.5 lg:px-10">
+        <AgenciNavWordmark surface="light" className="shrink-0 text-foreground" />
 
-        <div className="mt-10 space-y-1">
-          {STEPS.map((step) => {
-            const done    = completed.has(step.id);
-            const active  = step.id === current;
-            const future  = step.id > current && !done;
-            const Icon    = step.icon;
-
+        <nav className="hidden flex-1 items-center justify-center gap-2 md:flex" aria-label="Onboarding steg">
+          {STEPS.map((step, i) => {
+            const done = completed.has(step.id);
+            const active = step.id === current;
             return (
-              <div
-                key={step.id}
-                className={cn(
-                  "flex items-center gap-3.5 rounded-xl px-3 py-3 transition-colors",
-                  active  && "bg-white/[0.07]",
-                  future  && "opacity-40",
-                )}
-              >
-                {/* Icon box */}
+              <div key={step.id} className="flex items-center gap-2">
                 <div
                   className={cn(
-                    "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg",
-                    done   && "bg-white/90",
-                    active && !done && "bg-white",
-                    future && "border border-white/20 bg-transparent",
+                    "flex h-7 items-center gap-2 rounded-full pl-1 pr-3 text-[12px] font-medium transition-all",
+                    active && "bg-foreground text-background shadow-sm",
+                    done && !active && "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300",
+                    !active && !done && "bg-muted/40 text-muted-foreground",
                   )}
                 >
-                  {done ? (
-                    <CheckIcon className="h-4 w-4 text-zinc-950" />
-                  ) : (
-                    <Icon
-                      className={cn(
-                        "h-4 w-4",
-                        active  ? "text-zinc-950" : "text-white/50",
-                      )}
-                      strokeWidth={1.75}
-                    />
-                  )}
-                </div>
-
-                {/* Label */}
-                <div className="min-w-0">
-                  <p
+                  <span
                     className={cn(
-                      "text-[13px] font-semibold leading-none",
-                      active || done ? "text-white" : "text-white/50",
+                      "flex size-5 items-center justify-center rounded-full text-[10px] font-bold",
+                      active && "bg-background/20 text-background",
+                      done && !active && "bg-emerald-500 text-white",
+                      !active && !done && "bg-background/60 text-muted-foreground",
                     )}
                   >
-                    {step.label}
-                  </p>
-                  <p className="mt-1 truncate text-[11px] text-white/35">
-                    {step.desc}
-                  </p>
+                    {done ? <CheckIcon className="size-3" strokeWidth={3} /> : step.id}
+                  </span>
+                  <span className="hidden lg:inline">{step.label}</span>
                 </div>
+                {i < STEPS.length - 1 && (
+                  <span className={cn("hidden h-px w-4 lg:block", done ? "bg-emerald-500/40" : "bg-border")} />
+                )}
               </div>
             );
           })}
-        </div>
+        </nav>
+
+        <button
+          type="button"
+          onClick={onSkip}
+          className="ml-auto shrink-0 text-[12px] text-muted-foreground transition-colors hover:text-foreground md:ml-0"
+        >
+          Hopp over →
+        </button>
       </div>
-
-      <button
-        type="button"
-        onClick={onSkip}
-        className="text-left text-[12px] text-white/30 transition-colors hover:text-white/60"
-      >
-        Hopp over oppsett →
-      </button>
-    </aside>
+    </header>
   );
 }
 
-// ─── Step header (mobile step bar) ────────────────────────────────────────────
-function MobileStepBar({ current }: { current: StepId }) {
-  return (
-    <div className="flex items-center gap-1.5 lg:hidden">
-      {STEPS.map((s) => (
-        <div
-          key={s.id}
-          className={cn(
-            "h-1 flex-1 rounded-full transition-all",
-            s.id <= current ? "bg-foreground" : "bg-border",
-          )}
-        />
-      ))}
-    </div>
-  );
-}
-
-// ─── Error box ────────────────────────────────────────────────────────────────
 function ErrorBox({ message }: { message: string }) {
   return (
     <p className="rounded-lg border border-destructive/30 bg-destructive/8 px-3.5 py-2.5 text-[13px] text-destructive">
@@ -154,16 +114,30 @@ function ErrorBox({ message }: { message: string }) {
   );
 }
 
-// ─── Step 1: Create agent ─────────────────────────────────────────────────────
+function StepHeader({ step, title, desc }: { step: number; title: string; desc: string }) {
+  return (
+    <div className="space-y-1.5">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+        Steg {step} av 4
+      </p>
+      <h1 className="text-[24px] font-bold tracking-[-0.02em] text-foreground sm:text-[28px]">
+        {title}
+      </h1>
+      <p className="text-[14px] leading-relaxed text-muted-foreground">{desc}</p>
+    </div>
+  );
+}
+
+// ─── Step 1 ──────────────────────────────────────────────────────────────────
 function Step1({
   onDone,
 }: {
   onDone: (id: Id<"agents">, name: string) => void;
 }) {
   const createAgent = useMutation(api.private.agents.create);
-  const [name, setName]   = useState("");
-  const [desc, setDesc]   = useState("");
-  const [busy, setBusy]   = useState(false);
+  const [name, setName] = useState("");
+  const [desc, setDesc] = useState("");
+  const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const submit = async (e: React.FormEvent) => {
@@ -172,7 +146,10 @@ function Step1({
     setBusy(true);
     setError(null);
     try {
-      const { agentId } = await createAgent({ name: name.trim(), description: desc.trim() || undefined });
+      const { agentId } = await createAgent({
+        name: name.trim(),
+        description: desc.trim() || undefined,
+      });
       onDone(agentId, name.trim());
     } catch (err: unknown) {
       const msg =
@@ -188,21 +165,14 @@ function Step1({
   };
 
   return (
-    <form onSubmit={(e) => void submit(e)} className="space-y-6">
-      <div className="space-y-1">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-          Steg 1 av 4
-        </p>
-        <h1 className="text-[22px] font-semibold tracking-tight text-foreground">
-          Gi agenten et navn
-        </h1>
-        <p className="text-[13px] leading-relaxed text-muted-foreground">
-          Agenten din svarer kunder automatisk — gi den et navn som
-          gjenspeiler hva den gjør.
-        </p>
-      </div>
+    <form onSubmit={(e) => void submit(e)} className="space-y-7">
+      <StepHeader
+        step={1}
+        title="Gi agenten et navn"
+        desc="Agenten din svarer kunder automatisk — gi den et navn som gjenspeiler hva den gjør."
+      />
 
-      <div className="space-y-4">
+      <div className="space-y-5">
         <div className="space-y-2">
           <Label htmlFor="agent-name">
             Agentnavn <span className="text-destructive">*</span>
@@ -215,9 +185,9 @@ function Step1({
             onChange={(e) => setName(e.target.value)}
             disabled={busy}
             maxLength={60}
+            className="h-11"
           />
         </div>
-
         <div className="space-y-2">
           <Label htmlFor="agent-desc">
             Beskrivelse{" "}
@@ -239,18 +209,12 @@ function Step1({
 
       {error && <ErrorBox message={error} />}
 
-      <Button
-        type="submit"
-        className="w-full"
-        size="lg"
-        disabled={busy || !name.trim()}
-      >
+      <Button type="submit" className="w-full h-11" size="lg" disabled={busy || !name.trim()}>
         {busy ? (
           <Loader2Icon className="animate-spin" />
         ) : (
           <>
-            Opprett agent
-            <ArrowRightIcon />
+            Opprett agent <ArrowRightIcon />
           </>
         )}
       </Button>
@@ -258,25 +222,26 @@ function Step1({
   );
 }
 
-// ─── Step 2: Add knowledge ────────────────────────────────────────────────────
+// ─── Step 2 ──────────────────────────────────────────────────────────────────
 function Step2({
   agentId,
   onDone,
+  onUrlSubmitted,
 }: {
   agentId: Id<"agents">;
   onDone: () => void;
+  onUrlSubmitted: (url: string) => void;
 }) {
-  const addWebpage         = useAction(api.private.files.addWebpage);
-  const generateUploadUrl  = useMutation(api.private.files.generateUploadUrl);
+  const addWebpage = useAction(api.private.files.addWebpage);
+  const generateUploadUrl = useMutation(api.private.files.generateUploadUrl);
   const addFileByStorageId = useAction(api.private.files.addFileByStorageId);
 
-  const [tab, setTab]                     = useState<"url" | "file">("url");
-  const [url, setUrl]                     = useState("");
-  const [file, setFile]                   = useState<File | null>(null);
-  const [busy, setBusy]                   = useState(false);
-  const [error, setError]                 = useState<string | null>(null);
-  const [planError, setPlanError]         = useState(false);
-  const fileRef                           = useRef<HTMLInputElement>(null);
+  const [tab, setTab] = useState<"url" | "file">("url");
+  const [url, setUrl] = useState("");
+  const [file, setFile] = useState<File | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   const handleError = (err: unknown) => {
     const msg =
@@ -285,14 +250,7 @@ function Step2({
         : typeof err === "object" && err && "message" in err
           ? String((err as { message: unknown }).message)
           : "Noe gikk galt";
-    if (
-      msg.toLowerCase().includes("abonnement") ||
-      msg.toLowerCase().includes("subscription")
-    ) {
-      setPlanError(true);
-    } else {
-      setError(msg);
-    }
+    setError(msg);
   };
 
   const submitUrl = async (e: React.FormEvent) => {
@@ -300,9 +258,10 @@ function Step2({
     if (!url.trim()) return;
     setBusy(true);
     setError(null);
-    setPlanError(false);
     try {
-      await addWebpage({ url: url.trim(), agentId });
+      const trimmed = url.trim();
+      onUrlSubmitted(trimmed);
+      await addWebpage({ url: trimmed, agentId });
       onDone();
     } catch (err) {
       handleError(err);
@@ -316,7 +275,6 @@ function Step2({
     if (!file) return;
     setBusy(true);
     setError(null);
-    setPlanError(false);
     try {
       const mimeType = file.type || "text/plain";
       const uploadUrl = await generateUploadUrl();
@@ -326,9 +284,9 @@ function Step2({
         body: file,
       });
       if (!res.ok) throw new Error(`Opplasting feilet: HTTP ${res.status}`);
-      const { storageId } = await res.json() as { storageId: string };
+      const { storageId } = (await res.json()) as { storageId: string };
       await addFileByStorageId({
-        storageId: storageId as any,
+        storageId: storageId as Id<"_storage">,
         filename: file.name,
         mimeType,
         agentId,
@@ -342,80 +300,71 @@ function Step2({
   };
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-1">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-          Steg 2 av 4
-        </p>
-        <h1 className="text-[22px] font-semibold tracking-tight text-foreground">
-          Legg til kunnskap
-        </h1>
-        <p className="text-[13px] leading-relaxed text-muted-foreground">
-          Agenten bruker dette til å svare riktig på kundenes spørsmål. Legg
-          til en nettside eller last opp et dokument.
-        </p>
-      </div>
+    <div className="space-y-7">
+      <StepHeader
+        step={2}
+        title="Legg til kunnskap"
+        desc="Agenten bruker dette til å svare riktig på kundenes spørsmål. Vi henter også farger fra nettsiden din automatisk."
+      />
 
-      {/* Tab toggle */}
-      <div className="grid h-9 grid-cols-2 gap-1 rounded-lg border border-border bg-muted/30 p-0.5">
+      <div className="grid h-10 grid-cols-2 gap-1 rounded-xl border border-border bg-muted/30 p-1">
         {(["url", "file"] as const).map((t) => (
           <button
             key={t}
             type="button"
             onClick={() => setTab(t)}
             className={cn(
-              "flex items-center justify-center gap-2 rounded-md text-[13px] font-medium transition-all",
+              "flex items-center justify-center gap-2 rounded-lg text-[13px] font-medium transition-all",
               tab === t
-                ? "bg-background text-foreground shadow-xs"
+                ? "bg-background text-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground",
             )}
           >
             {t === "url" ? (
-              <><GlobeIcon className="size-3.5" /> Nettside-URL</>
+              <>
+                <GlobeIcon className="size-3.5" /> Nettside-URL
+              </>
             ) : (
-              <><FileTextIcon className="size-3.5" /> Last opp fil</>
+              <>
+                <FileTextIcon className="size-3.5" /> Last opp fil
+              </>
             )}
           </button>
         ))}
       </div>
 
-      {planError ? (
-        <div className="space-y-3 rounded-xl border border-border bg-muted/20 p-5">
-          <p className="text-[13px] font-semibold text-foreground">
-            Krever aktivt abonnement
-          </p>
-          <p className="text-[13px] leading-relaxed text-muted-foreground">
-            Opplasting av kunnskap krever et aktivt abonnement. Du kan legge
-            til innhold fra Knowledge Base etter du har valgt en plan.
-          </p>
-          <Button variant="outline" size="sm" onClick={onDone}>
-            Fortsett uten kunnskap
-          </Button>
-        </div>
-      ) : tab === "url" ? (
-        <form onSubmit={(e) => void submitUrl(e)} className="space-y-4">
+      {tab === "url" ? (
+        <form onSubmit={(e) => void submitUrl(e)} className="space-y-5">
           <div className="space-y-2">
             <Label htmlFor="kb-url">Nettside-URL</Label>
             <Input
               id="kb-url"
               type="url"
               autoFocus
-              placeholder="https://dinbedrift.no/om-oss"
+              placeholder="https://dinbedrift.no"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               disabled={busy}
+              className="h-11"
             />
-            <p className="text-[11px] text-muted-foreground">
-              Vi henter innholdet og gjør det søkbart for agenten.
+            <p className="text-[11.5px] text-muted-foreground">
+              Vi henter innholdet og bruker det som kunnskapsbase. Vi prøver
+              også å finne primærfargen fra siden din.
             </p>
           </div>
           {error && <ErrorBox message={error} />}
-          <Button type="submit" className="w-full" size="lg" disabled={busy || !url.trim()}>
-            {busy ? <Loader2Icon className="animate-spin" /> : <>Hent innhold <ArrowRightIcon /></>}
+          <Button type="submit" className="w-full h-11" size="lg" disabled={busy || !url.trim()}>
+            {busy ? (
+              <Loader2Icon className="animate-spin" />
+            ) : (
+              <>
+                Hent innhold <ArrowRightIcon />
+              </>
+            )}
           </Button>
         </form>
       ) : (
-        <form onSubmit={(e) => void submitFile(e)} className="space-y-4">
+        <form onSubmit={(e) => void submitFile(e)} className="space-y-5">
           <div className="space-y-2">
             <Label>Dokument</Label>
             <input
@@ -429,38 +378,36 @@ function Step2({
               type="button"
               onClick={() => fileRef.current?.click()}
               className={cn(
-                "flex h-28 w-full flex-col items-center justify-center gap-2.5 rounded-xl border-2 border-dashed transition-colors",
+                "flex h-32 w-full flex-col items-center justify-center gap-2.5 rounded-xl border-2 border-dashed transition-colors",
                 file
-                  ? "border-border bg-muted/30"
+                  ? "border-foreground/40 bg-muted/30"
                   : "border-border hover:border-foreground/30 hover:bg-muted/20",
               )}
             >
               {file ? (
                 <>
                   <CheckIcon className="size-5 text-foreground" />
-                  <span className="text-[13px] font-medium text-foreground">
-                    {file.name}
-                  </span>
-                  <span className="text-[11px] text-muted-foreground">
-                    Klikk for å bytte fil
-                  </span>
+                  <span className="text-[13px] font-medium text-foreground">{file.name}</span>
+                  <span className="text-[11px] text-muted-foreground">Klikk for å bytte fil</span>
                 </>
               ) : (
                 <>
                   <FileTextIcon className="size-5 text-muted-foreground/60" strokeWidth={1.5} />
-                  <span className="text-[13px] text-muted-foreground">
-                    Klikk for å velge fil
-                  </span>
-                  <span className="text-[11px] text-muted-foreground/60">
-                    PDF, DOCX, TXT, Markdown
-                  </span>
+                  <span className="text-[13px] text-muted-foreground">Klikk for å velge fil</span>
+                  <span className="text-[11px] text-muted-foreground/60">PDF, DOCX, TXT, Markdown</span>
                 </>
               )}
             </button>
           </div>
           {error && <ErrorBox message={error} />}
-          <Button type="submit" className="w-full" size="lg" disabled={busy || !file}>
-            {busy ? <Loader2Icon className="animate-spin" /> : <>Last opp <ArrowRightIcon /></>}
+          <Button type="submit" className="w-full h-11" size="lg" disabled={busy || !file}>
+            {busy ? (
+              <Loader2Icon className="animate-spin" />
+            ) : (
+              <>
+                Last opp <ArrowRightIcon />
+              </>
+            )}
           </Button>
         </form>
       )}
@@ -468,7 +415,7 @@ function Step2({
       <button
         type="button"
         onClick={onDone}
-        className="w-full text-center text-[12px] text-muted-foreground/60 transition-colors hover:text-muted-foreground"
+        className="block w-full text-center text-[12px] text-muted-foreground/60 transition-colors hover:text-muted-foreground"
       >
         Hopp over — legg til kunnskap senere
       </button>
@@ -476,22 +423,51 @@ function Step2({
   );
 }
 
-// ─── Step 3: Customize widget ─────────────────────────────────────────────────
+// ─── Step 3 ──────────────────────────────────────────────────────────────────
 function Step3({
   agentId,
   agentName,
+  initialColor,
+  colorSource,
+  onChange,
   onDone,
 }: {
   agentId: Id<"agents">;
   agentName: string;
+  initialColor: string;
+  colorSource: "extracted" | "default";
+  onChange: (next: { title: string; greeting: string; color: string }) => void;
   onDone: () => void;
 }) {
   const upsert = useMutation(api.private.widgetSettings.upsert);
-  const [title,    setTitle]   = useState(agentName);
+  const [title, setTitle] = useState(agentName);
   const [greeting, setGreeting] = useState("Hei! Hvordan kan jeg hjelpe deg? 😊");
-  const [color,    setColor]   = useState("#18181b");
-  const [busy,     setBusy]    = useState(false);
-  const [error,    setError]   = useState<string | null>(null);
+  const [color, setColor] = useState(initialColor);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setColor(initialColor);
+  }, [initialColor]);
+
+  useEffect(() => {
+    onChange({ title, greeting, color });
+  }, [title, greeting, color, onChange]);
+
+  // Auto-save with debounce so preview iframe reflects changes
+  useEffect(() => {
+    const t = setTimeout(() => {
+      void upsert({
+        forAgentId: agentId,
+        widgetTitle: title.trim() || agentName,
+        greetMessage: greeting.trim() || "Hei! Hvordan kan jeg hjelpe deg i dag?",
+        defaultSuggestions: { suggestion1: undefined, suggestion2: undefined, suggestion3: undefined },
+        vapiSettings: { assistantId: undefined, phoneNumber: undefined },
+        appearance: { headerColor: color, headerTextColor: "#ffffff" },
+      }).catch(() => undefined);
+    }, 600);
+    return () => clearTimeout(t);
+  }, [agentId, agentName, color, greeting, title, upsert]);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -502,19 +478,9 @@ function Step3({
         forAgentId: agentId,
         widgetTitle: title.trim() || agentName,
         greetMessage: greeting.trim() || "Hei! Hvordan kan jeg hjelpe deg i dag?",
-        defaultSuggestions: {
-          suggestion1: undefined,
-          suggestion2: undefined,
-          suggestion3: undefined,
-        },
-        vapiSettings: {
-          assistantId: undefined,
-          phoneNumber: undefined,
-        },
-        appearance: {
-          headerColor: color,
-          headerTextColor: "#ffffff",
-        },
+        defaultSuggestions: { suggestion1: undefined, suggestion2: undefined, suggestion3: undefined },
+        vapiSettings: { assistantId: undefined, phoneNumber: undefined },
+        appearance: { headerColor: color, headerTextColor: "#ffffff" },
       });
       onDone();
     } catch (err: unknown) {
@@ -531,21 +497,23 @@ function Step3({
   };
 
   return (
-    <form onSubmit={(e) => void submit(e)} className="space-y-6">
-      <div className="space-y-1">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-          Steg 3 av 4
-        </p>
-        <h1 className="text-[22px] font-semibold tracking-tight text-foreground">
-          Tilpass widgeten
-        </h1>
-        <p className="text-[13px] leading-relaxed text-muted-foreground">
-          Sett opp hvordan chatwidgeten ser ut på nettsiden din. Du kan endre
-          alt dette fra Widget-innstillinger senere.
-        </p>
-      </div>
+    <form onSubmit={(e) => void submit(e)} className="space-y-7">
+      <StepHeader
+        step={3}
+        title="Tilpass widgeten"
+        desc="Endringer vises i sanntid i forhåndsvisningen til høyre."
+      />
 
-      <div className="space-y-4">
+      {colorSource === "extracted" && (
+        <div className="flex items-center gap-2.5 rounded-xl border border-emerald-500/30 bg-emerald-500/5 px-3.5 py-2.5">
+          <SparklesIcon className="size-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+          <p className="text-[12.5px] text-emerald-700 dark:text-emerald-300">
+            Vi fant primærfargen fra nettsiden din og brukte den her.
+          </p>
+        </div>
+      )}
+
+      <div className="space-y-5">
         <div className="space-y-2">
           <Label htmlFor="widget-title">Widgettittel</Label>
           <Input
@@ -555,6 +523,7 @@ function Step3({
             onChange={(e) => setTitle(e.target.value)}
             disabled={busy}
             maxLength={50}
+            className="h-11"
           />
         </div>
 
@@ -575,42 +544,35 @@ function Step3({
         <div className="space-y-2">
           <Label htmlFor="header-color">Primærfarge</Label>
           <div className="flex items-center gap-3">
-            <div className="relative">
-              <input
-                id="header-color"
-                type="color"
-                value={color}
-                onChange={(e) => setColor(e.target.value)}
-                disabled={busy}
-                className="h-9 w-12 cursor-pointer rounded-md border border-border bg-transparent p-0.5"
-              />
-            </div>
+            <input
+              id="header-color"
+              type="color"
+              value={color}
+              onChange={(e) => setColor(e.target.value)}
+              disabled={busy}
+              className="h-11 w-14 cursor-pointer rounded-xl border border-border bg-transparent p-1"
+            />
             <Input
               value={color}
               onChange={(e) => setColor(e.target.value)}
               disabled={busy}
-              className="max-w-[110px] font-mono text-xs uppercase"
+              className="h-11 max-w-[140px] font-mono text-xs uppercase"
               placeholder="#18181b"
             />
-            {/* Mini preview */}
-            <div className="ml-auto shrink-0 overflow-hidden rounded-lg border border-border shadow-xs" style={{ width: 100 }}>
-              <div
-                className="flex items-center gap-2 px-2.5 py-2"
-                style={{ background: color }}
-              >
-                <div className="h-3.5 w-3.5 shrink-0 rounded-full bg-white/20" />
-                <span className="truncate text-[10px] font-semibold text-white">
-                  {title || agentName}
-                </span>
-              </div>
-              <div className="bg-white p-2 dark:bg-zinc-900">
-                <div
-                  className="rounded-md px-2 py-1.5 text-[9px] font-medium text-white"
-                  style={{ background: color, maxWidth: "80%" }}
-                >
-                  {greeting.slice(0, 22)}…
-                </div>
-              </div>
+            <div className="ml-auto flex gap-1.5">
+              {["#18181b", "#2563eb", "#10b981", "#f97316", "#a855f7"].map((c) => (
+                <button
+                  key={c}
+                  type="button"
+                  onClick={() => setColor(c)}
+                  className={cn(
+                    "size-7 rounded-lg border transition-transform hover:scale-110",
+                    color.toLowerCase() === c ? "border-foreground ring-2 ring-foreground/20" : "border-border",
+                  )}
+                  style={{ background: c }}
+                  aria-label={`Bruk farge ${c}`}
+                />
+              ))}
             </div>
           </div>
         </div>
@@ -618,22 +580,20 @@ function Step3({
 
       {error && <ErrorBox message={error} />}
 
-      <Button type="submit" className="w-full" size="lg" disabled={busy || !greeting.trim()}>
-        {busy ? <Loader2Icon className="animate-spin" /> : <>Lagre innstillinger <ArrowRightIcon /></>}
+      <Button type="submit" className="w-full h-11" size="lg" disabled={busy || !greeting.trim()}>
+        {busy ? (
+          <Loader2Icon className="animate-spin" />
+        ) : (
+          <>
+            Lagre og fortsett <ArrowRightIcon />
+          </>
+        )}
       </Button>
-
-      <button
-        type="button"
-        onClick={onDone}
-        className="w-full text-center text-[12px] text-muted-foreground/60 transition-colors hover:text-muted-foreground"
-      >
-        Hopp over — bruk standardinnstillinger
-      </button>
     </form>
   );
 }
 
-// ─── Step 4: Integration ──────────────────────────────────────────────────────
+// ─── Step 4 ──────────────────────────────────────────────────────────────────
 function Step4({
   orgId,
   agentId,
@@ -653,24 +613,13 @@ function Step4({
   };
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-1">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-          Steg 4 av 4
-        </p>
-        <h1 className="text-[22px] font-semibold tracking-tight text-foreground">
-          Legg til på nettsiden din
-        </h1>
-        <p className="text-[13px] leading-relaxed text-muted-foreground">
-          Lim inn denne script-taggen rett før{" "}
-          <code className="rounded bg-muted px-1 py-0.5 font-mono text-[11px]">
-            &lt;/body&gt;
-          </code>{" "}
-          på nettsiden din. Widgeten starter automatisk.
-        </p>
-      </div>
+    <div className="space-y-7">
+      <StepHeader
+        step={4}
+        title="Legg til på nettsiden din"
+        desc="Lim inn denne script-taggen rett før </body> på nettsiden din. Widgeten starter automatisk."
+      />
 
-      {/* Code block */}
       <div className="relative">
         <pre className="overflow-x-auto rounded-xl border border-border bg-zinc-950 px-5 py-4 text-[12px] leading-relaxed text-zinc-300">
           <code>{code}</code>
@@ -686,41 +635,37 @@ function Step4({
           )}
         >
           {copied ? (
-            <><CheckIcon className="size-3" /> Kopiert!</>
+            <>
+              <CheckIcon className="size-3" /> Kopiert!
+            </>
           ) : (
-            <><CopyIcon className="size-3" /> Kopier</>
+            <>
+              <CopyIcon className="size-3" /> Kopier
+            </>
           )}
         </button>
       </div>
 
-      {/* CMS tips */}
-      <div className="space-y-2">
+      <div className="space-y-2.5">
         <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
           Hvor limer du inn koden?
         </p>
         <div className="grid grid-cols-2 gap-2">
           {[
-            ["WordPress",   "Appearance → Theme Editor → footer.php"],
-            ["Webflow",     "Project Settings → Custom Code → Footer"],
+            ["WordPress", "Appearance → Theme Editor → footer.php"],
+            ["Webflow", "Project Settings → Custom Code → Footer"],
             ["Squarespace", "Settings → Advanced → Code Injection"],
-            ["Shopify",     "Online Store → Themes → theme.liquid"],
+            ["Shopify", "Online Store → Themes → theme.liquid"],
           ].map(([platform, hint]) => (
-            <div
-              key={platform}
-              className="rounded-xl border border-border bg-muted/20 px-3.5 py-3"
-            >
-              <p className="text-[12px] font-semibold text-foreground">
-                {platform}
-              </p>
-              <p className="mt-0.5 text-[11px] leading-relaxed text-muted-foreground">
-                {hint}
-              </p>
+            <div key={platform} className="rounded-xl border border-border bg-muted/20 px-3.5 py-3">
+              <p className="text-[12px] font-semibold text-foreground">{platform}</p>
+              <p className="mt-0.5 text-[11px] leading-relaxed text-muted-foreground">{hint}</p>
             </div>
           ))}
         </div>
       </div>
 
-      <Button className="w-full" size="lg" onClick={onFinish}>
+      <Button className="w-full h-11" size="lg" onClick={onFinish}>
         Gå til dashboardet
         <ArrowRightIcon />
       </Button>
@@ -738,21 +683,93 @@ function Step4({
   );
 }
 
-// ─── Main view ────────────────────────────────────────────────────────────────
+// ─── Live preview ────────────────────────────────────────────────────────────
+function LivePreview({
+  orgId,
+  agentId,
+  reloadKey,
+  active,
+}: {
+  orgId: string;
+  agentId: Id<"agents"> | null;
+  reloadKey: number;
+  active: boolean;
+}) {
+  const url = useMemo(() => {
+    if (!orgId) return null;
+    return getWidgetPreviewUrl(orgId, {
+      playground: true,
+      agentId: agentId ?? undefined,
+    });
+  }, [orgId, agentId]);
+
+  return (
+    <div className="hidden h-full min-h-0 flex-col bg-gradient-to-b from-muted/30 to-muted/10 lg:flex">
+      <div className="flex shrink-0 items-center justify-between border-b border-border/60 px-6 py-3.5">
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+            Forhåndsvisning
+          </p>
+          <p className="text-[13px] font-semibold text-foreground">Slik ser widgeten ut</p>
+        </div>
+        <span className={cn(
+          "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10.5px] font-semibold uppercase tracking-wide",
+          active ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400" : "bg-muted text-muted-foreground",
+        )}>
+          <span className={cn(
+            "size-1.5 rounded-full",
+            active ? "bg-emerald-500 animate-pulse" : "bg-muted-foreground/40",
+          )} />
+          {active ? "Live" : "Venter"}
+        </span>
+      </div>
+
+      <div className="flex min-h-0 flex-1 items-center justify-center p-8">
+        {url && active ? (
+          <div className="w-full max-w-[400px] overflow-hidden rounded-2xl border border-border/70 bg-background shadow-2xl">
+            <iframe
+              key={reloadKey}
+              src={url}
+              title="Widget-forhåndsvisning"
+              allow="clipboard-read; clipboard-write; microphone"
+              className="block h-[min(640px,calc(100dvh-12rem))] w-full border-0 bg-background"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
+          </div>
+        ) : (
+          <div className="flex w-full max-w-[400px] flex-col items-center gap-3 rounded-2xl border-2 border-dashed border-border/70 bg-background/40 px-6 py-16 text-center">
+            <div className="flex size-12 items-center justify-center rounded-2xl border border-border/60 bg-background">
+              <SparklesIcon className="size-5 text-muted-foreground/60" strokeWidth={1.5} />
+            </div>
+            <p className="text-[13.5px] font-semibold text-foreground">Klar når du er</p>
+            <p className="text-[12px] leading-relaxed text-muted-foreground">
+              Når du har laget agenten, viser vi widget-en din her med dine farger, tittel og velkomstmelding.
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── Main view ───────────────────────────────────────────────────────────────
 export const OnboardingView = () => {
-  const router       = useRouter();
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const isNewIntent  = searchParams.get("new") === "1";
+  const isNewIntent = searchParams.get("new") === "1";
   const { organization } = useOrganization();
-  const agents       = useQuery(api.private.agents.list);
+  const agents = useQuery(api.private.agents.list);
+  const extractThemeColor = useAction(api.private.themeColor.extractThemeColor);
 
-  const [step,      setStep]      = useState<StepId>(1);
+  const [step, setStep] = useState<StepId>(1);
   const [completed, setCompleted] = useState<Set<StepId>>(new Set());
-  const [agentId,   setAgentId]   = useState<Id<"agents"> | null>(null);
+  const [agentId, setAgentId] = useState<Id<"agents"> | null>(null);
   const [agentName, setAgentName] = useState("");
+  const [extractedColor, setExtractedColor] = useState<string | null>(null);
+  const [colorSource, setColorSource] = useState<"extracted" | "default">("default");
+  const [previewReloadKey, setPreviewReloadKey] = useState(0);
 
-  // Redirect back if user already has agents — unless they explicitly navigated
-  // here to create a new one (?new=1) or have already started the wizard.
+  // Redirect if already has agents
   useEffect(() => {
     if (isNewIntent || agentId !== null) return;
     if (agents !== undefined && agents !== null && agents.length > 0) {
@@ -760,28 +777,25 @@ export const OnboardingView = () => {
     }
   }, [agents, router, agentId, isNewIntent]);
 
-  const done = (s: StepId) =>
-    setCompleted((prev) => new Set([...prev, s]));
+  const done = (s: StepId) => setCompleted((prev) => new Set([...prev, s]));
 
   const { getToken } = useAuth();
 
-  // Org is active in Clerk but Convex JWT lacks orgId (token cached without org).
-  // Force Clerk to refresh the template token (skipCache), then reload once so
-  // ConvexProviderWithClerk picks up the fresh token on re-initialization.
+  // Clerk/Convex JWT sync after org creation
   useEffect(() => {
     if (!organization || agents !== null) return;
-    const params = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
-    if (params.get("_r")) return; // already reloaded — don't loop
+    const params = new URLSearchParams(
+      typeof window !== "undefined" ? window.location.search : "",
+    );
+    if (params.get("_r")) return;
     void getToken({ template: "convex", skipCache: true }).then(() => {
       const url = new URL(window.location.href);
       url.searchParams.set("_r", "1");
       window.location.replace(url.toString());
     });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [organization, agents]);
 
-  // agents === null means Convex JWT doesn't have orgId yet (race condition after org creation)
-  // Wait until both Clerk org and Convex JWT are in sync before showing the form
   if (agents == null || !organization) {
     return (
       <div className="dashboard-app-shell flex min-h-screen items-center justify-center bg-background">
@@ -792,35 +806,31 @@ export const OnboardingView = () => {
 
   const orgId = organization?.id ?? "";
 
+  const handleUrlSubmitted = (url: string) => {
+    void extractThemeColor({ url })
+      .then((r) => {
+        if (r.color) {
+          setExtractedColor(r.color);
+          setColorSource("extracted");
+        }
+      })
+      .catch(() => undefined);
+  };
+
+  const reloadPreview = () => setPreviewReloadKey((k) => k + 1);
+
   return (
-    <div className="dashboard-app-shell flex h-screen overflow-hidden bg-background">
-      {/* ── Left sidebar ── */}
-      <Sidebar
+    <div className="dashboard-app-shell flex h-screen flex-col overflow-hidden bg-background">
+      <ProgressHeader
         current={step}
         completed={completed}
         onSkip={() => router.push("/agents")}
       />
 
-      {/* ── Right content ── */}
-      <div className="flex flex-1 flex-col overflow-y-auto">
-        {/* Mobile header */}
-        <header className="flex items-center justify-between border-b border-border px-5 py-3.5 lg:hidden">
-          <AgenciNavWordmark surface="dark" className="text-foreground dark:text-white" />
-          <button
-            type="button"
-            onClick={() => router.push("/agents")}
-            className="text-[12px] text-muted-foreground hover:text-foreground"
-          >
-            Hopp over
-          </button>
-        </header>
-
-        <div className="flex flex-1 flex-col items-center justify-center px-6 py-12">
-          <div className="w-full max-w-md space-y-8">
-            {/* Mobile progress bar */}
-            <MobileStepBar current={step} />
-
-            {/* Step content */}
+      <div className="grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+        {/* Form column */}
+        <div className="flex min-h-0 flex-col overflow-y-auto">
+          <div className="mx-auto flex w-full max-w-[520px] flex-col px-6 py-10 lg:py-14">
             {step === 1 && (
               <Step1
                 onDone={(id, name) => {
@@ -828,6 +838,7 @@ export const OnboardingView = () => {
                   setAgentName(name);
                   done(1);
                   setStep(2);
+                  reloadPreview();
                 }}
               />
             )}
@@ -835,7 +846,12 @@ export const OnboardingView = () => {
             {step === 2 && agentId && (
               <Step2
                 agentId={agentId}
-                onDone={() => { done(2); setStep(3); }}
+                onDone={() => {
+                  done(2);
+                  setStep(3);
+                  reloadPreview();
+                }}
+                onUrlSubmitted={handleUrlSubmitted}
               />
             )}
 
@@ -843,7 +859,14 @@ export const OnboardingView = () => {
               <Step3
                 agentId={agentId}
                 agentName={agentName}
-                onDone={() => { done(3); setStep(4); }}
+                initialColor={extractedColor ?? "#18181b"}
+                colorSource={colorSource}
+                onChange={() => reloadPreview()}
+                onDone={() => {
+                  done(3);
+                  setStep(4);
+                  reloadPreview();
+                }}
               />
             )}
 
@@ -851,24 +874,29 @@ export const OnboardingView = () => {
               <Step4
                 orgId={orgId}
                 agentId={agentId}
-                onFinish={() =>
-                  router.push(agentId ? `/agents/${agentId}` : "/agents")
-                }
+                onFinish={() => router.push(agentId ? `/agents/${agentId}` : "/agents")}
               />
             )}
 
-            {/* Back button */}
             {step > 1 && step < 4 && (
               <button
                 type="button"
                 onClick={() => setStep((s) => (s - 1) as StepId)}
-                className="mx-auto block text-[12px] text-muted-foreground/60 hover:text-muted-foreground"
+                className="mx-auto mt-8 block text-[12px] text-muted-foreground/60 hover:text-muted-foreground"
               >
                 ← Tilbake
               </button>
             )}
           </div>
         </div>
+
+        {/* Live preview column */}
+        <LivePreview
+          orgId={orgId}
+          agentId={agentId}
+          reloadKey={previewReloadKey}
+          active={agentId !== null}
+        />
       </div>
     </div>
   );

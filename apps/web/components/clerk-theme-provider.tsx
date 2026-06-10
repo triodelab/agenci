@@ -55,6 +55,14 @@ export function ClerkThemeProvider({
       : "!font-medium !text-zinc-700 !opacity-100 [&[data-state='checked']]:!text-zinc-950 [&[data-state='checked']]:!font-semibold";
 
     /**
+     * «Upload»-knappen i Setup-your-organization og lignende logo-felter blir
+     * nesten usynlig med standard Clerk-styling. Tving fram tydelig kontrast.
+     */
+    const fileUploadButton = isDark
+      ? "!inline-flex !items-center !justify-center !px-3 !py-1.5 !rounded-md !text-[13px] !font-semibold !text-zinc-50 !bg-zinc-800 hover:!bg-zinc-700 !border !border-zinc-700 !opacity-100"
+      : "!inline-flex !items-center !justify-center !px-3 !py-1.5 !rounded-md !text-[13px] !font-semibold !text-zinc-900 !bg-zinc-100 hover:!bg-zinc-200 !border !border-zinc-300 !opacity-100";
+
+    /**
      * Bruk nye variabelnavn (juli 2025+): colorForeground / colorMutedForeground / colorInput.
      *
      * @see https://clerk.com/docs/guides/customizing-clerk/appearance-prop/variables
@@ -135,6 +143,9 @@ export function ClerkThemeProvider({
         organizationSwitcherPreviewButton__organization: previewManage,
         organizationSwitcherPreviewButton__personal: previewManage,
         organizationListCreateOrganizationActionButton: popoverAction,
+        fileDropAreaButtonPrimary: fileUploadButton,
+        avatarImageActionsUpload: fileUploadButton,
+        formFieldInputShowPasswordButton: isDark ? "!text-zinc-300" : "!text-zinc-600",
       },
       organizationProfile: {
         elements: {
