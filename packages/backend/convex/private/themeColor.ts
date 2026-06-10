@@ -47,6 +47,33 @@ export const extractThemeColor = action({
         if (c) return { color: c };
       }
 
+      // Fallback: CSS custom properties for common brand color variable names
+      const CSS_VARS = [
+        "--primary",
+        "--accent",
+        "--brand",
+        "--brand-color",
+        "--color-primary",
+        "--color-accent",
+        "--color-brand",
+        "--highlight",
+      ];
+      const styleBlocks = [...head.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/gi)].map(
+        (m) => m[1] ?? "",
+      );
+      const allCss = styleBlocks.join("\n");
+      for (const varName of CSS_VARS) {
+        const pattern = new RegExp(
+          `${varName}\\s*:\\s*(#[0-9a-f]{3,8}|rgb\\([^)]+\\))`,
+          "i",
+        );
+        const match = allCss.match(pattern);
+        if (match?.[1]) {
+          const c = normalizeColor(match[1]);
+          if (c) return { color: c };
+        }
+      }
+
       return { color: null };
     } catch {
       return { color: null };
