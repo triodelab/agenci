@@ -331,9 +331,10 @@ function Step2({
   onDone,
 }: {
   agentId: Id<"agents">;
-  onDone: () => void;
+  onDone: (brandColor?: string) => void;
 }) {
   const addWebpage = useAction(api.private.files.addWebpage);
+  const extractThemeColor = useAction(api.private.themeColor.extractThemeColor);
   const generateUploadUrl = useMutation(api.private.files.generateUploadUrl);
   const addFileByStorageId = useAction(api.private.files.addFileByStorageId);
 
@@ -360,8 +361,11 @@ function Step2({
     setBusy(true);
     setError(null);
     try {
-      await addWebpage({ url: url.trim(), agentId });
-      onDone();
+      const [, colorResult] = await Promise.all([
+        addWebpage({ url: url.trim(), agentId }),
+        extractThemeColor({ url: url.trim() }).catch(() => ({ color: null })),
+      ]);
+      onDone(colorResult.color ?? undefined);
     } catch (err) {
       handleError(err);
     } finally {
@@ -548,16 +552,18 @@ function Step2({
 function Step3({
   agentId,
   agentName,
+  initialColor,
   onDone,
 }: {
   agentId: Id<"agents">;
   agentName: string;
+  initialColor: string;
   onDone: () => void;
 }) {
   const upsert = useMutation(api.private.widgetSettings.upsert);
   const [title, setTitle] = useState(agentName);
   const [greeting, setGreeting] = useState("Hei! Hvordan kan jeg hjelpe deg? 😊");
-  const [color, setColor] = useState("#18181b");
+  const [color, setColor] = useState(initialColor);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -916,6 +922,7 @@ export const OnboardingView = () => {
   const [completed, setCompleted] = useState<Set<StepId>>(new Set());
   const [agentId, setAgentId] = useState<Id<"agents"> | null>(null);
   const [agentName, setAgentName] = useState("");
+  const [brandColor, setBrandColor] = useState("#18181b");
   const [previewReloadKey, setPreviewReloadKey] = useState(0);
   const reloadPreview = useCallback(() => setPreviewReloadKey((k) => k + 1), []);
 
@@ -1001,7 +1008,8 @@ export const OnboardingView = () => {
               {step === 2 && agentId && (
                 <Step2
                   agentId={agentId}
-                  onDone={() => {
+                  onDone={(color) => {
+                    if (color) setBrandColor(color);
                     done(2);
                     setStep(3);
                     reloadPreview();
@@ -1012,6 +1020,7 @@ export const OnboardingView = () => {
                 <Step3
                   agentId={agentId}
                   agentName={agentName}
+                  initialColor={brandColor}
                   onDone={() => {
                     done(3);
                     setStep(4);
