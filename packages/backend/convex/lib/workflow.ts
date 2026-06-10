@@ -72,6 +72,17 @@ export const supportAgentOnboarding = workflow.define({
       },
       { name: "save branding" },
     );
+
+    // Apply primary color to widget appearance so the onboarding preview updates
+    await step.runMutation(
+      internal.private.widgetSettings.applyBrandColor,
+      {
+        agentId,
+        orgId: args.orgId,
+        primaryColor: brandingData.primaryColor,
+      },
+      { name: "apply brand color" },
+    );
   },
 });
 

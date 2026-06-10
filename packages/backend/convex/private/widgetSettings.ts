@@ -1,5 +1,5 @@
 import { ConvexError, v } from "convex/values";
-import { internalQuery, mutation, query } from "../_generated/server";
+import { internalMutation, internalQuery, mutation, query } from "../_generated/server";
 import { getOrgIdOrNull } from "../lib/auth";
 
 const appearanceArgs = v.optional(
@@ -143,6 +143,42 @@ export const saveSystemPrompt = mutation({
         defaultSuggestions: {},
         vapiSettings: {},
         systemPrompt: args.systemPrompt,
+      });
+    }
+  },
+});
+
+export const applyBrandColor = internalMutation({
+  args: {
+    agentId: v.id("agents"),
+    orgId: v.string(),
+    primaryColor: v.union(v.string(), v.null()),
+  },
+  handler: async (ctx, args) => {
+    if (!args.primaryColor) return;
+
+    const existing = await ctx.db
+      .query("widgetSettings")
+      .withIndex("by_agent_id", (q) => q.eq("agentId", args.agentId))
+      .first();
+
+    const appearance = {
+      ...(existing?.appearance ?? {}),
+      headerColor: args.primaryColor,
+      bubbleUserColor: args.primaryColor,
+      bubbleButtonColor: args.primaryColor,
+    };
+
+    if (existing) {
+      await ctx.db.patch(existing._id, { appearance });
+    } else {
+      await ctx.db.insert("widgetSettings", {
+        organizationId: args.orgId,
+        agentId: args.agentId,
+        greetMessage: "Hei! Hvordan kan jeg hjelpe deg i dag?",
+        defaultSuggestions: {},
+        vapiSettings: {},
+        appearance,
       });
     }
   },
