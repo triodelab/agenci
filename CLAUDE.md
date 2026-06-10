@@ -1,91 +1,219 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code when working with the Agenci codebase.
 
-## What This Project Is
+---
 
-Agenci is a Norwegian-language AI customer support platform. Organizations embed a chat widget on their website; the widget connects to an AI support agent backed by a RAG knowledge base. The product includes a dashboard for managing agents, knowledge sources (web crawling + file uploads), conversations, and billing.
+# Project Overview
 
-## Monorepo Structure
+Agenci is a Norwegian-language AI customer support platform.
 
-pnpm + Turborepo workspace with:
-- `apps/web` — Next.js 15 dashboard (port 3000), authenticated via Clerk
-- `apps/widget` — Next.js 15 embeddable chat widget (port 3001), uses anonymous contact sessions
-- `apps/embed` — Vite-built JS snippet that injects the widget iframe into third-party sites (port 3002)
-- `packages/backend` — Convex backend (all server logic, DB, AI)
-- `packages/ui` — shared shadcn/ui component library
-- `packages/math` — shared utilities
+Organizations embed a chat widget on their website. The widget connects to an AI support agent backed by a RAG knowledge base.
 
-## Development Commands
+The platform includes:
 
-```bash
-# Start everything
-pnpm dev
+* AI-powered customer support agents
+* Knowledge base management
+* Website crawling and ingestion
+* File uploads
+* Conversation management
+* Billing and subscriptions
+* Multi-tenant organization support
 
-# Start individual services
-pnpm dev:web        # Next.js dashboard only
-pnpm dev:widget     # Widget app only
-pnpm dev:backend    # Convex backend only (runs `convex dev`)
+---
 
-# First-time Convex setup
-pnpm dev:setup      # convex dev --configure --until-success
+# Tech Stack
 
-# Type check all apps
-pnpm exec tsc --noEmit -p apps/web
-pnpm exec tsc --noEmit -p apps/widget
+Frontend:
 
-# Lint
-pnpm lint
+* Next.js 15
+* React 19
+* TypeScript
+* Tailwind CSS v4
+* shadcn/ui
+* Clerk Authentication
 
-# Format
-pnpm format
+Backend:
 
-# Test backend AI connectivity
-pnpm -F @agenci/backend test:openai-mini
-pnpm -F @agenci/backend test:openai-mini:convex
+* Convex
+* Convex Agent
+* Convex RAG
+* Convex Workflow
+* OpenAI GPT-4o-mini
 
-# Full verification (typecheck + backend ping)
-pnpm verify
-```
+Infrastructure:
 
-## Backend Architecture (`packages/backend/convex/`)
+* Turborepo
+* pnpm workspace
+* AWS Secrets Manager
+* Stripe
 
-The Convex backend is organized into:
-- `schema.ts` — all table definitions
-- `convex.config.ts` — registers three Convex components: `@convex-dev/agent`, `@convex-dev/rag`, `@convex-dev/workflow`
-- `http.ts` — HTTP routes for Clerk webhook (user sync) and Stripe webhook (billing)
-- `crons.ts` — scheduled jobs: hourly website sync scheduler, daily session purge
-- `system/` — internal mutations/queries/actions (not exposed to clients directly)
-- `private/` — Convex functions callable only from authenticated dashboard users
-- `public/` — Convex functions callable from the widget (unauthenticated contact sessions)
-- `lib/` — shared utilities: `auth.ts`, `secrets.ts` (AWS Secrets Manager), `workflow.ts`, `knowledgeIngestion.ts`, `firecrawl.ts`, `webpageCrawler.ts`
+Language:
 
-### Auth pattern
-`getOrgIdOrNull(ctx)` in `lib/auth.ts` reads `orgId` from the Clerk JWT custom claims. All dashboard functions gate on this. The widget uses anonymous contact sessions (no Clerk auth).
+* Norwegian (Bokmål)
 
-### RAG / Knowledge Base
-- `@convex-dev/rag` component with OpenAI `text-embedding-3-small` (1536 dims)
-- Namespace pattern: `${orgId}:${agentId}` for agent-specific knowledge, or just `orgId` for org-wide
-- Entry ingestion via `lib/knowledgeIngestion.ts` → `upsertWebpageEntry()` handles HTML→plaintext, dedup via content hash
-- Website crawling uses `@convex-dev/workflow` to orchestrate multi-step Firecrawl scraping via `system/websites.ts`
+---
 
-### AI Agent
-- `system/ai/agents/supportAgent.ts` — `@convex-dev/agent` wrapping `gpt-4o-mini`
-- System prompt is Norwegian; agent searches knowledge base via `searchTool`, can escalate or resolve conversations
-- Playground exposed via `playground.ts` using `@convex-dev/agent-playground`
+# Monorepo Structure
 
-### Secrets
-API keys (OpenAI, Firecrawl, Vapi, etc.) are stored in AWS Secrets Manager via `lib/secrets.ts`. Convex env vars hold AWS credentials.
+apps/web
 
-### Subscriptions & Billing
-Stripe webhooks update the `subscriptions` table. Plans: `starter`, `pro`, `business`. `lib/subscriptionAccess.ts` gates features.
+* Dashboard application
 
-## Key Dependencies
+apps/widget
 
-- `@convex-dev/workpool` must be a **direct dependency** at `^0.3.0+` — both `@convex-dev/workflow@0.4.2` and `@convex-dev/rag@0.3.3` require it as a peer dep
-- Convex catalog version is defined in `pnpm-workspace.yaml` and must stay in sync across all packages
-- `zod` v4 (catalog) — note API differences from v3 if referencing docs
+* Customer-facing chat widget
 
-## Norwegian Language Note
+apps/embed
 
-UI text, AI prompts, error messages, and comments throughout the codebase are in Norwegian (bokmål). Keep this consistent when modifying existing strings.
+* Embeddable script loader
+
+packages/backend
+
+* Convex backend
+
+packages/ui
+
+* Shared UI components
+
+packages/math
+
+* Shared utilities
+
+---
+
+# Development Principles
+
+Always:
+
+* Follow existing project architecture
+* Reuse existing patterns before introducing new ones
+* Keep solutions simple
+* Prefer incremental changes
+* Maintain strict TypeScript compatibility
+* Keep UI text in Norwegian unless explicitly requested otherwise
+* Preserve existing coding conventions
+
+Never:
+
+* Introduce new dependencies unless necessary
+* Perform large refactors without approval
+* Change database schemas without approval
+* Change authentication logic without approval
+* Change billing logic without approval
+
+---
+
+# Cost Optimization Rules
+
+IMPORTANT:
+
+The repository is large.
+
+Do NOT scan the entire repository unless explicitly requested.
+
+Always minimize token usage.
+
+Before reading files:
+
+1. Identify the smallest possible set of files required.
+2. Read only directly relevant files.
+3. Avoid recursive exploration.
+4. Avoid project-wide searches unless necessary.
+
+When solving issues:
+
+* Start with the file explicitly mentioned by the user.
+* Read neighboring files only if required.
+* Do not inspect unrelated folders.
+
+Avoid commands and behaviors that result in large-scale repository analysis.
+
+Examples of what NOT to do:
+
+* Analyze the entire codebase
+* Review the whole architecture
+* Find all bugs in the project
+* Scan every component
+* Read all Convex functions
+
+Examples of preferred behavior:
+
+* Fix a specific component
+* Fix a specific TypeScript error
+* Update a single feature
+* Review only relevant files
+
+---
+
+# Debugging Strategy
+
+When debugging:
+
+1. Read the failing file first.
+2. Identify imports and dependencies.
+3. Read only directly connected files.
+4. Stop exploring once sufficient context is found.
+5. Propose the smallest safe fix.
+
+Never perform broad exploratory debugging without a clear reason.
+
+---
+
+# Context Handling
+
+Prefer focused context over large context.
+
+Only use 1M context mode when:
+
+* explicitly requested
+* performing architecture reviews
+* performing large migrations
+* analyzing multiple subsystems
+
+For normal development tasks:
+
+* Use standard Sonnet mode
+* Keep context focused
+* Avoid unnecessary file reads
+
+---
+
+# Convex Rules
+
+Authentication:
+
+* Use getOrgIdOrNull(ctx)
+* Dashboard routes require Clerk auth
+* Widget routes use anonymous contact sessions
+
+Knowledge Base:
+
+* Namespace format: ${orgId}:${agentId}
+* Use existing ingestion pipeline
+* Preserve deduplication behavior
+
+AI Agent:
+
+* Norwegian system prompts
+* Use existing search tools
+* Preserve escalation flows
+
+---
+
+# Output Expectations
+
+When making changes:
+
+* Explain what changed
+* Explain why
+* Keep edits minimal
+* Avoid unrelated modifications
+
+When uncertain:
+
+* Ask before making architectural decisions
+* Ask before changing database structures
+* Ask before changing billing or auth systems
+
+Optimize for correctness, maintainability, and minimal token usage.
