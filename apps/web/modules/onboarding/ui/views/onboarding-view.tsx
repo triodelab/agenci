@@ -555,12 +555,14 @@ function Step3({
   agentId,
   agentName,
   initialColor,
+  externalColor,
   onPreviewChange,
   onDone,
 }: {
   agentId: Id<"agents">;
   agentName: string;
   initialColor: string;
+  externalColor?: string;
   onPreviewChange: (color: string, title: string) => void;
   onDone: () => void;
 }) {
@@ -568,6 +570,19 @@ function Step3({
   const [title, setTitle] = useState(agentName);
   const [greeting, setGreeting] = useState("Hei! Hvordan kan jeg hjelpe deg? 😊");
   const [color, setColor] = useState(initialColor);
+  const colorTouched = useRef(false);
+
+  // Sync brand color from Firecrawl once it arrives (only if user hasn't picked manually)
+  useEffect(() => {
+    if (externalColor && externalColor !== "#18181b" && !colorTouched.current) {
+      setColor(externalColor);
+    }
+  }, [externalColor]);
+
+  const handleColorChange = (newColor: string) => {
+    colorTouched.current = true;
+    setColor(newColor);
+  };
 
   useEffect(() => {
     onPreviewChange(color, title);
@@ -678,13 +693,13 @@ function Step3({
               id="header-color"
               type="color"
               value={color}
-              onChange={(e) => setColor(e.target.value)}
+              onChange={(e) => handleColorChange(e.target.value)}
               disabled={busy}
               className="h-12 w-16 cursor-pointer rounded-xl border border-border bg-transparent p-1"
             />
             <Input
               value={color}
-              onChange={(e) => setColor(e.target.value)}
+              onChange={(e) => handleColorChange(e.target.value)}
               disabled={busy}
               className="h-12 max-w-[150px] rounded-xl font-mono text-xs uppercase"
               placeholder="#18181b"
@@ -695,7 +710,7 @@ function Step3({
                   <button
                     key={c}
                     type="button"
-                    onClick={() => setColor(c)}
+                    onClick={() => handleColorChange(c)}
                     className={cn(
                       "size-9 rounded-xl border transition-transform hover:scale-110",
                       color.toLowerCase() === c
@@ -1004,6 +1019,7 @@ export const OnboardingView = () => {
                   agentId={agentId}
                   agentName={agentName}
                   initialColor={brandColor}
+                  externalColor={brandColor}
                   onPreviewChange={handlePreviewChange}
                   onDone={() => {
                     done(3);
