@@ -212,7 +212,7 @@ export const WidgetChatScreen = () => {
       <WidgetHeader className="flex w-full min-w-0 shrink-0 items-center justify-between gap-2">
         <div className="flex min-w-0 flex-1 items-center gap-x-2">
           <Button
-            className="shrink-0"
+            className="shrink-0 !text-[var(--widget-header-text)]"
             onClick={onBack}
             size="icon"
             variant="transparent"
@@ -224,7 +224,7 @@ export const WidgetChatScreen = () => {
           </p>
         </div>
         <Button
-          className="shrink-0"
+          className="shrink-0 !text-[var(--widget-header-text)]"
           size="icon"
           variant="transparent"
           onClick={() => setShowPrivacyPanel(true)}

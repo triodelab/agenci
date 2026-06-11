@@ -625,7 +625,7 @@ function Step3({
       }
     }, 500);
     return () => clearTimeout(t);
-  }, [agentId, agentName, color, greeting, title, upsert]);
+  }, [agentId, agentName, color, fontFamily, greeting, title, upsert]);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -645,9 +645,12 @@ function Step3({
         vapiSettings: { assistantId: undefined, phoneNumber: undefined },
         appearance: {
           headerColor: color,
-          headerTextColor: "#ffffff",
+          headerTextColor: getContrastTextColor(color),
           bubbleUserColor: color,
+          bubbleUserTextColor: getContrastTextColor(color),
           bubbleButtonColor: color,
+          bubbleButtonIconColor: getContrastTextColor(color),
+          ...(fontFamily ? { fontFamily } : {}),
         },
       });
       onDone();

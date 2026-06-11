@@ -35,6 +35,7 @@ export const WidgetVoiceScreen = () => {
           <Button
             variant="transparent"
             size="icon"
+            className="!text-[var(--widget-header-text)]"
             onClick={() => setScreen("selection")}
           >
             <ArrowLeftIcon />
