@@ -61,9 +61,9 @@ export const extractThemeColor = action({
       const fromInline = findCssVarColor(inlineCss);
       if (fromInline) return { color: fromInline };
 
-      // 4. CSS custom properties in external stylesheets (first match wins)
+      // 4. CSS custom properties in external stylesheets (theme sheets first, up to 5)
       const sheetUrls = extractStylesheetUrls(head, target);
-      for (const sheetUrl of sheetUrls.slice(0, 3)) {
+      for (const sheetUrl of sheetUrls.slice(0, 5)) {
         try {
           const cssRes = await fetch(sheetUrl, {
             headers: { "User-Agent": BOT_UA },
@@ -111,7 +111,9 @@ function extractStylesheetUrls(html: string, base: URL): string[] {
       // skip malformed URLs
     }
   }
-  return urls;
+  // Theme stylesheets are most likely to have brand CSS vars — check them first
+  const isTheme = (u: string) => /\/themes?\//i.test(u);
+  return [...urls.filter(isTheme), ...urls.filter((u) => !isTheme(u))];
 }
 
 function normalizeColor(raw: string): string | null {
