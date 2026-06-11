@@ -78,10 +78,42 @@ export const DEFAULT_WIDGET_APPEARANCE_DARK: WidgetAppearance = {
   bubbleButtonSize: 60,
 };
 
+/**
+ * Returns the text color (#ffffff or #18181b) with best contrast
+ * against bgHex using the WCAG relative-luminance formula.
+ */
+export function getContrastTextColor(bgHex: string): "#ffffff" | "#18181b" {
+  const hex = bgHex.replace("#", "");
+  if (hex.length !== 6) return "#ffffff";
+  const toLinear = (c: number) =>
+    c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+  const r = toLinear(parseInt(hex.slice(0, 2), 16) / 255);
+  const g = toLinear(parseInt(hex.slice(2, 4), 16) / 255);
+  const b = toLinear(parseInt(hex.slice(4, 6), 16) / 255);
+  const L = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  return L > 0.179 ? "#18181b" : "#ffffff";
+}
+
 export function mergeWidgetAppearance(
   partial?: Partial<WidgetAppearance> | null,
 ): WidgetAppearance {
-  return { ...DEFAULT_WIDGET_APPEARANCE_LIGHT, ...partial };
+  const merged = { ...DEFAULT_WIDGET_APPEARANCE_LIGHT, ...partial };
+  // If user/button bubble colors weren't explicitly saved, inherit the header color
+  if (partial?.headerColor) {
+    if (!partial.bubbleUserColor) merged.bubbleUserColor = partial.headerColor;
+    if (!partial.bubbleButtonColor) merged.bubbleButtonColor = partial.headerColor;
+  }
+  // Auto-compute text colors based on contrast when not explicitly set
+  if (!partial?.headerTextColor && merged.headerColor) {
+    merged.headerTextColor = getContrastTextColor(merged.headerColor);
+  }
+  if (!partial?.bubbleUserTextColor && merged.bubbleUserColor) {
+    merged.bubbleUserTextColor = getContrastTextColor(merged.bubbleUserColor);
+  }
+  if (!partial?.bubbleButtonIconColor && merged.bubbleButtonColor) {
+    merged.bubbleButtonIconColor = getContrastTextColor(merged.bubbleButtonColor);
+  }
+  return merged;
 }
 
 function widgetColorVars(a: WidgetAppearance): CSSProperties {

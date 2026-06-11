@@ -29,6 +29,7 @@ import { AgenciNavWordmark } from "@/components/logo";
 import { WidgetChatPreviewCard } from "@/modules/customization/ui/components/widget-appearance-fields";
 import {
   DEFAULT_WIDGET_APPEARANCE_LIGHT,
+  getContrastTextColor,
 } from "@workspace/ui/lib/widget-appearance";
 
 const EMBED_SRC =
@@ -607,7 +608,14 @@ function Step3({
             suggestion3: undefined,
           },
           vapiSettings: { assistantId: undefined, phoneNumber: undefined },
-          appearance: { headerColor: color, headerTextColor: "#ffffff" },
+          appearance: {
+            headerColor: color,
+            headerTextColor: getContrastTextColor(color),
+            bubbleUserColor: color,
+            bubbleUserTextColor: getContrastTextColor(color),
+            bubbleButtonColor: color,
+            bubbleButtonIconColor: getContrastTextColor(color),
+          },
         });
       } catch {
         // Silent — submit-knappen viser feilen
@@ -632,7 +640,12 @@ function Step3({
           suggestion3: undefined,
         },
         vapiSettings: { assistantId: undefined, phoneNumber: undefined },
-        appearance: { headerColor: color, headerTextColor: "#ffffff" },
+        appearance: {
+          headerColor: color,
+          headerTextColor: "#ffffff",
+          bubbleUserColor: color,
+          bubbleButtonColor: color,
+        },
       });
       onDone();
     } catch (err: unknown) {
@@ -859,12 +872,15 @@ function OnboardingWidgetPreview({
   color: string;
   title: string;
 }) {
+  const textColor = getContrastTextColor(color);
   const appearance = {
     ...DEFAULT_WIDGET_APPEARANCE_LIGHT,
     headerColor: color,
-    headerTextColor: "#ffffff",
+    headerTextColor: textColor,
     bubbleUserColor: color,
+    bubbleUserTextColor: textColor,
     bubbleButtonColor: color,
+    bubbleButtonIconColor: textColor,
   };
 
   return (
