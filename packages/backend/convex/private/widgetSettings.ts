@@ -31,6 +31,7 @@ const appearanceArgs = v.optional(
     bubbleButtonColor: v.optional(v.string()),
     bubbleButtonIconColor: v.optional(v.string()),
     bubbleButtonSize: v.optional(v.number()),
+    fontFamily: v.optional(v.string()),
   }),
 );
 
@@ -165,25 +166,30 @@ export const applyBrandColor = internalMutation({
     agentId: v.id("agents"),
     orgId: v.string(),
     primaryColor: v.union(v.string(), v.null()),
+    fontFamily: v.union(v.string(), v.null()),
   },
   handler: async (ctx, args) => {
-    if (!args.primaryColor) return;
+    if (!args.primaryColor && !args.fontFamily) return;
 
     const existing = await ctx.db
       .query("widgetSettings")
       .withIndex("by_agent_id", (q) => q.eq("agentId", args.agentId))
       .first();
 
-    const textColor = getContrastTextColor(args.primaryColor);
-    const appearance = {
-      ...(existing?.appearance ?? {}),
-      headerColor: args.primaryColor,
-      headerTextColor: textColor,
-      bubbleUserColor: args.primaryColor,
-      bubbleUserTextColor: textColor,
-      bubbleButtonColor: args.primaryColor,
-      bubbleButtonIconColor: textColor,
-    };
+    const base = existing?.appearance ?? {};
+    const appearance: Record<string, unknown> = { ...base };
+    if (args.primaryColor) {
+      const textColor = getContrastTextColor(args.primaryColor);
+      appearance.headerColor = args.primaryColor;
+      appearance.headerTextColor = textColor;
+      appearance.bubbleUserColor = args.primaryColor;
+      appearance.bubbleUserTextColor = textColor;
+      appearance.bubbleButtonColor = args.primaryColor;
+      appearance.bubbleButtonIconColor = textColor;
+    }
+    if (args.fontFamily) {
+      appearance.fontFamily = args.fontFamily;
+    }
 
     if (existing) {
       await ctx.db.patch(existing._id, { appearance });

@@ -21,6 +21,7 @@ export const widgetAppearanceSchema = z.object({
   bubbleButtonColor: z.string(),
   bubbleButtonIconColor: z.string(),
   bubbleButtonSize: z.number().min(40).max(80),
+  fontFamily: z.string().optional(),
 });
 
 export const widgetSettingsSchema = z.object({

@@ -16,6 +16,7 @@ export const WidgetHeader = ({
       style={{
         backgroundColor: "var(--widget-header-bg)",
         color: "var(--widget-header-text)",
+        fontFamily: "var(--widget-font-family, inherit)",
       }}
     >
       {children}

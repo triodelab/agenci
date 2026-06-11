@@ -335,7 +335,7 @@ function Step2({
   onDone,
 }: {
   agentId: Id<"agents">;
-  onDone: (color?: string) => void;
+  onDone: (color?: string, fontFamily?: string) => void;
 }) {
   const addWebpage = useAction(api.private.files.addWebpage);
   const kickoffOnboarding = useMutation(api.lib.workflow.kickoffAgentOnboarding);
@@ -366,12 +366,12 @@ function Step2({
     setBusy(true);
     setError(null);
     try {
-      const [, colorResult] = await Promise.all([
+      const [, themeResult] = await Promise.all([
         addWebpage({ url: url.trim(), agentId }),
-        extractThemeColor({ url: url.trim() }).catch(() => ({ color: null })),
+        extractThemeColor({ url: url.trim() }).catch(() => ({ color: null, fontFamily: null })),
       ]);
       void kickoffOnboarding({ url: url.trim(), agentId });
-      onDone(colorResult.color ?? undefined);
+      onDone(themeResult.color ?? undefined, themeResult.fontFamily ?? undefined);
     } catch (err) {
       handleError(err);
     } finally {
@@ -560,6 +560,7 @@ function Step3({
   agentName,
   initialColor,
   externalColor,
+  fontFamily,
   onPreviewChange,
   onDone,
 }: {
@@ -567,6 +568,7 @@ function Step3({
   agentName: string;
   initialColor: string;
   externalColor?: string;
+  fontFamily?: string;
   onPreviewChange: (color: string, title: string) => void;
   onDone: () => void;
 }) {
@@ -615,6 +617,7 @@ function Step3({
             bubbleUserTextColor: getContrastTextColor(color),
             bubbleButtonColor: color,
             bubbleButtonIconColor: getContrastTextColor(color),
+            ...(fontFamily ? { fontFamily } : {}),
           },
         });
       } catch {
@@ -924,6 +927,7 @@ export const OnboardingView = () => {
   const [agentId, setAgentId] = useState<Id<"agents"> | null>(null);
   const [agentName, setAgentName] = useState("");
   const [brandColor, setBrandColor] = useState("#18181b");
+  const [brandFont, setBrandFont] = useState<string | undefined>(undefined);
   const [previewColor, setPreviewColor] = useState("#18181b");
   const [previewTitle, setPreviewTitle] = useState("");
 
@@ -1026,8 +1030,9 @@ export const OnboardingView = () => {
               {step === 2 && agentId && (
                 <Step2
                   agentId={agentId}
-                  onDone={(color) => {
+                  onDone={(color, fontFamily) => {
                     if (color) setBrandColor(color);
+                    if (fontFamily) setBrandFont(fontFamily);
                     setPreviewTitle(agentName);
                     done(2);
                     setStep(3);
@@ -1040,6 +1045,7 @@ export const OnboardingView = () => {
                   agentName={agentName}
                   initialColor={brandColor}
                   externalColor={brandColor}
+                  fontFamily={brandFont}
                   onPreviewChange={handlePreviewChange}
                   onDone={() => {
                     done(3);

@@ -29,6 +29,8 @@ export interface WidgetAppearance {
   bubbleButtonColor: string;
   bubbleButtonIconColor: string;
   bubbleButtonSize: number;
+  /** Brand font family extracted from the customer's website */
+  fontFamily?: string;
 }
 
 /** Typisk innebygd chat (bredde × høyde) — nær vanlige widget-rammer. */
@@ -103,15 +105,24 @@ export function mergeWidgetAppearance(
     if (!partial.bubbleUserColor) merged.bubbleUserColor = partial.headerColor;
     if (!partial.bubbleButtonColor) merged.bubbleButtonColor = partial.headerColor;
   }
-  // Auto-compute text colors based on contrast when not explicitly set
-  if (!partial?.headerTextColor && merged.headerColor) {
-    merged.headerTextColor = getContrastTextColor(merged.headerColor);
+  // Auto-compute text colors — also corrects legacy stored "#ffffff" on light backgrounds
+  if (merged.headerColor) {
+    const ideal = getContrastTextColor(merged.headerColor);
+    if (!partial?.headerTextColor || (partial.headerTextColor === "#ffffff" && ideal === "#18181b")) {
+      merged.headerTextColor = ideal;
+    }
   }
-  if (!partial?.bubbleUserTextColor && merged.bubbleUserColor) {
-    merged.bubbleUserTextColor = getContrastTextColor(merged.bubbleUserColor);
+  if (merged.bubbleUserColor) {
+    const ideal = getContrastTextColor(merged.bubbleUserColor);
+    if (!partial?.bubbleUserTextColor || (partial.bubbleUserTextColor === "#ffffff" && ideal === "#18181b")) {
+      merged.bubbleUserTextColor = ideal;
+    }
   }
-  if (!partial?.bubbleButtonIconColor && merged.bubbleButtonColor) {
-    merged.bubbleButtonIconColor = getContrastTextColor(merged.bubbleButtonColor);
+  if (merged.bubbleButtonColor) {
+    const ideal = getContrastTextColor(merged.bubbleButtonColor);
+    if (!partial?.bubbleButtonIconColor || (partial.bubbleButtonIconColor === "#ffffff" && ideal === "#18181b")) {
+      merged.bubbleButtonIconColor = ideal;
+    }
   }
   return merged;
 }
@@ -129,6 +140,7 @@ function widgetColorVars(a: WidgetAppearance): CSSProperties {
     ["--widget-input-bg" as string]: a.inputBackgroundColor,
     ["--widget-input-text" as string]: a.inputTextColor,
     ["--widget-input-placeholder" as string]: a.inputPlaceholderColor,
+    ...(a.fontFamily ? { ["--widget-font-family" as string]: a.fontFamily } : {}),
   };
 }
 
