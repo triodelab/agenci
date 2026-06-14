@@ -18,9 +18,10 @@ import Link from "next/link";
 import { Suspense, Component, type ReactNode, useState, useEffect, useCallback } from "react";
 import { useQuery } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
-import { LogoIcon } from "@/components/logo";
+import { AgenciNavWordmark } from "@/components/logo";
 import { useSidebar } from "@workspace/ui/components/sidebar";
 import { ModeToggle } from "@/components/mode-toggle";
+import { useTheme } from "next-themes";
 import {
   Popover,
   PopoverContent,
@@ -406,24 +407,23 @@ function TipRow({ tip, onDismiss }: { tip: Tip; onDismiss: (id: string) => void 
 
 export function DashboardTopNav() {
   const { toggleSidebar } = useSidebar();
+  const { resolvedTheme } = useTheme();
+  const wordmarkSurface = resolvedTheme === "dark" ? "dark" : "light";
 
   return (
     <header className="dash-topnav flex h-[60px] shrink-0 items-center justify-between gap-4 border-b border-border/70 bg-background px-4 lg:px-5">
-      {/* Left: mobile-only toggle + logo; desktop shows plan badge only */}
+      {/* Left: toggle + wordmark + plan badge */}
       <div className="flex items-center gap-3 min-w-0">
         <button
           onClick={toggleSidebar}
-          className="flex lg:hidden size-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+          className="flex size-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
           aria-label="Toggle sidebar"
         >
           <SidebarIcon className="size-4" strokeWidth={1.75} />
         </button>
 
-        <Link href="/dashboard" className="flex lg:hidden items-center gap-2 shrink-0">
-          <LogoIcon className="size-7 rounded-lg brightness-0 dark:invert" />
-          <span className="font-semibold text-[15px] tracking-tight text-foreground hidden sm:block">
-            Agenci
-          </span>
+        <Link href="/agents" className="flex items-center shrink-0">
+          <AgenciNavWordmark surface={wordmarkSurface} />
         </Link>
 
         <QueryErrorBoundary>

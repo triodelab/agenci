@@ -11,7 +11,6 @@ import {
   LibraryBigIcon,
   Mic,
   PaletteIcon,
-  PanelLeftIcon,
   PlugIcon,
   ZapIcon,
   GemIcon,
@@ -21,7 +20,6 @@ import {
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import { useQuery } from "convex/react";
-import { useTheme } from "next-themes";
 import { Component, type ReactNode } from "react";
 import { api } from "@workspace/backend/_generated/api";
 import type { Id } from "@workspace/backend/_generated/dataModel";
@@ -45,7 +43,6 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
-  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -57,7 +54,6 @@ import {
   TooltipTrigger,
 } from "@workspace/ui/components/tooltip";
 import { cn } from "@workspace/ui/lib/utils";
-import { AgenciNavWordmark } from "@/components/logo";
 
 // ─── Nav items ────────────────────────────────────────────────────────────────
 
@@ -246,10 +242,8 @@ function PlanCard({ collapsed }: { collapsed: boolean }) {
 export const DashboardSidebar = () => {
   const pathname = usePathname();
   const params = useParams();
-  const { state, isMobile, toggleSidebar } = useSidebar();
+  const { state, isMobile } = useSidebar();
   const collapsed = state === "collapsed" && !isMobile;
-  const { resolvedTheme } = useTheme();
-  const wordmarkSurface = resolvedTheme === "dark" ? "dark" : "light";
 
   const agentId =
     typeof params?.agentId === "string" ? (params.agentId as Id<"agents">) : undefined;
@@ -283,25 +277,6 @@ export const DashboardSidebar = () => {
       className="!relative !inset-auto !h-full bg-sidebar dash-sidebar-scope"
       collapsible="icon"
     >
-      {/* Header: toggle + wordmark — matcher TopNav-bakgrunn (bypasser dash-sidebar-scope) */}
-      <SidebarHeader className="bg-[#FAFAF9] p-0 dark:bg-[#111110]">
-        <div className="flex h-[60px] items-center gap-1 px-3">
-          <button
-            onClick={toggleSidebar}
-            className="flex size-8 shrink-0 items-center justify-center rounded-lg text-[#1C1C1C] transition-colors hover:bg-[#1C1C1C]/10 dark:text-white dark:hover:bg-white/10"
-            aria-label="Toggle sidebar"
-          >
-            <PanelLeftIcon className="size-4" strokeWidth={1.75} />
-          </button>
-          <Link
-            href="/agents"
-            className="group-data-[collapsible=icon]:hidden flex items-center"
-          >
-            <AgenciNavWordmark surface={wordmarkSurface} />
-          </Link>
-        </div>
-      </SidebarHeader>
-
       <SidebarContent className="px-2 pt-3 pb-2 gap-0">
         {agentId ? (
           <>

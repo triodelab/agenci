@@ -25,17 +25,19 @@ export const DashboardLayout = async ({ children }: { children: React.ReactNode 
            * Sidebar/MainArea are siblings inside the inner div — flex-1 handles widths.
            */}
           <SidebarProvider
-            className="dashboard-app-shell flex h-svh min-h-0 max-h-svh w-full"
+            className="dashboard-app-shell flex flex-col h-svh min-h-0 max-h-svh w-full"
             defaultOpen={defaultOpen}
           >
             <UserSync />
-            {/* Sidebar runs full height — has its own header with logo + toggle */}
-            <DashboardSidebar />
-            {/* Content column: top nav + trial banner + main area */}
-            <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-              <DashboardTopNav />
-              <TrialBanner />
-              <DashboardMainArea>{children}</DashboardMainArea>
+            {/* Full-width top nav — spans above both sidebar and content */}
+            <DashboardTopNav />
+            {/* Sidebar + content below the nav */}
+            <div className="flex min-h-0 flex-1 overflow-hidden">
+              <DashboardSidebar />
+              <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+                <TrialBanner />
+                <DashboardMainArea>{children}</DashboardMainArea>
+              </div>
             </div>
           </SidebarProvider>
         </Provider>
