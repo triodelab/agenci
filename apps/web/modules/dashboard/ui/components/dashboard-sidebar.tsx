@@ -242,7 +242,7 @@ function PlanCard({ collapsed }: { collapsed: boolean }) {
 export const DashboardSidebar = () => {
   const pathname = usePathname();
   const params = useParams();
-  const { state, isMobile } = useSidebar();
+  const { state, isMobile, toggleSidebar } = useSidebar();
   const collapsed = state === "collapsed" && !isMobile;
 
   const agentId =
@@ -277,6 +277,15 @@ export const DashboardSidebar = () => {
       className="!relative !inset-auto !h-full bg-sidebar dash-sidebar-scope"
       collapsible="icon"
     >
+      {/* Clickable right-edge strip to collapse sidebar */}
+      {!collapsed && (
+        <button
+          type="button"
+          onClick={toggleSidebar}
+          aria-label="Lukk sidebar"
+          className="absolute right-0 top-0 z-10 h-full w-1.5 cursor-col-resize opacity-0 hover:opacity-100 hover:bg-border/60 transition-opacity"
+        />
+      )}
       <SidebarContent className="px-2 pt-3 pb-2 gap-0">
         {agentId ? (
           <>
