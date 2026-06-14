@@ -68,6 +68,7 @@ export default defineSchema({
         bubbleButtonColor: v.optional(v.string()),
         bubbleButtonIconColor: v.optional(v.string()),
         bubbleButtonSize: v.optional(v.number()),
+        fontFamily: v.optional(v.string()),
       }),
     ),
     bookingEnabled: v.optional(v.boolean()),
