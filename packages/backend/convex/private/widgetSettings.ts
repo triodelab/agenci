@@ -176,20 +176,18 @@ export const applyBrandColor = internalMutation({
       .withIndex("by_agent_id", (q) => q.eq("agentId", args.agentId))
       .first();
 
-    const base = existing?.appearance ?? {};
-    const appearance: Record<string, unknown> = { ...base };
-    if (args.primaryColor) {
-      const textColor = getContrastTextColor(args.primaryColor);
-      appearance.headerColor = args.primaryColor;
-      appearance.headerTextColor = textColor;
-      appearance.bubbleUserColor = args.primaryColor;
-      appearance.bubbleUserTextColor = textColor;
-      appearance.bubbleButtonColor = args.primaryColor;
-      appearance.bubbleButtonIconColor = textColor;
-    }
-    if (args.fontFamily) {
-      appearance.fontFamily = args.fontFamily;
-    }
+    const colorPatch = args.primaryColor
+      ? {
+          headerColor: args.primaryColor,
+          headerTextColor: getContrastTextColor(args.primaryColor),
+          bubbleUserColor: args.primaryColor,
+          bubbleUserTextColor: getContrastTextColor(args.primaryColor),
+          bubbleButtonColor: args.primaryColor,
+          bubbleButtonIconColor: getContrastTextColor(args.primaryColor),
+        }
+      : {};
+    const fontPatch = args.fontFamily ? { fontFamily: args.fontFamily } : {};
+    const appearance = { ...(existing?.appearance ?? {}), ...colorPatch, ...fontPatch };
 
     if (existing) {
       await ctx.db.patch(existing._id, { appearance });
