@@ -417,15 +417,13 @@ export const DashboardSidebar = () => {
       className="!relative !inset-auto !h-full bg-sidebar dash-sidebar-scope"
       collapsible="icon"
     >
-      {/* Clickable right-edge strip to collapse sidebar */}
-      {!collapsed && (
-        <button
-          type="button"
-          onClick={toggleSidebar}
-          aria-label="Lukk sidebar"
-          className="absolute right-0 top-0 z-10 h-full w-1.5 cursor-col-resize opacity-0 hover:opacity-100 hover:bg-border/60 transition-opacity"
-        />
-      )}
+      {/* Clickable right-edge strip to toggle sidebar */}
+      <button
+        type="button"
+        onClick={toggleSidebar}
+        aria-label={collapsed ? "Åpne sidebar" : "Lukk sidebar"}
+        className="absolute right-0 top-0 z-10 h-full w-1.5 cursor-col-resize opacity-0 hover:opacity-100 hover:bg-border/60 transition-opacity"
+      />
       <QueryErrorBoundary>
         <SidebarBody collapsed={collapsed} agentId={agentId} pathname={pathname} />
       </QueryErrorBoundary>
