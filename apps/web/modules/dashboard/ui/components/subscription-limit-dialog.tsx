@@ -27,8 +27,8 @@ export function SubscriptionLimitDialog({
     <Dialog open={open} onOpenChange={(o) => { if (!o) onClose(); }}>
       <DialogContent className="dashboard-app-shell sm:max-w-sm">
         <div className="flex flex-col items-center gap-5 py-2 text-center">
-          <div className="grid size-16 place-items-center rounded-2xl bg-amber-500/10 ring-1 ring-amber-500/20">
-            <ZapIcon className="size-8 text-amber-500" strokeWidth={1.75} />
+          <div className="grid size-16 place-items-center rounded-2xl bg-foreground/8 ring-1 ring-border">
+            <ZapIcon className="size-8 text-foreground" strokeWidth={1.75} />
           </div>
           <div className="space-y-2">
             <DialogTitle className="text-[18px] font-bold tracking-[-0.02em]">
@@ -41,7 +41,7 @@ export function SubscriptionLimitDialog({
           <div className="flex w-full flex-col gap-2">
             <Button
               asChild
-              className="w-full gap-2 bg-amber-500 text-white hover:bg-amber-600 dark:bg-amber-500 dark:hover:bg-amber-600"
+              className="w-full gap-2"
               onClick={onClose}
             >
               <Link href="/billing">
