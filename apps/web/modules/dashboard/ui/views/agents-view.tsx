@@ -53,6 +53,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { DashboardAccentButton } from "@/modules/dashboard/ui/components/dashboard-accent";
 import { DashboardPageShell } from "@/modules/dashboard/ui/components/dashboard-page-shell";
+import { SubscriptionLimitDialog } from "@/modules/dashboard/ui/components/subscription-limit-dialog";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@workspace/ui/components/tooltip";
 
 type AgentDoc = Doc<"agents">;
@@ -130,6 +131,8 @@ export function AgentsView() {
   const [createName, setCreateName] = useState("");
   const [createDescription, setCreateDescription] = useState("");
   const [createBusy, setCreateBusy] = useState(false);
+  const [limitOpen, setLimitOpen] = useState(false);
+  const [limitMessage, setLimitMessage] = useState("");
 
   const [editTarget, setEditTarget] = useState<AgentDoc | null>(null);
   const [editName, setEditName] = useState("");
@@ -159,7 +162,15 @@ export function AgentsView() {
       setCreateName("");
       setCreateDescription("");
     } catch (err) {
-      toast.error(formatMutationError(err, "Kunne ikke opprette agent."));
+      const msg = formatMutationError(err, "Kunne ikke opprette agent.");
+      const code = (err as { data?: { code?: string } })?.data?.code;
+      const isLimit = code === "LIMIT_REACHED" || msg.includes("nådd maks");
+      if (isLimit) {
+        setLimitMessage(msg);
+        setLimitOpen(true);
+      } else {
+        toast.error(msg);
+      }
     } finally {
       setCreateBusy(false);
     }
@@ -407,6 +418,14 @@ export function AgentsView() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* ── Subscription limit dialog ── */}
+      <SubscriptionLimitDialog
+        open={limitOpen}
+        onClose={() => setLimitOpen(false)}
+        title="Agentgrensen er nådd"
+        message={limitMessage || `Du har nådd maks ${maxAgents} agent${maxAgents === 1 ? "" : "er"} på din plan. Oppgrader for å opprette flere.`}
+      />
 
       {/* ── Delete dialog ── */}
       <AlertDialog onOpenChange={(o) => { if (!o) setDeleteTarget(null); }} open={deleteTarget !== null}>

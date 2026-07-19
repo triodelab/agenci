@@ -31,6 +31,7 @@ import {
   DEFAULT_WIDGET_APPEARANCE_LIGHT,
   getContrastTextColor,
 } from "@workspace/ui/lib/widget-appearance";
+import { SubscriptionLimitDialog } from "@/modules/dashboard/ui/components/subscription-limit-dialog";
 
 const EMBED_SRC =
   process.env.NEXT_PUBLIC_WIDGET_EMBED_SCRIPT_URL?.trim() ||
@@ -229,6 +230,20 @@ function StepHeader({
   );
 }
 
+function parseConvexError(err: unknown, fallback: string): { message: string; isLimitError: boolean } {
+  if (err && typeof err === "object") {
+    const o = err as { data?: { message?: string; code?: string }; message?: string };
+    const message = o.data?.message ?? o.message ?? fallback;
+    const code = o.data?.code;
+    const isLimitError =
+      code === "LIMIT_REACHED" ||
+      (typeof message === "string" &&
+        (message.includes("nådd maks") || message.includes("samtale-grense")));
+    return { message, isLimitError };
+  }
+  return { message: fallback, isLimitError: false };
+}
+
 // ─── Step 1 ─────────────────────────────────────────────────────────────────
 function Step1({
   onDone,
@@ -240,6 +255,8 @@ function Step1({
   const [desc, setDesc] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [limitOpen, setLimitOpen] = useState(false);
+  const [limitMessage, setLimitMessage] = useState("");
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -253,13 +270,13 @@ function Step1({
       });
       onDone(agentId, name.trim());
     } catch (err: unknown) {
-      const msg =
-        err instanceof Error
-          ? err.message
-          : typeof err === "object" && err && "message" in err
-            ? String((err as { message: unknown }).message)
-            : "Noe gikk galt";
-      setError(msg);
+      const { message, isLimitError } = parseConvexError(err, "Noe gikk galt");
+      if (isLimitError) {
+        setLimitMessage(message);
+        setLimitOpen(true);
+      } else {
+        setError(message);
+      }
     } finally {
       setBusy(false);
     }
@@ -325,6 +342,13 @@ function Step1({
           </>
         )}
       </Button>
+
+      <SubscriptionLimitDialog
+        open={limitOpen}
+        onClose={() => setLimitOpen(false)}
+        title="Agentgrensen er nådd"
+        message={limitMessage || "Du har nådd maks antall agenter på din plan. Oppgrader for å opprette flere."}
+      />
     </form>
   );
 }

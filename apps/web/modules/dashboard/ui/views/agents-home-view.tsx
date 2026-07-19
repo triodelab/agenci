@@ -29,10 +29,12 @@ import {
   Trash2Icon,
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { DashboardAccentButton } from "@/modules/dashboard/ui/components/dashboard-accent";
 import { DashboardPageShell } from "@/modules/dashboard/ui/components/dashboard-page-shell";
+import { SubscriptionLimitDialog } from "@/modules/dashboard/ui/components/subscription-limit-dialog";
 
 type AgentWithCount = Doc<"agents"> & { openConversationCount: number };
 
@@ -207,7 +209,9 @@ function UsageBanner() {
 }
 
 export function AgentsHomeView() {
+  const router = useRouter();
   const agents = useQuery(api.private.agents.listWithCounts);
+  const subscription = useQuery(api.private.subscription.getOwn);
   const createAgent = useMutation(api.private.agents.create);
   const removeAgent = useMutation(api.private.agents.remove);
 
@@ -218,6 +222,19 @@ export function AgentsHomeView() {
   const [deleteTarget, setDeleteTarget] = useState<AgentWithCount | null>(null);
   const [deleteConfirmName, setDeleteConfirmName] = useState("");
   const [deleteBusy, setDeleteBusy] = useState(false);
+  const [limitOpen, setLimitOpen] = useState(false);
+
+  const agentCount = agents?.length ?? 0;
+  const maxAgents = subscription?.maxAgents ?? 1;
+  const atLimit = agentCount >= maxAgents;
+
+  const handleNewAgent = () => {
+    if (atLimit) {
+      setLimitOpen(true);
+    } else {
+      router.push("/onboarding?new=1");
+    }
+  };
 
   const onCreate = async () => {
     const n = createName.trim();
@@ -267,11 +284,9 @@ export function AgentsHomeView() {
             Velg en agent for å se samtaler, kunnskapsbase og innstillinger.
           </p>
         </div>
-        <DashboardAccentButton asChild className="w-full sm:w-auto shrink-0 gap-2">
-          <Link href="/onboarding?new=1">
-            <PlusIcon className="size-4" />
-            Ny agent
-          </Link>
+        <DashboardAccentButton className="w-full sm:w-auto shrink-0 gap-2" onClick={handleNewAgent} type="button">
+          <PlusIcon className="size-4" />
+          Ny agent
         </DashboardAccentButton>
       </div>
 
@@ -422,6 +437,13 @@ export function AgentsHomeView() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <SubscriptionLimitDialog
+        open={limitOpen}
+        onClose={() => setLimitOpen(false)}
+        title="Agentgrensen er nådd"
+        message={`Du har nådd maks ${maxAgents} agent${maxAgents === 1 ? "" : "er"} på din plan. Oppgrader for å opprette flere.`}
+      />
     </DashboardPageShell>
   );
 }

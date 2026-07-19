@@ -2,7 +2,7 @@
 
 import { WidgetHeader } from "@/modules/widget/ui/components/widget-header";
 import { useAtomValue, useSetAtom } from "jotai";
-import { CalendarIcon, ChevronRightIcon, MessageSquareTextIcon, MicIcon, PhoneIcon } from "lucide-react";
+import { CalendarIcon, ChevronRightIcon, MessageSquareTextIcon, MicIcon, PhoneIcon, ZapIcon } from "lucide-react";
 import { useWidgetDisplayTitle } from "@/lib/widget-display-title";
 import {
   agentIdAtom,
@@ -41,6 +41,7 @@ export const WidgetSelectionScreen = () => {
 
   const createConversation = useMutation(api.public.conversations.create);
   const [isPending, setIsPending] = useState(false);
+  const [limitReached, setLimitReached] = useState(false);
 
   const handleNewConversation = async () => {
     if (!organizationId) {
@@ -48,12 +49,13 @@ export const WidgetSelectionScreen = () => {
       setErrorMessage("Organisasjons-ID mangler");
       return;
     }
-    
+
     if (!contactSessionId) {
       setScreen("auth");
       return;
     }
-    
+
+    setLimitReached(false);
     setIsPending(true);
     try {
       const conversationId = await createConversation({
@@ -64,8 +66,13 @@ export const WidgetSelectionScreen = () => {
 
       setConversationId(conversationId);
       setScreen("chat");
-    } catch {
-      setScreen("auth");
+    } catch (err: unknown) {
+      const code = (err as { data?: { code?: string } })?.data?.code;
+      if (code === "LIMIT_REACHED") {
+        setLimitReached(true);
+      } else {
+        setScreen("auth");
+      }
     } finally {
       setIsPending(false);
     }
@@ -99,6 +106,21 @@ export const WidgetSelectionScreen = () => {
         className="flex flex-1 flex-col gap-y-3 p-4 overflow-y-auto"
         style={{ backgroundColor: "var(--widget-bg, #fff)" }}
       >
+        {limitReached && (
+          <div className="flex flex-col items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-5 text-center">
+            <div className="grid size-10 place-items-center rounded-xl bg-amber-100">
+              <ZapIcon className="size-5 text-amber-600" strokeWidth={1.75} />
+            </div>
+            <div>
+              <p className="text-[13px] font-semibold text-amber-900">
+                Samtalegrensen er nådd
+              </p>
+              <p className="mt-0.5 text-[12px] leading-relaxed text-amber-700">
+                Denne bedriften har brukt opp sin månedlige kvote. Prøv igjen neste måned.
+              </p>
+            </div>
+          </div>
+        )}
         <button
           type="button"
           className="flex h-16 w-full items-center justify-between rounded-xl border px-4 text-[14px] font-medium transition-opacity hover:opacity-80 disabled:opacity-40"
