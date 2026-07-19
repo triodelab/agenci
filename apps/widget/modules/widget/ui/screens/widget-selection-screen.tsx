@@ -2,7 +2,7 @@
 
 import { WidgetHeader } from "@/modules/widget/ui/components/widget-header";
 import { useAtomValue, useSetAtom } from "jotai";
-import { CalendarIcon, ChevronRightIcon, MessageSquareTextIcon, MicIcon, PhoneIcon, ZapIcon } from "lucide-react";
+import { CalendarIcon, ChevronRightIcon, MessageSquareTextIcon, MicIcon, PhoneIcon } from "lucide-react";
 import { useWidgetDisplayTitle } from "@/lib/widget-display-title";
 import {
   agentIdAtom,
@@ -106,21 +106,18 @@ export const WidgetSelectionScreen = () => {
         className="flex flex-1 flex-col gap-y-3 p-4 overflow-y-auto"
         style={{ backgroundColor: "var(--widget-bg, #fff)" }}
       >
-        {limitReached && (
-          <div className="flex flex-col items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-5 text-center">
-            <div className="grid size-10 place-items-center rounded-xl bg-amber-100">
-              <ZapIcon className="size-5 text-amber-600" strokeWidth={1.75} />
-            </div>
-            <div>
-              <p className="text-[13px] font-semibold text-amber-900">
-                Samtalegrensen er nådd
-              </p>
-              <p className="mt-0.5 text-[12px] leading-relaxed text-amber-700">
-                Denne bedriften har brukt opp sin månedlige kvote. Prøv igjen neste måned.
-              </p>
-            </div>
+        {limitReached ? (
+          <div
+            className="flex h-16 w-full items-center justify-center rounded-xl border px-4 text-[13px] opacity-40 cursor-not-allowed select-none"
+            style={{
+              backgroundColor: "var(--widget-input-bg, #fff)",
+              borderColor: "var(--widget-input-border, #e4e4e7)",
+              color: "var(--widget-input-text, #18181b)",
+            }}
+          >
+            Chat utilgjengelig
           </div>
-        )}
+        ) : (
         <button
           type="button"
           className="flex h-16 w-full items-center justify-between rounded-xl border px-4 text-[14px] font-medium transition-opacity hover:opacity-80 disabled:opacity-40"
@@ -138,6 +135,7 @@ export const WidgetSelectionScreen = () => {
           </div>
           <ChevronRightIcon className="size-4 shrink-0 opacity-50" />
         </button>
+        )}
         {widgetSettings?.bookingEnabled && !sessionIsAnonymous && (
           <button
             type="button"
