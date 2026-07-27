@@ -7,6 +7,8 @@ type SearchArgs = {
   query: string;
 };
 
+type RagSearchResult = Awaited<ReturnType<typeof rag.search>>;
+
 export const search = createTool({
   description:
     "Search the knowledge base for relevant information to help answer user questions",
@@ -21,7 +23,7 @@ export const search = createTool({
     required: ["query"],
     additionalProperties: false,
   }),
-  handler: async (ctx, args) => {
+  handler: async (ctx, args): Promise<string> => {
     const { query } = args as SearchArgs;
     if (!ctx.threadId) {
       return "No results found.";
@@ -36,20 +38,17 @@ export const search = createTool({
       return "No results found.";
     }
 
-    const orgId = conversation.organizationId;
-    const agentId = conversation.agentId;
+    const orgId: string = conversation.organizationId;
+    const agentId: string | undefined = conversation.agentId;
+    const agentNs: string | null = agentId ? `${orgId}:${agentId}` : null;
 
-    // Search agent-specific namespace first, then fall back to org-level namespace
-    const agentNamespace = agentId ? `${orgId}:${agentId}` : null;
-    const orgNamespace = orgId;
-
-    let searchResult = agentNamespace
-      ? await rag.search(ctx, { namespace: agentNamespace, query, limit: 5 })
+    // Search agent-specific namespace first, then fall back to org-level
+    let searchResult: RagSearchResult | null = agentNs
+      ? await rag.search(ctx, { namespace: agentNs, query, limit: 5 })
       : null;
 
-    // If agent-specific search returned nothing, try org-level namespace
     if (!searchResult?.text || searchResult.text.trim().length === 0) {
-      searchResult = await rag.search(ctx, { namespace: orgNamespace, query, limit: 5 });
+      searchResult = await rag.search(ctx, { namespace: orgId, query, limit: 5 });
     }
 
     const trainingBlock: string = await ctx.runQuery(
@@ -57,7 +56,7 @@ export const search = createTool({
       { organizationId: orgId },
     );
 
-    const sources = searchResult.entries
+    const sources: string = (searchResult?.entries ?? [])
       .map((e: { title?: string | null }) => e.title || null)
       .filter((t: string | null): t is string => t !== null)
       .join(", ");
@@ -66,7 +65,7 @@ export const search = createTool({
       ? `\n\nOperatør-godkjente eksempler:\n${trainingBlock}`
       : "";
 
-    if (!searchResult.text || searchResult.text.trim().length === 0) {
+    if (!searchResult?.text || searchResult.text.trim().length === 0) {
       return "Ingen relevante resultater funnet i kunnskapsbasen.";
     }
 
