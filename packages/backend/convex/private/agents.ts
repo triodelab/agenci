@@ -251,7 +251,7 @@ export const cleanupDeletedAgent = internalAction({
           paginationOpts: { numItems: 50, cursor },
         });
         for (const entry of result.page) {
-          await rag.deleteAsync(ctx, { entryId: entry._id as string });
+          await rag.deleteAsync(ctx, { entryId: entry.entryId });
         }
         cursor = result.isDone ? null : result.continueCursor;
       } while (cursor);
