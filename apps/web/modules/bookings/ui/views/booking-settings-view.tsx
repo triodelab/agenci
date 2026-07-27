@@ -104,7 +104,7 @@ export const BookingSettingsView = ({ agentId }: BookingSettingsViewProps) => {
 
   const isBookingEnabled = widgetSettings?.bookingEnabled ?? false;
   const minServiceDuration = services && services.length > 0
-    ? Math.min(...services.filter((s) => s.isActive).map((s) => s.durationMinutes))
+    ? Math.min(...services.filter((s: { isActive: boolean; durationMinutes: number }) => s.isActive).map((s: { isActive: boolean; durationMinutes: number }) => s.durationMinutes))
     : 30;
 
   const handleToggleBooking = async (enabled: boolean) => {
