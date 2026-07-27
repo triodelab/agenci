@@ -37,16 +37,20 @@ export const search = createTool({
     }
 
     const orgId = conversation.organizationId;
+    const agentId = conversation.agentId;
 
-    const namespace = conversation.agentId
-      ? `${orgId}:${conversation.agentId}`
-      : orgId;
+    // Search agent-specific namespace first, then fall back to org-level namespace
+    const agentNamespace = agentId ? `${orgId}:${agentId}` : null;
+    const orgNamespace = orgId;
 
-    const searchResult = await rag.search(ctx, {
-      namespace,
-      query,
-      limit: 5,
-    });
+    let searchResult = agentNamespace
+      ? await rag.search(ctx, { namespace: agentNamespace, query, limit: 5 })
+      : null;
+
+    // If agent-specific search returned nothing, try org-level namespace
+    if (!searchResult?.text || searchResult.text.trim().length === 0) {
+      searchResult = await rag.search(ctx, { namespace: orgNamespace, query, limit: 5 });
+    }
 
     const trainingBlock: string = await ctx.runQuery(
       internal.private.answerTraining.listRecentForAgent,

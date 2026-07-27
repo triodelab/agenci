@@ -159,9 +159,15 @@ export function hasActiveSubscriptionAccess(
   subscription: { status: string } | null | undefined,
   options?: { userEmail?: string | null },
 ): boolean {
+  // Active or trialing paid subscription
   if (subscription?.status === "active" || subscription?.status === "trialing") {
     return true;
   }
+  // Free or canceled plan — AI still responds at free tier, monthly conversation limit enforced separately
+  if (!subscription || subscription.status === "free" || subscription.status === "canceled") {
+    return true;
+  }
+  // Dev bypasses
   if (isDevSubscriptionBypassEnabled()) {
     return true;
   }
@@ -171,5 +177,6 @@ export function hasActiveSubscriptionAccess(
   if (isDevTeamEmailAllowlisted(options?.userEmail)) {
     return true;
   }
+  // Cancelled subscription — no AI access
   return false;
 }
