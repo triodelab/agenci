@@ -1,7 +1,11 @@
 import { ConvexError, v } from "convex/values";
-import { mutation, query } from "../_generated/server";
+import { internalAction, internalMutation, internalQuery, mutation, query } from "../_generated/server";
 import { getOrgIdOrNull, getUserEmailOrNull } from "../lib/auth";
 import { getMaxAgents } from "../lib/subscriptionAccess";
+import { agentNamespace } from "../lib/knowledgeIngestion";
+import rag from "../system/ai/rag";
+import { internal } from "../_generated/api";
+import type { Id } from "../_generated/dataModel";
 
 function slugifyName(name: string): string {
   const lower = name
@@ -206,5 +210,139 @@ export const remove = mutation({
       throw new ConvexError({ code: "NOT_FOUND", message: "Agent not found" });
     }
     await ctx.db.delete(args.agentId);
+    await ctx.scheduler.runAfter(0, internal.private.agents.cleanupDeletedAgent, {
+      agentId: args.agentId,
+      orgId,
+    });
+  },
+});
+
+export const cleanupDeletedAgent = internalAction({
+  args: { agentId: v.id("agents"), orgId: v.string() },
+  handler: async (ctx, args) => {
+    const { agentId, orgId } = args;
+
+    // 1. Delete conversations
+    await ctx.runMutation(internal.private.agents.deleteAgentConversations, { agentId });
+
+    // 2. Delete widgetSettings
+    await ctx.runMutation(internal.private.agents.deleteAgentWidgetSettings, { agentId });
+
+    // 3. Delete agentBranding
+    await ctx.runMutation(internal.private.agents.deleteAgentBranding, { agentId });
+
+    // 4. Delete booking data
+    await ctx.runMutation(internal.private.agents.deleteAgentBookingData, { agentId });
+
+    // 5. Delete websiteSources + runs + pages
+    const sources = await ctx.runQuery(internal.private.agents.listAgentWebsiteSources, { agentId, orgId });
+    for (const sourceId of sources) {
+      await ctx.runMutation(internal.private.agents.deleteWebsiteSourceCascade, { sourceId });
+    }
+
+    // 6. Delete RAG namespace entries
+    const namespace = agentNamespace(orgId, agentId);
+    const ns = await rag.getNamespace(ctx, { namespace });
+    if (ns) {
+      let cursor: string | null = null;
+      do {
+        const result = await rag.list(ctx, {
+          namespaceId: ns.namespaceId,
+          paginationOpts: { numItems: 50, cursor },
+        });
+        for (const entry of result.page) {
+          await rag.deleteAsync(ctx, { entryId: entry._id as string });
+        }
+        cursor = result.isDone ? null : result.continueCursor;
+      } while (cursor);
+    }
+  },
+});
+
+export const listAgentWebsiteSources = internalQuery({
+  args: { agentId: v.id("agents"), orgId: v.string() },
+  handler: async (ctx, args): Promise<Id<"websiteSources">[]> => {
+    const sources = await ctx.db
+      .query("websiteSources")
+      .withIndex("by_organization_id_and_agent_id", (q) =>
+        q.eq("organizationId", args.orgId).eq("agentId", args.agentId),
+      )
+      .collect();
+    return sources.map((s) => s._id);
+  },
+});
+
+export const deleteWebsiteSourceCascade = internalMutation({
+  args: { sourceId: v.id("websiteSources") },
+  handler: async (ctx, args) => {
+    const runs = await ctx.db
+      .query("websiteRuns")
+      .withIndex("by_website_source_id", (q) => q.eq("websiteSourceId", args.sourceId))
+      .collect();
+    for (const run of runs) await ctx.db.delete(run._id);
+
+    const pages = await ctx.db
+      .query("websitePages")
+      .withIndex("by_website_source_id", (q) => q.eq("websiteSourceId", args.sourceId))
+      .collect();
+    for (const page of pages) await ctx.db.delete(page._id);
+
+    await ctx.db.delete(args.sourceId);
+  },
+});
+
+export const deleteAgentConversations = internalMutation({
+  args: { agentId: v.id("agents") },
+  handler: async (ctx, args) => {
+    const conversations = await ctx.db
+      .query("conversations")
+      .withIndex("by_agent_id", (q) => q.eq("agentId", args.agentId))
+      .collect();
+    for (const c of conversations) await ctx.db.delete(c._id);
+  },
+});
+
+export const deleteAgentWidgetSettings = internalMutation({
+  args: { agentId: v.id("agents") },
+  handler: async (ctx, args) => {
+    const settings = await ctx.db
+      .query("widgetSettings")
+      .withIndex("by_agent_id", (q) => q.eq("agentId", args.agentId))
+      .collect();
+    for (const s of settings) await ctx.db.delete(s._id);
+  },
+});
+
+export const deleteAgentBranding = internalMutation({
+  args: { agentId: v.id("agents") },
+  handler: async (ctx, args) => {
+    const brandings = await ctx.db
+      .query("agentBranding")
+      .withIndex("by_agent_id", (q) => q.eq("agentId", args.agentId))
+      .collect();
+    for (const b of brandings) await ctx.db.delete(b._id);
+  },
+});
+
+export const deleteAgentBookingData = internalMutation({
+  args: { agentId: v.id("agents") },
+  handler: async (ctx, args) => {
+    const services = await ctx.db
+      .query("bookingServices")
+      .withIndex("by_agent_id", (q) => q.eq("agentId", args.agentId))
+      .collect();
+    for (const s of services) await ctx.db.delete(s._id);
+
+    const availability = await ctx.db
+      .query("bookingAvailability")
+      .withIndex("by_agent_id", (q) => q.eq("agentId", args.agentId))
+      .collect();
+    for (const a of availability) await ctx.db.delete(a._id);
+
+    const bookings = await ctx.db
+      .query("bookings")
+      .withIndex("by_agent_id", (q) => q.eq("agentId", args.agentId))
+      .collect();
+    for (const b of bookings) await ctx.db.delete(b._id);
   },
 });
