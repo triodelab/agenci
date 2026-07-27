@@ -297,6 +297,7 @@ export function KnowledgeTrainingPlayground({
   const kickoffWebsiteOnboarding = useMutation(
     api.lib.workflow.kickoffAgentOnboarding,
   );
+  const addWebpage = useAction(api.private.files.addWebpage);
   const pauseWebsiteSource = useAction(api.private.files.pauseWebsiteSource);
   const resumeWebsiteSource = useAction(api.private.files.resumeWebsiteSource);
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
@@ -376,8 +377,11 @@ export function KnowledgeTrainingPlayground({
     setIsImportingWebpage(true);
     try {
       const trimmedUrl = webUrl.trim();
-      await kickoffWebsiteOnboarding({ agentId, url: trimmedUrl });
-      toast.success(`Nettside sendt til behandling: ${trimmedUrl}`);
+      // Direct HTML fetch + RAG indexing (same as onboarding Step 2)
+      await addWebpage({ url: trimmedUrl, agentId });
+      // Also kick off Firecrawl workflow for richer content (best-effort)
+      void kickoffWebsiteOnboarding({ agentId, url: trimmedUrl }).catch(() => {});
+      toast.success(`Nettside lagt til i kunnskapsbasen: ${trimmedUrl}`);
       setWebUrl("");
     } catch (e) {
       const msg =
