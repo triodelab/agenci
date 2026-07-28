@@ -139,24 +139,15 @@ export function mergeWidgetAppearance(
     if (!partial.bubbleUserColor) merged.bubbleUserColor = partial.headerColor;
     if (!partial.bubbleButtonColor) merged.bubbleButtonColor = partial.headerColor;
   }
-  // Auto-compute text colors — also corrects legacy stored "#ffffff" on light backgrounds
+  // Always recompute text colors from background — overrides any stale stored value
   if (merged.headerColor) {
-    const ideal = getContrastTextColor(merged.headerColor);
-    if (!partial?.headerTextColor || (partial.headerTextColor === "#ffffff" && ideal === "#18181b")) {
-      merged.headerTextColor = ideal;
-    }
+    merged.headerTextColor = getContrastTextColor(merged.headerColor);
   }
   if (merged.bubbleUserColor) {
-    const ideal = getContrastTextColor(merged.bubbleUserColor);
-    if (!partial?.bubbleUserTextColor || (partial.bubbleUserTextColor === "#ffffff" && ideal === "#18181b")) {
-      merged.bubbleUserTextColor = ideal;
-    }
+    merged.bubbleUserTextColor = getContrastTextColor(merged.bubbleUserColor);
   }
   if (merged.bubbleButtonColor) {
-    const ideal = getContrastTextColor(merged.bubbleButtonColor);
-    if (!partial?.bubbleButtonIconColor || (partial.bubbleButtonIconColor === "#ffffff" && ideal === "#18181b")) {
-      merged.bubbleButtonIconColor = ideal;
-    }
+    merged.bubbleButtonIconColor = getContrastTextColor(merged.bubbleButtonColor);
   }
   return merged;
 }
