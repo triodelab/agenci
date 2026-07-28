@@ -38,22 +38,34 @@ async function runExtractThemeColor(url: string): Promise<{ color: string | null
     const head = html.slice(0, 100000);
     const base = new URL(res.url || target.toString());
 
-    let color: string | null = null;
+    let vibrantColor: string | null = null;  // vibrant brand color (preferred)
+    let fallbackColor: string | null = null; // neutral color (last resort)
     let fontFamily: string | null = null;
+
+    const tryColor = (raw: string | null | undefined): void => {
+      if (!raw) return;
+      const c = normalizeColor(raw);
+      if (!c) return;
+      if (!isNearBlack(c) && !isNearWhite(c) && !isNearGray(c)) {
+        vibrantColor = vibrantColor ?? c;
+      } else {
+        fallbackColor = fallbackColor ?? c;
+      }
+    };
 
     // ── 1. <meta name="theme-color"> ────────────────────────────────────────
     const metaA = head.match(/<meta[^>]+name=["']theme-color["'][^>]*content=["']([^"']+)["']/i);
     const metaB = head.match(/<meta[^>]+content=["']([^"']+)["'][^>]*name=["']theme-color["']/i);
-    if ((metaA ?? metaB)?.[1]) color = normalizeColor((metaA ?? metaB)![1]!);
+    tryColor((metaA ?? metaB)?.[1]);
 
     // ── 2. <meta name="msapplication-TileColor"> ────────────────────────────
-    if (!color) {
+    if (!vibrantColor) {
       const ms = head.match(/<meta[^>]+name=["']msapplication-TileColor["'][^>]*content=["']([^"']+)["']/i);
-      if (ms?.[1]) color = normalizeColor(ms[1]);
+      tryColor(ms?.[1]);
     }
 
     // ── 3. Web App Manifest theme_color ─────────────────────────────────────
-    if (!color) {
+    if (!vibrantColor) {
       const mLink = head.match(/<link[^>]+rel=["']manifest["'][^>]*href=["']([^"']+)["']/i);
       if (mLink?.[1]) {
         try {
@@ -62,14 +74,14 @@ async function runExtractThemeColor(url: string): Promise<{ color: string | null
           });
           if (mRes.ok) {
             const mj = await mRes.json() as { theme_color?: string };
-            if (mj.theme_color) color = normalizeColor(mj.theme_color);
+            tryColor(mj.theme_color);
           }
         } catch { /* skip */ }
       }
     }
 
     // ── 4. SVG favicon ────────────────────────────────────────────────────
-    if (!color) {
+    if (!vibrantColor) {
       const svgIcon = head.match(
         /<link[^>]+rel=["'][^"']*icon[^"']*["'][^>]+href=["']([^"']+\.svg[^"']*)["']/i,
       ) ?? head.match(
@@ -80,13 +92,13 @@ async function runExtractThemeColor(url: string): Promise<{ color: string | null
           const svgRes = await fetch(new URL(svgIcon[1], base).toString(), {
             headers: { "User-Agent": BOT_UA }, signal: AbortSignal.timeout(3000),
           });
-          if (svgRes.ok) color = extractColorFromSvg(await svgRes.text());
+          if (svgRes.ok) tryColor(extractColorFromSvg(await svgRes.text()));
         } catch { /* skip */ }
       }
     }
 
     // ── 5. Inline <svg> ───────────────────────────────────────────────────
-    if (!color) color = extractColorFromSvg(head);
+    if (!vibrantColor) tryColor(extractColorFromSvg(head));
 
     // ── 6. Google Fonts ───────────────────────────────────────────────────
     if (!fontFamily) fontFamily = extractGoogleFont(head);
@@ -94,28 +106,29 @@ async function runExtractThemeColor(url: string): Promise<{ color: string | null
     // ── 7. Inline <style> CSS ─────────────────────────────────────────────
     const inlineCss = [...head.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/gi)]
       .map((m) => m[1] ?? "").join("\n");
-    if (!color) color = findBestColorFromCss(inlineCss);
+    if (!vibrantColor) tryColor(findBestColorFromCss(inlineCss));
     if (!fontFamily) fontFamily = findFontFromCss(inlineCss);
 
     // ── 8. Inline style= attributes ───────────────────────────────────────
-    if (!color) color = findColorInInlineStyles(head);
+    if (!vibrantColor) tryColor(findColorInInlineStyles(head));
 
     // ── 9. External stylesheets ───────────────────────────────────────────
     const sheets = extractStylesheetUrls(head, base);
     for (const sheetUrl of sheets.slice(0, 8)) {
-      if (color && fontFamily) break;
+      if (vibrantColor && fontFamily) break;
       try {
         const cr = await fetch(sheetUrl, {
           headers: { "User-Agent": BOT_UA }, signal: AbortSignal.timeout(5000),
         });
         if (!cr.ok) continue;
         const css = (await cr.text()).slice(0, 150000);
-        if (!color) color = findBestColorFromCss(css);
+        if (!vibrantColor) tryColor(findBestColorFromCss(css));
         if (!fontFamily) fontFamily = findFontFromCss(css);
         if (!fontFamily) fontFamily = extractGoogleFont(css);
       } catch { /* try next */ }
     }
 
+    const color = vibrantColor ?? fallbackColor;
     return { color, fontFamily };
   } catch {
     return { color: null, fontFamily: null };
