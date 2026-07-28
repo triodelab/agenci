@@ -4,6 +4,7 @@ import { getOrgIdOrNull, getUserEmailOrNull } from "../lib/auth";
 import { getMaxAgents } from "../lib/subscriptionAccess";
 import { agentNamespace } from "../lib/knowledgeIngestion";
 import rag from "../system/ai/rag";
+import type { EntryId } from "@convex-dev/rag";
 import { internal } from "../_generated/api";
 import type { Id } from "../_generated/dataModel";
 
@@ -247,7 +248,7 @@ export const cleanupDeletedAgent = internalAction({
       let cursor: string | null = null;
       let isDone = false;
       while (!isDone) {
-        const result: { page: Array<{ entryId: string }>; isDone: boolean; continueCursor: string } =
+        const result: { page: Array<{ entryId: EntryId }>; isDone: boolean; continueCursor: string } =
           await rag.list(ctx, {
             namespaceId: ns.namespaceId,
             paginationOpts: { numItems: 50, cursor },

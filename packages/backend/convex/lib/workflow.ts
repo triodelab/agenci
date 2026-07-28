@@ -36,7 +36,7 @@ export const supportAgentOnboarding = workflow.define({
 
     // Step 1: Extract brand color and font from URL (no external API key needed)
     const themeResult = (await step.runAction(
-      internal.private.themeColor.extractThemeColor,
+      internal.private.themeColor.extractThemeColorInternal,
       { url },
       { name: "extract theme color", retry: true },
     )) as { color: string | null; fontFamily: string | null };
