@@ -81,18 +81,52 @@ export const DEFAULT_WIDGET_APPEARANCE_DARK: WidgetAppearance = {
 };
 
 /**
- * Returns the text color (#ffffff or #18181b) with best contrast
- * against bgHex using the WCAG relative-luminance formula.
+ * Returns the optimal text color (#ffffff or #18181b) for a background.
+ *
+ * Uses WCAG luminance as baseline, but overrides for vibrant/saturated brand
+ * colors: brands almost always pair vibrant colors with white text, and the
+ * pure WCAG formula picks black on mid-luminance vibrant colors (hot pink,
+ * orange, etc.) which looks wrong. Yellow hues are the exception.
  */
 export function getContrastTextColor(bgHex: string): "#ffffff" | "#18181b" {
   const hex = bgHex.replace("#", "");
   if (hex.length !== 6) return "#ffffff";
+
+  const ri = parseInt(hex.slice(0, 2), 16) / 255;
+  const gi = parseInt(hex.slice(2, 4), 16) / 255;
+  const bi = parseInt(hex.slice(4, 6), 16) / 255;
+
+  // WCAG relative luminance
   const toLinear = (c: number) =>
     c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
-  const r = toLinear(parseInt(hex.slice(0, 2), 16) / 255);
-  const g = toLinear(parseInt(hex.slice(2, 4), 16) / 255);
-  const b = toLinear(parseInt(hex.slice(4, 6), 16) / 255);
-  const L = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  const L = 0.2126 * toLinear(ri) + 0.7152 * toLinear(gi) + 0.0722 * toLinear(bi);
+
+  // Very light → always dark text; very dark → always white text
+  if (L > 0.55) return "#18181b";
+  if (L < 0.04) return "#ffffff";
+
+  // HSL saturation + lightness
+  const max = Math.max(ri, gi, bi);
+  const min = Math.min(ri, gi, bi);
+  const d = max - min;
+  const sat = max === 0 ? 0 : d / max;
+  const lightness = (max + min) / 2;
+
+  // Vibrant saturated colors (brand colors) → white text,
+  // UNLESS they're in the yellow hue range (50–70°) which is naturally light.
+  if (sat > 0.35 && lightness < 0.72) {
+    let hue = 0;
+    if (d > 0) {
+      if (max === ri) hue = ((gi - bi) / d + 6) % 6;
+      else if (max === gi) hue = (bi - ri) / d + 2;
+      else hue = (ri - gi) / d + 4;
+      hue *= 60;
+    }
+    const isYellow = hue >= 45 && hue <= 75;
+    if (!isYellow) return "#ffffff";
+  }
+
+  // Fallback: pure WCAG decision
   return L > 0.179 ? "#18181b" : "#ffffff";
 }
 
