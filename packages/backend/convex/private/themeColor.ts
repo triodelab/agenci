@@ -1,4 +1,5 @@
 "use node";
+import { inflateSync } from "zlib";
 import { v } from "convex/values";
 import { action, internalAction } from "../_generated/server";
 
@@ -38,8 +39,8 @@ async function runExtractThemeColor(url: string): Promise<{ color: string | null
     const head = html.slice(0, 100000);
     const base = new URL(res.url || target.toString());
 
-    let vibrantColor: string | null = null;  // vibrant brand color (preferred)
-    let fallbackColor: string | null = null; // neutral color (last resort)
+    let vibrantColor: string | null = null;
+    let fallbackColor: string | null = null;
     let fontFamily: string | null = null;
 
     const tryColor = (raw: string | null | undefined): void => {
@@ -53,18 +54,73 @@ async function runExtractThemeColor(url: string): Promise<{ color: string | null
       }
     };
 
-    // ── 1. <meta name="theme-color"> ────────────────────────────────────────
-    const metaA = head.match(/<meta[^>]+name=["']theme-color["'][^>]*content=["']([^"']+)["']/i);
-    const metaB = head.match(/<meta[^>]+content=["']([^"']+)["'][^>]*name=["']theme-color["']/i);
-    tryColor((metaA ?? metaB)?.[1]);
+    // ── 1. Favicon (highest priority — logo always uses brand color) ─────────
+    // Try SVG favicon first (text-parsable)
+    const svgIconMatch = head.match(
+      /<link[^>]+rel=["'][^"']*icon[^"']*["'][^>]+href=["']([^"']+\.svg[^"']*)["']/i,
+    ) ?? head.match(
+      /<link[^>]+href=["']([^"']+\.svg[^"']*)["'][^>]+rel=["'][^"']*icon[^"']*["']/i,
+    );
+    if (svgIconMatch?.[1]) {
+      try {
+        const svgRes = await fetch(new URL(svgIconMatch[1], base).toString(), {
+          headers: { "User-Agent": BOT_UA }, signal: AbortSignal.timeout(4000),
+        });
+        if (svgRes.ok) tryColor(extractColorFromSvg(await svgRes.text()));
+      } catch { /* skip */ }
+    }
 
-    // ── 2. <meta name="msapplication-TileColor"> ────────────────────────────
+    // Try default /favicon.svg if not found yet
+    if (!vibrantColor) {
+      try {
+        const defaultSvg = await fetch(new URL("/favicon.svg", base).toString(), {
+          headers: { "User-Agent": BOT_UA }, signal: AbortSignal.timeout(3000),
+        });
+        if (defaultSvg.ok && defaultSvg.headers.get("content-type")?.includes("svg")) {
+          tryColor(extractColorFromSvg(await defaultSvg.text()));
+        }
+      } catch { /* skip */ }
+    }
+
+    // Try PNG favicons with pixel extraction
+    if (!vibrantColor) {
+      const pngCandidates: string[] = [];
+      // Apple touch icon (180x180, usually solid brand color background)
+      const appleIcon = head.match(/<link[^>]+rel=["']apple-touch-icon["'][^>]+href=["']([^"']+)["']/i)
+        ?? head.match(/<link[^>]+href=["']([^"']+)["'][^>]+rel=["']apple-touch-icon["']/i);
+      if (appleIcon?.[1]) pngCandidates.push(new URL(appleIcon[1], base).toString());
+      // Explicit PNG favicon
+      const pngIcon = head.match(/<link[^>]+rel=["'][^"']*icon[^"']*["'][^>]+href=["']([^"']+\.png[^"']*)["']/i);
+      if (pngIcon?.[1]) pngCandidates.push(new URL(pngIcon[1], base).toString());
+      // Default paths
+      pngCandidates.push(new URL("/apple-touch-icon.png", base).toString());
+      pngCandidates.push(new URL("/favicon.png", base).toString());
+
+      for (const pngUrl of pngCandidates) {
+        if (vibrantColor) break;
+        try {
+          const pr = await fetch(pngUrl, { headers: { "User-Agent": BOT_UA }, signal: AbortSignal.timeout(4000) });
+          if (!pr.ok) continue;
+          const ct = pr.headers.get("content-type") ?? "";
+          if (!ct.includes("png") && !ct.includes("image")) continue;
+          const color = extractDominantColorFromPng(await pr.arrayBuffer());
+          tryColor(color);
+        } catch { /* skip */ }
+      }
+    }
+
+    // ── 2. Meta tags ──────────────────────────────────────────────────────────
+    if (!vibrantColor) {
+      const metaA = head.match(/<meta[^>]+name=["']theme-color["'][^>]*content=["']([^"']+)["']/i);
+      const metaB = head.match(/<meta[^>]+content=["']([^"']+)["'][^>]*name=["']theme-color["']/i);
+      tryColor((metaA ?? metaB)?.[1]);
+    }
     if (!vibrantColor) {
       const ms = head.match(/<meta[^>]+name=["']msapplication-TileColor["'][^>]*content=["']([^"']+)["']/i);
       tryColor(ms?.[1]);
     }
 
-    // ── 3. Web App Manifest theme_color ─────────────────────────────────────
+    // ── 3. Web App Manifest ───────────────────────────────────────────────────
     if (!vibrantColor) {
       const mLink = head.match(/<link[^>]+rel=["']manifest["'][^>]*href=["']([^"']+)["']/i);
       if (mLink?.[1]) {
@@ -80,52 +136,34 @@ async function runExtractThemeColor(url: string): Promise<{ color: string | null
       }
     }
 
-    // ── 4. SVG favicon ────────────────────────────────────────────────────
-    if (!vibrantColor) {
-      const svgIcon = head.match(
-        /<link[^>]+rel=["'][^"']*icon[^"']*["'][^>]+href=["']([^"']+\.svg[^"']*)["']/i,
-      ) ?? head.match(
-        /<link[^>]+href=["']([^"']+\.svg[^"']*)["'][^>]+rel=["'][^"']*icon[^"']*["']/i,
-      );
-      if (svgIcon?.[1]) {
-        try {
-          const svgRes = await fetch(new URL(svgIcon[1], base).toString(), {
-            headers: { "User-Agent": BOT_UA }, signal: AbortSignal.timeout(3000),
-          });
-          if (svgRes.ok) tryColor(extractColorFromSvg(await svgRes.text()));
-        } catch { /* skip */ }
-      }
-    }
-
-    // ── 5. Inline <svg> ───────────────────────────────────────────────────
+    // ── 4. Inline <svg> in HTML ───────────────────────────────────────────────
     if (!vibrantColor) tryColor(extractColorFromSvg(head));
 
-    // ── 6. Google Fonts ───────────────────────────────────────────────────
+    // ── 5. Google Fonts ───────────────────────────────────────────────────────
     if (!fontFamily) fontFamily = extractGoogleFont(head);
 
-    // ── 7. Inline <style> CSS ─────────────────────────────────────────────
+    // ── 6. Inline <style> — brand CSS variables only ──────────────────────────
     const inlineCss = [...head.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/gi)]
       .map((m) => m[1] ?? "").join("\n");
     if (!vibrantColor) tryColor(findBestColorFromCss(inlineCss));
     if (!fontFamily) fontFamily = findFontFromCss(inlineCss);
 
-    // ── 8. Inline style= attributes ───────────────────────────────────────
-    if (!vibrantColor) tryColor(findColorInInlineStyles(head));
-
-    // ── 9. External stylesheets ───────────────────────────────────────────
-    const sheets = extractStylesheetUrls(head, base);
-    for (const sheetUrl of sheets.slice(0, 8)) {
-      if (vibrantColor && fontFamily) break;
-      try {
-        const cr = await fetch(sheetUrl, {
-          headers: { "User-Agent": BOT_UA }, signal: AbortSignal.timeout(5000),
-        });
-        if (!cr.ok) continue;
-        const css = (await cr.text()).slice(0, 150000);
-        if (!vibrantColor) tryColor(findBestColorFromCss(css));
-        if (!fontFamily) fontFamily = findFontFromCss(css);
-        if (!fontFamily) fontFamily = extractGoogleFont(css);
-      } catch { /* try next */ }
+    // ── 7. External stylesheets ───────────────────────────────────────────────
+    if (!vibrantColor || !fontFamily) {
+      const sheets = extractStylesheetUrls(head, base);
+      for (const sheetUrl of sheets.slice(0, 5)) {
+        if (vibrantColor && fontFamily) break;
+        try {
+          const cr = await fetch(sheetUrl, {
+            headers: { "User-Agent": BOT_UA }, signal: AbortSignal.timeout(5000),
+          });
+          if (!cr.ok) continue;
+          const css = (await cr.text()).slice(0, 150000);
+          if (!vibrantColor) tryColor(findBestColorFromCss(css));
+          if (!fontFamily) fontFamily = findFontFromCss(css);
+          if (!fontFamily) fontFamily = extractGoogleFont(css);
+        } catch { /* skip */ }
+      }
     }
 
     const color = vibrantColor ?? fallbackColor;
@@ -133,6 +171,103 @@ async function runExtractThemeColor(url: string): Promise<{ color: string | null
   } catch {
     return { color: null, fontFamily: null };
   }
+}
+
+// ── PNG dominant color extractor ─────────────────────────────────────────────
+
+function extractDominantColorFromPng(data: ArrayBuffer): string | null {
+  try {
+    const buf = Buffer.from(data);
+    // Verify PNG signature
+    if (buf[0] !== 0x89 || buf[1] !== 0x50 || buf[2] !== 0x4e || buf[3] !== 0x47) return null;
+
+    let pos = 8;
+    let width = 0, height = 0, bitDepth = 0, colorType = 0;
+    const idatChunks: Buffer[] = [];
+
+    while (pos + 12 <= buf.length) {
+      const len = buf.readUInt32BE(pos);
+      const type = buf.subarray(pos + 4, pos + 8).toString("ascii");
+      const data = buf.subarray(pos + 8, pos + 8 + len);
+      if (type === "IHDR") {
+        width = data.readUInt32BE(0);
+        height = data.readUInt32BE(4);
+        bitDepth = data[8] ?? 8;
+        colorType = data[9] ?? 2;
+      } else if (type === "IDAT") {
+        idatChunks.push(Buffer.from(data));
+      } else if (type === "IEND") break;
+      pos += 12 + len;
+    }
+
+    // Only handle 8-bit RGB or RGBA
+    if ((colorType !== 2 && colorType !== 6) || bitDepth !== 8) return null;
+    const bpp = colorType === 6 ? 4 : 3;
+    const rowLen = width * bpp;
+
+    let decompressed: Buffer;
+    try { decompressed = inflateSync(Buffer.concat(idatChunks)); } catch { return null; }
+
+    const colorFreq = new Map<string, number>();
+    let prevRow = Buffer.alloc(rowLen, 0);
+
+    for (let y = 0; y < height; y++) {
+      const rowOff = y * (rowLen + 1);
+      if (rowOff + rowLen >= decompressed.length) break;
+      const filter = decompressed[rowOff] ?? 0;
+      const raw = decompressed.subarray(rowOff + 1, rowOff + 1 + rowLen);
+      const row = Buffer.alloc(rowLen);
+
+      for (let i = 0; i < rowLen; i++) {
+        const x = raw[i] ?? 0;
+        const a = i >= bpp ? row[i - bpp] ?? 0 : 0;
+        const b = prevRow[i] ?? 0;
+        const c = i >= bpp ? prevRow[i - bpp] ?? 0 : 0;
+        switch (filter) {
+          case 0: row[i] = x; break;
+          case 1: row[i] = (x + a) & 0xff; break;
+          case 2: row[i] = (x + b) & 0xff; break;
+          case 3: row[i] = (x + Math.floor((a + b) / 2)) & 0xff; break;
+          case 4: {
+            const p = a + b - c;
+            const pa = Math.abs(p - a), pb = Math.abs(p - b), pc = Math.abs(p - c);
+            row[i] = (x + (pa <= pb && pa <= pc ? a : pb <= pc ? b : c)) & 0xff;
+            break;
+          }
+          default: row[i] = x;
+        }
+      }
+      prevRow = row;
+
+      for (let x = 0; x < width; x++) {
+        const i = x * bpp;
+        const r = row[i] ?? 0, g = row[i + 1] ?? 0, b = row[i + 2] ?? 0;
+        const alpha = bpp === 4 ? (row[i + 3] ?? 255) : 255;
+        if (alpha < 100) continue;
+        if (r > 240 && g > 240 && b > 240) continue; // skip white
+        if (r < 20 && g < 20 && b < 20) continue;    // skip black
+        const hex = `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
+        colorFreq.set(hex, (colorFreq.get(hex) ?? 0) + 1);
+      }
+    }
+
+    if (colorFreq.size === 0) return null;
+
+    // Score by saturation × frequency
+    let best: string | null = null;
+    let bestScore = -1;
+    for (const [hex, count] of colorFreq) {
+      const r = parseInt(hex.slice(1, 3), 16);
+      const g = parseInt(hex.slice(3, 5), 16);
+      const b = parseInt(hex.slice(5, 7), 16);
+      const max = Math.max(r, g, b), min = Math.min(r, g, b);
+      const sat = max === 0 ? 0 : (max - min) / max;
+      if (sat < 0.25) continue;
+      const score = sat * 0.6 + Math.min(1, count / Math.max(1, width)) * 0.4;
+      if (score > bestScore) { bestScore = score; best = hex; }
+    }
+    return best;
+  } catch { return null; }
 }
 
 export const extractThemeColor = action({
