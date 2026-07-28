@@ -245,16 +245,19 @@ export const cleanupDeletedAgent = internalAction({
     const ns = await rag.getNamespace(ctx, { namespace });
     if (ns) {
       let cursor: string | null = null;
-      do {
-        const result = await rag.list(ctx, {
-          namespaceId: ns.namespaceId,
-          paginationOpts: { numItems: 50, cursor },
-        });
+      let isDone = false;
+      while (!isDone) {
+        const result: { page: Array<{ entryId: string }>; isDone: boolean; continueCursor: string } =
+          await rag.list(ctx, {
+            namespaceId: ns.namespaceId,
+            paginationOpts: { numItems: 50, cursor },
+          });
         for (const entry of result.page) {
           await rag.deleteAsync(ctx, { entryId: entry.entryId });
         }
-        cursor = result.isDone ? null : result.continueCursor;
-      } while (cursor);
+        isDone = result.isDone;
+        cursor = isDone ? null : result.continueCursor;
+      }
     }
   },
 });
