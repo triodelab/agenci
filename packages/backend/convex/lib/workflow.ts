@@ -1,7 +1,6 @@
 import { WorkflowManager } from "@convex-dev/workflow";
 import { components, internal } from "../_generated/api";
 import { ConvexError, v } from "convex/values";
-import type { ScrapedBranding } from "./firecrawl";
 import { internalQuery, mutation } from "../_generated/server";
 import { getOrgIdOrNull } from "./auth";
 
@@ -35,53 +34,41 @@ export const supportAgentOnboarding = workflow.define({
   handler: async (step, args) => {
     const { agentId, url, orgId } = args;
 
-    // Step 1: Scrape the URL
-    const scrapeResult = (await step.runAction(
-      internal.lib.firecrawl.scrapeWebsiteUrlFn,
+    // Step 1: Extract brand color and font from URL (no external API key needed)
+    const themeResult = (await step.runAction(
+      internal.private.themeColor.extractThemeColor,
       { url },
-      { name: "scrape website", retry: true },
-    )) as { markdown: string | null; branding: ScrapedBranding };
+      { name: "extract theme color", retry: true },
+    )) as { color: string | null; fontFamily: string | null };
 
-    // Step 2: Ingest markdown into RAG (best-effort — don't block branding if content is too short)
-    const { markdown, branding } = scrapeResult;
+    const primaryColor = themeResult.color ?? null;
+    const fontFamily = themeResult.fontFamily ?? null;
 
-    if (markdown && markdown.length >= 40) {
-      await step.runAction(
-        internal.private.onboarding.ingestMarkdownFn,
-        { orgId, agentId, url: url, markdown },
-        { name: "ingest markdown", retry: true },
-      );
-    }
-
-    // Step 3: Save branding and apply to widget appearance
-    const b = branding;
-    const brandingData = {
-      logoUrl: typeof b?.logoUrl === "string" ? b.logoUrl : null,
-      colorScheme: b?.colorScheme ?? null,
-      primaryColor: b?.primaryColor ?? null,
-      secondaryColor: b?.secondaryColor ?? null,
-      backgroundColor: b?.backgroundColor ?? null,
-      textPrimaryColor: b?.textPrimaryColor ?? null,
-    };
+    // Step 2: Save branding record
     await step.runMutation(
       internal.private.onboarding.insertWebsiteBranding,
       {
         agentId,
-        orgId: args.orgId,
+        orgId,
         websiteUrl: url,
-        ...brandingData,
+        logoUrl: null,
+        colorScheme: null,
+        primaryColor,
+        secondaryColor: null,
+        backgroundColor: null,
+        textPrimaryColor: null,
       },
       { name: "save branding" },
     );
 
-    // Apply primary color and font to widget appearance so the onboarding preview updates
+    // Step 3: Apply primary color and font to widget appearance
     await step.runMutation(
       internal.private.widgetSettings.applyBrandColor,
       {
         agentId,
-        orgId: args.orgId,
-        primaryColor: brandingData.primaryColor,
-        fontFamily: null,
+        orgId,
+        primaryColor,
+        fontFamily,
       },
       { name: "apply brand color" },
     );
