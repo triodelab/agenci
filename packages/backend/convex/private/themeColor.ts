@@ -24,153 +24,122 @@ const COLOR_VAL =
 const COLOR_VAL_G =
   /#[0-9a-f]{3,8}|rgba?\([^)]+\)|hsla?\([^)]+\)|oklch\([^)]+\)|lch\([^)]+\)/gi;
 
+async function fetchPngBuffer(url: string, timeoutMs = 5000): Promise<ArrayBuffer | null> {
+  try {
+    const res = await fetch(url, { headers: { "User-Agent": BOT_UA }, signal: AbortSignal.timeout(timeoutMs) });
+    if (!res.ok) return null;
+    return await res.arrayBuffer();
+  } catch { return null; }
+}
+
 async function runExtractThemeColor(url: string): Promise<{ color: string | null; fontFamily: string | null }> {
   let target: URL;
   try { target = new URL(url.trim()); } catch { return { color: null, fontFamily: null }; }
   if (target.protocol !== "http:" && target.protocol !== "https:") return { color: null, fontFamily: null };
 
+  let vibrantColor: string | null = null;
+  let fallbackColor: string | null = null;
+  let fontFamily: string | null = null;
+
+  const tryColor = (raw: string | null | undefined): void => {
+    if (!raw) return;
+    const c = normalizeColor(raw);
+    if (!c) return;
+    if (!isNearBlack(c) && !isNearWhite(c) && !isNearGray(c)) {
+      vibrantColor = vibrantColor ?? c;
+    } else {
+      fallbackColor = fallbackColor ?? c;
+    }
+  };
+
+  const domain = target.hostname;
+
+  // ── Phase 1: Google Favicon Service (works for ANY domain, no HTML needed) ──
+  // Google caches and serves favicons for all major websites reliably.
+  const googleFaviconUrl = `https://www.google.com/s2/favicons?sz=64&domain=${encodeURIComponent(domain)}`;
+  const googlePng = await fetchPngBuffer(googleFaviconUrl, 5000);
+  if (googlePng) tryColor(extractDominantColorFromPng(googlePng));
+
+  // ── Phase 2: Fetch HTML for font info + additional color signals ─────────────
+  let html = "";
+  let base = target;
   try {
     const res = await fetch(target.toString(), {
       headers: { "User-Agent": BOT_UA },
       signal: AbortSignal.timeout(8000),
     });
-    if (!res.ok) return { color: null, fontFamily: null };
-    const html = await res.text();
-    const head = html.slice(0, 100000);
-    const base = new URL(res.url || target.toString());
-
-    let vibrantColor: string | null = null;
-    let fallbackColor: string | null = null;
-    let fontFamily: string | null = null;
-
-    const tryColor = (raw: string | null | undefined): void => {
-      if (!raw) return;
-      const c = normalizeColor(raw);
-      if (!c) return;
-      if (!isNearBlack(c) && !isNearWhite(c) && !isNearGray(c)) {
-        vibrantColor = vibrantColor ?? c;
-      } else {
-        fallbackColor = fallbackColor ?? c;
-      }
-    };
-
-    // ── 1. Favicon (highest priority — logo always uses brand color) ─────────
-    // Try SVG favicon first (text-parsable)
-    const svgIconMatch = head.match(
-      /<link[^>]+rel=["'][^"']*icon[^"']*["'][^>]+href=["']([^"']+\.svg[^"']*)["']/i,
-    ) ?? head.match(
-      /<link[^>]+href=["']([^"']+\.svg[^"']*)["'][^>]+rel=["'][^"']*icon[^"']*["']/i,
-    );
-    if (svgIconMatch?.[1]) {
-      try {
-        const svgRes = await fetch(new URL(svgIconMatch[1], base).toString(), {
-          headers: { "User-Agent": BOT_UA }, signal: AbortSignal.timeout(4000),
-        });
-        if (svgRes.ok) tryColor(extractColorFromSvg(await svgRes.text()));
-      } catch { /* skip */ }
+    if (res.ok) {
+      html = await res.text();
+      base = new URL(res.url || target.toString());
     }
+  } catch { /* continue with empty html */ }
 
-    // Try default /favicon.svg if not found yet
-    if (!vibrantColor) {
-      try {
-        const defaultSvg = await fetch(new URL("/favicon.svg", base).toString(), {
-          headers: { "User-Agent": BOT_UA }, signal: AbortSignal.timeout(3000),
-        });
-        if (defaultSvg.ok && defaultSvg.headers.get("content-type")?.includes("svg")) {
-          tryColor(extractColorFromSvg(await defaultSvg.text()));
-        }
-      } catch { /* skip */ }
-    }
+  const head = html.slice(0, 100000);
 
-    // Try PNG favicons with pixel extraction
-    if (!vibrantColor) {
-      const pngCandidates: string[] = [];
-      // Apple touch icon (180x180, usually solid brand color background)
-      const appleIcon = head.match(/<link[^>]+rel=["']apple-touch-icon["'][^>]+href=["']([^"']+)["']/i)
-        ?? head.match(/<link[^>]+href=["']([^"']+)["'][^>]+rel=["']apple-touch-icon["']/i);
-      if (appleIcon?.[1]) pngCandidates.push(new URL(appleIcon[1], base).toString());
-      // Explicit PNG favicon
-      const pngIcon = head.match(/<link[^>]+rel=["'][^"']*icon[^"']*["'][^>]+href=["']([^"']+\.png[^"']*)["']/i);
-      if (pngIcon?.[1]) pngCandidates.push(new URL(pngIcon[1], base).toString());
-      // Default paths
-      pngCandidates.push(new URL("/apple-touch-icon.png", base).toString());
-      pngCandidates.push(new URL("/favicon.png", base).toString());
+  if (!fontFamily) fontFamily = extractGoogleFont(head);
 
-      for (const pngUrl of pngCandidates) {
-        if (vibrantColor) break;
-        try {
-          const pr = await fetch(pngUrl, { headers: { "User-Agent": BOT_UA }, signal: AbortSignal.timeout(4000) });
-          if (!pr.ok) continue;
-          const ct = pr.headers.get("content-type") ?? "";
-          if (!ct.includes("png") && !ct.includes("image")) continue;
-          const color = extractDominantColorFromPng(await pr.arrayBuffer());
-          tryColor(color);
-        } catch { /* skip */ }
-      }
-    }
+  // ── Phase 3: SVG favicon (text-parsable, very accurate) ──────────────────────
+  if (!vibrantColor) {
+    const svgMatch = head.match(/<link[^>]+rel=["'][^"']*icon[^"']*["'][^>]+href=["']([^"']+\.svg[^"']*)["']/i)
+      ?? head.match(/<link[^>]+href=["']([^"']+\.svg[^"']*)["'][^>]+rel=["'][^"']*icon[^"']*["']/i);
+    const svgUrl = svgMatch?.[1]
+      ? new URL(svgMatch[1], base).toString()
+      : new URL("/favicon.svg", base).toString();
+    try {
+      const sr = await fetch(svgUrl, { headers: { "User-Agent": BOT_UA }, signal: AbortSignal.timeout(3000) });
+      if (sr.ok) tryColor(extractColorFromSvg(await sr.text()));
+    } catch { /* skip */ }
+  }
 
-    // ── 2. Meta tags ──────────────────────────────────────────────────────────
-    if (!vibrantColor) {
-      const metaA = head.match(/<meta[^>]+name=["']theme-color["'][^>]*content=["']([^"']+)["']/i);
-      const metaB = head.match(/<meta[^>]+content=["']([^"']+)["'][^>]*name=["']theme-color["']/i);
-      tryColor((metaA ?? metaB)?.[1]);
-    }
-    if (!vibrantColor) {
-      const ms = head.match(/<meta[^>]+name=["']msapplication-TileColor["'][^>]*content=["']([^"']+)["']/i);
-      tryColor(ms?.[1]);
-    }
+  // ── Phase 4: Apple touch icon PNG (solid brand background, 180×180) ──────────
+  if (!vibrantColor) {
+    const appleMatch = head.match(/<link[^>]+rel=["']apple-touch-icon["'][^>]+href=["']([^"']+)["']/i)
+      ?? head.match(/<link[^>]+href=["']([^"']+)["'][^>]+rel=["']apple-touch-icon["']/i);
+    const appleUrl = appleMatch?.[1]
+      ? new URL(appleMatch[1], base).toString()
+      : new URL("/apple-touch-icon.png", base).toString();
+    const applePng = await fetchPngBuffer(appleUrl, 4000);
+    if (applePng) tryColor(extractDominantColorFromPng(applePng));
+  }
 
-    // ── 3. Web App Manifest ───────────────────────────────────────────────────
+  // ── Phase 5: Meta theme-color (skip neutrals, try vibrant first) ─────────────
+  if (!vibrantColor) {
+    const metaA = head.match(/<meta[^>]+name=["']theme-color["'][^>]*content=["']([^"']+)["']/i);
+    const metaB = head.match(/<meta[^>]+content=["']([^"']+)["'][^>]*name=["']theme-color["']/i);
+    tryColor((metaA ?? metaB)?.[1]);
     if (!vibrantColor) {
       const mLink = head.match(/<link[^>]+rel=["']manifest["'][^>]*href=["']([^"']+)["']/i);
       if (mLink?.[1]) {
         try {
-          const mRes = await fetch(new URL(mLink[1], base).toString(), {
-            headers: { "User-Agent": BOT_UA }, signal: AbortSignal.timeout(4000),
-          });
-          if (mRes.ok) {
-            const mj = await mRes.json() as { theme_color?: string };
-            tryColor(mj.theme_color);
-          }
+          const mr = await fetch(new URL(mLink[1], base).toString(), { headers: { "User-Agent": BOT_UA }, signal: AbortSignal.timeout(3000) });
+          if (mr.ok) { const mj = await mr.json() as { theme_color?: string }; tryColor(mj.theme_color); }
         } catch { /* skip */ }
       }
     }
+  }
 
-    // ── 4. Inline <svg> in HTML ───────────────────────────────────────────────
-    if (!vibrantColor) tryColor(extractColorFromSvg(head));
-
-    // ── 5. Google Fonts ───────────────────────────────────────────────────────
-    if (!fontFamily) fontFamily = extractGoogleFont(head);
-
-    // ── 6. Inline <style> — brand CSS variables only ──────────────────────────
-    const inlineCss = [...head.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/gi)]
-      .map((m) => m[1] ?? "").join("\n");
+  // ── Phase 6: CSS brand variables (inline + external) ─────────────────────────
+  if (!vibrantColor || !fontFamily) {
+    const inlineCss = [...head.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/gi)].map((m) => m[1] ?? "").join("\n");
     if (!vibrantColor) tryColor(findBestColorFromCss(inlineCss));
     if (!fontFamily) fontFamily = findFontFromCss(inlineCss);
 
-    // ── 7. External stylesheets ───────────────────────────────────────────────
     if (!vibrantColor || !fontFamily) {
       const sheets = extractStylesheetUrls(head, base);
-      for (const sheetUrl of sheets.slice(0, 5)) {
+      for (const sheetUrl of sheets.slice(0, 4)) {
         if (vibrantColor && fontFamily) break;
         try {
-          const cr = await fetch(sheetUrl, {
-            headers: { "User-Agent": BOT_UA }, signal: AbortSignal.timeout(5000),
-          });
+          const cr = await fetch(sheetUrl, { headers: { "User-Agent": BOT_UA }, signal: AbortSignal.timeout(5000) });
           if (!cr.ok) continue;
           const css = (await cr.text()).slice(0, 150000);
           if (!vibrantColor) tryColor(findBestColorFromCss(css));
-          if (!fontFamily) fontFamily = findFontFromCss(css);
-          if (!fontFamily) fontFamily = extractGoogleFont(css);
+          if (!fontFamily) { fontFamily = findFontFromCss(css) ?? extractGoogleFont(css); }
         } catch { /* skip */ }
       }
     }
-
-    const color = vibrantColor ?? fallbackColor;
-    return { color, fontFamily };
-  } catch {
-    return { color: null, fontFamily: null };
   }
+
+  return { color: vibrantColor ?? fallbackColor, fontFamily };
 }
 
 // ── PNG dominant color extractor ─────────────────────────────────────────────
