@@ -219,6 +219,14 @@ export const WidgetChatScreen = () => {
           >
             <ArrowLeftIcon />
           </Button>
+          {widgetSettings?.faviconUrl && (
+            <img
+              src={widgetSettings.faviconUrl}
+              alt=""
+              className="size-5 shrink-0 rounded-sm object-contain"
+              onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+            />
+          )}
           <p className="min-w-0 flex-1 truncate text-left font-semibold">
             {widgetTitle}
           </p>

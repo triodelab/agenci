@@ -37,10 +37,21 @@ export const getByOrganizationId = query({
     const canUseBookings = getCanUseBookings(args.organizationId, subscription);
     const canHideBranding = getCanHideBranding(args.organizationId, subscription);
 
+    // Get favicon URL from agentBranding if available
+    let faviconUrl: string | null = null;
+    if (settings.agentId) {
+      const branding = await ctx.db
+        .query("agentBranding")
+        .withIndex("by_agent_id", (q) => q.eq("agentId", settings.agentId!))
+        .first();
+      faviconUrl = branding?.logoUrl ?? null;
+    }
+
     return {
       ...settings,
       bookingEnabled: settings.bookingEnabled && canUseBookings,
       hideBranding: canHideBranding,
+      faviconUrl,
     };
   },
 });

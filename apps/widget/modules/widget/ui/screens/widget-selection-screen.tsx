@@ -82,12 +82,22 @@ export const WidgetSelectionScreen = () => {
     <>
       <WidgetHeader>
         <div className="flex flex-col justify-between gap-y-2 px-2 pb-6 pt-1">
-          <p
-            className="text-center text-[15px] font-semibold tracking-tight"
-            style={{ color: "var(--widget-header-text)" }}
-          >
-            {widgetTitle}
-          </p>
+          <div className="flex items-center justify-center gap-2">
+            {widgetSettings?.faviconUrl && (
+              <img
+                src={widgetSettings.faviconUrl}
+                alt=""
+                className="size-5 rounded-sm object-contain"
+                onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+              />
+            )}
+            <p
+              className="text-center text-[15px] font-semibold tracking-tight"
+              style={{ color: "var(--widget-header-text)" }}
+            >
+              {widgetTitle}
+            </p>
+          </div>
           <p
             className="text-3xl font-semibold"
             style={{ color: "var(--widget-header-text)" }}

@@ -22,6 +22,8 @@ export const conversationIdAtomFamily = atomFamily((organizationId: string) =>
 export type WidgetSettingsPublic = Doc<"widgetSettings"> & {
   /** Settes av server: true når plan tillater å skjule «Powered by Agenci». */
   hideBranding?: boolean;
+  /** Favicon URL for the customer's website (from Google favicon service). */
+  faviconUrl?: string | null;
 };
 
 export const widgetSettingsAtom = atom<WidgetSettingsPublic | null>(null);

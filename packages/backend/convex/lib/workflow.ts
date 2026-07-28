@@ -44,14 +44,20 @@ export const supportAgentOnboarding = workflow.define({
     const primaryColor = themeResult.color ?? null;
     const fontFamily = themeResult.fontFamily ?? null;
 
-    // Step 2: Save branding record
+    // Step 2: Save branding record (favicon via Google's reliable service)
+    let faviconUrl: string | null = null;
+    try {
+      const domain = new URL(url).hostname;
+      faviconUrl = `https://www.google.com/s2/favicons?sz=64&domain=${encodeURIComponent(domain)}`;
+    } catch { /* skip */ }
+
     await step.runMutation(
       internal.private.onboarding.insertWebsiteBranding,
       {
         agentId,
         orgId,
         websiteUrl: url,
-        logoUrl: null,
+        logoUrl: faviconUrl,
         colorScheme: null,
         primaryColor,
         secondaryColor: null,
