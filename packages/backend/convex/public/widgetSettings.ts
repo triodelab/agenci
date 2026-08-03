@@ -37,21 +37,14 @@ export const getByOrganizationId = query({
     const canUseBookings = getCanUseBookings(args.organizationId, subscription);
     const canHideBranding = getCanHideBranding(args.organizationId, subscription);
 
-    // Get favicon URL — use stored logoUrl or derive from sourceUrl domain
+    // Only return faviconUrl if explicitly saved (validated real favicon, not grey placeholder)
     let faviconUrl: string | null = null;
     if (settings.agentId) {
       const branding = await ctx.db
         .query("agentBranding")
         .withIndex("by_agent_id", (q) => q.eq("agentId", settings.agentId!))
         .first();
-      if (branding?.logoUrl) {
-        faviconUrl = branding.logoUrl;
-      } else if (branding?.sourceUrl) {
-        try {
-          const domain = new URL(branding.sourceUrl).hostname;
-          faviconUrl = `https://www.google.com/s2/favicons?sz=64&domain=${encodeURIComponent(domain)}`;
-        } catch { /* skip */ }
-      }
+      faviconUrl = branding?.logoUrl ?? null;
     }
 
     return {
