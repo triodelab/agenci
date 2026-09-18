@@ -1,15 +1,19 @@
+/**
+ * Task 1.2 — Stripe checkout uses Better Auth session (was Clerk `auth()`).
+ */
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { getServerSession } from "@/lib/auth-server";
 import { getStripe } from "@/lib/stripe";
 
 export async function POST(req: Request) {
   try {
-    const { orgId } = await auth();
+    const session = await getServerSession();
+    const orgId = session?.session?.activeOrganizationId;
     if (!orgId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { priceId } = await req.json() as { priceId?: string };
+    const { priceId } = (await req.json()) as { priceId?: string };
     if (!priceId) {
       return NextResponse.json({ error: "Missing priceId" }, { status: 400 });
     }
@@ -19,7 +23,7 @@ export async function POST(req: Request) {
       req.headers.get("origin") ??
       "http://localhost:3000";
 
-    const session = await getStripe().checkout.sessions.create({
+    const checkout = await getStripe().checkout.sessions.create({
       mode: "subscription",
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${origin}/billing?checkout=success`,
@@ -28,7 +32,7 @@ export async function POST(req: Request) {
       subscription_data: { metadata: { orgId } },
     });
 
-    return NextResponse.json({ url: session.url });
+    return NextResponse.json({ url: checkout.url });
   } catch (err) {
     console.error("[stripe/checkout]", err);
     return NextResponse.json({ error: "Checkout failed" }, { status: 500 });

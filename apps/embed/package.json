@@ -10,7 +10,7 @@
   "devDependencies": {
     "@types/node": "catalog:",
     "@workspace/eslint-config": "workspace:^",
-    "@workspace/typescript-config": "workspace:*",
+    "@agenci/config": "workspace:*",
     "eslint": "^9.20.1",
     "typescript": "catalog:",
     "vite": "^5.0.8"

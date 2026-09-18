@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useLayoutEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
-import { useUser } from "@clerk/nextjs";
+import { useUser } from "@/lib/auth-compat";
 import { cn } from "@workspace/ui/lib/utils";
 import { AgenciNavWordmark } from "@/components/logo";
 import { AuthAwareLink } from "@/components/auth-aware-link";

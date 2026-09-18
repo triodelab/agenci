@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useUser, useClerk } from "@clerk/nextjs";
+import { useUser, useClerk } from "@/lib/auth-compat";
 import { useTheme } from "next-themes";
 import { toast } from "sonner";
 import {

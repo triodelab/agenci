@@ -1,0 +1,3 @@
+[install]
+# Hoisted node_modules — closer to npm than pnpm isolated, and what Next/Turbo expect.
+linker = "hoisted"

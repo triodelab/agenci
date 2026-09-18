@@ -13,11 +13,13 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@orpc/client": "catalog:",
+    "@orpc/server": "catalog:",
     "@convex-dev/agent": "^0.1.16",
     "@hookform/resolvers": "^5.2.0",
     "@vapi-ai/web": "^2.3.8",
     "@agenci/backend": "workspace:*",
-    "@workspace/math": "workspace:*",
+    "backend": "workspace:*",
     "@workspace/ui": "workspace:*",
     "convex": "catalog:",
     "date-fns": "^4.1.0",
@@ -35,7 +37,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@workspace/eslint-config": "workspace:^",
-    "@workspace/typescript-config": "workspace:*",
+    "@agenci/config": "workspace:*",
     "typescript": "catalog:"
   }
 }

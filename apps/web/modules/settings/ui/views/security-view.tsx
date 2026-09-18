@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useUser, useClerk, useSession } from "@clerk/nextjs";
+import { useUser, useClerk, useSession } from "@/lib/auth-compat";
 import { toast } from "sonner";
 import {
   LockIcon, ShieldCheckIcon, KeyRoundIcon, Trash2Icon,

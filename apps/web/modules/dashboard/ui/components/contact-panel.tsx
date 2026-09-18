@@ -1,7 +1,7 @@
 "use client";
 
 import Bowser from "bowser";
-import { useUser } from "@clerk/nextjs";
+import { useUser } from "@/lib/auth-compat";
 import {
   Accordion,
   AccordionContent,

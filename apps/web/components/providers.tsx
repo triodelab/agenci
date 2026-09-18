@@ -1,10 +1,14 @@
+/**
+ * Task 1.2 — Root providers.
+ *
+ * ClerkThemeProvider + ConvexProviderWithClerk removed.
+ * Convex stays as a plain provider until Phase 5/8 API cutover (data still on Convex).
+ * Auth identity is Better Auth only (cookies via /api/auth rewrite).
+ */
 "use client";
 
 import * as React from "react";
-import { ConvexReactClient } from "convex/react";
-import { ConvexProviderWithClerk } from "convex/react-clerk";
-import { useAuth } from "@clerk/nextjs";
-import { ClerkThemeProvider } from "@/components/clerk-theme-provider";
+import { ConvexProvider, ConvexReactClient } from "convex/react";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ScrollToHash } from "@/components/scroll-to-hash";
 import { parseConvexDeploymentUrl } from "@/lib/convex-url";
@@ -20,12 +24,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
       enableSystem
       disableTransitionOnChange
     >
-      <ClerkThemeProvider>
-        <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
-          <ScrollToHash />
-          {children}
-        </ConvexProviderWithClerk>
-      </ClerkThemeProvider>
+      {/* Task 1.2: no Clerk — session comes from Better Auth client hooks */}
+      <ConvexProvider client={convex}>
+        <ScrollToHash />
+        {children}
+      </ConvexProvider>
     </ThemeProvider>
   );
 }

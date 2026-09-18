@@ -323,7 +323,7 @@ Per i dag er kun nettside-widget «live». Resten markeres som «Snart» i UI-et
 
 ## 7. Teknisk arkitektur
 
-### 7.1 Monorepo-struktur (pnpm + Turborepo)
+### 7.1 Monorepo-struktur (Bun + Turborepo)
 
 ```
 agenci/

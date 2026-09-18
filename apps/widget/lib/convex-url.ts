@@ -30,7 +30,7 @@ export function parseConvexDeploymentUrl(raw: string | undefined): string {
     hostname === "example.convex.cloud"
   ) {
     throw new Error(
-      "NEXT_PUBLIC_CONVEX_URL er fortsatt en plassholder. Sett den ekte https://….convex.cloud-adressen fra Convex Dashboard – samme linje som i apps/web/.env – i apps/widget/.env.local, og restart pnpm dev:widget.",
+      "NEXT_PUBLIC_CONVEX_URL er fortsatt en plassholder. Sett den ekte https://….convex.cloud-adressen fra Convex Dashboard – samme linje som i apps/web/.env – i apps/widget/.env.local, og restart bun dev:widget.",
     );
   }
 

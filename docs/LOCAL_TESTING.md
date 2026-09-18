@@ -4,7 +4,7 @@ Dashboardet føles «lite å gjøre» når **data eller tilkoblinger mangler**. 
 
 ## 1. Convex
 
-- `packages/backend`: `npx convex dev` (eller `pnpm dev:backend` fra rot).
+- `packages/backend`: `npx convex dev` (eller `bun dev:backend` fra rot).
 - **Samme deployment** som `NEXT_PUBLIC_CONVEX_URL` i `apps/web` og `apps/widget`.
 - **Miljøvariabler på deploymenten** (Dashboard → Environment variables eller `npx convex env set`): se [`packages/backend/.env.example`](../packages/backend/.env.example) for full liste.
 - Widget bruker `public/organizations.validate` → trenger **`CLERK_SECRET_KEY` på Convex** for å slå opp organisasjoner.
@@ -64,7 +64,7 @@ Når du legger til en nettside i dashboardet, opprettes en `websiteRun` og Conve
 ## 4. Widget (`apps/widget`)
 
 - `.env.local` med **samme** `NEXT_PUBLIC_CONVEX_URL` som web.
-- Start: `pnpm dev:widget` → [http://localhost:3001/?organizationId=org_…](http://localhost:3001/?organizationId=org_…)
+- Start: `bun dev:widget` → [http://localhost:3001/?organizationId=org_…](http://localhost:3001/?organizationId=org_…)
 
 Mer detalj: [apps/widget/README.md](../apps/widget/README.md).
 

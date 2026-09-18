@@ -8,7 +8,7 @@ Opprett **`apps/widget/.env.local`** (kopier fra `.env.example`) og sett:
 
 - **`NEXT_PUBLIC_CONVEX_URL`** – **nøyaktig samme** URL som `NEXT_PUBLIC_CONVEX_URL` i `apps/web/.env` (og som `CONVEX_URL` i `packages/backend/.env.local`).
 
-Feilen `Couldn't parse deployment name your-deployment` betyr at URL-en fortsatt er en **plassholder** – bytt til den ekte `https://….convex.cloud`-adressen og **restart** widget (`Ctrl+C`, deretter `pnpm dev:widget`).
+Feilen `Couldn't parse deployment name your-deployment` betyr at URL-en fortsatt er en **plassholder** – bytt til den ekte `https://….convex.cloud`-adressen og **restart** widget (`Ctrl+C`, deretter `bun dev:widget`).
 
 Convex-actions som `public/organizations.validate` trenger **`CLERK_SECRET_KEY` satt på Convex-deploymenten** (ikke bare lokalt), ellers feiler organisasjonssjekken.
 
@@ -17,13 +17,13 @@ Convex-actions som `public/organizations.validate` trenger **`CLERK_SECRET_KEY` 
 Fra monorepo-roten:
 
 ```bash
-pnpm dev:widget
+bun dev:widget
 ```
 
 Eller:
 
 ```bash
-cd apps/widget && pnpm dev
+cd apps/widget && bun dev
 ```
 
 Standardport: **3001**.
@@ -42,9 +42,9 @@ Finn `org_…` i Clerk (Organization → Details) eller kopier fra feltet **Orga
 
 | Tjeneste | Kommando | Merknad |
 |----------|----------|--------|
-| Convex backend | `pnpm dev:backend` (eller `cd packages/backend && npx convex dev`) | Må være koblet til samme deployment som URL-en over |
-| Widget | `pnpm dev:widget` | Denne appen |
-| Web (valgfritt) | `pnpm dev:web` | For dashboard, innstillinger, knowledge, osv. |
+| Convex backend | `bun dev:backend` (eller `cd packages/backend && npx convex dev`) | Må være koblet til samme deployment som URL-en over |
+| Widget | `bun dev:widget` | Denne appen |
+| Web (valgfritt) | `bun dev:web` | For dashboard, innstillinger, knowledge, osv. |
 
 ## 5. Innebyggingskode (`<script>`)
 

@@ -1,6 +1,8 @@
 "use client";
 
-import { OrganizationSwitcher, UserButton } from "@clerk/nextjs";
+/**
+ * Task 1.2 — Clerk OrganizationSwitcher / UserButton replaced with Better Auth menus.
+ */
 import {
   BellIcon,
   SidebarIcon,
@@ -28,6 +30,8 @@ import {
   PopoverTrigger,
 } from "@workspace/ui/components/popover";
 import { cn } from "@workspace/ui/lib/utils";
+import { OrgSwitcher } from "@/modules/auth/ui/components/org-switcher";
+import { UserMenu } from "@/modules/auth/ui/components/user-menu";
 
 // ── Error boundary ────────────────────────────────────────────────────────────
 
@@ -441,20 +445,8 @@ export function DashboardTopNav() {
         />
 
         <Suspense fallback={<div className="h-8 w-32 animate-pulse rounded-lg bg-muted" />}>
-          <OrganizationSwitcher
-            hidePersonal
-            skipInvitationScreen
-            appearance={{
-              elements: {
-                rootBox: "h-8!",
-                avatarBox: "size-4! rounded-md!",
-                organizationSwitcherTrigger:
-                  "h-8! rounded-lg! border border-border/70 bg-transparent px-2! text-[12px]! font-medium! hover:bg-muted! shadow-none!",
-                organizationPreviewTextContainer: "text-[12px]! font-medium! text-foreground!",
-                organizationSwitcherTriggerIcon: "ml-1! size-3.5! text-muted-foreground!",
-              },
-            }}
-          />
+          {/* Task 1.2: Better Auth org switcher (was Clerk OrganizationSwitcher) */}
+          <OrgSwitcher />
         </Suspense>
 
         <QueryErrorBoundary fallback={
@@ -466,15 +458,8 @@ export function DashboardTopNav() {
         </QueryErrorBoundary>
 
         <Suspense fallback={<div className="size-8 animate-pulse rounded-lg bg-muted" />}>
-          <UserButton
-            appearance={{
-              elements: {
-                rootBox: "h-8!",
-                userButtonTrigger: "h-8! rounded-lg! border border-border/70 bg-transparent p-1! hover:bg-muted!",
-                avatarBox: "size-6! rounded-md!",
-              },
-            }}
-          />
+          {/* Task 1.2: Better Auth user menu (was Clerk UserButton) */}
+          <UserMenu />
         </Suspense>
       </div>
     </header>

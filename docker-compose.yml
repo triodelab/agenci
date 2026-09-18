@@ -1,0 +1,129 @@
+name: agenci
+
+# Local / self-host stack:
+#   postgres (pgvector) + redis + neo4j + qdrant + inngest
+# App (Elysia) usually runs on the host via `bun --filter backend dev`.
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg18
+    container_name: agenci-postgres
+    environment:
+      POSTGRES_DB: agenci
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+    networks:
+      - agenci-network
+    ports:
+      - "5432:5432"
+    volumes:
+      - agenci-postgres-data:/var/lib/postgresql
+      - ./docker/postgres/init-databases.sql:/docker-entrypoint-initdb.d/01-init-databases.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d agenci"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  redis-worker:
+    image: redis:7-alpine
+    container_name: agenci-redis-worker
+    ports:
+      - "6379:6379"
+    volumes:
+      - agenci-redis-data:/data
+    networks:
+      - agenci-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+  redis-memory:
+    image: redis:8
+    container_name: agenci-redis-memory
+    ports:
+      - "6380:6379"
+    volumes:
+      - agenci-redis-memory-data:/data
+    networks:
+      - agenci-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+  # Knowledge graph (configured later — image only for now)
+  neo4j:
+    image: neo4j:5-community
+    container_name: agenci-neo4j
+    environment:
+      NEO4J_AUTH: neo4j/${NEO4J_PASSWORD:-password}
+      NEO4J_PLUGINS: '["apoc"]'
+      NEO4J_server_memory_heap_initial__size: 512m
+      NEO4J_server_memory_heap_max__size: 512m
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    volumes:
+      - agenci-neo4j-data:/data
+      - agenci-neo4j-logs:/logs
+    networks:
+      - agenci-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:7474 || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    restart: unless-stopped
+
+  # Vector DB (configured later — image only for now; app RAG still targets pgvector)
+  qdrant:
+    image: qdrant/qdrant:v1.13.6
+    container_name: agenci-qdrant
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - agenci-qdrant-data:/qdrant/storage
+    networks:
+      - agenci-network
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'exec 3<>/dev/tcp/127.0.0.1/6333'"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+  inngest:
+    image: inngest/inngest:latest
+    container_name: agenci-inngest
+    command: inngest dev -u http://host.docker.internal:3003/api/inngest
+    ports:
+      - "8288:8288"
+      - "8289:8289"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      INNGEST_DEV: "1"
+    networks:
+      - agenci-network
+    restart: unless-stopped
+
+networks:
+  agenci-network:
+    driver: bridge
+
+volumes:
+  agenci-postgres-data:
+  agenci-redis-data:
+  agenci-redis-memory-data:
+  agenci-neo4j-data:
+  agenci-neo4j-logs:
+  agenci-qdrant-data:

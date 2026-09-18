@@ -26,25 +26,25 @@ The platform includes:
 
 Frontend:
 
-* Next.js 15
-* React 19
+* Next.js 15 (`apps/web`, `apps/widget`)
+* React 19 + TanStack Router (`apps/dashboard`)
 * TypeScript
 * Tailwind CSS v4
 * shadcn/ui
-* Clerk Authentication
+* Better Auth (staff dashboard); Clerk still on legacy Next dashboard
 
 Backend:
 
-* Convex
-* Convex Agent
-* Convex RAG
-* Convex Workflow
+* Elysia (`apps/backend`) — Better Auth, Inngest, Prisma
+* **Mastra** (`@agenci/mastra`) — customer-facing support agents (library; not a public HTTP service)
+* Prisma + PostgreSQL (pgvector)
 * OpenAI GPT-4o-mini
+* Legacy: Convex (being migrated away)
 
 Infrastructure:
 
 * Turborepo
-* pnpm workspace
+* Bun workspaces (`bun install`, `bun --filter <pkg> <script>`)
 * AWS Secrets Manager
 * Stripe
 
@@ -56,9 +56,17 @@ Language:
 
 # Monorepo Structure
 
+apps/dashboard
+
+* Staff dashboard (React + TanStack Router)
+
+apps/backend
+
+* Elysia API (Better Auth, Inngest, documents)
+
 apps/web
 
-* Dashboard application
+* Marketing / legacy Next dashboard (being migrated)
 
 apps/widget
 
@@ -70,7 +78,11 @@ apps/embed
 
 packages/backend
 
-* Convex backend
+* Convex backend (legacy)
+
+packages/mastra
+
+* Mastra agents + workflows (e-commerce / healthcare support)
 
 packages/ui
 
@@ -195,9 +207,12 @@ Knowledge Base:
 
 AI Agent:
 
+* Mastra library (`@agenci/mastra`) — e-commerce + healthcare support
+* Invoked from Inngest / API (not a public Mastra HTTP server)
 * Norwegian system prompts
 * Use existing search tools
 * Preserve escalation flows
+* RAG namespace: `${organizationId}:${agentId}`
 
 ---
 

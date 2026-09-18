@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useOrganization, useClerk } from "@clerk/nextjs";
+import { useOrganization, useClerk } from "@/lib/auth-compat";
 import { toast } from "sonner";
 import {
   Building2, CopyIcon, CheckIcon, UsersIcon,

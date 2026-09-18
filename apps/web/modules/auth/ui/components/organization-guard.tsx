@@ -1,37 +1,35 @@
+/**
+ * Task 1.2 — OrganizationGuard uses Better Auth active organization
+ * (replaces Clerk `useOrganization`).
+ */
 "use client";
 
-import { useOrganization } from "@clerk/nextjs";
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { authClient } from "@/lib/auth-client";
 import { DashboardFullSkeleton } from "@/modules/dashboard/ui/components/dashboard-skeleton";
 
-export const OrganizationGuard = ({ children }: { children: React.ReactNode }) => {
-  const { organization, isLoaded } = useOrganization();
+export const OrganizationGuard = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
   const router = useRouter();
+  const { data: session, isPending: sessionPending } = authClient.useSession();
+  const { data: activeOrg, isPending: orgPending } =
+    authClient.useActiveOrganization();
 
-  // Brief delay after load to allow the JWT to refresh after org creation
-  const [stable, setStable] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    if (!isLoaded) {
-      setStable(false);
-      return;
-    }
-    // Give Clerk 800ms to refresh the session after org creation before deciding
-    timerRef.current = setTimeout(() => setStable(true), 800);
-    return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-    };
-  }, [isLoaded, organization?.id]);
+  const isLoaded = !sessionPending && !orgPending;
+  const hasOrg =
+    !!activeOrg?.id || !!session?.session?.activeOrganizationId;
 
   useEffect(() => {
-    if (stable && !organization) {
+    if (isLoaded && session?.user && !hasOrg) {
       router.replace("/onboarding");
     }
-  }, [stable, organization, router]);
+  }, [isLoaded, session?.user, hasOrg, router]);
 
-  if (!isLoaded || !stable || (!organization && stable)) {
+  if (!isLoaded || (session?.user && !hasOrg)) {
     return <DashboardFullSkeleton />;
   }
 

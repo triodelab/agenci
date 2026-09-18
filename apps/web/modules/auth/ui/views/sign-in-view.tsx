@@ -1,6 +1,10 @@
+/**
+ * Task 1.2 — Sign-in via Better Auth email/password (Clerk removed).
+ * OAuth buttons are disabled until providers are configured on the server.
+ */
 "use client";
 
-import { useAuth, useSignIn } from "@clerk/nextjs";
+import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -31,81 +35,53 @@ function MicrosoftIcon() {
 const inputCls =
   "h-10 w-full rounded-[8px] border border-[#d4d0cb] bg-white px-3.5 text-[14px] text-[#1C1C1C] placeholder-[#a09d98] outline-none transition focus:border-[#b8b3ae] focus:ring-2 focus:ring-[#1C1C1C]/8 disabled:opacity-50";
 
-function clerkErrMsg(err: unknown): string {
-  const e = err as { errors?: Array<{ code?: string; message?: string; longMessage?: string }> } | null;
-  const first = e?.errors?.[0];
-  const code = first?.code ?? "";
-
-  if (code === "form_password_incorrect" || code.includes("password_incorrect"))
-    return "Feil passord. Prøv igjen.";
-  if (code === "form_identifier_not_found" || code.includes("identifier_not_found"))
+function authErrMsg(err: unknown): string {
+  const e = err as { message?: string; code?: string } | null;
+  const msg = (e?.message ?? "").toLowerCase();
+  if (msg.includes("invalid") && msg.includes("password"))
+    return "Feil e-post eller passord. Prøv igjen.";
+  if (msg.includes("not found") || msg.includes("user"))
     return "Fant ingen konto med denne e-postadressen.";
-  if (code === "too_many_requests")
-    return "For mange forsøk. Vent litt og prøv igjen.";
-
-  return first?.longMessage ?? first?.message ?? "Innlogging mislyktes. Prøv igjen.";
+  return e?.message ?? "Innlogging mislyktes. Prøv igjen.";
 }
 
 export const SignInView = () => {
-  const { userId } = useAuth();
-  const { signIn, setActive, isLoaded } = useSignIn();
+  const { data: session, isPending } = authClient.useSession();
   const router = useRouter();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPwd, setShowPwd] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [oauthLoading, setOauthLoading] = useState<"google" | "microsoft" | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (userId) router.replace("/agents");
-  }, [userId, router]);
-
-  const handleOAuth = async (provider: "oauth_google" | "oauth_microsoft") => {
-    if (!isLoaded) return;
-    setOauthLoading(provider === "oauth_google" ? "google" : "microsoft");
-    setError(null);
-    try {
-      await signIn.authenticateWithRedirect({
-        strategy: provider,
-        redirectUrl: `${window.location.origin}/sso-callback`,
-        redirectUrlComplete: "/agents",
-      });
-    } catch {
-      setError("Noe gikk galt. Prøv igjen.");
-      setOauthLoading(null);
-    }
-  };
+    if (session?.user) router.replace("/agents");
+  }, [session?.user, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isLoaded) return;
     setLoading(true);
     setError(null);
 
     try {
-      const attempt = await signIn.create({
-        identifier: email,
-        strategy: "password",
+      const { error: signInError } = await authClient.signIn.email({
+        email,
         password,
       });
-
-      if (attempt.status === "complete") {
-        await setActive({ session: attempt.createdSessionId });
-        router.push("/agents");
+      if (signInError) {
+        setError(authErrMsg(signInError));
         return;
       }
-
-      setError(`Innlogging mislyktes (${attempt.status}). Prøv igjen.`);
+      router.push("/agents");
     } catch (err: unknown) {
-      setError(clerkErrMsg(err));
+      setError(authErrMsg(err));
     } finally {
       setLoading(false);
     }
   };
 
-  const busy = loading || oauthLoading !== null;
+  const busy = loading || isPending;
 
   return (
     <div className="space-y-5">
@@ -118,25 +94,17 @@ export const SignInView = () => {
         </p>
       </div>
 
-      {/* OAuth */}
+      {/* OAuth — not wired on Better Auth yet (Task 1.2 keeps email/password path) */}
       <div className="grid grid-cols-2 gap-2.5">
         {(["google", "microsoft"] as const).map((p) => (
           <button
             key={p}
             type="button"
-            disabled={busy}
-            onClick={() =>
-              void handleOAuth(p === "google" ? "oauth_google" : "oauth_microsoft")
-            }
-            className="flex h-10 items-center justify-center gap-2 rounded-[8px] border border-[#d4d0cb] bg-white text-[13px] font-medium text-[#4b5563] transition hover:border-[#b8b3ae] hover:text-[#1C1C1C] disabled:opacity-50"
+            disabled
+            title="Sosial innlogging kommer snart"
+            className="flex h-10 items-center justify-center gap-2 rounded-[8px] border border-[#d4d0cb] bg-white text-[13px] font-medium text-[#4b5563] opacity-50"
           >
-            {oauthLoading === p ? (
-              <Loader2Icon className="h-4 w-4 animate-spin" />
-            ) : p === "google" ? (
-              <GoogleIcon />
-            ) : (
-              <MicrosoftIcon />
-            )}
+            {p === "google" ? <GoogleIcon /> : <MicrosoftIcon />}
             {p === "google" ? "Google" : "Microsoft"}
           </button>
         ))}

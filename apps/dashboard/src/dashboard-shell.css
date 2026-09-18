@@ -1,0 +1,336 @@
+/**
+ * Dashboard shell tokens — subset of apps/web/styles/tokens.css for the React dashboard.
+ */
+.dashboard-app-shell [data-slot="sidebar"] {
+  flex-shrink: 0 !important;
+  height: 100% !important;
+}
+
+.dashboard-app-shell [data-slot="sidebar-container"] {
+  position: relative !important;
+  inset: auto !important;
+  height: 100% !important;
+  overflow-y: auto !important;
+}
+
+.dashboard-app-shell [data-slot="sidebar-gap"] {
+  display: none !important;
+}
+
+.dashboard-app-shell {
+  --background: #fafaf9;
+  --foreground: #1c1c1c;
+  --card: #ffffff;
+  --card-foreground: #1c1c1c;
+  --popover: #ffffff;
+  --popover-foreground: #1c1c1c;
+  --primary: #1c1c1c;
+  --primary-foreground: #fafaf9;
+  --secondary: #f4f1ee;
+  --secondary-foreground: #1c1c1c;
+  --muted: #f4f1ee;
+  --muted-foreground: #6b6560;
+  --accent: #f4f1ee;
+  --accent-foreground: #1c1c1c;
+  --border: #e8e4df;
+  --input: #e8e4df;
+  --ring: #1c1c1c;
+  --radius: 0.625rem;
+  --sidebar: #1c1c1c;
+  --sidebar-foreground: #f2f3f5;
+  --sidebar-primary: #ffffff;
+  --sidebar-primary-foreground: #1c1c1c;
+  --sidebar-accent: #2a2a2a;
+  --sidebar-accent-foreground: #f2f3f5;
+  --sidebar-border: #2a2a2a;
+  --sidebar-ring: #f2f3f5;
+}
+
+.dash-sidebar-scope {
+  --foreground: #f2f3f5;
+  --background: #1c1c1c;
+  --muted: #2a2a2a;
+  --muted-foreground: #9ca3af;
+  --card: #262626;
+  --border: #2a2a2a;
+  --input: #2a2a2a;
+}
+
+.dark .dashboard-app-shell {
+  --background: #191917;
+  --foreground: #f2f3f5;
+  --card: #222220;
+  --card-foreground: #f2f3f5;
+  --popover: #222220;
+  --popover-foreground: #f2f3f5;
+  --primary: #f2f3f5;
+  --primary-foreground: #191917;
+  --secondary: #272725;
+  --secondary-foreground: #f2f3f5;
+  --muted: #272725;
+  --muted-foreground: #9c9890;
+  --accent: #272725;
+  --accent-foreground: #f2f3f5;
+  --border: #2e2d2b;
+  --input: #2e2d2b;
+  --ring: #f2f3f5;
+  --sidebar: #111110;
+  --sidebar-foreground: #f2f3f5;
+  --sidebar-primary: #f2f3f5;
+  --sidebar-primary-foreground: #111110;
+  --sidebar-accent: #222220;
+  --sidebar-accent-foreground: #f2f3f5;
+  --sidebar-border: #2a2a28;
+  --sidebar-ring: #f2f3f5;
+}
+
+.dark .dash-sidebar-scope {
+  --foreground: #e8e6e3;
+  --background: #111110;
+  --muted: #222220;
+  --muted-foreground: #8c8880;
+  --card: #1e1e1c;
+  --border: #2a2a28;
+  --input: #2a2a28;
+}
+
+.app-dashboard-main {
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--background);
+}
+
+.app-dashboard-main.app-dashboard-canvas {
+  background-color: oklch(0.985 0 0);
+  background-image: radial-gradient(oklch(0.88 0 0) 1px, transparent 1px);
+  background-size: 20px 20px;
+  background-attachment: fixed;
+}
+
+.dark .app-dashboard-main.app-dashboard-canvas {
+  background-color: var(--background);
+  background-image: radial-gradient(
+    color-mix(in oklch, var(--foreground) 14%, transparent) 1px,
+    transparent 1px
+  );
+  background-size: 20px 20px;
+  background-attachment: fixed;
+}
+
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dash-page-kicker {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+.dash-page-title {
+  font-size: clamp(1.625rem, 2.2vw + 1rem, 2.125rem);
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  line-height: 1.15;
+  color: var(--foreground);
+}
+
+.dash-page-desc {
+  max-width: 36rem;
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: var(--muted-foreground);
+}
+
+.dash-workspace-inner {
+  max-width: none;
+}
+
+.dash-card-surface,
+.dash-panel-glass,
+.dash-integration-orb,
+.app-dashboard-panel {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  border-radius: 1rem;
+  border: 1px solid color-mix(in oklch, var(--border) 70%, transparent);
+  background: color-mix(in oklch, var(--card) 82%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow:
+    0 1px 0 oklch(1 0 0 / 0.55) inset,
+    0 12px 40px -28px oklch(0 0 0 / 0.12);
+}
+
+.dark .dash-card-surface,
+.dark .dash-panel-glass,
+.dark .dash-integration-orb,
+.dark .app-dashboard-panel {
+  border-color: color-mix(in oklch, var(--border) 100%, transparent);
+  background: var(--card);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow:
+    0 1px 0 oklch(1 0 0 / 0.07) inset,
+    0 14px 44px -26px oklch(0 0 0 / 0.5);
+}
+
+.dash-card-surface::before,
+.dash-panel-glass::before,
+.dash-integration-orb::before,
+.app-dashboard-panel::before {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    ellipse 120% 90% at 100% 0%,
+    oklch(0.93 0 0 / 0.55),
+    transparent 58%
+  );
+}
+
+.dark .dash-card-surface::before,
+.dark .dash-panel-glass::before,
+.dark .dash-integration-orb::before,
+.dark .app-dashboard-panel::before {
+  background: radial-gradient(
+    ellipse 120% 90% at 100% 0%,
+    oklch(0.28 0.01 264 / 0.42),
+    transparent 58%
+  );
+}
+
+.dash-card-surface > *,
+.dash-panel-glass > *,
+.dash-integration-orb > *,
+.app-dashboard-panel > * {
+  position: relative;
+  z-index: 1;
+}
+
+.dash-integration-orb {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1.75rem 1.25rem;
+  text-align: center;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.dash-integration-orb:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in oklch, var(--foreground) 12%, var(--border));
+  box-shadow:
+    0 1px 0 oklch(1 0 0 / 0.65) inset,
+    0 16px 40px -20px oklch(0 0 0 / 0.14);
+}
+
+.dash-subpane-rail {
+  border-right: 1px solid color-mix(in oklch, var(--border) 90%, transparent);
+  background: var(--card);
+}
+
+.dark .dash-subpane-rail {
+  background: var(--background);
+}
+
+.dash-subpane-main {
+  background: transparent;
+}
+
+.dash-page-header-accent {
+  position: relative;
+  margin-bottom: 2rem;
+  padding-bottom: 1.75rem;
+  padding-left: 1rem;
+  border-bottom: 1px solid color-mix(in oklch, var(--border) 90%, transparent);
+}
+
+@media (min-width: 640px) {
+  .dash-page-header-accent {
+    margin-bottom: 2.5rem;
+    padding-bottom: 2rem;
+  }
+}
+
+.dash-page-header-accent::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.15rem;
+  bottom: 1.75rem;
+  width: 3px;
+  border-radius: 2px;
+  background: linear-gradient(
+    180deg,
+    oklch(0.22 0 0) 0%,
+    oklch(0.32 0 0) 55%,
+    color-mix(in oklch, var(--foreground) 40%, var(--muted)) 100%
+  );
+}
+
+.dark .dash-page-header-accent::before {
+  background: linear-gradient(
+    180deg,
+    oklch(0.88 0 0) 0%,
+    oklch(0.72 0 0) 100%
+  );
+}
+
+.dash-knowledge-playground {
+  background-color: color-mix(in oklch, var(--muted) 22%, var(--background));
+  background-image: radial-gradient(
+    circle at center,
+    color-mix(in oklch, var(--foreground) 10%, transparent) 1px,
+    transparent 1px
+  );
+  background-size: 22px 22px;
+}
+
+.dark .dash-knowledge-playground {
+  background-color: color-mix(in oklch, var(--muted) 18%, var(--background));
+  background-image: radial-gradient(
+    circle at center,
+    color-mix(in oklch, var(--foreground) 16%, transparent) 1px,
+    transparent 1px
+  );
+}
+
+.dash-conversations-canvas {
+  background-color: color-mix(in oklch, var(--muted) 12%, var(--background));
+  background-image: radial-gradient(
+    circle at center,
+    color-mix(in oklch, var(--foreground) 8%, transparent) 1px,
+    transparent 1px
+  );
+  background-size: 20px 20px;
+}
+
+.dark .dash-conversations-canvas {
+  background-color: color-mix(in oklch, var(--muted) 10%, var(--background));
+  background-image: radial-gradient(
+    circle at center,
+    color-mix(in oklch, var(--foreground) 12%, transparent) 1px,
+    transparent 1px
+  );
+}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useUser } from "@clerk/nextjs";
+import { useUser } from "@/lib/auth-compat";
 import { useQuery } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
 import { toast } from "sonner";

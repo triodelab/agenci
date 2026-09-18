@@ -1,0 +1,24 @@
+{
+  "name": "@agenci/auth",
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./src/index.ts"
+    },
+    "./*": {
+      "default": "./src/*.ts"
+    }
+  },
+  "scripts": {},
+  "dependencies": {
+    "@agenci/db": "workspace:*",
+    "@agenci/env": "workspace:*",
+    "better-auth": "catalog:",
+    "dotenv": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@agenci/config": "workspace:*",
+    "typescript": "catalog:"
+  }
+}

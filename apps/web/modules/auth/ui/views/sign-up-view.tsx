@@ -1,158 +1,157 @@
-import { SignUp } from "@clerk/nextjs";
+/**
+ * Task 1.2 — Sign-up via Better Auth email/password (replaces Clerk <SignUp />).
+ */
+"use client";
+
+import { authClient } from "@/lib/auth-client";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { EyeIcon, EyeOffIcon, Loader2Icon } from "lucide-react";
+
+const inputCls =
+  "h-10 w-full rounded-[8px] border border-[#d4d0cb] bg-white px-3.5 text-[14px] text-[#1C1C1C] placeholder-[#a09d98] outline-none transition focus:border-[#b8b3ae] focus:ring-2 focus:ring-[#1C1C1C]/8 disabled:opacity-50";
 
 export const SignUpView = () => {
+  const router = useRouter();
+  const { data: session } = authClient.useSession();
+
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPwd, setShowPwd] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (session?.user) router.replace("/onboarding");
+  }, [session?.user, router]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    try {
+      const { error: signUpError } = await authClient.signUp.email({
+        name,
+        email,
+        password,
+      });
+      if (signUpError) {
+        setError(signUpError.message ?? "Kunne ikke opprette konto.");
+        return;
+      }
+      router.push("/onboarding");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Kunne ikke opprette konto.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <SignUp
-      routing="path"
-      path="/sign-up"
-      signInUrl="/sign-in"
-      forceRedirectUrl="/onboarding"
-      appearance={{
-        variables: {
-          colorBackground: "transparent",
-          colorPrimary: "#1C1C1C",
-          colorText: "#1C1C1C",
-          colorTextSecondary: "#6b7280",
-          colorTextOnPrimaryBackground: "#FFFFFF",
-          colorInputBackground: "#FFFFFF",
-          colorInputText: "#1C1C1C",
-          colorNeutral: "#d4d0cb",
-          colorDanger: "#DC2626",
-          borderRadius: "8px",
-          fontSize: "14px",
-          fontFamily: "inherit",
-          fontWeight: { normal: "400", medium: "500", bold: "600" },
-        },
-        elements: {
-          rootBox: { width: "100%" },
-          card: {
-            boxShadow: "none",
-            backgroundColor: "transparent",
-            padding: "0",
-            border: "none",
-            gap: "20px",
-            width: "100%",
-          },
-          header: { paddingBottom: "0" },
-          headerTitle: {
-            fontFamily: "inherit",
-            fontSize: "22px",
-            fontWeight: "600",
-            letterSpacing: "-0.03em",
-            color: "#1C1C1C",
-          },
-          headerSubtitle: {
-            fontFamily: "inherit",
-            fontSize: "14px",
-            color: "#6b7280",
-            marginTop: "4px",
-          },
-          socialButtonsBlockButton: {
-            fontFamily: "inherit",
-            border: "1px solid #d4d0cb",
-            borderRadius: "8px",
-            backgroundColor: "#FFFFFF",
-            height: "40px",
-            fontSize: "13px",
-            fontWeight: "500",
-            color: "#4b5563",
-            boxShadow: "none",
-          },
-          socialButtonsBlockButtonText: {
-            fontFamily: "inherit",
-            fontSize: "13px",
-            fontWeight: "500",
-          },
-          dividerRow: { marginTop: "4px", marginBottom: "4px" },
-          dividerLine: { backgroundColor: "#d4d0cb" },
-          dividerText: {
-            fontFamily: "inherit",
-            color: "#a09d98",
-            fontSize: "11px",
-          },
-          formFieldLabel: {
-            fontFamily: "inherit",
-            fontSize: "13px",
-            fontWeight: "500",
-            color: "#4b5563",
-            marginBottom: "6px",
-          },
-          formFieldInput: {
-            fontFamily: "inherit",
-            border: "1px solid #d4d0cb",
-            borderRadius: "8px",
-            backgroundColor: "#FFFFFF",
-            height: "40px",
-            fontSize: "14px",
-            color: "#1C1C1C",
-            boxShadow: "none",
-            paddingLeft: "14px",
-            paddingRight: "14px",
-          },
-          formButtonPrimary: {
-            fontFamily: "inherit",
-            backgroundColor: "#1C1C1C",
-            borderRadius: "8px",
-            height: "40px",
-            fontSize: "14px",
-            fontWeight: "600",
-            color: "#FFFFFF",
-            boxShadow: "none",
-            textTransform: "none",
-            letterSpacing: "0em",
-          },
-          footer: {
-            backgroundColor: "transparent",
-            background: "transparent",
-          },
-          footerAction: {
-            backgroundColor: "transparent",
-            paddingTop: "8px",
-          },
-          footerActionText: {
-            fontFamily: "inherit",
-            fontSize: "13px",
-            color: "#6b7280",
-          },
-          footerActionLink: {
-            fontFamily: "inherit",
-            fontSize: "13px",
-            fontWeight: "600",
-            color: "#1C1C1C",
-          },
-          identityPreviewText: {
-            fontFamily: "inherit",
-            fontSize: "14px",
-            color: "#1C1C1C",
-          },
-          identityPreviewEditButton: {
-            fontFamily: "inherit",
-            fontSize: "13px",
-            color: "#6b7280",
-          },
-          formFieldInputShowPasswordButton: { color: "#a09d98" },
-          formFieldSuccessText: {
-            fontFamily: "inherit",
-            fontSize: "12px",
-          },
-          alertText: {
-            fontFamily: "inherit",
-            fontSize: "13px",
-          },
-          alert: {
-            borderRadius: "8px",
-            border: "1px solid #fecaca",
-            backgroundColor: "#fef2f2",
-          },
-          otpCodeFieldInput: {
-            fontFamily: "inherit",
-            borderRadius: "8px",
-            border: "1px solid #d4d0cb",
-            backgroundColor: "#FFFFFF",
-            color: "#1C1C1C",
-          },
-        },
-      }}
-    />
+    <div className="space-y-5">
+      <div className="space-y-1">
+        <h2 className="text-[22px] font-semibold tracking-[-0.03em] text-[#1C1C1C]">
+          Opprett konto
+        </h2>
+        <p className="text-[14px] text-[#6b7280]">
+          Kom i gang med Agenci
+        </p>
+      </div>
+
+      <form onSubmit={(e) => void handleSubmit(e)} className="space-y-3.5">
+        <div className="space-y-1.5">
+          <label htmlFor="su-name" className="text-[13px] font-medium text-[#4b5563]">
+            Navn
+          </label>
+          <input
+            id="su-name"
+            type="text"
+            autoComplete="name"
+            required
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Ditt navn"
+            disabled={loading}
+            className={inputCls}
+          />
+        </div>
+
+        <div className="space-y-1.5">
+          <label htmlFor="su-email" className="text-[13px] font-medium text-[#4b5563]">
+            E-post
+          </label>
+          <input
+            id="su-email"
+            type="email"
+            autoComplete="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="din@epost.no"
+            disabled={loading}
+            className={inputCls}
+          />
+        </div>
+
+        <div className="space-y-1.5">
+          <label htmlFor="su-pwd" className="text-[13px] font-medium text-[#4b5563]">
+            Passord
+          </label>
+          <div className="relative">
+            <input
+              id="su-pwd"
+              type={showPwd ? "text" : "password"}
+              autoComplete="new-password"
+              required
+              minLength={8}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Minst 8 tegn"
+              disabled={loading}
+              className={`${inputCls} pr-10`}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPwd((v) => !v)}
+              tabIndex={-1}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#a09d98] hover:text-[#4b5563]"
+            >
+              {showPwd ? (
+                <EyeOffIcon className="h-4 w-4" />
+              ) : (
+                <EyeIcon className="h-4 w-4" />
+              )}
+            </button>
+          </div>
+        </div>
+
+        {error && (
+          <p className="rounded-[8px] border border-red-200 bg-red-50 px-3.5 py-2.5 text-[13px] text-red-600">
+            {error}
+          </p>
+        )}
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="flex h-10 w-full items-center justify-center gap-2 rounded-[8px] bg-[#1C1C1C] text-[14px] font-semibold text-white transition hover:bg-[#2a2a2a] disabled:opacity-50"
+        >
+          {loading && <Loader2Icon className="h-4 w-4 animate-spin" />}
+          Opprett konto
+        </button>
+      </form>
+
+      <p className="text-center text-[13px] text-[#6b7280]">
+        Har du allerede konto?{" "}
+        <Link
+          href="/sign-in"
+          className="font-semibold text-[#1C1C1C] transition-colors hover:text-[#2a2a2a]"
+        >
+          Logg inn
+        </Link>
+      </p>
+    </div>
   );
 };
