@@ -3,13 +3,12 @@ import { Mastra } from '@mastra/core/mastra';
 import { PinoLogger } from '@mastra/loggers';
 import { LibSQLStore } from '@mastra/libsql';
 import { DuckDBStore } from "@mastra/duckdb";
-import { PgVector } from "@mastra/pg";
 import { MastraCompositeStore } from '@mastra/core/storage';
 import { Observability, MastraStorageExporter, MastraPlatformExporter, SensitiveDataFilter } from '@mastra/observability';
-import { env } from "@agenci/env/server";
 import { weatherWorkflow } from './workflows/weather-workflow';
 import { weatherAgent } from './agents/weather-agent';
 import { customerServiceAgent } from './agents/customer-service-agent';
+import { pgVector } from './vector';
 
 /**
  * Static agents for Studio. Per-org customer agents are `addAgent`'d after
@@ -18,12 +17,7 @@ import { customerServiceAgent } from './agents/customer-service-agent';
 export const mastra = new Mastra({
   workflows: { weatherWorkflow },
   agents: { weatherAgent, customerServiceAgent },
-  vectors: {
-    pgVector: new PgVector({
-      id: "pg-vector",
-      connectionString: env.DATABASE_URL,
-    }),
-  },
+  vectors: { pgVector },
   storage: new MastraCompositeStore({
     id: 'composite-storage',
     default: new LibSQLStore({

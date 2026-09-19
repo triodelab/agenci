@@ -13,7 +13,7 @@ bun --filter dashboard dev
 bun dev:dashboard
 ```
 
-Requires the Elysia API for auth (`bun --filter backend dev` on `:3003`).
+Requires the Hono API for auth (`bun --filter server dev` on `:3003`).
 
 ## Ports
 

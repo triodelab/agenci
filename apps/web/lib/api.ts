@@ -2,7 +2,7 @@
  * Task 2.2 — Typed oRPC client for the Next dashboard (web).
  * Uses same-origin `/rpc` rewrite → Hono so Better Auth cookies stay first-party.
  */
-import type { AppRouter } from "backend/router";
+import type { AppRouter } from "server/router";
 import { createORPCClient } from "@orpc/client";
 import { RPCLink } from "@orpc/client/fetch";
 import type { RouterClient } from "@orpc/server";

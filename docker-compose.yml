@@ -2,7 +2,7 @@ name: agenci
 
 # Local / self-host stack:
 #   postgres (pgvector) + redis + neo4j + qdrant + inngest
-# App (Elysia) usually runs on the host via `bun --filter backend dev`.
+# App (Hono) usually runs on the host via `bun --filter server dev`.
 
 services:
   postgres:
@@ -33,21 +33,6 @@ services:
       - "6379:6379"
     volumes:
       - agenci-redis-data:/data
-    networks:
-      - agenci-network
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 3s
-      retries: 5
-    restart: unless-stopped
-  redis-memory:
-    image: redis:8
-    container_name: agenci-redis-memory
-    ports:
-      - "6380:6379"
-    volumes:
-      - agenci-redis-memory-data:/data
     networks:
       - agenci-network
     healthcheck:
@@ -116,6 +101,46 @@ services:
       - agenci-network
     restart: unless-stopped
 
+  minio:
+    image: minio/minio:latest
+    container_name: agenci-minio
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-agenci}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-agenci_dev_secret}
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio-data:/data
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - agenci-network
+
+  minio-setup:
+    image: minio/mc:latest
+    container_name: agenci-minio-setup
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set myminio http://minio:9000 $${MINIO_ACCESS_KEY} $${MINIO_SECRET_KEY};
+      mc mb myminio/$${MINIO_BUCKET} --ignore-existing;
+      mc anonymous set download myminio/$${MINIO_BUCKET}/public;
+      echo 'MinIO bucket ready.';
+      "
+    environment:
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-agenci}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-agenci_dev_secret}
+      MINIO_BUCKET: ${MINIO_BUCKET:-agenci-bucket}
+    networks:
+      - agenci-network
+
 networks:
   agenci-network:
     driver: bridge
@@ -123,7 +148,7 @@ networks:
 volumes:
   agenci-postgres-data:
   agenci-redis-data:
-  agenci-redis-memory-data:
   agenci-neo4j-data:
   agenci-neo4j-logs:
   agenci-qdrant-data:
+  minio-data:

@@ -1,7 +1,6 @@
 import { NonRetriableError, type InngestFunction } from "inngest";
 import prisma from "@agenci/db";
 import { scrapeWebsiteForAgentOnboarding } from "@/lib/firecrawl";
-import { uploadMarkdown } from "@/lib/s3-client";
 import { upsertAgentWidgetBrand } from "@/modules/agents/branding";
 import { chunkMarkdown, embedAndStoreChunks } from "@/modules/ingest/service";
 import { isInvalidOpenAIKeyError } from "@/modules/ingest/embedding";
@@ -56,18 +55,12 @@ export const processAgentOnboarding: InngestFunction.Any = inngest.createFunctio
       });
     });
 
-    const markdownKey = await step.run("upload-markdown", async () => {
-      const key = `${organizationId}/${agentId}/${documentId}.md`;
-      return uploadMarkdown(key, markdown);
-    });
-
     await step.run("persist-document", async () => {
       await prisma.document.update({
         where: { id: documentId },
         data: {
           status: "INDEXING",
           markdownContent: markdown,
-          markdownKey,
         },
       });
     });
@@ -90,7 +83,7 @@ export const processAgentOnboarding: InngestFunction.Any = inngest.createFunctio
           documentId,
           organizationId,
           agentId,
-          storageKey: markdownKey,
+          storageKey: documentId,
           sourceUrl: url,
           sourceType: "webpage",
         });
@@ -132,7 +125,6 @@ export const processAgentOnboarding: InngestFunction.Any = inngest.createFunctio
       ok: true as const,
       agentId,
       documentId,
-      markdownKey,
       chunkCount: ingest.chunkCount,
     };
   },

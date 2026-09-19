@@ -1,7 +1,8 @@
 import { Agent } from "@mastra/core/agent";
-import { Memory } from "@mastra/memory";
 import { SUPPORT_AGENT_PROMPT } from "../constants";
-import { createGraphQueryTool } from "../tools/qraph-query-tool";
+import { createKnowledgeSearchTool } from "../tools/knowledge-search-tool";
+import { CUSTOMER_AGENT_MODEL, customerAgentMemory } from "../store";
+
 
 export type CustomerServiceAgentInput = {
   /** Prisma `Agent.id` — also used as the Mastra registration key. */
@@ -35,11 +36,12 @@ export function createCustomerServiceAgent({
     id,
     name,
     instructions: buildInstructions(name, description),
-    model: "openai/gpt-5-mini",
+    model: CUSTOMER_AGENT_MODEL,
     tools: {
-      graphQueryTool: createGraphQueryTool(id),
+      // Key must stay `searchTool` — the system prompt refers to it by name.
+      searchTool: createKnowledgeSearchTool(id),
     },
-    memory: new Memory(),
+    memory: customerAgentMemory,
   });
 }
 

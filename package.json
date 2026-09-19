@@ -46,10 +46,10 @@
     "dev:web": "turbo -F web dev",
     "dev:dashboard": "turbo -F dashboard dev",
     "docker:down": "docker compose down",
-    "dev:backend": "bun --filter backend dev",
-    "verify": "bunx tsc --noEmit -p apps/web && bunx tsc --noEmit -p apps/widget && bun --filter dashboard check-types && bun --filter backend check-types",
-    "infra:up": "docker compose up -d postgres inngest",
-    "server:up": "docker compose up -d server postgres inngest"
+    "dev:server": "bun --filter server dev",
+    "verify": "bunx tsc --noEmit -p apps/web && bunx tsc --noEmit -p apps/widget && bun --filter dashboard check-types && bun --filter server check-types",
+    "infra:up": "docker compose up -d postgres inngest minio minio-setup",
+    "server:up": "docker compose up -d server postgres inngest minio minio-setup"
   },
   "devDependencies": {
     "@types/bun": "catalog:",

@@ -27,32 +27,8 @@ model Document {
   markdownKey     String?            @unique
   createdAt       DateTime           @default(now())
   updatedAt       DateTime           @updatedAt
-  chunks          DocumentChunk[]
 
   @@index([organizationId])
   @@index([agentId])
   @@map("documents")
-}
-
-/// Retrieval-ready passage with embedding for semantic search.
-///
-/// `embedding` is pgvector (`Unsupported("vector")`). Set dimensions in the
-/// SQL migration (e.g. `vector(1536)`). The generated `search_vector` tsvector
-/// column is also migration-only (Prisma cannot model generated columns).
-model DocumentChunk {
-  id            String                 @id @default(uuid()) @db.Uuid
-  documentId    String
-  document      Document               @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  chunkIndex    Int
-  page          String?                @db.VarChar(64)
-  section       String?                @db.Text
-  text          String                 @db.Text
-  embedding     Unsupported("vector")?
-  tokenCount    Int?
-  chunkMetadata Json                   @default("{}") @map("chunk_metadata")
-  createdAt     DateTime               @default(now()) @db.Timestamptz(6)
-
-  @@unique([documentId, chunkIndex], map: "uq_document_chunks_document_chunk")
-  @@index([documentId], map: "ix_document_chunks_document_id")
-  @@map("document_chunks")
 }

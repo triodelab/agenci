@@ -4,7 +4,7 @@ import {
   isInvalidLlamaKeyError,
   parseDocumentToMarkdown,
 } from "@/lib/llama";
-import { fileExists, readFileBytes, uploadMarkdown } from "@/lib/s3-client";
+import { fileExists, readFileBytes } from "@/lib/s3-client";
 import { chunkMarkdown, embedAndStoreChunks } from "@/modules/ingest/service";
 import { isInvalidOpenAIKeyError } from "@/modules/ingest/embedding";
 import { inngest, uploadDocumentEvent } from "@/inngest/client";
@@ -78,7 +78,7 @@ export const uploadDocumentTask: InngestFunction.Any = inngest.createFunction(
     await step.run("get-document", async () => {
       if (!(await fileExists(s3Key))) {
         await markFailed(documentId);
-        throw new NonRetriableError("Dokumentet ble ikke funnet i S3");
+        throw new NonRetriableError("Dokumentet ble ikke funnet i fil-lageret");
       }
       return s3Key;
     });
@@ -111,18 +111,12 @@ export const uploadDocumentTask: InngestFunction.Any = inngest.createFunction(
       throw new NonRetriableError("LlamaParse returnerte ingen markdown");
     }
 
-    const markdownKey = await step.run("upload-markdown", async () => {
-      const key = `${organizationId}/${agentId}/${documentId}.md`;
-      return uploadMarkdown(key, markdown);
-    });
-
     await step.run("persist-document", async () => {
       await prisma.document.update({
         where: { id: documentId },
         data: {
           status: "INDEXING",
           markdownContent: markdown,
-          markdownKey,
         },
       });
     });
@@ -147,7 +141,7 @@ export const uploadDocumentTask: InngestFunction.Any = inngest.createFunction(
           documentId,
           organizationId,
           agentId,
-          storageKey: markdownKey,
+          storageKey: s3Key,
           sourceType: "document",
         });
       } catch (error) {
@@ -177,7 +171,6 @@ export const uploadDocumentTask: InngestFunction.Any = inngest.createFunction(
     return {
       ok: true as const,
       documentId,
-      markdownKey,
       chunkCount: ingest.chunkCount,
     };
   },

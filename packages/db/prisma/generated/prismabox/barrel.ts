@@ -14,6 +14,5 @@ export * from "./TeamMember";
 export * from "./Member";
 export * from "./Invitation";
 export * from "./Document";
-export * from "./DocumentChunk";
 export * from "./__nullable__";
 export * from "./__transformDate__";

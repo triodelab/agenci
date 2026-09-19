@@ -19,7 +19,7 @@
     "@hookform/resolvers": "^5.2.0",
     "@vapi-ai/web": "^2.3.8",
     "@agenci/backend": "workspace:*",
-    "backend": "workspace:*",
+    "server": "workspace:*",
     "@workspace/ui": "workspace:*",
     "convex": "catalog:",
     "date-fns": "^4.1.0",

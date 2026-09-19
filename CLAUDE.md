@@ -35,7 +35,7 @@ Frontend:
 
 Backend:
 
-* Elysia (`apps/backend`) — Better Auth, Inngest, Prisma
+* Hono (`apps/server`) — Better Auth, oRPC, Inngest, Prisma, Mastra
 * **Mastra** (`@agenci/mastra`) — customer-facing support agents (library; not a public HTTP service)
 * Prisma + PostgreSQL (pgvector)
 * OpenAI GPT-4o-mini
@@ -60,9 +60,9 @@ apps/dashboard
 
 * Staff dashboard (React + TanStack Router)
 
-apps/backend
+apps/server
 
-* Elysia API (Better Auth, Inngest, documents)
+* Hono API (Better Auth, oRPC, Inngest, documents, Mastra agents)
 
 apps/web
 

@@ -2,8 +2,8 @@
  * Task 2.3 — Widget WebSocket helper.
  * Auth via contact-session id (query) or ticket from POST /api/ws/ticket.
  */
-import type { WsClientMessage, WsServerMessage } from "backend/ws";
-import { CONTACT_SESSION_HEADER } from "backend/ws";
+import type { WsClientMessage, WsServerMessage } from "server/ws";
+import { CONTACT_SESSION_HEADER } from "server/ws";
 
 export type WidgetWsHandlers = {
   onMessage?: (msg: WsServerMessage) => void;

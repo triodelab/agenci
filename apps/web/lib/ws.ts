@@ -4,7 +4,7 @@
  * Flow: POST /api/ws/ticket (cookie) → connect ws to Hono `/ws?ticket=`.
  * Reconnect with backoff; client ping keeps the channel warm.
  */
-import type { WsClientMessage, WsServerMessage } from "backend/ws";
+import type { WsClientMessage, WsServerMessage } from "server/ws";
 
 export type AgenciWsHandlers = {
   onMessage?: (msg: WsServerMessage) => void;

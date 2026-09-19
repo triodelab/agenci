@@ -71,29 +71,6 @@ export const DocumentRelations = t.Object(
         { additionalProperties: false },
       ),
     ),
-    chunks: t.Array(
-      t.Object(
-        {
-          id: t.String(),
-          documentId: t.String(),
-          chunkIndex: t.Integer(),
-          page: __nullable__(t.String()),
-          section: __nullable__(t.String()),
-          text: t.String(),
-          tokenCount: __nullable__(t.Integer()),
-          chunkMetadata: t.Any(),
-          createdAt: t.Date(),
-        },
-        {
-          additionalProperties: false,
-          description: `Retrieval-ready passage with embedding for semantic search.
-\`embedding\` is pgvector (\`Unsupported("vector")\`). Set dimensions in the
-SQL migration (e.g. \`vector(1536)\`). The generated \`search_vector\` tsvector
-column is also migration-only (Prisma cannot model generated columns).`,
-        },
-      ),
-      { additionalProperties: false },
-    ),
   },
   { additionalProperties: false },
 );
@@ -178,22 +155,6 @@ export const DocumentRelationsInputCreate = t.Object(
         { additionalProperties: false },
       ),
     ),
-    chunks: t.Optional(
-      t.Object(
-        {
-          connect: t.Array(
-            t.Object(
-              {
-                id: t.String({ additionalProperties: false }),
-              },
-              { additionalProperties: false },
-            ),
-            { additionalProperties: false },
-          ),
-        },
-        { additionalProperties: false },
-      ),
-    ),
   },
   { additionalProperties: false },
 );
@@ -222,31 +183,6 @@ export const DocumentRelationsInputUpdate = t.Partial(
               { additionalProperties: false },
             ),
             disconnect: t.Boolean(),
-          },
-          { additionalProperties: false },
-        ),
-      ),
-      chunks: t.Partial(
-        t.Object(
-          {
-            connect: t.Array(
-              t.Object(
-                {
-                  id: t.String({ additionalProperties: false }),
-                },
-                { additionalProperties: false },
-              ),
-              { additionalProperties: false },
-            ),
-            disconnect: t.Array(
-              t.Object(
-                {
-                  id: t.String({ additionalProperties: false }),
-                },
-                { additionalProperties: false },
-              ),
-              { additionalProperties: false },
-            ),
           },
           { additionalProperties: false },
         ),
@@ -386,7 +322,6 @@ export const DocumentSelect = t.Partial(
       markdownKey: t.Boolean(),
       createdAt: t.Boolean(),
       updatedAt: t.Boolean(),
-      chunks: t.Boolean(),
       _count: t.Boolean(),
     },
     { additionalProperties: false },
@@ -400,7 +335,6 @@ export const DocumentInclude = t.Partial(
       agent: t.Boolean(),
       type: t.Boolean(),
       status: t.Boolean(),
-      chunks: t.Boolean(),
       _count: t.Boolean(),
     },
     { additionalProperties: false },

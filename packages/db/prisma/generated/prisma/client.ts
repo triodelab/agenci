@@ -101,12 +101,3 @@ export type Invitation = Prisma.InvitationModel
  * 
  */
 export type Document = Prisma.DocumentModel
-/**
- * Model DocumentChunk
- * Retrieval-ready passage with embedding for semantic search.
- * 
- * `embedding` is pgvector (`Unsupported("vector")`). Set dimensions in the
- * SQL migration (e.g. `vector(1536)`). The generated `search_vector` tsvector
- * column is also migration-only (Prisma cannot model generated columns).
- */
-export type DocumentChunk = Prisma.DocumentChunkModel

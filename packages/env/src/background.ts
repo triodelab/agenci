@@ -27,13 +27,11 @@ export const env = createEnv({
     WIDGET_ORIGIN: z.url().optional(),
     PORT: z.string().transform((val) => parseInt(val)).pipe(z.number().min(1).max(65535)),
     NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
-    AWS_ACCESS_KEY_ID: z.string().min(1),
-    AWS_SECRET_ACCESS_KEY: z.string().min(1),
-    AWS_ENDPOINT_URL_S3: z.url(),
-    AWS_ENDPOINT_URL_IAM: z.url(),
-    AWS_REGION: z.string().min(1),
-    AWS_BUCKET_NAME: z.string().min(1),
-    AWS_MARKDOWN_BUCKET: z.string().min(1),
+    MINIO_ENDPOINT: z.url().default("http://localhost:9000"),
+    MINIO_ACCESS_KEY: z.string().min(1).default("agenci"),
+    MINIO_SECRET_KEY: z.string().min(1).default("agenci_dev_secret"),
+    MINIO_REGION: z.string().min(1).default("us-east-1"),
+    MINIO_BUCKET: z.string().min(1).default("agenci-bucket"),
     /**
      * OpenAI API key for Mastra agents (`openai/gpt-4o-mini`).
      * Optional at boot so non-AI routes work; required when generating replies.

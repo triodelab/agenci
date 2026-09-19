@@ -5,6 +5,7 @@ import { z } from "zod";
 import { base, privateProcedure, requireOrgMiddleware } from "./procedures";
 import { agentsRouter } from "@/modules/agents/router";
 import { documentsRouter } from "@/modules/documents/router";
+import { chatRouter } from "@/modules/chat/router";
 
 const health = base
   .output(z.object({ ok: z.literal(true) }))
@@ -34,6 +35,7 @@ export const privateRouter = {
     })),
   agents: agentsRouter,
   documents: documentsRouter,
+  chat: chatRouter,
 };
 
 export const appRouter = {

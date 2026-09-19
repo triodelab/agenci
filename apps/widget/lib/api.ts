@@ -2,8 +2,8 @@
  * Task 2.2 — Typed oRPC client for the customer widget.
  * Sends `X-Contact-Session-Id` on every public call when provided.
  */
-import type { AppRouter } from "backend/router";
-import { CONTACT_SESSION_HEADER } from "backend/ws";
+import type { AppRouter } from "server/router";
+import { CONTACT_SESSION_HEADER } from "server/ws";
 import { createORPCClient } from "@orpc/client";
 import { RPCLink } from "@orpc/client/fetch";
 import type { RouterClient } from "@orpc/server";
