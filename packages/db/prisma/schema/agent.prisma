@@ -1,0 +1,56 @@
+enum AgentStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+/// Runtime Mastra vertical for customer-facing support agents.
+enum AgentVertical {
+  ECOMMERCE
+  HEALTHCARE
+}
+
+model Agent {
+  id             String            @id @default(cuid())
+  organizationId String
+  organization   Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  name           String            @unique
+  description    String
+  slug           String            @unique
+  modelLabel     String?
+  status         AgentStatus       @default(PENDING)
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  widgetBrand    AgentWidgetBrand?
+  documents      Document[]
+
+  @@index([organizationId, slug, name])
+  @@map("agents")
+}
+
+/// Widget appearance extracted from Firecrawl `formats: ["branding"]`.
+model AgentWidgetBrand {
+  id                 String   @id @default(cuid())
+  agentId            String   @unique
+  agent              Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  organizationId     String
+  sourceUrl          String?
+  logoUrl            String?
+  colorScheme        String?
+  primaryColor       String?
+  secondaryColor     String?
+  accentColor        String?
+  backgroundColor    String?
+  textPrimaryColor   String?
+  textSecondaryColor String?
+  fontFamilyPrimary  String?
+  fontFamilyHeading  String?
+  fontFamilyCode     String?
+  extractedAt        DateTime @default(now())
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([organizationId])
+  @@map("agent_widget_brands")
+}

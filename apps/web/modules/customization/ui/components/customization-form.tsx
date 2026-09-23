@@ -13,7 +13,7 @@ import {
 } from "@workspace/ui/components/form";
 import { Input } from "@workspace/ui/components/input";
 import { Textarea } from "@workspace/ui/components/textarea";
-import { Doc } from "@workspace/backend/_generated/dataModel";
+import type { Doc } from "@workspace/backend/_generated/dataModel";
 import { useMutation } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
 import { mergeWidgetAppearance } from "@workspace/ui/lib/widget-appearance";

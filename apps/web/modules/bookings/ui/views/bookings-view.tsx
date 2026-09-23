@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, usePaginatedQuery } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
-import { Id } from "@workspace/backend/_generated/dataModel";
+import type { Id } from "@workspace/backend/_generated/dataModel";
 import { Button } from "@workspace/ui/components/button";
 import { CalendarIcon, CheckIcon, XIcon } from "lucide-react";
 import { cn } from "@workspace/ui/lib/utils";

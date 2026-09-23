@@ -1,6 +1,6 @@
 "use client";
 
-import { useOrganization } from "@clerk/nextjs";
+import { useOrganization } from "@/lib/auth-compat";
 import { useState } from "react";
 import {
   CopyIcon,
@@ -166,7 +166,7 @@ export const IntegrationsView = () => {
             <p className="text-[12px] leading-relaxed text-muted-foreground/70 border-t border-border/40 pt-4">
               Lokalt: kjør{" "}
               <code className="rounded bg-muted px-1 py-0.5 font-mono text-[11px] text-foreground">
-                pnpm dev:widget
+                bun dev:widget
               </code>{" "}
               på port 3001.
             </p>

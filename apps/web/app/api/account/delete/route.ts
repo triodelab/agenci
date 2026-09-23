@@ -1,22 +1,22 @@
-import { auth, clerkClient } from "@clerk/nextjs/server";
+/**
+ * Task 1.2 — Account delete temporarily gated.
+ * Clerk `users.deleteUser` removed; full Better Auth deleteUser lands with email confirm later.
+ */
 import { NextResponse } from "next/server";
+import { getServerSession } from "@/lib/auth-server";
 
 export async function POST() {
-  const { userId } = await auth();
+  const session = await getServerSession();
 
-  if (!userId) {
+  if (!session?.user) {
     return NextResponse.json({ error: "Ikke autentisert" }, { status: 401 });
   }
 
-  try {
-    const clerk = await clerkClient();
-    await clerk.users.deleteUser(userId);
-    return NextResponse.json({ success: true });
-  } catch (err) {
-    console.error("[account/delete]", err);
-    return NextResponse.json(
-      { error: "Kunne ikke slette kontoen. Prøv igjen eller kontakt post@triodelab.no." },
-      { status: 500 },
-    );
-  }
+  return NextResponse.json(
+    {
+      error:
+        "Kontosletting via Better Auth er ikke aktivert ennå. Kontakt post@triodelab.no.",
+    },
+    { status: 501 },
+  );
 }

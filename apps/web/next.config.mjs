@@ -4,14 +4,49 @@ import { fileURLToPath } from "node:url";
 import { withSentryConfig } from "@sentry/nextjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-/** Repo root (agenci/) — anbefalt for pnpm-monorepo slik at tracing og chunks resolver riktig */
+/** Repo root (agenci/) — anbefalt for Bun-monorepo slik at tracing og chunks resolver riktig */
 const monorepoRoot = path.join(__dirname, "../..");
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  transpilePackages: ["@workspace/ui"],
+  transpilePackages: ["@workspace/ui", "@agenci/auth", "server"],
   devIndicators: false,
   outputFileTracingRoot: monorepoRoot,
+  /**
+   * Proxy Better Auth / oRPC / WS ticket to Fastify so cookies stay first-party
+   * on the Next origin (localhost:3000 → server :3003).
+   */
+  async rewrites() {
+    const server =
+      process.env.NEXT_PUBLIC_SERVER_URL?.replace(/\/$/, "") ||
+      "http://localhost:3003";
+    return [
+      {
+        source: "/api/auth/:path*",
+        destination: `${server}/api/auth/:path*`,
+      },
+      {
+        source: "/api/me",
+        destination: `${server}/api/me`,
+      },
+      {
+        source: "/api/me/org",
+        destination: `${server}/api/me/org`,
+      },
+      {
+        source: "/api/ws/ticket",
+        destination: `${server}/api/ws/ticket`,
+      },
+      {
+        source: "/rpc",
+        destination: `${server}/rpc`,
+      },
+      {
+        source: "/rpc/:path*",
+        destination: `${server}/rpc/:path*`,
+      },
+    ];
+  },
 };
 
 export default withSentryConfig(nextConfig, {

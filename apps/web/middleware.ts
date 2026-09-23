@@ -1,71 +1,123 @@
-import { NextResponse } from 'next/server';
-import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
+/**
+ * Task 1.2 Step 3 — Middleware using Better Auth session cookie / get-session.
+ *
+ * Replaces `clerkMiddleware`. Session is read via same-origin `/api/auth/get-session`
+ * (Next rewrite → Hono) so cookies stay first-party.
+ */
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { getSessionCookie } from "better-auth/cookies";
 
-const isPublicRoute = createRouteMatcher([
+const PUBLIC_PATHS = [
   "/",
-  "/sign-in(.*)",
-  "/sign-up(.*)",
-  "/sso-callback(.*)",
+  "/sign-in",
+  "/sign-up",
+  "/sso-callback",
   "/priser",
   "/integrasjoner",
   "/hvordan-det-virker",
   "/personvern",
   "/vilkar",
   "/kontakt",
-  "/blogg(.*)",
+  "/blogg",
   "/sitemap.xml",
   "/robots.txt",
   "/api/contact",
   "/api/newsletter",
   "/api/stripe/webhook",
-  "/api/widget(.*)",
-  "/widget(.*)",
-  "/booking(.*)",
-]);
+  "/api/widget",
+  "/api/auth",
+  "/widget",
+  "/booking",
+];
 
-/** Markedsføring + kontakt — innloggede brukere uten org skal fortsatt kunne besøke */
-const isOrgFreeRoute = createRouteMatcher([
-  "/sign-in(.*)",
-  "/sign-up(.*)",
-  "/sso-callback(.*)",
-  "/onboarding(.*)",
+/** Innloggede uten org kan fortsatt besøke disse */
+const ORG_FREE_PREFIXES = [
+  "/sign-in",
+  "/sign-up",
+  "/sso-callback",
+  "/onboarding",
   "/integrasjoner",
   "/hvordan-det-virker",
   "/personvern",
   "/vilkar",
   "/kontakt",
-]);
+];
 
-export default clerkMiddleware(async (auth, req) => {
-  // Public routes: skip auth entirely
-  if (isPublicRoute(req)) {
-    try {
-      const { userId, orgId } = await auth();
-      if (userId && orgId && req.nextUrl.pathname === "/") {
-        if (req.nextUrl.searchParams.get("from") !== "marketing") {
-          return NextResponse.redirect(new URL("/dashboard", req.url));
+function matchesPrefix(pathname: string, prefixes: string[]) {
+  return prefixes.some(
+    (p) => pathname === p || pathname.startsWith(`${p}/`),
+  );
+}
+
+export default async function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl;
+
+  // Always allow Better Auth + Next internals handled by matcher exclusion
+  if (pathname.startsWith("/api/auth")) {
+    return NextResponse.next();
+  }
+
+  const isPublic = matchesPrefix(pathname, PUBLIC_PATHS);
+  const sessionCookie = getSessionCookie(req);
+
+  if (isPublic) {
+    // Signed-in users hitting marketing home → dashboard (same behavior as Clerk middleware)
+    if (sessionCookie && pathname === "/") {
+      if (req.nextUrl.searchParams.get("from") !== "marketing") {
+        // Confirm session is real (cookie alone can be stale)
+        try {
+          const session = await fetchSession(req);
+          if (session?.user && session.session?.activeOrganizationId) {
+            return NextResponse.redirect(new URL("/dashboard", req.url));
+          }
+        } catch {
+          // ignore — show marketing
         }
       }
-    } catch {
-      // Clerk handshake/clock-skew failures must not take down public pages
     }
     return NextResponse.next();
   }
 
-  await auth.protect();
+  // Protected routes
+  if (!sessionCookie) {
+    const signIn = new URL("/sign-in", req.url);
+    signIn.searchParams.set("redirect_url", pathname);
+    return NextResponse.redirect(signIn);
+  }
 
-  const { userId, orgId } = await auth();
+  const session = await fetchSession(req);
+  if (!session?.user) {
+    const signIn = new URL("/sign-in", req.url);
+    signIn.searchParams.set("redirect_url", pathname);
+    return NextResponse.redirect(signIn);
+  }
 
-  if (userId && !orgId && !isOrgFreeRoute(req)) {
+  const orgId = session.session?.activeOrganizationId ?? null;
+  if (!orgId && !matchesPrefix(pathname, ORG_FREE_PREFIXES)) {
     return NextResponse.redirect(new URL("/onboarding", req.url));
   }
-});
+
+  return NextResponse.next();
+}
+
+async function fetchSession(req: NextRequest) {
+  const res = await fetch(new URL("/api/auth/get-session", req.nextUrl.origin), {
+    headers: {
+      cookie: req.headers.get("cookie") ?? "",
+    },
+    cache: "no-store",
+  });
+  if (!res.ok) return null;
+  return (await res.json()) as {
+    user?: { id: string };
+    session?: { activeOrganizationId?: string | null };
+  } | null;
+}
 
 export const config = {
   matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
-    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
-    // Always run for API routes
-    '/(api|trpc)(.*)',
+    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
+    "/(api|trpc)(.*)",
   ],
-}
+};

@@ -1,16 +1,16 @@
 import { StructuredData } from "@/components/structured-data";
 import { LandingNav } from "@/modules/landing/ui/components/landing-nav";
 import { LandingHeroSection } from "@/modules/landing/ui/components/landing-hero-section";
-import { LandingWhySection } from "@/modules/landing/ui/components/landing-why-section";
-import { LandingProductIntroSection } from "@/modules/landing/ui/components/landing-product-intro-section";
-import { LandingPlatformSection } from "@/modules/landing/ui/components/landing-platform-section";
-import { LandingModulesSection } from "@/modules/landing/ui/components/landing-modules-section";
-import { LandingFinalCtaSection } from "@/modules/landing/ui/components/landing-final-cta-section";
-import { LandingIntegrationsSection } from "@/modules/landing/ui/components/landing-integrations-section";
-import { LandingPricingSection } from "@/modules/landing/ui/components/landing-pricing-section";
-import { LandingFaqSection } from "@/modules/landing/ui/components/landing-faq-section";
-import { LandingContactSection } from "@/modules/landing/ui/components/landing-contact-section";
+import { LandingMascotPromiseSection } from "@/modules/landing/ui/components/landing-mascot-promise-section";
+import {
+  LandingMeetSection,
+  LandingOutcomeDemosSection,
+  LandingBrandSection,
+  LandingWorkflowSection,
+} from "@/modules/landing/ui/components/landing-product-story-sections";
+import storyStyles from "@/modules/landing/ui/components/product-story.module.css";
 import { LandingFooter } from "@/modules/landing/ui/components/landing-footer";
+import { LandingFeatureCarousel } from "@/modules/landing/ui/components/landing-feature-carousel";
 import { CookieConsentBanner } from "@/components/cookie-consent-banner";
 
 export function LandingPageView() {
@@ -27,30 +27,23 @@ export function LandingPageView() {
       <LandingNav variant="auto" />
       <main
         id="main-content"
-        className="landing-warp min-h-svh overflow-x-hidden antialiased [text-rendering:optimizeLegibility]"
+        className="landing-warp min-h-svh overflow-x-clip bg-[#FAFAFA] antialiased [text-rendering:optimizeLegibility]"
       >
         {/* dark */}
         <LandingHeroSection />
-        {/* cream */}
-        <LandingWhySection />
-        {/* dark */}
-        <LandingProductIntroSection />
-        {/* dark */}
-        <LandingPlatformSection />
-        {/* cream */}
-        <LandingModulesSection />
-        {/* cream */}
-        <LandingFinalCtaSection />
-        {/* dark */}
-        <LandingIntegrationsSection />
-        {/* dark */}
-        <LandingPricingSection />
-        {/* cream */}
-        <LandingFaqSection />
-        {/* dark */}
-        <LandingContactSection />
+        {/* mascot */}
+        <LandingMascotPromiseSection />
+        <div className={storyStyles.root} data-agenci-product-sections>
+          <LandingMeetSection />
+          <LandingOutcomeDemosSection />
+          <LandingBrandSection />
+          <LandingFeatureCarousel />
+          <LandingWorkflowSection />
+        </div>
       </main>
-      <LandingFooter />
+      <div className="bg-[#FAFAFA]">
+        <LandingFooter />
+      </div>
       <CookieConsentBanner />
     </>
   );

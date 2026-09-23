@@ -2,7 +2,7 @@
 
 import { useQuery } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
-import { useUser } from "@clerk/nextjs";
+import { useUser } from "@/lib/auth-compat";
 import { hasUiPremiumBypass } from "@/lib/dev-bypass";
 import { PremiumFeatureOverlay } from "./premium-feature-overlay";
 import { CardGridSkeleton } from "@/modules/dashboard/ui/components/dashboard-skeleton";

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { BookingsView } from "@/modules/bookings/ui/views/bookings-view";
-import { Id } from "@workspace/backend/_generated/dataModel";
+import type { Id } from "@workspace/backend/_generated/dataModel";
 
 export const metadata: Metadata = { title: "Bestillinger" };
 
