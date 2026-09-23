@@ -16,3 +16,29 @@
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
+
+/* Hover-pillen bak hovedlenkene: ett lag, klippet (clip-path) til lenken under
+   pekeren — glir mellom lenker på 220 ms og tones inn/ut på 150 ms, begge på
+   compositoren. data-instant: pekeren kom utenfra, så klippet hopper og bare
+   tonen animeres. */
+.navHover {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 150ms ease,
+    clip-path 220ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.navHover[data-visible] {
+  opacity: 1;
+}
+.navHover[data-instant] {
+  transition: opacity 150ms ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .navHover {
+    transition: opacity 150ms ease;
+  }
+}

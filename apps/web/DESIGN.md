@@ -126,7 +126,11 @@ På forsiden forteller formen teksten, styrt av scroll: sirkelen ved «Gjør min
   - *Hero-overtakelse* (som stingray.no): filmen glir med 0,45× og teksten 0,6× av scrollen mens maskot-seksjonen tar over heroen.
   - *Åpneren*: maskot-seksjonens avrundede underkant ligger over Møt Agenci; innholdet der ligger først 280 px inn under kanten og glir ned på plass (ikke hele seksjonen). Kanten og skyggen (`#181c1a`) hører til maskot-seksjonen og følger den; en dypere skygge i samme tone tones inn mens kanten stiger — lokket løftes.
   - *Naturbilder* bak glasskortene: ±5 % parallakse inne i rammen, skalert 1,12 så kantene aldri vises.
-- **Mikrointeraksjoner:** trykk `scale(.97)` / 160 ms på knapper og faner (`.95` på små runde piler); fane- og prisbytte glir den nye teksten inn (6 px, 40 → 100 % opasitet, 240–280 ms) i en liten bølge på 30–40 ms per kort.
+- **Mikrointeraksjoner:** trykk `scale(.97)` / 160 ms på knapper og faner (`.95` på små runde piler); fane- og prisbytte glir den nye teksten inn (6 px, 40 → 100 % opasitet, 240–280 ms) i en liten bølge på 30–40 ms per kort — først etter første valg, aldri ved sidelasting.
+- **Overskrifter, scroll-inn:** bare på utvalgte steder — Outcome, Brand og Workflow — ikke alle. 55 → 100 % opasitet og 22 px (unntak fra 8 px-regelen: den følger scrollen, ikke tiden), `entry 0–75 %`; neste linje kommer 10 % senere i scrollen.
+- **Nav-hover:** én pille bak hovedlenkene, klippet til lenken under pekeren — glir mellom lenker (`clip-path` 220 ms) og tones inn/ut (150 ms). Kommer pekeren utenfra, hopper den dit og tones bare inn. Kun mus/penn. Lenkene ligger kant i kant, så det ikke finnes døde felt mellom dem.
+- **Cookie-samtykke:** stripen glir opp fra underkanten (400 ms `ease`) og ut samme vei (250 ms); innstillingsdialogen tones inn med kortet fra 96 % (250 ms), ut på 180 ms. Redusert bevegelse: bare opasitet.
+- **Nyhetsbrev-knappen:** tone-overgang og trykk; tekstbyttet (Meld meg på → Sender → Du er på listen!) kommer inn fra 2 px uskarphet på 200 ms.
 
 ## Bilder
 

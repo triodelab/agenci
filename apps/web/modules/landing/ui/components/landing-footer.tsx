@@ -63,6 +63,13 @@ export function LandingFooter() {
     }
   };
 
+  /* Knappeteksten tones mykt over ved hvert tilstandsbytte (ikke ved lasting). */
+  const newsletterState = newsletterLoading
+    ? "loading"
+    : newsletterSuccess
+      ? "success"
+      : "idle";
+
   return (
     <footer data-landing-nav-surface="light" className="agenci-fresh-footer">
       <div className="agenci-footer-top">
@@ -134,15 +141,24 @@ export function LandingFooter() {
               type="submit"
               disabled={newsletterLoading || newsletterSuccess}
             >
-              {newsletterLoading ? (
-                <>
-                  <AgenciLoader decorative /> Sender
-                </>
-              ) : newsletterSuccess ? (
-                "Du er på listen!"
-              ) : (
-                "Meld meg på"
-              )}
+              <span
+                key={newsletterState}
+                className={
+                  newsletterState === "idle"
+                    ? undefined
+                    : "agenci-footer-label-swap"
+                }
+              >
+                {newsletterLoading ? (
+                  <>
+                    <AgenciLoader decorative /> Sender
+                  </>
+                ) : newsletterSuccess ? (
+                  "Du er på listen!"
+                ) : (
+                  "Meld meg på"
+                )}
+              </span>
             </button>
           </form>
         </div>

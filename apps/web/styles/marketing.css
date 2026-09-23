@@ -664,6 +664,45 @@
   opacity: 0.55;
   cursor: default;
 }
+/* Nyhetsbrev-knappen: tone-overgang, trykk-svar og hover bare for ekte pekere. */
+.agenci-footer-nav button {
+  transition:
+    background-color 180ms ease,
+    opacity 180ms ease,
+    transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.agenci-footer-nav button:not(:disabled):active {
+  transform: scale(0.97);
+}
+@media (hover: hover) and (pointer: fine) {
+  .agenci-fresh-footer .agenci-footer-nav button:not(:disabled):hover {
+    background: var(--agenci-accent-hover);
+  }
+}
+/* Meld meg på → Sender → Du er på listen!: ny tekst kommer inn fra en liten
+   uskarphet (maskerer byttet) i stedet for å hoppe. */
+.agenci-footer-label-swap {
+  animation: agenci-footer-label-swap 200ms ease both;
+}
+@keyframes agenci-footer-label-swap {
+  from {
+    opacity: 0.4;
+    filter: blur(2px);
+  }
+}
+@keyframes agenci-footer-label-fade {
+  from {
+    opacity: 0.4;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .agenci-footer-nav button {
+    transition: none;
+  }
+  .agenci-footer-label-swap {
+    animation-name: agenci-footer-label-fade;
+  }
+}
 .agenci-footer-nav .agenci-loader {
   width: 24px;
 }

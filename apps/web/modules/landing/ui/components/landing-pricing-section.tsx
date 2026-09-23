@@ -109,6 +109,8 @@ export function LandingPricingSection({
   embedded?: boolean;
 }) {
   const [isYearly, setIsYearly] = useState(false);
+  /* Prisbyttet animeres først etter første valg — ikke ved sidelasting. */
+  const [toggled, setToggled] = useState(false);
   const Container = embedded ? "div" : "section";
   return (
     <Container
@@ -136,7 +138,10 @@ export function LandingPricingSection({
                 key={String(yearly)}
                 type="button"
                 aria-pressed={isYearly === yearly}
-                onClick={() => setIsYearly(yearly)}
+                onClick={() => {
+                  setIsYearly(yearly);
+                  setToggled(true);
+                }}
               >
                 {yearly ? "Årlig" : "Månedlig"}
               </button>
@@ -160,14 +165,14 @@ export function LandingPricingSection({
               {/* key={isYearly}: ny pris glir inn ved bytte (agenci-price-swap). */}
               <p
                 key={`value-${isYearly}`}
-                className="agenci-price-value agenci-price-swap"
+                className={`agenci-price-value${toggled ? " agenci-price-swap" : ""}`}
               >
                 {price.toLocaleString("nb-NO")}
                 <span>kr{price > 0 ? " / mnd" : ""}</span>
               </p>
               <p
                 key={`period-${isYearly}`}
-                className="agenci-price-period agenci-price-swap"
+                className={`agenci-price-period${toggled ? " agenci-price-swap" : ""}`}
               >
                 {price === 0
                   ? "Alltid gratis"

@@ -1,7 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useLayoutEffect, useState } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type PointerEvent as ReactPointerEvent,
+} from "react";
 import { Menu, X } from "lucide-react";
 import { useUser } from "@/lib/auth-compat";
 import { cn } from "@workspace/ui/lib/utils";
@@ -45,6 +51,34 @@ export function LandingNav({ variant = "dark" }: LandingNavProps) {
   const [scrolled, setScrolled] = useState(false);
   const [autoSurface, setAutoSurface] = useState<"dark" | "light">("dark");
   const { user, isLoaded } = useUser();
+  const navRef = useRef<HTMLElement>(null);
+  const [navHover, setNavHover] = useState({
+    left: 0,
+    right: 0,
+    visible: false,
+    instant: true,
+  });
+
+  /* Hover-pillen glir mellom hovedlenkene: ett lag bak lenkene, klippet til
+     lenken under pekeren. Kommer pekeren utenfra, hopper klippet rett dit og
+     pillen tones inn — den glir bare mellom lenker. Kun mus/penn; berøring og
+     tastatur får ingen glideanimasjon. */
+  const showNavHover = (event: ReactPointerEvent<HTMLAnchorElement>) => {
+    if (event.pointerType !== "mouse" && event.pointerType !== "pen") return;
+    const nav = navRef.current;
+    if (!nav) return;
+    const link = event.currentTarget;
+    const left = link.offsetLeft;
+    const right = nav.clientWidth - (link.offsetLeft + link.offsetWidth);
+    setNavHover((current) => ({
+      left,
+      right,
+      visible: true,
+      instant: !current.visible,
+    }));
+  };
+  const hideNavHover = () =>
+    setNavHover((current) => ({ ...current, visible: false }));
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 0);
@@ -96,21 +130,43 @@ export function LandingNav({ variant = "dark" }: LandingNavProps) {
         </Link>
 
         {/* Center nav */}
+        {/* Lenkene ligger kant i kant (ingen gap): mellomrommet ligger inne i
+            hver lenke (px-[13px] = gammel px-3 + halve gap-0.5), så pekeren
+            aldri faller i et dødt felt mellom dem og pillen blinker av. */}
         <nav
-          className="hidden items-center gap-0.5 lg:flex"
+          ref={navRef}
+          onPointerLeave={hideNavHover}
+          className="relative hidden items-center lg:flex"
           aria-label="Hovedlenker"
         >
+          <span
+            aria-hidden="true"
+            className={cn(
+              styles.navHover,
+              showScrolledGradient
+                ? "bg-white/[0.12]"
+                : isDark
+                ? "bg-white/[0.07]"
+                : "bg-muted/70",
+            )}
+            data-visible={navHover.visible || undefined}
+            data-instant={navHover.instant || undefined}
+            style={{
+              clipPath: `inset(0 ${navHover.right}px 0 ${navHover.left}px round 6px)`,
+            }}
+          />
           {LANDING_NAV_PRIMARY_LINKS.map((item) => (
             <Link
               key={item.name}
               href={item.href}
+              onPointerEnter={showNavHover}
               className={cn(
-                "rounded-md px-3 py-2 text-[13px] font-medium transition-colors",
+                "relative z-[1] rounded-md px-[13px] py-2 text-[13px] font-medium transition-colors",
                 showScrolledGradient
-                  ? "text-white/90 hover:bg-white/[0.12] hover:text-white"
+                  ? "text-white/90 hover:text-white"
                   : isDark
-                  ? "text-[#b8bfca] hover:bg-white/[0.07] hover:text-white"
-                  : "text-muted-foreground hover:bg-muted/70 hover:text-foreground",
+                  ? "text-[#b8bfca] hover:text-white"
+                  : "text-muted-foreground hover:text-foreground",
               )}
             >
               {item.name}

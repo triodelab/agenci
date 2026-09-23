@@ -92,6 +92,16 @@
   overflow: hidden;
   background: var(--agenci-page);
 }
+.meet::before {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  background-image: radial-gradient(circle, rgb(81 107 115 / 17%) 0.8px, transparent 1px);
+  background-size: 24px 24px;
+  content: "";
+  mask-image: linear-gradient(to bottom, #000 0%, #000 68%, transparent 100%);
+  pointer-events: none;
+}
 .meet::after {
   position: absolute;
   z-index: 0;
@@ -102,7 +112,7 @@
   background: linear-gradient(
     to bottom,
     transparent 0%,
-    rgb(215 228 235 / 0.68) 48%,
+    var(--agenci-page) 48%,
     #fff 100%
   );
   content: "";
@@ -194,16 +204,6 @@
   color: #273236;
   background: #fff;
 }
-.outcomes::before {
-  position: absolute;
-  z-index: 0;
-  inset: 0;
-  background-image: radial-gradient(circle, rgb(81 107 115 / 17%) 0.8px, transparent 1px);
-  background-size: 24px 24px;
-  content: "";
-  mask-image: linear-gradient(to bottom, #000 0%, #000 58%, transparent 100%);
-  pointer-events: none;
-}
 .outcomeFrame {
   position: relative;
   z-index: 1;
@@ -236,6 +236,32 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+/* Samme scroll-inngang på to utvalgte overskrifter til — Brand og Workflow,
+   ikke alle (Møt Agenci glir allerede ut under maskot-kanten, og karusellen og
+   prisene beveger seg nok selv). Neste linje kommer litt etter den første, så
+   overskriften leses i rekkefølge. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .brandHeading,
+    .workflowHeading {
+      view-timeline: --agenci-section-heading block;
+    }
+    .brandHeading > *,
+    .workflowHeading > div > *,
+    .workflowHeading > p {
+      animation: outcomeHeadingEnter 1s linear both;
+      animation-timeline: --agenci-section-heading;
+      animation-range: entry 0% entry 75%;
+    }
+    .brandHeading > h2,
+    .workflowHeading > div > h2 {
+      animation-range: entry 10% entry 85%;
+    }
+    .workflowHeading > p {
+      animation-range: entry 20% entry 95%;
+    }
   }
 }
 .outcomeEyebrow {
@@ -718,7 +744,7 @@
   aspect-ratio: 6 / 5;
   min-height: 500px;
   margin: 0;
-  border-radius: 0;
+  border-radius: 18px;
   justify-content: center;
   padding-block: 44px 64px;
 }

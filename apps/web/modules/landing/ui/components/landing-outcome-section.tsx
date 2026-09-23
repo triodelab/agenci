@@ -44,6 +44,12 @@ const stages = [
 
 export function LandingOutcomeDemosSection() {
   const [active, setActive] = useState(0);
+  /* Byttet animeres først etter første valg — ikke ved sidelasting. */
+  const [switched, setSwitched] = useState(false);
+  const selectStage = (index: number) => {
+    setActive(index);
+    setSwitched(true);
+  };
   const buttons = useRef<(HTMLButtonElement | null)[]>([]);
   const inAction = active === 1;
   const activeStage = stages[active] ?? stages[0];
@@ -54,7 +60,7 @@ export function LandingOutcomeDemosSection() {
       : event.key === "Home" ? 0 : event.key === "End" ? stages.length - 1 : null;
     if (next === null) return;
     event.preventDefault();
-    setActive(next);
+    selectStage(next);
     buttons.current[next]?.focus();
   }
 
@@ -78,7 +84,7 @@ export function LandingOutcomeDemosSection() {
                 aria-selected={active === index}
                 aria-controls="outcome-panel"
                 tabIndex={active === index ? 0 : -1}
-                onClick={() => setActive(index)}
+                onClick={() => selectStage(index)}
                 onKeyDown={(event) => handleTabKey(event, index)}
               >
                 <span className={styles.outcomeStageNumber} aria-hidden="true">0{index + 1}</span>
@@ -94,7 +100,7 @@ export function LandingOutcomeDemosSection() {
             return (
               <div className={styles.outcomeCell} key={card.id}>
                 <article id={card.id} className={`${styles.outcomeCard} ${index === 1 ? styles.outcomeCardFeatured : ""} ${inAction ? styles.outcomeCardInAction : ""}`}>
-                  <div key={`copy-${active}`} className={`${styles.cardCopy} ${styles.outcomeCopyIn}`}>
+                  <div key={`copy-${active}`} className={`${styles.cardCopy} ${switched ? styles.outcomeCopyIn : ""}`}>
                     <span className={styles.outcomeLabel}>{inAction ? "I praksis" : `Steg 0${active + 1}`}</span>
                     <h3>{content.title}</h3>
                     <p>{content.text}</p>
@@ -102,7 +108,7 @@ export function LandingOutcomeDemosSection() {
                   {inAction ? (
                     <ProductDemo className={styles.outcomeAnimation} scene={card.scene} description={card.description} />
                   ) : (
-                    <div key={`note-${active}`} className={`${styles.outcomeNote} ${styles.outcomeCopyIn}`}>
+                    <div key={`note-${active}`} className={`${styles.outcomeNote} ${switched ? styles.outcomeCopyIn : ""}`}>
                       <FileText size={11} strokeWidth={1.2} aria-hidden="true" />
                       <p>{content.note}</p>
                     </div>
