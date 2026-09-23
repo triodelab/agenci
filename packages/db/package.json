@@ -1,0 +1,35 @@
+{
+  "name": "@agenci/db",
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./src/index.ts"
+    },
+    "./*": {
+      "default": "./src/*.ts"
+    }
+  },
+  "scripts": {
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:deploy": "prisma migrate deploy",
+    "db:push": "prisma db push",
+    "db:studio": "prisma studio"
+  },
+  "dependencies": {
+    "@agenci/env": "workspace:*",
+    "@prisma/adapter-pg": "^7.9.1",
+    "@prisma/client": "^7.9.1",
+    "dotenv": "catalog:",
+    "elysia": "catalog:",
+    "pg": "^8.22.0",
+    "prismabox": "^1.1.26",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@agenci/config": "workspace:*",
+    "@types/pg": "^8.20.0",
+    "prisma": "^7.9.1",
+    "typescript": "catalog:"
+  }
+}

@@ -3,11 +3,10 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import Link from "next/link";
-import { Button } from "@workspace/ui/components/button";
-import { Input } from "@workspace/ui/components/input";
-import { Label } from "@workspace/ui/components/label";
+import { ArrowUpRight } from "lucide-react";
+import { AgenciLoader } from "@/components/agenci-loader";
 import { AgenciNavWordmark } from "@/components/logo";
-import { useUser } from "@clerk/nextjs";
+import { useUser } from "@/lib/auth-compat";
 import {
   LANDING_AUTH_PATHS,
   LANDING_FOOTER_NAV_GROUPS,
@@ -64,126 +63,125 @@ export function LandingFooter() {
     }
   };
 
-  return (
-    <footer
-      data-landing-nav-surface="dark"
-      className="border-t border-[#2a2a2a] bg-[#1C1C1C] px-6 py-14 xl:px-8"
-    >
-      <div className="mx-auto max-w-[1200px]">
-        {/* Top: logo + tagline */}
-        <div className="flex flex-wrap items-start justify-between gap-10 border-b border-[#2a2a2a] pb-12">
-          <div className="max-w-xs space-y-3">
-            <Link href="/" aria-label="Agenci — forsiden" className="inline-block">
-              <AgenciNavWordmark surface="dark" className="text-white opacity-70" />
-            </Link>
-            <p className="text-[13px] leading-relaxed text-[#6b7280]">
-              KI-chat for nettsiden din — svar fra din kunnskap, samtaler i dashboard, mennesker i loop.
-            </p>
-          </div>
-        </div>
+  /* Knappeteksten tones mykt over ved hvert tilstandsbytte (ikke ved lasting). */
+  const newsletterState = newsletterLoading
+    ? "loading"
+    : newsletterSuccess
+      ? "success"
+      : "idle";
 
-        {/* Nav columns */}
-        <nav
-          className="grid grid-cols-2 gap-10 py-12 sm:grid-cols-2 lg:grid-cols-4"
-          aria-label="Footer"
-        >
-          {LANDING_FOOTER_NAV_GROUPS.map((group) => (
-            <div key={group.name}>
-              <h2 className="mb-4 text-[11px] font-medium uppercase tracking-[0.4px] text-[#4b5563]">
-                {group.name}
-              </h2>
-              <ul className="space-y-2.5">
-                {group.links.map((link) => (
-                  <li key={link.href}>
-                    <Link
-                      href={link.href}
-                      className="text-[13px] text-[#6b7280] transition-colors hover:text-[#f2f3f5]"
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-          <div>
-            <h2 className="mb-4 text-[11px] font-medium uppercase tracking-[0.4px] text-[#4b5563]">
-              Konto
-            </h2>
-            <ul className="space-y-2.5">
-              {accountLinksToShow.map((link) => (
-                <li key={`${link.label}-${link.href}`}>
-                  <Link
-                    href={link.href}
-                    className="text-[13px] text-[#6b7280] transition-colors hover:text-[#f2f3f5]"
-                  >
-                    {link.label}
-                  </Link>
+  return (
+    <footer data-landing-nav-surface="light" className="agenci-fresh-footer">
+      <div className="agenci-footer-top">
+        <Link href="/?from=marketing" aria-label="Agenci — forsiden">
+          <AgenciNavWordmark surface="light" />
+        </Link>
+        <p>
+          Gode samtaler.
+          <br />
+          Litt enklere hverdag.
+        </p>
+        <a href="mailto:hei@agenci.no" className="agenci-text-link">
+          Si hei <ArrowUpRight size={18} />
+        </a>
+      </div>
+      <nav className="agenci-footer-nav" aria-label="Footer">
+        {LANDING_FOOTER_NAV_GROUPS.map((group) => (
+          <div key={group.name}>
+            <h2>{group.name === "Forside" ? "Agenci" : "Utforsk"}</h2>
+            <ul>
+              {group.links.map((link) => (
+                <li key={link.href}>
+                  <Link href={link.href}>{link.label}</Link>
                 </li>
               ))}
             </ul>
           </div>
-          <div className="col-span-2 lg:col-span-1">
-            <h2 className="mb-4 text-[11px] font-medium uppercase tracking-[0.4px] text-[#4b5563]">
-              Nyhetsbrev
-            </h2>
-            <p className="text-[13px] text-[#6b7280]">
-              Produktnyheter — ca. én gang i måneden.
-            </p>
-            <form
-              onSubmit={handleNewsletterSubmit}
-              className="mt-4 w-full max-w-sm"
-              aria-label="Nyhetsbrev"
-              aria-busy={newsletterLoading}
-            >
-              <Label className="sr-only" htmlFor="footer-newsletter-email">
-                E-post
-              </Label>
-              <Input
-                id="footer-newsletter-email"
-                className="h-9 rounded-[8px] border-[#2a2a2a] bg-[#161616] text-[#9ca3af] placeholder:text-[#4b5563] focus-visible:border-[#3a3a3a] focus-visible:ring-2 focus-visible:ring-white/10"
-                placeholder="din@epost.no"
-                type="email"
-                required
-                name="email"
-                value={newsletterEmail}
-                onChange={(e) => setNewsletterEmail(e.target.value)}
-                disabled={newsletterLoading || newsletterSuccess}
-              />
-              <Button
-                type="submit"
-                className="mt-2 h-9 w-full rounded-[8px] bg-white text-[13px] font-medium text-[#1C1C1C] transition-colors hover:bg-[#f2f3f5]"
-                disabled={newsletterLoading || newsletterSuccess}
-                aria-busy={newsletterLoading}
-              >
-                {newsletterLoading
-                  ? "Sender..."
-                  : newsletterSuccess
-                    ? "Påmeldt!"
-                    : "Abonner"}
-              </Button>
-            </form>
-          </div>
-        </nav>
-
-        {/* Bottom bar */}
-        <div className="flex flex-col items-center justify-between gap-4 border-t border-[#2a2a2a] pt-8 sm:flex-row">
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
-            <span className="text-[12px] text-[#4b5563]">&copy; Agenci {new Date().getFullYear()}</span>
-            {LANDING_LEGAL_LINKS.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="text-[12px] text-[#4b5563] transition-colors hover:text-[#6b7280]"
-              >
-                {link.label}
-              </Link>
+        ))}
+        <div>
+          <h2>Din Agenci</h2>
+          <ul>
+            {accountLinksToShow.map((link) => (
+              <li key={link.label}>
+                <Link href={link.href}>{link.label}</Link>
+              </li>
             ))}
-          </div>
-          <div className="flex items-center gap-4">
-            <CookieSettingsButton />
-            <span className="text-[12px] text-[#4b5563]">Alle rettigheter reservert</span>
-          </div>
+            <li>
+              <a href="mailto:hei@agenci.no">hei@agenci.no</a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h2>Litt nytt fra oss</h2>
+          <p>
+            Produktnyheter og gode idéer.
+            <br />
+            Omtrent én gang i måneden.
+          </p>
+          <form
+            onSubmit={handleNewsletterSubmit}
+            aria-label="Nyhetsbrev"
+            aria-busy={newsletterLoading}
+          >
+            <label className="sr-only" htmlFor="footer-newsletter-email">
+              E-post
+            </label>
+            <input
+              id="footer-newsletter-email"
+              type="email"
+              required
+              name="email"
+              autoComplete="email"
+              placeholder="Din e-postadresse"
+              value={newsletterEmail}
+              onChange={(e) => setNewsletterEmail(e.target.value)}
+              disabled={newsletterLoading || newsletterSuccess}
+            />
+            <button
+              type="submit"
+              disabled={newsletterLoading || newsletterSuccess}
+            >
+              <span
+                key={newsletterState}
+                className={
+                  newsletterState === "idle"
+                    ? undefined
+                    : "agenci-footer-label-swap"
+                }
+              >
+                {newsletterLoading ? (
+                  <>
+                    <AgenciLoader decorative /> Sender
+                  </>
+                ) : newsletterSuccess ? (
+                  "Du er på listen!"
+                ) : (
+                  "Meld meg på"
+                )}
+              </span>
+            </button>
+          </form>
+        </div>
+      </nav>
+      <Link
+        className="agenci-footer-wordmark"
+        href="/?from=marketing"
+        aria-label="Agenci — tilbake til forsiden"
+      >
+        Agenci
+      </Link>
+      <div className="agenci-footer-bottom">
+        <div>
+          <span>© Agenci {new Date().getFullYear()}</span>
+          {LANDING_LEGAL_LINKS.map((link) => (
+            <Link key={link.href} href={link.href}>
+              {link.label}
+            </Link>
+          ))}
+        </div>
+        <div>
+          <CookieSettingsButton />
+          <span>Laget for gode samtaler.</span>
         </div>
       </div>
     </footer>

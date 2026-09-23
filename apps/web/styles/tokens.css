@@ -5,7 +5,9 @@
  */
 :root {
   /* Skrift – én typeface for hele prosjektet (satt i layout.tsx via next/font) */
-  --font-sans-fallback: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-sans-fallback:
+    ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
   /* Surfaces */
   --bg: oklch(0.988 0 0);
   --surface: oklch(0.97 0 0);
@@ -15,27 +17,27 @@
   --border-hero: #e8e4df;
   /* Podium – lys modus: svartgrå faded, proft med skygge */
   --podium-bg: oklch(0.28 0 0);
-  --podium-bg-fade: linear-gradient(180deg, oklch(0.32 0 0) 0%, oklch(0.26 0 0) 50%, oklch(0.24 0 0) 100%);
+  --podium-bg-fade: linear-gradient(
+    180deg,
+    oklch(0.32 0 0) 0%,
+    oklch(0.26 0 0) 50%,
+    oklch(0.24 0 0) 100%
+  );
   --podium-text: oklch(0.96 0 0);
   --podium-muted: oklch(0.72 0 0);
   --podium-border: oklch(0.22 0 0);
-  --podium-shadow: 0 32px 64px -16px oklch(0 0 0 / 0.25),
-    0 16px 32px -8px oklch(0 0 0 / 0.18),
+  --podium-shadow:
+    0 32px 64px -16px oklch(0 0 0 / 0.25), 0 16px 32px -8px oklch(0 0 0 / 0.18),
     0 0 0 1px oklch(0.35 0 0 / 0.4);
   --podium-card-bg: oklch(0.31 0 0);
   --podium-card-border: oklch(0.34 0 0);
-  --podium-card-shadow: 0 12px 32px -6px oklch(0 0 0 / 0.35),
-    0 4px 16px -4px oklch(0 0 0 / 0.2),
+  --podium-card-shadow:
+    0 12px 32px -6px oklch(0 0 0 / 0.35), 0 4px 16px -4px oklch(0 0 0 / 0.2),
     inset 0 1px 0 oklch(0.5 0 0 / 0.08);
   --podium-card-text: oklch(0.95 0 0);
   --podium-card-muted: oklch(0.68 0 0);
   --hero-badge-bg: rgba(255, 255, 255, 0.7);
   --hero-icon-box-bg: rgba(255, 255, 255, 0.6);
-  /* Accent — teal, matcher app primary (ikke lilla «chatbot-SaaS»-klone) */
-  --accent-primary: #0d9488;
-  --accent-primary-hover: #0f766e;
-  --accent-secondary: #475569;
-  --accent-secondary-hover: #334155;
   /* Borders & text – nøytral, ingen farge på tekst */
   --border: oklch(0.92 0 0);
   --text: oklch(0.18 0.01 260);
@@ -43,9 +45,10 @@
   /** Text on dark surfaces (e.g. dark cards) */
   --on-surface-2: oklch(0.98 0 0);
   /* Shadows – soft, premium */
-  --shadow-soft: 0 4px 24px -4px oklch(0.2 0 0 / 0.08),
-    0 8px 48px -8px oklch(0.2 0 0 / 0.06);
-  --shadow-lift: 0 12px 40px -8px oklch(0.2 0 0 / 0.1),
+  --shadow-soft:
+    0 4px 24px -4px oklch(0.2 0 0 / 0.08), 0 8px 48px -8px oklch(0.2 0 0 / 0.06);
+  --shadow-lift:
+    0 12px 40px -8px oklch(0.2 0 0 / 0.1),
     0 24px 80px -16px oklch(0.2 0 0 / 0.06);
   /* Radius – store runde kort */
   --radius-card: 1.5rem;
@@ -71,7 +74,7 @@
   --landing-ink-muted: #aaa;
   --landing-ink-subtle: #666;
   --landing-ink-tertiary: #444;
-  --landing-hairline: #1C1C1C;
+  --landing-hairline: #1c1c1c;
   --landing-hairline-strong: #282828;
 }
 
@@ -100,17 +103,22 @@
   --border-hero: oklch(0.22 0 0);
   /* Podium – dark: svartgrå faded, samme skyggefølelse */
   --podium-bg: oklch(0.14 0 0);
-  --podium-bg-fade: linear-gradient(180deg, oklch(0.17 0 0) 0%, oklch(0.13 0 0) 50%, oklch(0.11 0 0) 100%);
+  --podium-bg-fade: linear-gradient(
+    180deg,
+    oklch(0.17 0 0) 0%,
+    oklch(0.13 0 0) 50%,
+    oklch(0.11 0 0) 100%
+  );
   --podium-text: oklch(0.97 0 0);
   --podium-muted: oklch(0.65 0 0);
   --podium-border: oklch(0.18 0 0);
-  --podium-shadow: 0 32px 64px -16px oklch(0 0 0 / 0.55),
-    0 16px 32px -8px oklch(0 0 0 / 0.4),
+  --podium-shadow:
+    0 32px 64px -16px oklch(0 0 0 / 0.55), 0 16px 32px -8px oklch(0 0 0 / 0.4),
     0 0 0 1px oklch(0.22 0 0 / 0.6);
   --podium-card-bg: oklch(0.16 0 0);
-  --podium-card-border: oklch(0.20 0 0);
-  --podium-card-shadow: 0 12px 32px -6px oklch(0 0 0 / 0.5),
-    0 4px 16px -4px oklch(0 0 0 / 0.3),
+  --podium-card-border: oklch(0.2 0 0);
+  --podium-card-shadow:
+    0 12px 32px -6px oklch(0 0 0 / 0.5), 0 4px 16px -4px oklch(0 0 0 / 0.3),
     inset 0 1px 0 oklch(0.35 0 0 / 0.12);
   --podium-card-text: oklch(0.95 0 0);
   --podium-card-muted: oklch(0.68 0 0);
@@ -120,10 +128,10 @@
   --text: oklch(0.97 0 0);
   --muted: oklch(0.65 0 0);
   --on-surface-2: oklch(0.98 0 0);
-  --shadow-soft: 0 4px 24px -4px oklch(0 0 0 / 0.3),
-    0 8px 48px -8px oklch(0 0 0 / 0.2);
-  --shadow-lift: 0 12px 40px -8px oklch(0 0 0 / 0.4),
-    0 24px 80px -16px oklch(0 0 0 / 0.25);
+  --shadow-soft:
+    0 4px 24px -4px oklch(0 0 0 / 0.3), 0 8px 48px -8px oklch(0 0 0 / 0.2);
+  --shadow-lift:
+    0 12px 40px -8px oklch(0 0 0 / 0.4), 0 24px 80px -16px oklch(0 0 0 / 0.25);
 }
 
 /* Reduced motion: disable or shorten animations */
@@ -163,16 +171,40 @@
 
 .landing-hero-mesh {
   background:
-    radial-gradient(ellipse 100% 75% at 50% -35%, rgba(59, 130, 246, 0.12), transparent 58%),
-    radial-gradient(ellipse 55% 40% at 95% 15%, rgba(139, 92, 246, 0.09), transparent 52%),
-    radial-gradient(ellipse 50% 38% at 5% 75%, rgba(14, 165, 233, 0.07), transparent 48%);
+    radial-gradient(
+      ellipse 100% 75% at 50% -35%,
+      rgba(59, 130, 246, 0.12),
+      transparent 58%
+    ),
+    radial-gradient(
+      ellipse 55% 40% at 95% 15%,
+      rgba(139, 92, 246, 0.09),
+      transparent 52%
+    ),
+    radial-gradient(
+      ellipse 50% 38% at 5% 75%,
+      rgba(14, 165, 233, 0.07),
+      transparent 48%
+    );
 }
 
 .dark .landing-hero-mesh {
   background:
-    radial-gradient(ellipse 100% 75% at 50% -35%, rgba(59, 130, 246, 0.18), transparent 58%),
-    radial-gradient(ellipse 55% 40% at 95% 15%, rgba(139, 92, 246, 0.12), transparent 52%),
-    radial-gradient(ellipse 50% 38% at 5% 75%, rgba(14, 165, 233, 0.1), transparent 48%);
+    radial-gradient(
+      ellipse 100% 75% at 50% -35%,
+      rgba(59, 130, 246, 0.18),
+      transparent 58%
+    ),
+    radial-gradient(
+      ellipse 55% 40% at 95% 15%,
+      rgba(139, 92, 246, 0.12),
+      transparent 52%
+    ),
+    radial-gradient(
+      ellipse 50% 38% at 5% 75%,
+      rgba(14, 165, 233, 0.1),
+      transparent 48%
+    );
 }
 
 /* Cinematic hero — mørk, teal-forward (Agenci) */
@@ -180,18 +212,42 @@
   --landing-cinematic-fg: oklch(0.98 0 0);
   --landing-cinematic-muted: oklch(0.72 0.02 260);
   background:
-    radial-gradient(ellipse 110% 85% at 15% 15%, rgba(20, 184, 166, 0.14), transparent 52%),
-    radial-gradient(ellipse 90% 70% at 85% 10%, rgba(6, 182, 212, 0.1), transparent 50%),
-    radial-gradient(ellipse 80% 55% at 50% 100%, rgba(16, 185, 129, 0.08), transparent 55%),
+    radial-gradient(
+      ellipse 110% 85% at 15% 15%,
+      rgba(20, 184, 166, 0.14),
+      transparent 52%
+    ),
+    radial-gradient(
+      ellipse 90% 70% at 85% 10%,
+      rgba(6, 182, 212, 0.1),
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse 80% 55% at 50% 100%,
+      rgba(16, 185, 129, 0.08),
+      transparent 55%
+    ),
     linear-gradient(180deg, #050508 0%, #080a0c 45%, #07080a 100%);
   color: var(--landing-cinematic-fg);
 }
 
 .landing-hero-cinematic-mesh {
   background:
-    radial-gradient(ellipse 100% 75% at 50% -25%, rgba(45, 212, 191, 0.12), transparent 58%),
-    radial-gradient(ellipse 55% 42% at 95% 20%, rgba(34, 211, 238, 0.08), transparent 52%),
-    radial-gradient(ellipse 50% 38% at 5% 75%, rgba(16, 185, 129, 0.09), transparent 50%);
+    radial-gradient(
+      ellipse 100% 75% at 50% -25%,
+      rgba(45, 212, 191, 0.12),
+      transparent 58%
+    ),
+    radial-gradient(
+      ellipse 55% 42% at 95% 20%,
+      rgba(34, 211, 238, 0.08),
+      transparent 52%
+    ),
+    radial-gradient(
+      ellipse 50% 38% at 5% 75%,
+      rgba(16, 185, 129, 0.09),
+      transparent 50%
+    );
 }
 
 /* Scene: lett 3D-fordypning (egen stil — ikke samme vinkel som referanser) */
@@ -260,16 +316,99 @@
   }
 }
 
+/* Designsystem: organisk form (maskot/metaball). Formen styres av scroll i
+   landing-mascot-promise-section.tsx — «mindre manuelt» krymper til venstre,
+   «automatiser mer» vokser til høyre, uten vandring — og ingen evig tomgangsanimasjon. */
+
+/* Designsystem: maskot-seksjonens avrundede underkant — «åpneren» over Møt
+   Agenci. Kanten (::after) og skyggen hører til seksjonen selv, i samme
+   kullgrønne tone (#181c1a) som før, så skyggen følger seksjonen mens
+   innholdet under glir ut (parallaksen i product-story.module.css). */
+.agenci-mascot-lid {
+  --agenci-lid-radius: 56px;
+  position: relative;
+  z-index: 1;
+  view-timeline: --agenci-mascot block;
+}
+.agenci-mascot-lid::before,
+.agenci-mascot-lid::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: var(--agenci-lid-radius);
+  border-radius: 0 0 var(--agenci-lid-radius) var(--agenci-lid-radius);
+  pointer-events: none;
+  /* Skyggen skal bare falle nedover, på innholdet under — ikke blø opp på
+     seksjonen og tegne en strek der kanten begynner. */
+  clip-path: inset(0 -160px -200px);
+}
+/* Kanten: samme flate som seksjonen, med hvileskyggen. */
+.agenci-mascot-lid::after {
+  background: #fafafa;
+  box-shadow: 0 20px 45px #181c1a12;
+}
+/* Løftet: en dypere skygge i samme tone tones inn mens kanten stiger og
+   innholdet glir ut under — lokket løftes. Kun opacity (compositor). */
+.agenci-mascot-lid::before {
+  box-shadow: 0 34px 72px -12px rgb(24 28 26 / 16%);
+  opacity: 0;
+}
+@media (max-width: 700px) {
+  .agenci-mascot-lid {
+    --agenci-lid-radius: 30px;
+  }
+}
+/* Samme scroll-strekning som parallaksen: fra kanten når bunnen av bildet til
+   den når toppen. Uten støtte, eller med redusert bevegelse: bare hvileskyggen. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .agenci-mascot-lid::before {
+      animation-name: agenci-lid-lift;
+      animation-fill-mode: both;
+      animation-timing-function: linear;
+      animation-timeline: --agenci-mascot;
+      animation-range: entry 100% exit 100%;
+    }
+  }
+}
+@keyframes agenci-lid-lift {
+  0% {
+    opacity: 0;
+  }
+  55%,
+  100% {
+    opacity: 1;
+  }
+}
+
 .landing-section-mesh {
   background:
-    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(99, 102, 241, 0.07), transparent 55%),
-    radial-gradient(ellipse 45% 35% at 100% 100%, rgba(56, 189, 248, 0.06), transparent 60%);
+    radial-gradient(
+      ellipse 80% 50% at 50% -10%,
+      rgba(99, 102, 241, 0.07),
+      transparent 55%
+    ),
+    radial-gradient(
+      ellipse 45% 35% at 100% 100%,
+      rgba(56, 189, 248, 0.06),
+      transparent 60%
+    );
 }
 
 .dark .landing-section-mesh {
   background:
-    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(99, 102, 241, 0.12), transparent 55%),
-    radial-gradient(ellipse 45% 35% at 100% 100%, rgba(56, 189, 248, 0.08), transparent 60%);
+    radial-gradient(
+      ellipse 80% 50% at 50% -10%,
+      rgba(99, 102, 241, 0.12),
+      transparent 55%
+    ),
+    radial-gradient(
+      ellipse 45% 35% at 100% 100%,
+      rgba(56, 189, 248, 0.08),
+      transparent 60%
+    );
 }
 
 /* Landing: dashboard-oversikt mock — 3D «kort som lander» */
@@ -350,33 +489,33 @@
  */
 [data-mobile="true"][data-sidebar="sidebar"] {
   /* Warm dashboard palette */
-  --background: #1C1C1C;
-  --foreground: #F2F3F5;
+  --background: #1c1c1c;
+  --foreground: #f2f3f5;
   --card: #262626;
-  --card-foreground: #F2F3F5;
+  --card-foreground: #f2f3f5;
   --popover: #262626;
-  --popover-foreground: #F2F3F5;
-  --primary: #FFFFFF;
-  --primary-foreground: #1C1C1C;
-  --secondary: #2A2A2A;
-  --secondary-foreground: #F2F3F5;
-  --muted: #2A2A2A;
+  --popover-foreground: #f2f3f5;
+  --primary: #ffffff;
+  --primary-foreground: #1c1c1c;
+  --secondary: #2a2a2a;
+  --secondary-foreground: #f2f3f5;
+  --muted: #2a2a2a;
   --muted-foreground: #9ca3af;
-  --accent: #2A2A2A;
-  --accent-foreground: #F2F3F5;
-  --border: #2A2A2A;
-  --input: #2A2A2A;
-  --ring: #F2F3F5;
+  --accent: #2a2a2a;
+  --accent-foreground: #f2f3f5;
+  --border: #2a2a2a;
+  --input: #2a2a2a;
+  --ring: #f2f3f5;
   --radius: 0.625rem;
   /* Sidebar-specific tokens */
-  --sidebar: #1C1C1C;
-  --sidebar-foreground: #F2F3F5;
-  --sidebar-primary: #FFFFFF;
-  --sidebar-primary-foreground: #1C1C1C;
-  --sidebar-accent: #2A2A2A;
-  --sidebar-accent-foreground: #F2F3F5;
-  --sidebar-border: #2A2A2A;
-  --sidebar-ring: #F2F3F5;
+  --sidebar: #1c1c1c;
+  --sidebar-foreground: #f2f3f5;
+  --sidebar-primary: #ffffff;
+  --sidebar-primary-foreground: #1c1c1c;
+  --sidebar-accent: #2a2a2a;
+  --sidebar-accent-foreground: #f2f3f5;
+  --sidebar-border: #2a2a2a;
+  --sidebar-ring: #f2f3f5;
   /* Dashboard nav tokens */
   --dash-nav-active-bg: #2a2a2a;
   --dash-nav-active-surface: #2a2a2a;
@@ -393,7 +532,7 @@
   --card-foreground: #e8e6e3;
   --popover: #1e1e1c;
   --popover-foreground: #e8e6e3;
-  --primary: #F2F3F5;
+  --primary: #f2f3f5;
   --primary-foreground: #111110;
   --secondary: #222220;
   --secondary-foreground: #e8e6e3;
@@ -403,15 +542,15 @@
   --accent-foreground: #e8e6e3;
   --border: #2a2a28;
   --input: #2a2a28;
-  --ring: #F2F3F5;
+  --ring: #f2f3f5;
   --sidebar: #111110;
-  --sidebar-foreground: #F2F3F5;
-  --sidebar-primary: #F2F3F5;
+  --sidebar-foreground: #f2f3f5;
+  --sidebar-primary: #f2f3f5;
   --sidebar-primary-foreground: #111110;
   --sidebar-accent: #222220;
-  --sidebar-accent-foreground: #F2F3F5;
+  --sidebar-accent-foreground: #f2f3f5;
   --sidebar-border: #2a2a28;
-  --sidebar-ring: #F2F3F5;
+  --sidebar-ring: #f2f3f5;
   --dash-nav-active-bg: #2a2a2a;
   --dash-nav-active-border: #e4e4e7;
   --dash-knowledge-folder: #1e1e1e;
@@ -454,45 +593,45 @@
   --dash-knowledge-active: var(--dash-nav-active-bg);
   --dash-knowledge-folder: #262626;
   /* Surfaces — warm palette */
-  --background: #FAFAF9;
-  --foreground: #1C1C1C;
-  --card: #FFFFFF;
-  --card-foreground: #1C1C1C;
-  --popover: #FFFFFF;
-  --popover-foreground: #1C1C1C;
-  --primary: #1C1C1C;
-  --primary-foreground: #FAFAF9;
-  --secondary: #F4F1EE;
-  --secondary-foreground: #1C1C1C;
-  --muted: #F4F1EE;
-  --muted-foreground: #6B6560;
-  --accent: #F4F1EE;
-  --accent-foreground: #1C1C1C;
+  --background: #fafaf9;
+  --foreground: #1c1c1c;
+  --card: #ffffff;
+  --card-foreground: #1c1c1c;
+  --popover: #ffffff;
+  --popover-foreground: #1c1c1c;
+  --primary: #1c1c1c;
+  --primary-foreground: #fafaf9;
+  --secondary: #f4f1ee;
+  --secondary-foreground: #1c1c1c;
+  --muted: #f4f1ee;
+  --muted-foreground: #6b6560;
+  --accent: #f4f1ee;
+  --accent-foreground: #1c1c1c;
   --destructive: oklch(0.58 0.22 27);
-  --border: #E8E4DF;
-  --input: #E8E4DF;
-  --ring: #1C1C1C;
+  --border: #e8e4df;
+  --input: #e8e4df;
+  --ring: #1c1c1c;
   --radius: 0.625rem;
   /* Sidebar: dark — matches landing nav */
-  --sidebar: #1C1C1C;
-  --sidebar-foreground: #F2F3F5;
-  --sidebar-primary: #FFFFFF;
-  --sidebar-primary-foreground: #1C1C1C;
-  --sidebar-accent: #2A2A2A;
-  --sidebar-accent-foreground: #F2F3F5;
-  --sidebar-border: #2A2A2A;
-  --sidebar-ring: #F2F3F5;
+  --sidebar: #1c1c1c;
+  --sidebar-foreground: #f2f3f5;
+  --sidebar-primary: #ffffff;
+  --sidebar-primary-foreground: #1c1c1c;
+  --sidebar-accent: #2a2a2a;
+  --sidebar-accent-foreground: #f2f3f5;
+  --sidebar-border: #2a2a2a;
+  --sidebar-ring: #f2f3f5;
 }
 
 /* Dark-chrome scope: remaps generic tokens so sidebar elements work on #1C1C1C */
 .dash-sidebar-scope {
-  --foreground: #F2F3F5;
-  --background: #1C1C1C;
-  --muted: #2A2A2A;
+  --foreground: #f2f3f5;
+  --background: #1c1c1c;
+  --muted: #2a2a2a;
   --muted-foreground: #9ca3af;
   --card: #262626;
-  --border: #2A2A2A;
-  --input: #2A2A2A;
+  --border: #2a2a2a;
+  --input: #2a2a2a;
 }
 
 /* Dark mode sidebar scope — matches warm dark sidebar */
@@ -514,32 +653,32 @@
   --dash-knowledge-folder: #1e1e1e;
   /* Content area — warm dark, slightly lighter than sidebar so cards lift off */
   --background: #191917;
-  --foreground: #F2F3F5;
+  --foreground: #f2f3f5;
   --card: #222220;
-  --card-foreground: #F2F3F5;
+  --card-foreground: #f2f3f5;
   --popover: #222220;
-  --popover-foreground: #F2F3F5;
-  --primary: #F2F3F5;
+  --popover-foreground: #f2f3f5;
+  --primary: #f2f3f5;
   --primary-foreground: #191917;
   --secondary: #272725;
-  --secondary-foreground: #F2F3F5;
+  --secondary-foreground: #f2f3f5;
   --muted: #272725;
   --muted-foreground: #9c9890;
   --accent: #272725;
-  --accent-foreground: #F2F3F5;
+  --accent-foreground: #f2f3f5;
   --destructive: oklch(0.704 0.191 22.216);
   --border: #2e2d2b;
   --input: #2e2d2b;
-  --ring: #F2F3F5;
+  --ring: #f2f3f5;
   /* Sidebar — deepest warm dark */
   --sidebar: #111110;
-  --sidebar-foreground: #F2F3F5;
-  --sidebar-primary: #F2F3F5;
+  --sidebar-foreground: #f2f3f5;
+  --sidebar-primary: #f2f3f5;
   --sidebar-primary-foreground: #111110;
   --sidebar-accent: #222220;
-  --sidebar-accent-foreground: #F2F3F5;
+  --sidebar-accent-foreground: #f2f3f5;
   --sidebar-border: #2a2a28;
-  --sidebar-ring: #F2F3F5;
+  --sidebar-ring: #f2f3f5;
 }
 
 /* Sidetitler — felles hierarki på alle dashboard-sider */
@@ -817,7 +956,11 @@
 .dash-panel-terminal {
   border-radius: 1.25rem;
   border: 1px solid oklch(0.34 0.035 268);
-  background: linear-gradient(168deg, oklch(0.19 0.028 268) 0%, oklch(0.11 0.022 268) 100%);
+  background: linear-gradient(
+    168deg,
+    oklch(0.19 0.028 268) 0%,
+    oklch(0.11 0.022 268) 100%
+  );
   color: oklch(0.93 0.012 268);
   box-shadow:
     inset 0 1px 0 oklch(1 0 0 / 0.07),
@@ -826,7 +969,11 @@
 
 .dark .dash-panel-terminal {
   border-color: oklch(0.38 0.04 268);
-  background: linear-gradient(168deg, oklch(0.16 0.03 268) 0%, oklch(0.1 0.025 268) 100%);
+  background: linear-gradient(
+    168deg,
+    oklch(0.16 0.03 268) 0%,
+    oklch(0.1 0.025 268) 100%
+  );
 }
 
 .dash-integration-orb-icon {
@@ -945,7 +1092,11 @@
 }
 
 .dashboard-app-shell [data-sidebar="menu-button"][data-active="true"]:hover {
-  background-color: color-mix(in oklch, var(--foreground) 90%, transparent) !important;
+  background-color: color-mix(
+    in oklch,
+    var(--foreground) 90%,
+    transparent
+  ) !important;
 }
 
 .dark .dashboard-app-shell [data-sidebar="menu-button"][data-active="true"] {
@@ -1049,11 +1200,7 @@
 }
 
 .dark .dash-page-header-accent::before {
-  background: linear-gradient(
-    180deg,
-    oklch(0.88 0 0) 0%,
-    oklch(0.72 0 0) 100%
-  );
+  background: linear-gradient(180deg, oklch(0.88 0 0) 0%, oklch(0.72 0 0) 100%);
 }
 
 .dash-resize-handle {
@@ -1125,3 +1272,572 @@
   );
 }
 
+/*
+ * Marketing hero — people remain the visual anchor. A neutral film scrim gives
+ * type contrast without treating the footage as decorative texture.
+ *
+ * Skrifter (designsystem v1, se DESIGN.md): Gellix (titler), Inter (tekst),
+ * Space Grotesk (etiketter og tall), Circular (Agencis stemme). Alle lastes via
+ * next/font i app/layout.tsx, som setter variablene på <body>. Aliasene under
+ * må derfor stå på body, ikke :root.
+ */
+body {
+  --font-agenci-title: var(--font-gellix), ui-sans-serif, sans-serif;
+  --font-agenci-body: var(--font-sans), ui-sans-serif, sans-serif;
+  --font-agenci-voice: var(--font-circular), var(--font-sans), ui-sans-serif, sans-serif;
+  /*
+   * Bot-bubbler (hero-samtalen og widgetens svar) — Circular, Agencis egen
+   * stemme. Én bryter for begge steder. IKKE FORNØYD? Reverter ved å bytte
+   * linjen under til: --font-bot-voice: var(--font-agenci-body);
+   */
+  --font-bot-voice: var(--font-agenci-voice);
+}
+
+.agenci-cinematic-hero {
+  min-height: 90svh;
+}
+
+.agenci-cinematic-stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 28px;
+  min-height: 90svh;
+  max-width: 1600px;
+  margin-inline: auto;
+  padding: clamp(96px, 12svh, 132px) 32px 32px;
+}
+
+.agenci-cinematic-intro {
+  max-width: 40rem;
+}
+
+/* About:blank's white/80 + 12px frost, with a restrained liquid-glass rim.
+   Keep the optical surface outside Player transforms so it blurs the film. */
+.agenci-story {
+  --story-ink: #202723;
+  --story-muted: #5b645f;
+  --story-success: #3b6c51;
+  position: relative;
+  align-self: flex-end;
+  width: min(400px, 100%);
+  color: var(--story-ink);
+  font-family: var(--font-agenci-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Restore the original lower-left editorial placement without coupling it to
+   the independently timed conversation on the right. This must follow the
+   base story rule so the desktop position wins in the cascade. */
+@media (min-width: 1024px) {
+  .agenci-cinematic-intro {
+    margin-top: auto;
+    margin-bottom: 48px;
+  }
+
+  .agenci-story {
+    position: absolute;
+    right: 32px;
+    bottom: 32px;
+  }
+
+  /* Designsystem: 44px bleed, 1600px innhold (= karusellens kortrad).
+     Samme mekanikk som seksjonene under: bredden bærer innrykket, ikke padding,
+     slik at hero-innholdet starter på nøyaktig samme x som kortene og seksjonene. */
+  .agenci-cinematic-stage,
+  .agenci-bleed-row {
+    width: 80%;
+    max-width: none;
+    padding-inline: 0;
+  }
+}
+
+/* The hero is the canvas; only the conversation bubbles carry glass. */
+.agenci-story-heading {
+  display: none;
+}
+
+.agenci-story-channel {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--story-muted);
+}
+
+.agenci-story-demo {
+  margin-left: auto;
+  font-size: 10px;
+  color: var(--story-muted);
+}
+
+.agenci-story-player {
+  width: 100%;
+  height: 304px;
+  overflow: hidden;
+}
+
+.agenci-story-message {
+  padding: 10px 14px 12px;
+  border-radius: 16px;
+  font-size: 16px;
+  line-height: 1.4;
+  letter-spacing: -0.012em;
+  text-wrap: pretty;
+}
+
+.agenci-story-message.is-customer {
+  background: rgb(255 255 255 / 76%);
+  -webkit-backdrop-filter: blur(12px) saturate(125%);
+  backdrop-filter: blur(12px) saturate(125%);
+  border-bottom-right-radius: 5px;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 85%),
+    0 8px 22px rgb(0 0 0 / 12%);
+}
+
+.agenci-story-message.is-agent {
+  background: rgb(255 255 255 / 56%);
+  -webkit-backdrop-filter: blur(12px) saturate(125%);
+  backdrop-filter: blur(12px) saturate(125%);
+  border-bottom-left-radius: 5px;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 72%),
+    0 8px 22px rgb(0 0 0 / 9%);
+  font-family: var(--font-bot-voice);
+}
+
+.agenci-story-speaker {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--story-muted, #5b645f);
+}
+
+.agenci-story-message.is-agent .agenci-story-speaker {
+  color: var(--story-ink, #202723);
+}
+
+.agenci-story-message p {
+  margin: 0;
+}
+.agenci-story-composition .agenci-story-message {
+  font-size: inherit;
+}
+
+.agenci-story-outcome {
+  display: none;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgb(255 255 255 / 70%);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 3%);
+}
+
+.agenci-story-outcome strong,
+.agenci-story-outcome div > span {
+  display: block;
+}
+.agenci-story-outcome strong {
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+.agenci-story-outcome div > span {
+  margin-top: 3px;
+  font-size: 12px;
+  color: var(--story-muted, #5b645f);
+}
+.agenci-story-outcome-icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  color: var(--story-success, #3b6c51);
+}
+.agenci-story-product {
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+  border-radius: 8px;
+  outline: 1px solid rgb(0 0 0 / 5%);
+  outline-offset: -1px;
+}
+
+.agenci-story-product-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 72px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  border-bottom-left-radius: 5px;
+  background: rgb(255 255 255 / 64%);
+  -webkit-backdrop-filter: blur(12px) saturate(125%);
+  backdrop-filter: blur(12px) saturate(125%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 72%),
+    0 8px 22px rgb(0 0 0 / 9%);
+}
+
+.agenci-story-product-card > div {
+  min-width: 0;
+}
+.agenci-story-product-card strong,
+.agenci-story-product-card span,
+.agenci-story-product-card small {
+  display: block;
+}
+.agenci-story-product-card strong {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.25;
+}
+.agenci-story-product-card span {
+  margin-top: 2px;
+  font-size: 11px;
+  color: var(--story-success);
+}
+.agenci-story-product-card small {
+  margin-top: 4px;
+  overflow: hidden;
+  color: var(--story-muted);
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.agenci-story-check {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  margin-left: auto;
+  color: var(--story-success, #3b6c51);
+  background: #e5ede6;
+}
+
+.agenci-story-footer {
+  display: none;
+}
+.agenci-story-scenes,
+.agenci-story-playback {
+  display: flex;
+  align-items: center;
+}
+.agenci-story-playback {
+  margin-left: auto;
+}
+.agenci-story-scene,
+.agenci-story-control {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--story-muted);
+  cursor: pointer;
+  transition:
+    color 150ms ease,
+    background-color 150ms ease,
+    scale 150ms ease;
+}
+.agenci-story-scene span {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+.agenci-story-scene[aria-pressed="true"] span {
+  color: var(--story-ink);
+  background: rgb(255 255 255 / 78%);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 5%);
+}
+.agenci-story-scene-label {
+  padding-left: 8px;
+  font-size: 10px;
+  color: var(--story-muted);
+}
+.agenci-story-control-icon {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  scale: 0.25;
+  filter: blur(4px);
+  transition:
+    opacity 150ms ease,
+    scale 250ms cubic-bezier(0.16, 1, 0.3, 1),
+    filter 150ms ease;
+}
+.agenci-story-control-icon.is-visible {
+  opacity: 1;
+  scale: 1;
+  filter: blur(0);
+}
+.agenci-story-control-icon:first-child {
+  margin-left: 2px;
+}
+.agenci-story-control:focus-visible,
+.agenci-story-scene:focus-visible {
+  outline: 2px solid #293e33;
+  outline-offset: -4px;
+}
+.agenci-story-control:active,
+.agenci-story-scene:active {
+  scale: 0.96;
+}
+.agenci-story-static {
+  min-height: 240px;
+  display: grid;
+  align-content: start;
+  gap: 8px;
+}
+.agenci-story-static-outcome {
+  display: none;
+}
+.agenci-story-loading,
+.agenci-story-fallback {
+  display: grid;
+  place-content: center;
+  height: 304px;
+  padding: 32px;
+  font-size: 14px;
+  color: #5b645f;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .agenci-story-control:hover,
+  .agenci-story-scene:hover {
+    background: rgb(255 255 255 / 35%);
+    color: var(--story-ink);
+  }
+}
+
+@supports not (backdrop-filter: blur(12px)) {
+  .agenci-story-message.is-customer {
+    background: #f3f4f1;
+  }
+  .agenci-story-message.is-agent {
+    background: #e6e8e3;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+  .agenci-story-message.is-customer,
+  .agenci-story-message.is-agent {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .agenci-story-message.is-customer {
+    background: #f4f5f2;
+  }
+  .agenci-story-message.is-agent {
+    background: #e8ebe5;
+  }
+}
+
+@media (max-width: 639px) {
+  .agenci-cinematic-stage {
+    padding: 112px 24px 24px;
+    gap: 32px;
+  }
+  .agenci-story {
+    width: min(400px, 100%);
+  }
+  .agenci-story-scene-label {
+    display: none;
+  }
+  .agenci-cinematic-intro .agenci-cinematic-secondary {
+    padding-inline: 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .agenci-story-control,
+  .agenci-story-scene,
+  .agenci-story-control-icon {
+    transition: none;
+  }
+}
+
+.agenci-cinematic-film {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transform: scale(1.025);
+  transition:
+    opacity 900ms cubic-bezier(0.23, 1, 0.32, 1),
+    transform 900ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.agenci-cinematic-poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transform: scale(1.025);
+  transition:
+    opacity 900ms cubic-bezier(0.23, 1, 0.32, 1),
+    transform 900ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.agenci-cinematic-poster.is-active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.agenci-cinematic-film.is-active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.agenci-cinematic-scrim {
+  background:
+    linear-gradient(
+      90deg,
+      rgb(0 0 0 / 72%) 0%,
+      rgb(0 0 0 / 48%) 42%,
+      rgb(0 0 0 / 18%) 72%,
+      rgb(0 0 0 / 28%) 100%
+    ),
+    linear-gradient(
+      0deg,
+      rgb(0 0 0 / 70%) 0%,
+      transparent 38%,
+      rgb(0 0 0 / 16%) 100%
+    );
+}
+
+/* Designsystem 23.09.2026: hero-typografi, nå felles for alle store seksjonstitler
+   (delt av .agenci-cinematic-title / -copy og product-story sine h2 + centerHeading p). */
+.agenci-cinematic-title {
+  font-family: Arial, sans-serif;
+  font-weight: 500;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+
+.agenci-cinematic-copy {
+  font-family: var(--font-circular), var(--font-agenci-body), var(--font-sans), sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: -0.005em;
+}
+
+.agenci-cinematic-primary,
+.agenci-cinematic-secondary {
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.agenci-cinematic-primary {
+  background: #fff;
+  color: #101010;
+}
+
+.agenci-cinematic-primary:hover {
+  background: rgb(255 255 255 / 86%);
+}
+
+.agenci-cinematic-secondary {
+  border: 1px solid rgb(255 255 255 / 26%);
+  background: rgb(0 0 0 / 8%);
+  color: #fff;
+}
+
+.agenci-cinematic-secondary:hover {
+  border-color: rgb(255 255 255 / 48%);
+  background: rgb(255 255 255 / 9%);
+}
+
+.agenci-cinematic-primary:active,
+.agenci-cinematic-secondary:active {
+  transform: scale(0.97);
+}
+
+.agenci-cinematic-scene-count {
+  color: rgb(255 255 255 / 72%);
+  font-family: var(--font-agenci-title);
+  font-size: 0.75rem;
+  letter-spacing: -0.025em;
+}
+
+.agenci-cinematic-scene-button {
+  width: 1.5rem;
+  height: 0.125rem;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 32%);
+  cursor: pointer;
+  transition:
+    width 260ms cubic-bezier(0.23, 1, 0.32, 1),
+    background-color 180ms ease,
+    transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.agenci-cinematic-scene-button.is-active {
+  width: 3rem;
+  background: #fff;
+}
+
+.agenci-cinematic-scene-button:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 4px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .agenci-cinematic-scene-button:hover {
+    background: rgb(255 255 255 / 74%);
+  }
+}
+
+@media (max-width: 639px) {
+  .agenci-cinematic-scrim {
+    background:
+      linear-gradient(90deg, rgb(0 0 0 / 68%) 0%, rgb(0 0 0 / 38%) 100%),
+      linear-gradient(
+        0deg,
+        rgb(0 0 0 / 82%) 0%,
+        transparent 48%,
+        rgb(0 0 0 / 30%) 100%
+      );
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .agenci-cinematic-poster,
+  .agenci-cinematic-film,
+  .agenci-cinematic-scene-button,
+  .agenci-cinematic-primary,
+  .agenci-cinematic-secondary {
+    transition: none;
+  }
+
+  .agenci-cinematic-poster,
+  .agenci-cinematic-film {
+    transform: none;
+  }
+}

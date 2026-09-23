@@ -8,7 +8,10 @@ import {
 } from "@workspace/ui/components/accordion";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { LANDING_SECTION_IDS, landingSectionHref } from "@/modules/landing/constants";
+import {
+  LANDING_SECTION_IDS,
+  landingSectionHref,
+} from "@/modules/landing/constants";
 
 const faqs = [
   {
@@ -46,29 +49,25 @@ export function LandingFaqSection() {
     <section
       id={LANDING_SECTION_IDS.faq}
       data-landing-nav-surface="light"
-      className="bg-[#F9F9F9]"
+      className="agenci-editorial agenci-faq"
       aria-labelledby="faq-heading"
     >
-      <div className="mx-auto max-w-[1200px] px-6 py-24 md:py-32 xl:px-8">
+      <div className="mx-auto">
         <div className="grid gap-14 lg:grid-cols-[1fr_1.8fr] lg:gap-20 xl:gap-28">
-
           {/* Left — sticky */}
           <div className="lg:sticky lg:top-28 lg:self-start">
-            <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-[#8A8A8A]">
-              FAQ
-            </p>
-            <h2
-              id="faq-heading"
-              className="text-[1.75rem] font-bold leading-[1.1] tracking-[-0.038em] text-[#1C1C1C] sm:text-[2.1rem]"
-            >
-              Spørsmål vi får ofte
+            <p className="agenci-eyebrow">Godt du spør</p>
+            <h2 id="faq-heading" className="agenci-faq-title">
+              Lurer du på
+              <br />
+              <em>noe mer?</em>
             </h2>
             <p className="mt-4 text-[14px] leading-relaxed text-[#6B6B6B]">
               Finner du ikke svaret du leter etter?
             </p>
             <Link
               href={landingSectionHref("contact")}
-              className="mt-2 inline-flex items-center gap-1.5 text-[14px] text-[#8A8A8A] transition-colors hover:text-[#1C1C1C]"
+              className="agenci-text-link"
             >
               Send oss en melding
               <ArrowRight className="size-3.5" strokeWidth={2} />
@@ -81,12 +80,12 @@ export function LandingFaqSection() {
               <AccordionItem
                 key={item.q}
                 value={`item-${i}`}
-                className="border-[#E4DFD9]"
+                className="border-[#dce8e0]"
               >
-                <AccordionTrigger className="py-5 text-left text-[14px] font-semibold leading-snug text-[#1C1C1C] hover:text-[#1C1C1C] hover:no-underline [&>svg]:text-[#A8A29E] [&[data-state=open]>svg]:text-[#6B6B6B]">
+                <AccordionTrigger className="py-6 text-left text-[17px] font-medium leading-snug text-[#173f39] hover:text-[#0d9488] hover:no-underline [&>svg]:text-[#0d9488]">
                   {item.q}
                 </AccordionTrigger>
-                <AccordionContent className="pb-5 text-[13.5px] leading-[1.75] text-[#6B6B6B]">
+                <AccordionContent className="pb-6 text-[15px] leading-[1.75] text-[#586f69]">
                   {item.a}
                 </AccordionContent>
               </AccordionItem>

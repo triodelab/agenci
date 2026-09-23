@@ -1,9 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useLayoutEffect, useState } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type PointerEvent as ReactPointerEvent,
+} from "react";
 import { Menu, X } from "lucide-react";
-import { useUser } from "@clerk/nextjs";
+import { useUser } from "@/lib/auth-compat";
 import { cn } from "@workspace/ui/lib/utils";
 import { AgenciNavWordmark } from "@/components/logo";
 import { AuthAwareLink } from "@/components/auth-aware-link";
@@ -13,6 +19,7 @@ import {
   LANDING_NAV_SURFACE_ATTR,
   LANDING_NAV_TONE_BOUNDARY_ID,
 } from "@/modules/landing/constants";
+import styles from "./landing-nav.module.css";
 
 const NAV_HEIGHT_PX = 68;
 
@@ -34,7 +41,9 @@ function readAutoSurfaceTone(): "dark" | "light" {
   }
   const boundary = document.getElementById(LANDING_NAV_TONE_BOUNDARY_ID);
   if (!boundary) return "dark";
-  return boundary.getBoundingClientRect().top <= NAV_HEIGHT_PX ? "light" : "dark";
+  return boundary.getBoundingClientRect().top <= NAV_HEIGHT_PX
+    ? "light"
+    : "dark";
 }
 
 export function LandingNav({ variant = "dark" }: LandingNavProps) {
@@ -42,6 +51,34 @@ export function LandingNav({ variant = "dark" }: LandingNavProps) {
   const [scrolled, setScrolled] = useState(false);
   const [autoSurface, setAutoSurface] = useState<"dark" | "light">("dark");
   const { user, isLoaded } = useUser();
+  const navRef = useRef<HTMLElement>(null);
+  const [navHover, setNavHover] = useState({
+    left: 0,
+    right: 0,
+    visible: false,
+    instant: true,
+  });
+
+  /* Hover-pillen glir mellom hovedlenkene: ett lag bak lenkene, klippet til
+     lenken under pekeren. Kommer pekeren utenfra, hopper klippet rett dit og
+     pillen tones inn — den glir bare mellom lenker. Kun mus/penn; berøring og
+     tastatur får ingen glideanimasjon. */
+  const showNavHover = (event: ReactPointerEvent<HTMLAnchorElement>) => {
+    if (event.pointerType !== "mouse" && event.pointerType !== "pen") return;
+    const nav = navRef.current;
+    if (!nav) return;
+    const link = event.currentTarget;
+    const left = link.offsetLeft;
+    const right = nav.clientWidth - (link.offsetLeft + link.offsetWidth);
+    setNavHover((current) => ({
+      left,
+      right,
+      visible: true,
+      instant: !current.visible,
+    }));
+  };
+  const hideNavHover = () =>
+    setNavHover((current) => ({ ...current, visible: false }));
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 0);
@@ -62,22 +99,27 @@ export function LandingNav({ variant = "dark" }: LandingNavProps) {
     };
   }, [variant]);
 
+  const showScrolledGradient = variant === "auto" && scrolled;
   const isDark =
-    variant === "light" ? false : variant === "dark" ? true : autoSurface === "dark";
+    showScrolledGradient ||
+    (variant === "light" ? false : variant === "dark" ? true : autoSurface === "dark");
 
   return (
     <header
       className={cn(
         "fixed inset-x-0 top-0 z-50 transition-[background-color,border-color] duration-300",
-        isDark
-          ? scrolled
-            ? "border-b border-[#2a2a2a] bg-[#1C1C1C]/96 backdrop-blur-md"
-            : "border-b border-transparent bg-transparent"
-          : "border-b border-border/50 bg-background/95 backdrop-blur-sm shadow-sm",
+        showScrolledGradient
+          ? styles.scrolledGradient
+          : variant === "auto"
+            ? "border-b border-transparent bg-transparent"
+            : isDark
+            ? scrolled
+              ? "border-b border-[#2a2a2a] bg-[#1C1C1C]/96 backdrop-blur-md"
+              : "border-b border-transparent bg-transparent"
+            : "border-b border-border/50 bg-background/95 backdrop-blur-sm shadow-sm",
       )}
     >
-      <div className="mx-auto flex h-[4.25rem] max-w-[1200px] items-center justify-between gap-4 px-6 xl:px-8">
-
+      <div className="agenci-bleed-row mx-auto flex h-[4.25rem] max-w-[1600px] items-center justify-between gap-4 px-6">
         {/* Logo */}
         <Link
           href="/"
@@ -88,16 +130,43 @@ export function LandingNav({ variant = "dark" }: LandingNavProps) {
         </Link>
 
         {/* Center nav */}
-        <nav className="hidden items-center gap-0.5 lg:flex" aria-label="Hovedlenker">
+        {/* Lenkene ligger kant i kant (ingen gap): mellomrommet ligger inne i
+            hver lenke (px-[13px] = gammel px-3 + halve gap-0.5), så pekeren
+            aldri faller i et dødt felt mellom dem og pillen blinker av. */}
+        <nav
+          ref={navRef}
+          onPointerLeave={hideNavHover}
+          className="relative hidden items-center lg:flex"
+          aria-label="Hovedlenker"
+        >
+          <span
+            aria-hidden="true"
+            className={cn(
+              styles.navHover,
+              showScrolledGradient
+                ? "bg-white/[0.12]"
+                : isDark
+                ? "bg-white/[0.07]"
+                : "bg-muted/70",
+            )}
+            data-visible={navHover.visible || undefined}
+            data-instant={navHover.instant || undefined}
+            style={{
+              clipPath: `inset(0 ${navHover.right}px 0 ${navHover.left}px round 6px)`,
+            }}
+          />
           {LANDING_NAV_PRIMARY_LINKS.map((item) => (
             <Link
               key={item.name}
               href={item.href}
+              onPointerEnter={showNavHover}
               className={cn(
-                "rounded-md px-3 py-2 text-[13px] font-medium transition-colors",
-                isDark
-                  ? "text-[#b8bfca] hover:bg-white/[0.07] hover:text-white"
-                  : "text-muted-foreground hover:bg-muted/70 hover:text-foreground",
+                "relative z-[1] rounded-md px-[13px] py-2 text-[13px] font-medium transition-colors",
+                showScrolledGradient
+                  ? "text-white/90 hover:text-white"
+                  : isDark
+                  ? "text-[#b8bfca] hover:text-white"
+                  : "text-muted-foreground hover:text-foreground",
               )}
             >
               {item.name}
@@ -112,7 +181,9 @@ export function LandingNav({ variant = "dark" }: LandingNavProps) {
               href={LANDING_AUTH_PATHS.appHome}
               className={cn(
                 "hidden rounded-md px-3 py-2 text-[13px] font-medium transition-colors sm:inline-flex",
-                isDark
+                showScrolledGradient
+                  ? "text-white/90 hover:bg-white/[0.12] hover:text-white"
+                  : isDark
                   ? "text-[#b8bfca] hover:bg-white/[0.07] hover:text-white"
                   : "text-muted-foreground hover:bg-muted/70 hover:text-foreground",
               )}
@@ -124,7 +195,9 @@ export function LandingNav({ variant = "dark" }: LandingNavProps) {
               href={LANDING_AUTH_PATHS.signIn}
               className={cn(
                 "hidden rounded-md px-3 py-2 text-[13px] font-medium transition-colors sm:inline-flex",
-                isDark
+                showScrolledGradient
+                  ? "text-white/90 hover:bg-white/[0.12] hover:text-white"
+                  : isDark
                   ? "text-[#b8bfca] hover:bg-white/[0.07] hover:text-white"
                   : "text-muted-foreground hover:bg-muted/70 hover:text-foreground",
               )}
@@ -138,8 +211,10 @@ export function LandingNav({ variant = "dark" }: LandingNavProps) {
               href={LANDING_AUTH_PATHS.signUp}
               loggedInHref={LANDING_AUTH_PATHS.marketingLoggedInCta}
               className={cn(
-                "hidden h-9 items-center justify-center rounded-[8px] border px-[18px] text-[13px] font-medium transition-colors sm:inline-flex",
-                isDark
+                "hidden h-9 items-center justify-center rounded-full border px-[18px] text-[13px] font-medium transition-colors sm:inline-flex",
+                showScrolledGradient
+                  ? "border-white/70 text-white hover:border-white hover:bg-white/[0.12]"
+                  : isDark
                   ? "border-white/45 text-white hover:border-white/75 hover:bg-white/[0.08]"
                   : "border-border bg-foreground text-background hover:bg-foreground/90",
               )}
@@ -157,7 +232,11 @@ export function LandingNav({ variant = "dark" }: LandingNavProps) {
             aria-label={open ? "Lukk meny" : "Åpne meny"}
             className={cn(
               "inline-flex rounded-lg p-2 lg:hidden",
-              isDark ? "text-[#9ca3af] hover:bg-white/10" : "text-foreground hover:bg-muted",
+              showScrolledGradient
+                ? "text-white hover:bg-white/[0.12]"
+                : isDark
+                ? "text-[#9ca3af] hover:bg-white/10"
+                : "text-foreground hover:bg-muted",
             )}
           >
             {open ? <X className="size-5" /> : <Menu className="size-5" />}
@@ -193,7 +272,7 @@ export function LandingNav({ variant = "dark" }: LandingNavProps) {
               <Link
                 href={LANDING_AUTH_PATHS.appHome}
                 onClick={() => setOpen(false)}
-                className="flex h-9 items-center justify-center rounded-xl border border-[#2a2a2a] text-[13px] font-medium text-[#d1d5db] hover:bg-white/[0.07]"
+                className="flex h-9 items-center justify-center rounded-full border border-[#2a2a2a] text-[13px] font-medium text-[#d1d5db] hover:bg-white/[0.07]"
               >
                 Dashboard
               </Link>
@@ -202,7 +281,7 @@ export function LandingNav({ variant = "dark" }: LandingNavProps) {
                 <Link
                   href={LANDING_AUTH_PATHS.signIn}
                   onClick={() => setOpen(false)}
-                  className="flex h-9 items-center justify-center rounded-xl border border-[#2a2a2a] text-[13px] font-medium text-[#d1d5db] hover:bg-white/[0.07]"
+                  className="flex h-9 items-center justify-center rounded-full border border-[#2a2a2a] text-[13px] font-medium text-[#d1d5db] hover:bg-white/[0.07]"
                 >
                   Logg inn
                 </Link>
@@ -210,7 +289,7 @@ export function LandingNav({ variant = "dark" }: LandingNavProps) {
                   href={LANDING_AUTH_PATHS.signUp}
                   loggedInHref={LANDING_AUTH_PATHS.marketingLoggedInCta}
                   onClick={() => setOpen(false)}
-                  className="flex h-9 items-center justify-center rounded-xl bg-white text-[13px] font-semibold text-[#1C1C1C] hover:bg-[#f2f3f5]"
+                  className="flex h-9 items-center justify-center rounded-full bg-white text-[13px] font-semibold text-[#1C1C1C] hover:bg-[#f2f3f5]"
                 >
                   Kom i gang
                 </AuthAwareLink>

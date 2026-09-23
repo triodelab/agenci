@@ -1,3 +1,16 @@
 
 # clerk configuration (can include secrets)
 /.clerk/
+
+# Kommersielle skrifter (Gellix, Lineto Circular): repoet er offentlig, så kun
+# filene nettsiden og widgeten faktisk laster ligger i git (app/layout.tsx og
+# apps/widget/app/layout.tsx). Resten av familiene ligger lokalt, utenfor git.
+/public/fonts/gellix/*
+!/public/fonts/gellix/Gellix-Regular.woff2
+!/public/fonts/gellix/Gellix-Medium.woff2
+!/public/fonts/gellix/Gellix-SemiBold.woff2
+!/public/fonts/gellix/Gellix-Bold.woff2
+/public/fonts/Circular-Font-Family/*
+!/public/fonts/Circular-Font-Family/lineto-circular-book.ttf
+!/public/fonts/Circular-Font-Family/lineto-circular-bookItalic.ttf
+!/public/fonts/Circular-Font-Family/lineto-circular-medium.ttf

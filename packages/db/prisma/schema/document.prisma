@@ -1,0 +1,34 @@
+enum DocumentSourceType {
+  DOCUMENT
+  WEBPAGE
+  MEDIA
+}
+
+enum DocumentStatus {
+  PENDING
+  PROCESSING
+  INDEXING
+  COMPLETED
+  FAILED
+}
+
+model Document {
+  id              String             @id @default(cuid())
+  organizationId  String
+  organization    Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  agentId         String?
+  agent           Agent?             @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  ownerId         String
+  type            DocumentSourceType
+  status          DocumentStatus     @default(PENDING)
+  documentName    String?
+  markdownContent String?
+  s3Key           String?            @unique
+  markdownKey     String?            @unique
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  @@index([organizationId])
+  @@index([agentId])
+  @@map("documents")
+}
