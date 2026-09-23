@@ -23,6 +23,7 @@ export type AIMessageContentProps = HTMLAttributes<HTMLDivElement>;
 export const AIMessageContent = ({
   children,
   className,
+  style,
   ...props
 }: AIMessageContentProps) => (
   <div
@@ -37,6 +38,14 @@ export const AIMessageContent = ({
       "dark:group-[.is-user]:bg-zinc-100 dark:group-[.is-user]:text-zinc-950",
       className
     )}
+    /*
+     * Bot-svar i Circular (Agencis stemme, --font-bot-voice fra
+     * apps/web/styles/tokens.css). Brukersiden (.is-user) beholder UI-skriften
+     * via samme CSS — se group-[.is-user] under. Vil vi reversere: fjern
+     * style-linjen og group-[.is-user]:font-[...] klassen lenger ned, eller
+     * bytt --font-bot-voice i tokens.css.
+     */
+    style={{ fontFamily: "var(--font-bot-voice, inherit)", ...style }}
     {...props}
   >
     {children}

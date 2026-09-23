@@ -1,0 +1,18 @@
+.scrolledGradient {
+  isolation: isolate;
+  border-bottom: 0;
+  background: transparent;
+}
+
+.scrolledGradient::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  content: "";
+  background:
+    radial-gradient(ellipse 58% 180% at 49% 140%, #080a0c70 10%, transparent 100%),
+    radial-gradient(ellipse 64% 150% at 55% 90%, #26282a70 5%, transparent 100%),
+    linear-gradient(130deg, #17191b99, #10121499);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
