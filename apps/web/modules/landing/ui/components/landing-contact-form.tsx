@@ -11,7 +11,7 @@ import {
   LANDING_MARKETING_PRIMARY_CTA_SHADOW_CLASS,
   LANDING_MARKETING_PRIMARY_CTA_SURFACE_CLASS,
 } from "@/modules/landing/constants";
-import { Loader2 } from "lucide-react";
+import { AgenciLoader } from "@/components/agenci-loader";
 
 type LandingContactFormProps = {
   variant?: "dark" | "light";
@@ -101,9 +101,14 @@ export function LandingContactForm({
 
       <div className="grid gap-5 sm:grid-cols-2">
         <div className="space-y-1.5">
-          <Label htmlFor="contact-name" className={cn(isDark ? labelDark : labelLight)}>
+          <Label
+            htmlFor="contact-name"
+            className={cn(isDark ? labelDark : labelLight)}
+          >
             Navn{" "}
-            <span className={isDark ? "text-[#4b5563]" : "text-red-400"}>*</span>
+            <span className={isDark ? "text-[#4b5563]" : "text-red-400"}>
+              *
+            </span>
           </Label>
           <Input
             id="contact-name"
@@ -118,9 +123,14 @@ export function LandingContactForm({
           />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="contact-email" className={cn(isDark ? labelDark : labelLight)}>
+          <Label
+            htmlFor="contact-email"
+            className={cn(isDark ? labelDark : labelLight)}
+          >
             E-post{" "}
-            <span className={isDark ? "text-[#4b5563]" : "text-red-400"}>*</span>
+            <span className={isDark ? "text-[#4b5563]" : "text-red-400"}>
+              *
+            </span>
           </Label>
           <Input
             id="contact-email"
@@ -128,7 +138,9 @@ export function LandingContactForm({
             type="email"
             required
             autoComplete="email"
-            className={cn(isDark ? fieldDark : "h-10 rounded-[8px] " + fieldLight)}
+            className={cn(
+              isDark ? fieldDark : "h-10 rounded-[8px] " + fieldLight,
+            )}
             placeholder="din@epost.no"
           />
         </div>
@@ -136,9 +148,14 @@ export function LandingContactForm({
 
       <div className="grid gap-5 sm:grid-cols-2">
         <div className="space-y-1.5">
-          <Label htmlFor="contact-phone" className={cn(isDark ? labelDark : labelLight)}>
+          <Label
+            htmlFor="contact-phone"
+            className={cn(isDark ? labelDark : labelLight)}
+          >
             Telefon{" "}
-            <span className={isDark ? "text-[#4b5563]" : "text-muted-foreground"}>
+            <span
+              className={isDark ? "text-[#4b5563]" : "text-muted-foreground"}
+            >
               (valgfritt)
             </span>
           </Label>
@@ -147,28 +164,40 @@ export function LandingContactForm({
             name="phone"
             type="tel"
             autoComplete="tel"
-            className={cn(isDark ? fieldDark : "h-10 rounded-[8px] " + fieldLight)}
+            className={cn(
+              isDark ? fieldDark : "h-10 rounded-[8px] " + fieldLight,
+            )}
             placeholder="+47 …"
           />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="contact-subject" className={cn(isDark ? labelDark : labelLight)}>
+          <Label
+            htmlFor="contact-subject"
+            className={cn(isDark ? labelDark : labelLight)}
+          >
             Emne{" "}
-            <span className={isDark ? "text-[#4b5563]" : "text-red-400"}>*</span>
+            <span className={isDark ? "text-[#4b5563]" : "text-red-400"}>
+              *
+            </span>
           </Label>
           <Input
             id="contact-subject"
             name="subject"
             type="text"
             required
-            className={cn(isDark ? fieldDark : "h-10 rounded-[8px] " + fieldLight)}
+            className={cn(
+              isDark ? fieldDark : "h-10 rounded-[8px] " + fieldLight,
+            )}
             placeholder="Demo, prising, support …"
           />
         </div>
       </div>
 
       <div className="space-y-1.5">
-        <Label htmlFor="contact-message" className={cn(isDark ? labelDark : labelLight)}>
+        <Label
+          htmlFor="contact-message"
+          className={cn(isDark ? labelDark : labelLight)}
+        >
           Melding{" "}
           <span className={isDark ? "text-[#4b5563]" : "text-red-400"}>*</span>
         </Label>
@@ -189,9 +218,13 @@ export function LandingContactForm({
 
       <p
         id="contact-consent-hint"
-        className={cn("text-[12px] leading-[1.5]", isDark ? "text-[#4b5563]" : "text-muted-foreground")}
+        className={cn(
+          "text-[12px] leading-[1.5]",
+          isDark ? "text-[#4b5563]" : "text-muted-foreground",
+        )}
       >
-        Ved å sende inn samtykker du til at vi lagrer opplysningene for å besvare henvendelsen. Les mer i{" "}
+        Ved å sende inn samtykker du til at vi lagrer opplysningene for å
+        besvare henvendelsen. Les mer i{" "}
         <a
           href="/personvern"
           className={cn(
@@ -223,7 +256,7 @@ export function LandingContactForm({
       >
         {loading ? (
           <>
-            <Loader2 className="mr-2 size-4 animate-spin" aria-hidden />
+            <AgenciLoader className="mr-2" decorative />
             Sender…
           </>
         ) : (

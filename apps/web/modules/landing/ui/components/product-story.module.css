@@ -1,0 +1,1288 @@
+.root {
+  color: var(--agenci-ink);
+  background: var(--agenci-page, #fafafa);
+  font-family: var(--font-agenci-body), var(--font-sans), sans-serif;
+  display: flow-root;
+}
+.root :is(h2, h3) {
+  font-weight: 500;
+  text-wrap: balance;
+}
+/* Designsystem 23.09.2026: store seksjonstitler (h2) følger heroens typografi —
+   Arial, løsere sporing. Underoverskrifter (h3) beholder Gellix, uendret. */
+.root h2 {
+  font-family: Arial, sans-serif;
+  font-size: clamp(38px, 4.5vw, 64px);
+  line-height: 1.06;
+  letter-spacing: -0.045em;
+  margin: 0;
+}
+.root h3 {
+  font-family: var(--font-agenci-title), var(--font-sans), sans-serif;
+  letter-spacing: -0.035em;
+  line-height: 1.18;
+}
+.root p {
+  text-wrap: pretty;
+}
+.root :is(section, article, details, [id]) {
+  scroll-margin-top: 100px;
+}
+.root :is(a, button, summary):focus-visible {
+  outline: 2px solid var(--agenci-focus);
+  outline-offset: 5px;
+}
+.container {
+  /* Designsystem: 10% bleed per side på desktop (≤1050px: se media query under). */
+  width: 80%;
+  margin-inline: auto;
+  position: relative;
+}
+.section {
+  padding-block: 100px;
+  background: var(--agenci-page);
+}
+.eyebrow {
+  display: inline-block;
+  font-size: 13px;
+  letter-spacing: 0.025em;
+  color: var(--agenci-muted);
+}
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  border: 1px solid var(--agenci-border);
+  padding: 9px 15px;
+  border-radius: 100px;
+  font-size: 12px;
+  line-height: 1.25;
+}
+.pill > span {
+  width: 5px;
+  height: 5px;
+  background: var(--agenci-accent);
+  border-radius: 50%;
+}
+.centerHeading {
+  text-align: center;
+  margin: 0 auto 54px;
+}
+.centerHeading .eyebrow {
+  margin-bottom: 20px;
+}
+.centerHeading > p {
+  color: var(--agenci-muted);
+  font-family: var(--font-circular), var(--font-agenci-body), var(--font-sans), sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 1.6;
+  letter-spacing: -0.005em;
+  margin: 20px auto 0;
+}
+.centerHeading .pill {
+  margin-top: 25px;
+}
+/* Den avrundede kanten og skyggen øverst her tilhører maskot-seksjonen over
+   (tokens.css, .agenci-mascot-lid) og ligger over innholdet. */
+.meet {
+  position: relative;
+  isolation: isolate;
+  padding: 165px 0 110px;
+  overflow: hidden;
+  background: var(--agenci-page);
+}
+.meet::before {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  background-image: radial-gradient(circle, rgb(81 107 115 / 17%) 0.8px, transparent 1px);
+  background-size: 24px 24px;
+  content: "";
+  mask-image: linear-gradient(to bottom, #000 0%, #000 68%, transparent 100%);
+  pointer-events: none;
+}
+.meet::after {
+  position: absolute;
+  z-index: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 210px;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    var(--agenci-page) 48%,
+    #fff 100%
+  );
+  content: "";
+  pointer-events: none;
+}
+.meet .centerHeading h2 {
+  font-size: clamp(44px, 5vw, 68px);
+}
+.meet > .container {
+  z-index: 1;
+  width: 80%;
+}
+/* «Boksen åpnes»: maskot-seksjonens avrundede underkant er åpneren. Innholdet
+   i Møt Agenci ligger først litt inn under den (280px — ikke hele seksjonen) og
+   glir ned på plass mens seksjonen scroller fra bunnen til toppen av bildet;
+   seksjonens overflow-klipp skjuler det som fortsatt er inne under kanten.
+   Ren CSS på view-timeline, ingen JS. Uten støtte, eller med redusert
+   bevegelse, står innholdet på plass fra start. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .meet {
+      view-timeline: --agenci-meet block;
+    }
+    .meet > .container {
+      animation-name: meetEmerge;
+      animation-fill-mode: both;
+      animation-timing-function: linear;
+      animation-timeline: --agenci-meet;
+      animation-range: cover 0% contain 0%;
+    }
+  }
+}
+@keyframes meetEmerge {
+  from {
+    translate: 0 -280px;
+  }
+  to {
+    translate: 0 0;
+  }
+}
+.dashboardStage {
+  position: relative;
+  padding: 0;
+}
+.meetCaption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 24px 2px 0;
+}
+.meetCaption p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--agenci-muted);
+  margin: 0;
+}
+.textLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  min-height: 44px;
+  font-size: 14px;
+  color: var(--agenci-ink);
+  text-decoration: none;
+}
+.textLink svg,
+.primaryLink svg,
+.secondaryLink svg {
+  flex-shrink: 0;
+  transition: translate 0.18s ease-out;
+}
+.outcomes {
+  /* Preserve this section's pre-nature palette without changing adjacent sections. */
+  --agenci-ink: #243236;
+  --agenci-muted: #617074;
+  --agenci-subtle: #79898d;
+  --agenci-accent: #243236;
+  --agenci-border-strong: #c7d2d5;
+  --agenci-focus: #516b73;
+  --agenci-demo-ink: #243236;
+  --agenci-demo-muted: #617074;
+  --agenci-demo-line: #e3e9eb;
+  --agenci-demo-paper: #eef2f3;
+  padding-block: 36px;
+  position: relative;
+  isolation: isolate;
+  color: #273236;
+  background: #fff;
+}
+.outcomeFrame {
+  position: relative;
+  z-index: 1;
+  width: 80%;
+  margin-inline: auto;
+  border-inline: 1px solid #f1f3f3;
+}
+.outcomeHeader {
+  padding: 36px 20px 34px;
+  text-align: center;
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .outcomeHeader {
+      view-timeline: --agenci-outcome-heading block;
+    }
+    .outcomeEyebrow,
+    .outcomes .outcomeHeader h2 {
+      animation: outcomeHeadingEnter 1s linear both;
+      animation-timeline: --agenci-outcome-heading;
+      animation-range: entry 0% entry 75%;
+    }
+  }
+}
+@keyframes outcomeHeadingEnter {
+  from {
+    opacity: 0.55;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/* Samme scroll-inngang på to utvalgte overskrifter til — Brand og Workflow,
+   ikke alle (Møt Agenci glir allerede ut under maskot-kanten, og karusellen og
+   prisene beveger seg nok selv). Neste linje kommer litt etter den første, så
+   overskriften leses i rekkefølge. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .brandHeading,
+    .workflowHeading {
+      view-timeline: --agenci-section-heading block;
+    }
+    .brandHeading > *,
+    .workflowHeading > div > *,
+    .workflowHeading > p {
+      animation: outcomeHeadingEnter 1s linear both;
+      animation-timeline: --agenci-section-heading;
+      animation-range: entry 0% entry 75%;
+    }
+    .brandHeading > h2,
+    .workflowHeading > div > h2 {
+      animation-range: entry 10% entry 85%;
+    }
+    .workflowHeading > p {
+      animation-range: entry 20% entry 95%;
+    }
+  }
+}
+.outcomeEyebrow {
+  display: inline-block;
+  border-radius: 20px;
+  padding: 3px 8px;
+  background: #fafbfb;
+  color: #8d9494;
+  font-size: 8px;
+  font-weight: 400;
+  letter-spacing: 0.045em;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+.outcomes .outcomeHeader h2 {
+  margin-top: 18px;
+  font-family: Arial, sans-serif;
+  font-size: clamp(34px, 3.5vw, 46px);
+  font-weight: 500;
+  letter-spacing: -0.045em;
+  line-height: 1.12;
+}
+.outcomeHeader h2 > span {
+  color: #9ba7a9;
+}
+.outcomeTabs {
+  display: flex;
+  width: fit-content;
+  max-width: 100%;
+  margin: 31px auto 0;
+  padding: 3px;
+  border: 1px solid #f0f2f2;
+  border-radius: 10px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.outcomeTabs::-webkit-scrollbar {
+  display: none;
+}
+.outcomeTabs button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  flex-grow: 1;
+  flex-shrink: 0;
+  min-height: 44px;
+  padding: 10px 20px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #777f80;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.2;
+  cursor: pointer;
+}
+.outcomeStageNumber {
+  opacity: 0.6;
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+.outcomeTabs button[aria-selected="true"] {
+  background: #243236;
+  color: #fff;
+  box-shadow: 0 2px 4px #24323618;
+}
+/* Valgt fane tones over på stedet i stedet for å smelle; trykk gir svar. */
+.outcomeTabs button {
+  transition:
+    background-color 200ms ease,
+    color 200ms ease,
+    box-shadow 200ms ease,
+    transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.outcomeTabs button:active {
+  transform: scale(0.97);
+}
+/* Fanebytte: den nye teksten glir inn i en liten bølge over kortene, i stedet
+   for å byttes ut på stedet. Remountes via key={active} i komponenten. */
+.outcomeCopyIn {
+  animation: outcomeCopyIn 280ms cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+.outcomeCell:nth-child(2) .outcomeCopyIn {
+  animation-delay: 40ms;
+}
+.outcomeCell:nth-child(3) .outcomeCopyIn {
+  animation-delay: 80ms;
+}
+.outcomeCell:nth-child(4) .outcomeCopyIn {
+  animation-delay: 120ms;
+}
+/* Designsystem: innhold inn starter synlig og flyttes maks 8 px. */
+@keyframes outcomeCopyIn {
+  from {
+    opacity: 0.4;
+    transform: translateY(6px);
+  }
+}
+@keyframes outcomeCopyFade {
+  from {
+    opacity: 0.4;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .outcomeCopyIn {
+    animation-name: outcomeCopyFade;
+  }
+}
+.root .outcomeTabs button:focus-visible {
+  outline-offset: -2px;
+}
+.outcomeGrid:focus-visible {
+  outline: 2px solid var(--agenci-focus);
+  outline-offset: 3px;
+}
+.outcomeGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border-block: 1px solid #f1f3f3;
+}
+.outcomeCell {
+  min-width: 0;
+  padding: 13px;
+}
+.outcomeCell + .outcomeCell {
+  border-left: 1px solid #f1f3f3;
+}
+.outcomeCard {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 324px;
+  aspect-ratio: 0.79;
+  /* Clip the blurred decoration without creating an internally scrollable card. */
+  overflow: clip;
+  border: 1px solid #f0f3f2;
+  border-radius: 11px;
+  background: #fafbfb;
+}
+.outcomeCardFeatured {
+  color: #fff;
+  background: #97a5a8;
+  border-color: #ffffff24;
+  box-shadow: 0 20px 23px -15px #29323780;
+}
+.outcomeCardFeatured::before,
+.outcomeCardFeatured::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+}
+.outcomeCardFeatured::before {
+  inset: -25px;
+  background:
+    radial-gradient(ellipse 58% 43% at 49% 80%, #343a46 10%, transparent 100%),
+    radial-gradient(ellipse 64% 62% at 55% 50%, #928075 5%, transparent 100%),
+    linear-gradient(130deg, #a0afb1, #839398);
+  filter: blur(23px);
+}
+.outcomeCardFeatured::after {
+  background: #ffffff06;
+  box-shadow: inset 0 1px 0 #ffffff20;
+}
+.cardCopy {
+  padding: 17px 16px 0;
+}
+.outcomeLabel {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 6px;
+  border-radius: 10px;
+  background: #f3f8f5;
+  color: #668571;
+  font-size: 10px;
+  line-height: 1;
+}
+.cardCopy h3 {
+  font-size: 21px;
+  font-weight: 500;
+  line-height: 1.25;
+  margin: 12px 0 14px;
+  letter-spacing: -0.04em;
+  text-wrap: pretty;
+}
+.cardCopy p {
+  font-size: 12px;
+  line-height: 1.4;
+  color: #5e6566;
+  margin: 0;
+}
+.outcomeCardFeatured .outcomeLabel {
+  color: #fff;
+  background: #ffffff20;
+}
+.outcomeCardFeatured .cardCopy p {
+  color: #f2f4f4;
+}
+.outcomeNote {
+  margin-top: auto;
+  padding: 35px 16px 20px;
+  color: #8a9091;
+}
+.outcomeNote p {
+  margin: 6px 0 0;
+  font-size: 10px;
+  line-height: 1.45;
+}
+.outcomeCardFeatured .outcomeNote {
+  color: #c2c8c9;
+}
+.outcomeCardInAction {
+  aspect-ratio: auto;
+  height: 100%;
+}
+.outcomeAnimation {
+  margin-top: auto;
+  padding: 18px 10px 4px;
+}
+.outcomeCardInAction .cardCopy {
+  min-height: 152px;
+}
+.outcomeCardFeatured :global(.agenci-demo-screen) {
+  border-radius: 9px;
+  background: #f7f9f9;
+}
+.root .outcomeCardFeatured :global(.agenci-demo-caption) {
+  color: #fff;
+}
+.brandSection {
+  background: var(--agenci-page);
+}
+.brandHeading {
+  margin-bottom: 42px;
+}
+.brandHeading h2 {
+  margin-top: 24px;
+  font-size: clamp(34px, 4vw, 54px);
+}
+.brandHeading h2 span,
+.workflowHeading h2 span {
+  color: var(--agenci-subtle);
+}
+.bento {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+.bentoCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--agenci-border);
+  border-radius: 26px;
+  overflow: hidden;
+  min-width: 0;
+  background: var(--agenci-surface);
+  padding: 32px 10px 10px;
+}
+.bentoCopy {
+  padding: 0 22px 12px;
+  min-height: 182px;
+  position: relative;
+  z-index: 1;
+}
+.bentoCopy h3 {
+  font-size: clamp(27px, 2.65vw, 37px);
+  margin: 0 0 14px;
+}
+.bentoCopy p {
+  max-width: 410px;
+  font-size: 14px;
+  color: var(--agenci-muted);
+  line-height: 1.6;
+  margin: 0 0 16px;
+}
+.brandCard {
+  grid-column: span 2;
+}
+.natureMedia {
+  /* Same blur/saturation and bright rim as the hero's Remotion bubbles. */
+  --agenci-demo-panel: rgb(255 255 255 / 82%);
+  --agenci-demo-line: rgb(255 255 255 / 76%);
+  --agenci-demo-paper: rgb(255 255 255 / 58%);
+  --agenci-demo-panel-blur: blur(12px) saturate(125%);
+  --agenci-demo-panel-shadow: inset 0 1px 0 #ffffffd9, 0 8px 22px #0000001f;
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  margin-top: auto;
+  border-radius: 18px;
+  overflow: clip;
+  background: #e9eef0;
+}
+.natureBackdrop {
+  object-fit: cover;
+  object-position: center 64%;
+  pointer-events: none;
+  z-index: -1;
+}
+.natureMedia > :global(.agenci-product-demo) {
+  padding-top: 28px;
+  align-self: flex-end;
+}
+.hillMedia .natureBackdrop {
+  /* The supplied reference has an outer frame; crop it in layout, not in the asset. */
+  scale: 1.12;
+  object-position: center 62%;
+}
+.bookingMedia .natureBackdrop {
+  object-position: center 43%;
+}
+/* Parallakse: fotoet bak glasset ligger «lenger inne» enn rammen og glir
+   saktere enn siden (±5 % av rammehøyden; skalert opp så kantene aldri vises).
+   Ren CSS på nettleserens view-timeline — ingen JS. Uten støtte, eller med
+   redusert bevegelse, står bildet stille som før. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .natureMedia {
+      view-timeline: --agenci-nature block;
+    }
+    .natureBackdrop {
+      scale: 1.12;
+      animation-name: natureParallax;
+      animation-fill-mode: both;
+      animation-timing-function: linear;
+      animation-timeline: --agenci-nature;
+      animation-range: cover;
+    }
+    .hillMedia .natureBackdrop {
+      /* 1.12 beskjærer rammen i referansebildet; +0.10 gir rom for glidningen. */
+      scale: 1.22;
+    }
+  }
+}
+@keyframes natureParallax {
+  from {
+    translate: 0 -5%;
+  }
+  to {
+    translate: 0 5%;
+  }
+}
+.root .natureMedia :global(.agenci-demo-caption) {
+  background: #fff;
+  margin-top: 16px;
+  padding-inline: 12px;
+  color: var(--agenci-muted);
+}
+.natureMedia :global(.agenci-demo-glass) {
+  background: rgb(255 255 255 / 82%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(125%);
+  backdrop-filter: blur(12px) saturate(125%);
+  border: 1px solid rgb(255 255 255 / 80%);
+  box-shadow:
+    inset 0 1px 0 #ffffffd9,
+    0 8px 22px #0000001f;
+}
+.natureMedia :global(.agenci-demo-thinking) {
+  background: #fff;
+  border: 1px solid var(--agenci-border);
+  border-radius: 999px;
+  padding: 8px 12px !important;
+  margin-top: 3px;
+}
+.presenceCard .natureMedia :global(.agenci-demo-glass) {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  background: #fff !important;
+}
+.handoffCard .natureBackdrop {
+  object-position: center 57%;
+}
+.presenceCard > .textLink {
+  align-self: flex-start;
+  margin: 8px 22px 0;
+}
+.helpCard {
+  grid-column: span 2;
+}
+.helpCard :global(.agenci-product-demo) {
+  max-width: 620px;
+  margin: 30px auto 0;
+}
+.helpCard .natureMedia {
+  /* Keep the photo and the controls at one width; no floating white strip. */
+  padding-inline: 24px;
+}
+.helpCard .natureMedia :global(.agenci-demo-caption) {
+  background: rgb(255 255 255 / 94%);
+  border-radius: 12px 12px 0 0;
+}
+/* Only the two introductory brand cards use the open, alternating feature layout. */
+.featureRows {
+  margin-bottom: 80px;
+}
+.featureRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  grid-template-areas: "media copy";
+  align-items: center;
+  gap: clamp(36px, 4vw, 64px);
+}
+.featureRow + .featureRow {
+  margin-top: 72px;
+  padding-top: 72px;
+  border-top: 1px solid var(--agenci-border);
+}
+.featurePresence {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+  grid-template-areas: "copy media";
+}
+.featureCopy {
+  grid-area: copy;
+  min-width: 0;
+  padding-block: 20px;
+}
+.featureCopy h3 {
+  margin: 0 0 24px;
+  font-size: clamp(32px, 3vw, 42px);
+  line-height: 1.12;
+  letter-spacing: -0.045em;
+  text-wrap: pretty;
+}
+.featureCopy > p {
+  margin: 0;
+  color: var(--agenci-muted);
+  font-size: 18px;
+  line-height: 1.6;
+}
+.featureDetails {
+  list-style: none;
+  padding: 0;
+  margin: 40px 0 0;
+}
+.featureDetails li {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  padding-block: 20px;
+  font-size: 18px;
+  line-height: 1.4;
+}
+.featureDetails li + li {
+  border-top: 1px solid var(--agenci-border);
+}
+.featureDetails li > span {
+  display: grid;
+  place-items: center;
+  flex: 0 0 44px;
+  height: 44px;
+  border-radius: 7px;
+  background: #edf1ee;
+  color: #365c3d;
+}
+.featureLink {
+  margin-top: 64px;
+  padding-top: 18px;
+  border-top: 1px solid var(--agenci-border);
+}
+.featureLink .textLink {
+  color: #365c3d;
+  font-size: 17px;
+}
+.featureMedia {
+  --agenci-demo-panel: rgb(255 255 255 / 91%);
+  --agenci-demo-line: rgb(255 255 255 / 95%);
+  --agenci-demo-paper: rgb(255 255 255 / 62%);
+  --agenci-demo-panel-shadow:
+    0 0 0 7px #ffffff40, inset 0 1px 0 #fff, 0 18px 40px #15291e26;
+  grid-area: media;
+  width: 100%;
+  aspect-ratio: 6 / 5;
+  min-height: 500px;
+  margin: 0;
+  border-radius: 18px;
+  justify-content: center;
+  padding-block: 44px 64px;
+}
+.featureMedia::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 80px;
+  background: linear-gradient(transparent, #10231980);
+  pointer-events: none;
+  z-index: -1;
+}
+.featureMedia > :global(.agenci-product-demo) {
+  position: static;
+  align-self: center;
+  padding-top: 0;
+}
+.featureMedia :global(.agenci-demo-glass) {
+  background: var(--agenci-demo-panel) !important;
+  border-color: var(--agenci-demo-line);
+  box-shadow: var(--agenci-demo-panel-shadow);
+}
+.featurePresence .featureMedia > :global(.agenci-product-demo) {
+  width: min(78%, 430px);
+}
+.featurePresence .featureMedia :global(.agenci-demo-glass) {
+  background: #fff !important;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: 0 12px 30px #15291e1a;
+}
+.root .featureMedia :global(.agenci-demo-caption) {
+  position: absolute;
+  inset: auto 16px 6px;
+  margin: 0;
+  padding: 0;
+  color: #fff;
+  background: transparent;
+  font-size: 11px;
+  text-shadow: 0 1px 3px #0008;
+}
+.root .featureMedia :global(.agenci-demo-caption) button:hover {
+  background: #ffffff26;
+}
+.root .featureMedia :global(.agenci-demo-caption) button:focus-visible {
+  outline-color: #fff;
+  outline-offset: -3px;
+}
+@media (max-width: 1150px) {
+  .featureRow,
+  .featurePresence {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "copy" "media";
+    gap: 32px;
+  }
+  .featureCopy {
+    max-width: 640px;
+  }
+  .featureDetails {
+    margin-top: 24px;
+  }
+  .featureDetails li {
+    padding-block: 15px;
+  }
+  .featureMedia {
+    aspect-ratio: 3 / 2;
+    min-height: 0;
+  }
+  .featureMedia > :global(.agenci-product-demo) {
+    max-width: 720px;
+  }
+  .featureLink {
+    margin-top: 32px;
+  }
+}
+@media (max-width: 700px) {
+  .featureRows {
+    margin-bottom: 48px;
+  }
+  .featureRow {
+    gap: 24px;
+  }
+  .featureRow + .featureRow {
+    margin-top: 48px;
+    padding-top: 48px;
+  }
+  .featureCopy {
+    padding: 0;
+  }
+  .featureCopy h3 {
+    font-size: 32px;
+    margin-bottom: 18px;
+  }
+  .featureCopy > p {
+    font-size: 16px;
+  }
+  .featureDetails li {
+    font-size: 16px;
+    gap: 16px;
+  }
+  .featureMedia {
+    aspect-ratio: auto;
+    padding-block: 32px 64px;
+  }
+  .featureMedia > :global(.agenci-product-demo) {
+    padding-top: 0;
+  }
+  .featurePresence .featureMedia {
+    min-height: 390px;
+  }
+  .featurePresence .featureMedia > :global(.agenci-product-demo) {
+    width: 90%;
+  }
+}
+.root :global(.agenci-demo-screen) {
+  aspect-ratio: 400 / 360;
+}
+.root :global(.agenci-demo-caption) {
+  color: var(--agenci-muted);
+  padding: 0 18px;
+  font-size: 10px;
+}
+.root :global(.agenci-demo-caption) button:hover {
+  background: #2432360a;
+}
+.root :global(.agenci-demo-fallback) {
+  color: var(--agenci-ink);
+}
+.workflow {
+  padding-top: 80px;
+  padding-bottom: 70px;
+}
+.workflowHeading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 40px;
+}
+.workflowHeading .eyebrow {
+  margin-bottom: 20px;
+}
+.workflowHeading > p {
+  max-width: 310px;
+  color: var(--agenci-muted);
+  font-family: var(--font-circular), var(--font-agenci-body), var(--font-sans), sans-serif;
+  font-weight: 400;
+  line-height: 1.7;
+  font-size: 15px;
+  letter-spacing: -0.005em;
+  margin: 0 0 3px;
+}
+.steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  padding: 0;
+  list-style: none;
+  margin: 58px 0;
+  gap: 28px;
+}
+.steps li {
+  border-top: 1px solid var(--agenci-border-strong);
+  padding-top: 22px;
+}
+.stepNumber {
+  font-size: 12px;
+  color: var(--agenci-muted);
+}
+.steps h3 {
+  font-size: 22px;
+  margin: 30px 0 12px;
+}
+.steps p {
+  color: var(--agenci-muted);
+  font-size: 14px;
+  line-height: 1.7;
+}
+.startBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  padding: 40px;
+  border-radius: 24px;
+  background: #fff;
+  border: 1px solid var(--agenci-border);
+}
+.startBar h3 {
+  font-size: 28px;
+  margin: 0 0 8px;
+}
+.startBar p {
+  color: var(--agenci-muted);
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0;
+}
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+.primaryLink,
+.secondaryLink {
+  display: inline-flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 12px 21px;
+  border-radius: 999px;
+  font-size: 14px;
+  text-decoration: none;
+  /* Samme trykk og tone-overgang som hero-knappene. */
+  transition:
+    background-color 180ms ease,
+    transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.primaryLink:active,
+.secondaryLink:active {
+  transform: scale(0.97);
+}
+.primaryLink {
+  background: var(--agenci-accent);
+  color: #fff;
+}
+.secondaryLink {
+  border: 1px solid var(--agenci-border-strong);
+  color: var(--agenci-ink);
+}
+.practical {
+  margin-top: 38px;
+}
+.disclosure {
+  border-bottom: 1px solid var(--agenci-border);
+}
+.disclosure > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 3px;
+  cursor: pointer;
+  list-style: none;
+  font-size: 15px;
+}
+.disclosure > summary::-webkit-details-marker {
+  display: none;
+}
+.disclosure[open] > summary > svg {
+  rotate: 45deg;
+}
+.quickAnswers {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 35px;
+  padding: 8px 0 35px;
+}
+.quickAnswers h3 {
+  font-size: 21px;
+  margin: 0 0 12px;
+}
+.quickAnswers p {
+  color: var(--agenci-muted);
+  font-size: 14px;
+  line-height: 1.7;
+}
+.quickAnswers a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+/* Existing plan functionality remains available without adding a fifth section. */
+.practical :global(.agenci-pricing) {
+  width: 100%;
+  padding: 25px 0 45px;
+}
+.practical h2 {
+  font-size: 36px;
+}
+.practical h2 em {
+  color: var(--agenci-subtle);
+  font-style: normal;
+}
+.practical :global(.agenci-price-card),
+.practical :global(.agenci-enterprise) {
+  background: var(--agenci-surface);
+  border-color: var(--agenci-border);
+  color: var(--agenci-ink);
+}
+.practical :global(.agenci-price-card.is-featured) {
+  background: #fff;
+  border-color: var(--agenci-accent);
+}
+.practical :global(.agenci-price-name) > span,
+.practical :global(.agenci-billing) button[aria-pressed="true"],
+.practical :global(.is-featured .agenci-price-cta) {
+  background: var(--agenci-accent);
+  color: #fff;
+  border-color: var(--agenci-accent);
+}
+.practical :global(.agenci-billing) > div {
+  background: var(--agenci-surface-raised);
+}
+.practical :global(.agenci-price-value) > span,
+.practical :global(.agenci-price-period),
+.practical :global(.agenci-price-blurb),
+.practical :global(.agenci-pricing-lead),
+.practical :global(.agenci-price-note),
+.practical :global(.agenci-enterprise) p,
+.practical :global(.agenci-billing) > span,
+.practical :global(.agenci-billing) button {
+  color: var(--agenci-muted);
+}
+.practical :global(.agenci-price-card) ul,
+.practical :global(.agenci-price-cta) {
+  border-color: var(--agenci-border-strong);
+}
+.practical :global(.agenci-price-card) li > svg {
+  color: var(--agenci-focus);
+}
+.practical :global(.agenci-price-card) li.is-excluded {
+  color: var(--agenci-muted);
+}
+@media (hover: hover) {
+  .textLink:hover svg,
+  .primaryLink:hover svg,
+  .secondaryLink:hover svg {
+    translate: 3px 0;
+  }
+  .primaryLink:hover {
+    background: var(--agenci-accent-hover);
+  }
+  .secondaryLink:hover {
+    background: #fff;
+  }
+}
+@media (max-width: 1050px) {
+  .container {
+    width: calc(100% - 56px);
+  }
+  .outcomeGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .outcomeCell:nth-child(3) {
+    border-left: 0;
+  }
+  .outcomeCell:nth-child(n + 3) {
+    border-top: 1px solid #f1f3f3;
+  }
+  .outcomeCard {
+    aspect-ratio: auto;
+    min-height: 340px;
+  }
+  .bentoCopy {
+    padding-inline: 14px;
+    min-height: 0;
+  }
+  .startBar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .steps {
+    gap: 20px;
+  }
+}
+@media (max-width: 700px) {
+  .container {
+    width: calc(100% - 36px);
+  }
+  .section {
+    padding-block: 60px;
+  }
+  .meet {
+    padding: 105px 0 45px;
+  }
+  .centerHeading {
+    margin-bottom: 30px;
+  }
+  .centerHeading > p {
+    max-width: 270px;
+    font-size: 16px;
+  }
+  .dashboardStage {
+    padding: 0;
+    border-radius: 20px;
+  }
+  .meet > .container {
+    width: calc(100% - 36px);
+  }
+  .meetCaption {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 15px;
+  }
+  .outcomeGrid {
+    grid-template-columns: 1fr;
+  }
+  .outcomeFrame {
+    width: calc(100% - 32px);
+  }
+  .outcomeHeader {
+    padding: 30px 12px;
+  }
+  .outcomes .outcomeHeader h2 {
+    font-size: clamp(30px, 7.5vw, 38px);
+  }
+  .outcomeCell + .outcomeCell {
+    border-left: 0;
+    border-top: 1px solid #f1f3f3;
+  }
+  .outcomeTabs {
+    width: 100%;
+    margin-top: 25px;
+  }
+  .outcomeTabs button {
+    min-height: 44px;
+    padding: 9px 8px;
+    gap: 4px;
+    font-size: 11px;
+    flex-shrink: 1;
+  }
+  .outcomeStageNumber {
+    display: none;
+  }
+  .cardCopy {
+    padding: 20px 18px 0;
+  }
+  .cardCopy h3 {
+    font-size: 23px;
+  }
+  .cardCopy p {
+    font-size: 14px;
+  }
+  .brandHeading {
+    margin-bottom: 28px;
+  }
+  .brandHeading h2 {
+    font-size: 37px;
+  }
+  .bento {
+    grid-template-columns: 1fr;
+  }
+  .brandCard,
+  .helpCard {
+    grid-column: auto;
+  }
+  .bentoCard {
+    padding: 26px 8px 8px;
+    border-radius: 22px;
+  }
+  .bentoCopy {
+    padding-inline: 14px;
+  }
+  .natureMedia > :global(.agenci-product-demo) {
+    padding-top: 12px;
+  }
+  .helpCard .natureMedia {
+    padding-inline: 0;
+  }
+  .helpCard :global(.agenci-product-demo) {
+    margin-top: 0;
+  }
+  .bentoCopy h3 {
+    font-size: 30px;
+  }
+  .bentoCopy p {
+    font-size: 14px;
+  }
+  .workflowHeading {
+    display: block;
+  }
+  .workflowHeading > p {
+    max-width: 390px;
+    margin-top: 22px;
+  }
+  .steps {
+    grid-template-columns: 1fr 1fr;
+    gap: 28px 22px;
+    margin-block: 35px;
+  }
+  .steps h3 {
+    font-size: 23px;
+    margin-top: 20px;
+  }
+  .startBar {
+    padding: 26px 22px;
+    gap: 25px;
+  }
+  .startBar h3 {
+    font-size: 31px;
+  }
+  .actions {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .quickAnswers {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+  .practical :global(.agenci-heading-row) {
+    padding-inline: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .root *,
+  .root *::before,
+  .root *::after {
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .outcomeCardFeatured {
+    background: #40545d;
+  }
+  .outcomeCardFeatured::before,
+  .outcomeCardFeatured::after {
+    display: none;
+  }
+  .natureMedia {
+    --agenci-demo-panel: #fff;
+    --agenci-demo-paper: #f3f5f4;
+    --agenci-demo-panel-blur: none;
+  }
+  .root :global(.agenci-demo-glass) {
+    background: #fff !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+}
+@supports not (backdrop-filter: blur(1px)) {
+  .natureMedia {
+    --agenci-demo-panel: #fff;
+  }
+  .root :global(.agenci-demo-glass) {
+    background: #fff !important;
+  }
+}

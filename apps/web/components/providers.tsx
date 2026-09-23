@@ -13,10 +13,19 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { ScrollToHash } from "@/components/scroll-to-hash";
 import { parseConvexDeploymentUrl } from "@/lib/convex-url";
 
-const convexUrl = parseConvexDeploymentUrl(process.env.NEXT_PUBLIC_CONVEX_URL);
-const convex = new ConvexReactClient(convexUrl);
+const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL?.trim();
+const convex = convexUrl
+  ? new ConvexReactClient(parseConvexDeploymentUrl(convexUrl))
+  : null;
 
 export function Providers({ children }: { children: React.ReactNode }) {
+  const content = (
+    <>
+      <ScrollToHash />
+      {children}
+    </>
+  );
+
   return (
     <ThemeProvider
       attribute="class"
@@ -24,11 +33,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
       enableSystem
       disableTransitionOnChange
     >
-      {/* Task 1.2: no Clerk — session comes from Better Auth client hooks */}
-      <ConvexProvider client={convex}>
-        <ScrollToHash />
-        {children}
-      </ConvexProvider>
+      {/* Dashboard routes use Convex when configured; marketing can render standalone. */}
+      {convex ? <ConvexProvider client={convex}>{content}</ConvexProvider> : content}
     </ThemeProvider>
   );
 }

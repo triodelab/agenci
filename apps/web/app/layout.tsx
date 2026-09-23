@@ -1,27 +1,51 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import { Geist, Geist_Mono, Space_Grotesk } from "next/font/google"
+import { Inter, Space_Grotesk } from "next/font/google"
+import localFont from "next/font/local"
 
 import "@workspace/ui/globals.css";
-import "@clerk/ui/themes/shadcn.css";
 import "@/styles/tokens.css";
+import "@/styles/marketing.css";
 import { Providers } from "@/components/providers"
 import { Toaster } from "@workspace/ui/components/sonner";
 
-const fontSans = Geist({
+/**
+ * Designsystem v1 – fire skrifter (se DESIGN.md):
+ *  - Gellix (titler)              → --font-gellix    (public/fonts/gellix)
+ *  - Inter (løpetekst, UI)        → --font-sans
+ *  - Space Grotesk (etiketter)    → --font-display
+ *  - Circular (Agencis stemme)    → --font-circular  (public/fonts/Circular-Font-Family)
+ */
+const fontSans = Inter({
   subsets: ["latin"],
   variable: "--font-sans",
-})
-
-const fontMono = Geist_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono",
 })
 
 const fontDisplay = Space_Grotesk({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-display",
+})
+
+const fontGellix = localFont({
+  src: [
+    { path: "../public/fonts/gellix/Gellix-Regular.woff2", weight: "400", style: "normal" },
+    { path: "../public/fonts/gellix/Gellix-Medium.woff2", weight: "500", style: "normal" },
+    { path: "../public/fonts/gellix/Gellix-SemiBold.woff2", weight: "600", style: "normal" },
+    { path: "../public/fonts/gellix/Gellix-Bold.woff2", weight: "700", style: "normal" },
+  ],
+  variable: "--font-gellix",
+  display: "swap",
+})
+
+const fontCircular = localFont({
+  src: [
+    { path: "../public/fonts/Circular-Font-Family/lineto-circular-book.ttf", weight: "400", style: "normal" },
+    { path: "../public/fonts/Circular-Font-Family/lineto-circular-bookItalic.ttf", weight: "400", style: "italic" },
+    { path: "../public/fonts/Circular-Font-Family/lineto-circular-medium.ttf", weight: "500", style: "normal" },
+  ],
+  variable: "--font-circular",
+  display: "swap",
 })
 
 export const metadata: Metadata = {
@@ -92,7 +116,7 @@ export default function RootLayout({
   return (
     <html lang="no" suppressHydrationWarning data-scroll-behavior="smooth">
       <body
-        className={`${fontSans.variable} ${fontMono.variable} ${fontDisplay.variable} font-sans antialiased`}
+        className={`${fontSans.variable} ${fontDisplay.variable} ${fontGellix.variable} ${fontCircular.variable} font-sans antialiased`}
       >
         <Providers>
           {children}

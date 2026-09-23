@@ -2,9 +2,16 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { ChevronDown, Shield } from "lucide-react";
-import { useCookieConsent, ConsentState } from "@/hooks/use-cookie-consent";
+import { useCookieConsent, type ConsentState } from "@/hooks/use-cookie-consent";
 import { cn } from "@workspace/ui/lib/utils";
+
+/* Inn og ut: stripen glir opp fra underkanten og ut samme vei; dialogen tones
+   inn med kortet fra 96 % (modal, sentrert). Utgangen er raskere enn inngangen.
+   Fulle transform-strenger, så Motion kjører dem på WAAPI mens siden laster. */
+const EASE = [0.25, 0.1, 0.25, 1] as const; // CSS «ease»
+const EASE_OUT = [0.23, 1, 0.32, 1] as const;
 
 /* ─── Cookie definitions ──────────────────────────────────────────── */
 
@@ -267,8 +274,43 @@ export function CookieConsentBanner() {
     return () => window.removeEventListener("agenci-consent-updated", handler);
   }, []);
 
-  if (!mounted || hasConsented) return null;
-  if (!visible) return null;
+  /* Banneret vises aldri under hydrering (først etter mount + 500 ms), så
+     Motion sin useReducedMotion gir ingen mismatch her. */
+  const reduceMotion = useReducedMotion();
+  const open = mounted && !hasConsented && visible;
+
+  const stripMotion = {
+    initial: {
+      opacity: 0,
+      transform: reduceMotion ? "translateY(0%)" : "translateY(100%)",
+    },
+    animate: { opacity: 1, transform: "translateY(0%)" },
+    exit: {
+      opacity: 0,
+      transform: reduceMotion ? "translateY(0%)" : "translateY(100%)",
+      transition: { duration: 0.25, ease: EASE_OUT },
+    },
+    transition: { duration: 0.4, ease: EASE },
+  };
+  const backdropMotion = {
+    initial: { opacity: 0 },
+    animate: { opacity: 1 },
+    exit: { opacity: 0, transition: { duration: 0.18, ease: EASE_OUT } },
+    transition: { duration: 0.25, ease: EASE_OUT },
+  };
+  const cardMotion = {
+    initial: {
+      opacity: 0,
+      transform: reduceMotion ? "scale(1)" : "scale(0.96)",
+    },
+    animate: { opacity: 1, transform: "scale(1)" },
+    exit: {
+      opacity: 0,
+      transform: reduceMotion ? "scale(1)" : "scale(0.96)",
+      transition: { duration: 0.18, ease: EASE_OUT },
+    },
+    transition: { duration: 0.25, ease: EASE_OUT },
+  };
 
   const handleSave = () => {
     save(selections);
@@ -290,15 +332,19 @@ export function CookieConsentBanner() {
   };
 
   /* ── Details dialog ── */
-  if (showDetails) {
-    return (
-      <div
+  const details = (
+      <motion.div
+        key="details"
+        {...backdropMotion}
         className="fixed inset-0 z-[9999] flex items-end justify-center bg-black/70 p-4 backdrop-blur-sm sm:items-center"
         role="dialog"
         aria-modal="true"
         aria-label="Cookie-innstillinger"
       >
-        <div className="flex max-h-[90dvh] w-full max-w-[640px] flex-col rounded-[16px] border border-[#2a2a2a] bg-[#161616] shadow-[0_24px_64px_rgba(0,0,0,0.7)]">
+        <motion.div
+          {...cardMotion}
+          className="flex max-h-[90dvh] w-full max-w-[640px] flex-col rounded-[16px] border border-[#2a2a2a] bg-[#161616] shadow-[0_24px_64px_rgba(0,0,0,0.7)]"
+        >
           {/* Header */}
           <div className="flex items-center gap-3 border-b border-[#2a2a2a] px-6 py-5">
             <div className="flex h-8 w-8 items-center justify-center rounded-[8px] bg-white/[0.08]">
@@ -364,18 +410,19 @@ export function CookieConsentBanner() {
               </button>
             </div>
           </div>
-        </div>
-      </div>
-    );
-  }
+        </motion.div>
+      </motion.div>
+  );
 
   /* ── Initial banner strip ── */
-  return (
-    <div
+  const strip = (
+    <motion.div
+      key="strip"
+      {...stripMotion}
       role="dialog"
       aria-modal="false"
       aria-label="Cookie-samtykke"
-      className="fixed bottom-0 inset-x-0 z-[9999] px-4 pb-4 sm:px-6 transition-[opacity,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+      className="fixed bottom-0 inset-x-0 z-[9999] px-4 pb-4 sm:px-6"
     >
       <div className="mx-auto max-w-[960px] rounded-[12px] border border-[#2a2a2a] bg-[#161616] p-5 shadow-[0_-4px_32px_rgba(0,0,0,0.6)]">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6">
@@ -423,6 +470,10 @@ export function CookieConsentBanner() {
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
+  );
+
+  return (
+    <AnimatePresence>{open ? (showDetails ? details : strip) : null}</AnimatePresence>
   );
 }

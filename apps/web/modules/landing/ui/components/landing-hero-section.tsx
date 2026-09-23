@@ -1,218 +1,209 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
-import Image from "next/image";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence, useReducedMotion } from "motion/react";
+import { motion, useScroll, useTransform } from "motion/react";
+import { ArrowUpRight } from "lucide-react";
 import { AuthAwareLink } from "@/components/auth-aware-link";
+import { heroStories } from "../../hero-stories";
+import { HeroConversation } from "./hero-conversation";
 import {
   LANDING_AUTH_PATHS,
   LANDING_NAV_TONE_BOUNDARY_ID,
   landingSectionHref,
 } from "@/modules/landing/constants";
 
-const HEADLINE = ["En chatbot", "som kjenner", "bedriften din —", "og svarer for deg, hele døgnet."];
-
-const HERO_IMAGES = [
-  { src: "/Produktet/chatwidget.png", alt: "Chat-widget", label: "Chat-widget", position: "[object-position:center_30%]" },
-  { src: "/Produktet/oppsett.png", alt: "Oppsett", label: "Oppsett", position: "object-top" },
-  { src: "/Produktet/kunnskap.png", alt: "Kunnskapsbase", label: "Kunnskapsbase", position: "object-top" },
-  { src: "/Produktet/tilpassning.png", alt: "Tilpasning", label: "Tilpasning", position: "object-top" },
-  { src: "/Produktet/integregring.png", alt: "Integrasjoner", label: "Integrasjoner", position: "object-top" },
-];
-
+/** The conversation's Remotion timeline owns scene changes for film + UI. */
 export function LandingHeroSection() {
-  const reduceMotion = useReducedMotion();
-  const ease = [0.22, 1, 0.36, 1] as const;
-  const [activeImage, setActiveImage] = useState(0);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  const startInterval = useCallback(() => {
-    if (intervalRef.current) clearInterval(intervalRef.current);
-    if (reduceMotion) return;
-    intervalRef.current = setInterval(() => {
-      setActiveImage((i) => (i + 1) % HERO_IMAGES.length);
-    }, 4500);
-  }, [reduceMotion]);
+  const [activeScene, setActiveScene] = useState(0);
+  const [playingScene, setPlayingScene] = useState<number | null>(null);
+  const [reducedMotion, setReducedMotion] = useState(true);
+  const [paused, setPaused] = useState(false);
+  const [visible, setVisible] = useState(true);
+  const sectionRef = useRef<HTMLElement>(null);
+  /**
+   * Takeover (stingray.no): while the hero scrolls out, the film and the copy
+   * lag behind the page — film at ~0.45×, copy at ~0.6× — so the mascot lid
+   * below slides over them and the copy drifts up past the film. The hero's
+   * overflow clip hides what the lid has covered. Full transform strings on
+   * HTML elements, so Motion runs them on the native ScrollTimeline.
+   */
+  const { scrollYProgress: heroExit } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end start"],
+  });
+  const filmParallax = useTransform(
+    heroExit,
+    [0, 1],
+    ["translate3d(0, 0%, 0)", "translate3d(0, 55%, 0)"],
+  );
+  const copyParallax = useTransform(
+    heroExit,
+    [0, 1],
+    ["translate3d(0, 0%, 0)", "translate3d(0, 40%, 0)"],
+  );
+  const videoRefs = useRef<Array<HTMLVideoElement | null>>([]);
+  const playing = !reducedMotion && !paused && visible;
+  const nextScene = useCallback(
+    () => setActiveScene((scene) => (scene + 1) % heroStories.length),
+    [],
+  );
+  const togglePause = useCallback(() => setPaused((value) => !value), []);
 
   useEffect(() => {
-    startInterval();
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [startInterval]);
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const updatePreference = () => setReducedMotion(mediaQuery.matches);
 
-  const handleTabClick = (i: number) => {
-    setActiveImage(i);
-    startInterval();
-  };
+    updatePreference();
+    mediaQuery.addEventListener("change", updatePreference);
+
+    return () => mediaQuery.removeEventListener("change", updatePreference);
+  }, []);
+
+  useEffect(() => {
+    let inViewport = true;
+    const updateVisibility = () => setVisible(inViewport && !document.hidden);
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        inViewport = entry?.isIntersecting ?? false;
+        updateVisibility();
+      },
+      { threshold: 0.1 },
+    );
+    if (sectionRef.current) observer.observe(sectionRef.current);
+    document.addEventListener("visibilitychange", updateVisibility);
+    updateVisibility();
+    return () => {
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", updateVisibility);
+    };
+  }, []);
+
+  useEffect(() => {
+    videoRefs.current.forEach((video, index) => {
+      if (!video) {
+        return;
+      }
+
+      if (!playing || index !== activeScene) {
+        video.pause();
+
+        if (index !== activeScene) {
+          video.currentTime = 0;
+        }
+
+        return;
+      }
+
+      void video.play().catch(() => undefined);
+    });
+  }, [activeScene, playing]);
 
   return (
     <section
-      className="relative overflow-hidden bg-[#1C1C1C] pt-[4.25rem]"
-      aria-labelledby="landing-hero-heading"
+      ref={sectionRef}
       id={LANDING_NAV_TONE_BOUNDARY_ID}
+      className="agenci-cinematic-hero relative isolate overflow-hidden bg-[#090909] text-white"
+      aria-labelledby="landing-hero-heading"
       data-landing-nav-surface="dark"
     >
-      {/* Orthogonal grid */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{
-          backgroundImage: [
-            "repeating-linear-gradient(0deg, rgba(255,255,255,0.020) 0px, rgba(255,255,255,0.020) 1px, transparent 1px, transparent 72px)",
-            "repeating-linear-gradient(90deg, rgba(255,255,255,0.020) 0px, rgba(255,255,255,0.020) 1px, transparent 1px, transparent 72px)",
-          ].join(", "),
-        }}
-      />
-
-      {/* Subtle top vignette */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(ellipse 60% 35% at 50% 0%, rgba(255,255,255,0.04), transparent)",
-        }}
-      />
-
-      <div className="relative mx-auto max-w-[1200px] px-6 xl:px-8">
-        {/* Badge */}
-        <motion.div
-          initial={reduceMotion ? false : { opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease }}
-          className="pt-16 md:pt-22"
-        >
-          <div className="mb-8 inline-flex items-center gap-2.5 rounded-full border border-white/[0.08] bg-white/[0.04] px-4 py-1.5">
-            <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-white/60" />
-            <span className="text-[12px] font-medium tracking-[0.01em] text-white/48">
-              AI-chat for norske nettsider
-            </span>
-          </div>
-        </motion.div>
-
-        {/* Headline — words stagger in */}
-        <h1
-          id="landing-hero-heading"
-          className="mb-7"
-          aria-label="En chatbot som kjenner bedriften din — og svarer for deg, hele døgnet."
-        >
-          {HEADLINE.map((word, i) => (
-            <motion.span
-              key={word}
-              initial={reduceMotion ? false : { opacity: 0, y: 36 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: 0.72,
-                delay: 0.08 + i * 0.10,
-                ease,
-              }}
-              className="mr-[0.22em] inline-block text-[3rem] font-bold leading-[1.04] tracking-[-0.044em] text-white sm:text-[4rem] md:text-[5rem] lg:text-[5.8rem]"
-            >
-              {word}
-            </motion.span>
-          ))}
-        </h1>
-
-        {/* Subtitle */}
-        <motion.p
-          initial={reduceMotion ? false : { opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.65, delay: 0.45, ease }}
-          className="mb-9 max-w-[450px] text-[17px] leading-[1.62] tracking-[-0.01em] text-[#6B6B6B]"
-        >
-          Kunder som ikke får svar, bytter til konkurrenten. Agenci svarer på spørsmålene dine automatisk — presist, med din kunnskap, hele døgnet.
-        </motion.p>
-
-        {/* CTAs */}
-        <motion.div
-          initial={reduceMotion ? false : { opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.53, ease }}
-          className="mb-14 flex flex-wrap items-center gap-3"
-        >
-          <AuthAwareLink
-            href={LANDING_AUTH_PATHS.signUp}
-            loggedInHref={LANDING_AUTH_PATHS.marketingLoggedInCta}
-            className="inline-flex h-11 items-center justify-center rounded-full bg-white px-7 text-[14px] font-semibold text-[#1C1C1C] transition-all hover:bg-white/90 active:scale-[0.98]"
-          >
-            Start gratis
-          </AuthAwareLink>
-          <Link
-            href={landingSectionHref("contact")}
-            className="inline-flex h-11 items-center justify-center rounded-full border border-white/[0.10] px-7 text-[14px] font-medium text-white/52 transition-all hover:border-white/[0.20] hover:text-white/78"
-          >
-            Book en demo
-          </Link>
-        </motion.div>
-
-      </div>
-
-      {/* Product screenshot */}
       <motion.div
-        initial={reduceMotion ? false : { opacity: 0, y: 28 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.64, ease }}
-        className="relative mx-auto max-w-[1200px]"
+        className="absolute inset-0"
+        aria-hidden="true"
+        style={reducedMotion ? undefined : { transform: filmParallax }}
       >
-        <div className="overflow-hidden border border-b-0 border-white/[0.07] bg-[#111]">
-          <div className="flex h-[30px] shrink-0 items-center gap-[6px] border-b border-white/[0.07] px-4">
-            <span className="size-[7px] rounded-full bg-white/[0.10]" />
-            <span className="size-[7px] rounded-full bg-white/[0.10]" />
-            <span className="size-[7px] rounded-full bg-white/[0.10]" />
-          </div>
-          <div className="flex items-center gap-0 overflow-x-auto border-b border-white/[0.07]">
-            {HERO_IMAGES.map((img, i) => (
-              <button
-                key={img.label}
-                onClick={() => handleTabClick(i)}
-                className={`relative shrink-0 px-4 py-2 text-[11px] font-medium tracking-[0.01em] transition-colors ${
-                  i === activeImage
-                    ? "text-white/80"
-                    : "text-white/25 hover:text-white/50"
-                }`}
-              >
-                {img.label}
-                {i === activeImage && (
-                  <motion.span
-                    layoutId="hero-tab-indicator"
-                    className="absolute inset-x-0 bottom-0 h-[1px] bg-white/40"
-                  />
-                )}
-              </button>
-            ))}
-          </div>
-          <div className="relative h-[min(50vh,520px)] w-full overflow-hidden">
-            <AnimatePresence mode="wait">
-              {HERO_IMAGES.map((img, i) =>
-                i === activeImage ? (
-                  <motion.div
-                    key={img.src}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.7, ease: "easeInOut" }}
-                    className="absolute inset-0"
-                  >
-                    <Image
-                      src={img.src}
-                      alt={img.alt}
-                      fill
-                      sizes="(max-width: 1200px) 100vw, 1200px"
-                      className={`object-cover ${img.position}`}
-                      priority={i === 0}
-                    />
-                  </motion.div>
-                ) : null
-              )}
-            </AnimatePresence>
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-[#F9F9F9] to-transparent"
+        {heroStories.map((scene, index) => (
+          <div key={scene.id} className="absolute inset-0">
+            <img
+              alt=""
+              className={`agenci-cinematic-poster ${
+                activeScene === index ? "is-active" : ""
+              }`}
+              src={scene.posterSrc}
+              style={{ objectPosition: scene.position }}
             />
+            <video
+              ref={(node) => {
+                videoRefs.current[index] = node;
+              }}
+              className={`agenci-cinematic-film ${
+                activeScene === index &&
+                playingScene === index &&
+                !reducedMotion
+                  ? "is-active"
+                  : ""
+              }`}
+              poster={scene.posterSrc}
+              preload={index === 0 ? "auto" : "metadata"}
+              muted
+              playsInline
+              style={{ objectPosition: scene.position }}
+              onPlaying={() => setPlayingScene(index)}
+            >
+              <source src={scene.videoSrc} type="video/mp4" />
+            </video>
+          </div>
+        ))}
+      </motion.div>
+
+      <div
+        className="agenci-cinematic-scrim absolute inset-0"
+        aria-hidden="true"
+      />
+
+      <motion.div
+        className="agenci-cinematic-stage"
+        style={reducedMotion ? undefined : { transform: copyParallax }}
+      >
+        <div className="agenci-cinematic-intro">
+          <h1
+            id="landing-hero-heading"
+            className="agenci-cinematic-title max-w-[11.5ch] text-[clamp(3rem,5.4vw,5.25rem)] leading-[1] text-white"
+          >
+            Svar som føles menneskelige.
+          </h1>
+
+          <p
+            className="agenci-cinematic-copy mt-5 max-w-[38ch] text-[1.0625rem] leading-8 text-white/76 sm:text-[1.125rem]"
+          >
+            Agenci er der når kundene trenger svar — i en samtale, på farten
+            eller hjemme i sofaen.
+          </p>
+
+          <div className="mt-6 flex flex-wrap gap-3">
+            <AuthAwareLink
+              href={LANDING_AUTH_PATHS.signUp}
+              loggedInHref={LANDING_AUTH_PATHS.marketingLoggedInCta}
+              className="agenci-cinematic-primary group inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-6 text-[0.94rem] font-medium"
+            >
+              Kom i gang gratis
+              <ArrowUpRight
+                aria-hidden="true"
+                className="size-4 transition-transform duration-200 ease-out group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+              />
+            </AuthAwareLink>
+            <Link
+              href={landingSectionHref("contact")}
+              className="agenci-cinematic-secondary group inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-6 text-[0.94rem] font-medium"
+            >
+              Snakk med oss
+              <ArrowUpRight
+                aria-hidden="true"
+                className="size-4 transition-transform duration-200 ease-out group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+              />
+            </Link>
           </div>
         </div>
+
+        <HeroConversation
+          activeScene={activeScene}
+          playing={playing}
+          paused={paused}
+          reducedMotion={reducedMotion}
+          onSceneChange={setActiveScene}
+          onTogglePause={togglePause}
+          onComplete={nextScene}
+        />
       </motion.div>
     </section>
   );
