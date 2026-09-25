@@ -93,7 +93,7 @@ export const kickoffAgentOnboarding = mutation({
     const orgId = await getOrgIdOrNull(ctx);
     if (!orgId) {
       throw new ConvexError(
-        "No organization in session. Select an organization in Clerk.",
+        "No organization in session. Select an organization.",
       );
     }
 

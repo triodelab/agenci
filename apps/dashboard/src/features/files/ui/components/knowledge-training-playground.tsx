@@ -1,5 +1,8 @@
-import { useCallback, useMemo, useRef, useState } from "react";
-import { toast } from "sonner";
+import { Button } from "@workspace/ui/components/button";
+import { Input } from "@workspace/ui/components/input";
+import { Skeleton } from "@workspace/ui/components/skeleton";
+import { Textarea } from "@workspace/ui/components/textarea";
+import { cn } from "@workspace/ui/lib/utils";
 import {
   ExternalLinkIcon,
   FileIcon,
@@ -11,18 +14,15 @@ import {
   UploadIcon,
   XIcon,
 } from "lucide-react";
-import { Button } from "@workspace/ui/components/button";
-import { Input } from "@workspace/ui/components/input";
-import { Textarea } from "@workspace/ui/components/textarea";
-import { Skeleton } from "@workspace/ui/components/skeleton";
-import { cn } from "@workspace/ui/lib/utils";
-import { authClient } from "@/lib/auth-client";
-import { getWidgetPreviewUrl } from "@/lib/widget-preview-url";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { toast } from "sonner";
 import {
   useAddWebpageMutation,
   useAgentDocumentsQuery,
   useUploadDocumentMutation,
 } from "@/features/agents/queries/agents-queries";
+import { authClient } from "@/lib/auth-client";
+import { getWidgetPreviewUrl } from "@/lib/widget-preview-url";
 
 const UPLOAD_ACCEPT =
   ".pdf,.doc,.docx,.txt,.md,.markdown,.rtf,.ppt,.pptx,.xls,.xlsx,.csv,.html,.png,.jpg,.jpeg,.webp";
@@ -67,7 +67,10 @@ function PlaygroundSection({
 }) {
   return (
     <section
-      className={cn("app-dashboard-panel overflow-hidden rounded-2xl", className)}
+      className={cn(
+        "app-dashboard-panel overflow-hidden rounded-2xl",
+        className,
+      )}
     >
       {title ? (
         <div className="flex items-center justify-between border-b border-border/50 px-4 py-3">
@@ -152,9 +155,52 @@ export function KnowledgeTrainingPlayground({ agentId }: { agentId: string }) {
     [organization?.id, agentId],
   );
 
+  /**
+   * The preview iframe points at a fixed local port. If the widget dev server
+   * isn't running, some unrelated local project squatting that port would
+   * otherwise render silently inside the knowledge base — so we require a
+   * same-origin handshake from the real widget before trusting the frame,
+   * and never show unverified content.
+   */
+  const [widgetStatus, setWidgetStatus] = useState<
+    "checking" | "ready" | "timeout"
+  >("checking");
+
+  useEffect(() => {
+    if (!widgetUrl) return;
+    setWidgetStatus("checking");
+
+    let expectedOrigin: string;
+    try {
+      expectedOrigin = new URL(widgetUrl).origin;
+    } catch {
+      setWidgetStatus("timeout");
+      return;
+    }
+
+    const onMessage = (event: MessageEvent) => {
+      if (event.origin !== expectedOrigin) return;
+      if (
+        typeof event.data === "object" &&
+        event.data?.type === "agenci-widget-handshake"
+      ) {
+        setWidgetStatus("ready");
+      }
+    };
+    window.addEventListener("message", onMessage);
+
+    const timeout = window.setTimeout(() => {
+      setWidgetStatus((current) => (current === "ready" ? current : "timeout"));
+    }, 4000);
+
+    return () => {
+      window.removeEventListener("message", onMessage);
+      window.clearTimeout(timeout);
+    };
+  }, [widgetUrl, iframeKey]);
+
   const indexed = documents.some((doc) => doc.status === "COMPLETED");
-  const canAddWebpage =
-    isValidHttpUrl(webUrl) && !addWebpage.isPending;
+  const canAddWebpage = isValidHttpUrl(webUrl) && !addWebpage.isPending;
 
   const reloadWidget = useCallback(() => setIframeKey((key) => key + 1), []);
 
@@ -473,15 +519,39 @@ export function KnowledgeTrainingPlayground({ agentId }: { agentId: string }) {
                 "shadow-[0_1px_0_rgba(255,255,255,0.55)_inset,0_12px_40px_-28px_rgba(0,0,0,0.14)]",
               )}
             >
-              <iframe
-                allow="clipboard-read; clipboard-write; microphone"
-                className="block h-[min(640px,calc(100dvh-12rem))] w-full border-0 bg-background"
-                key={iframeKey}
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                src={widgetUrl ?? undefined}
-                title="Agenci chatwidget — forhåndsvisning"
-              />
+              {widgetStatus === "timeout" ? (
+                <div className="flex h-[min(640px,calc(100dvh-12rem))] w-full flex-col items-center justify-center gap-2 bg-background px-8 text-center">
+                  <p className="text-[14px] font-medium text-foreground">
+                    Widget-server svarer ikke
+                  </p>
+                  <p className="text-[12px] leading-relaxed text-muted-foreground">
+                    Fant ingen bekreftelse fra Agenci-widgeten på denne adressen
+                    — vises derfor ikke, i tilfelle noe annet kjører på porten.
+                    Start den med{" "}
+                    <code className="rounded bg-muted px-1 py-0.5 text-[11px]">
+                      bun run dev:widget
+                    </code>{" "}
+                    og trykk «Oppdater».
+                  </p>
+                </div>
+              ) : (
+                <div className="relative">
+                  <iframe
+                    allow="clipboard-read; clipboard-write; microphone"
+                    className="block h-[min(640px,calc(100dvh-12rem))] w-full border-0 bg-background"
+                    key={iframeKey}
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    src={widgetUrl ?? undefined}
+                    title="Agenci chatwidget — forhåndsvisning"
+                  />
+                  {widgetStatus === "checking" ? (
+                    <div className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm">
+                      <RefreshCwIcon className="size-5 animate-spin text-muted-foreground" />
+                    </div>
+                  ) : null}
+                </div>
+              )}
             </div>
           )}
         </div>

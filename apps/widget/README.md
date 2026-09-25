@@ -1,53 +1,37 @@
-# Agenci widget (forhåndsvisning)
+# Agenci widget
 
-Dette er en **egen Next.js-app** som viser chat-widgeten. Den bruker **samme Convex-backend** som `apps/web` (sett `NEXT_PUBLIC_CONVEX_URL`).
+Egen **Vite + React-app** (ingen Next.js) som viser chat-widgeten. Den snakker med
+`apps/server` (Hono, oRPC) — anonyme besøkende identifiseres med en contact session
+(`x-contact-session-id`), ikke innlogging.
 
 ## 1. Miljø
 
-Opprett **`apps/widget/.env.local`** (kopier fra `.env.example`) og sett:
+Valgfritt i `apps/widget/.env`:
 
-- **`NEXT_PUBLIC_CONVEX_URL`** – **nøyaktig samme** URL som `NEXT_PUBLIC_CONVEX_URL` i `apps/web/.env` (og som `CONVEX_URL` i `packages/backend/.env.local`).
+- **`NEXT_PUBLIC_SERVER_URL`** — adressen til `apps/server`. Standard: `http://localhost:3003`.
 
-Feilen `Couldn't parse deployment name your-deployment` betyr at URL-en fortsatt er en **plassholder** – bytt til den ekte `https://….convex.cloud`-adressen og **restart** widget (`Ctrl+C`, deretter `bun dev:widget`).
+## 2. Start lokalt
 
-Convex-actions som `public/organizations.validate` trenger **`CLERK_SECRET_KEY` satt på Convex-deploymenten** (ikke bare lokalt), ellers feiler organisasjonssjekken.
-
-## 2. Start widget lokalt
-
-Fra monorepo-roten:
+Fra monorepo-roten (serveren må kjøre, se rot-`package.json`):
 
 ```bash
-bun dev:widget
-```
-
-Eller:
-
-```bash
-cd apps/widget && bun dev
+bun run dev:widget
 ```
 
 Standardport: **3001**.
 
 ## 3. Åpne widget i nettleseren
 
-Du må sende med **Clerk organization ID** (samme som under **Integrations** i dashboardet):
+Send med organisasjons-ID-en (vises under **Organisasjon** i dashboardet):
 
 ```
-http://localhost:3001/?organizationId=org_xxxxxxxx
+http://localhost:3001/?organizationId=DIN_ORGANISASJONS_ID
 ```
 
-Finn `org_…` i Clerk (Organization → Details) eller kopier fra feltet **Organization ID** på `/integrations` i appen når du er logget inn med valgt org.
+Valgfritt: `&agentId=…` for en bestemt agent (ellers brukes organisasjonens første
+ferdig indekserte agent), og `&playground=1` for forhåndsvisningen i dashboardet.
 
-## 4. Hva du trenger kjørende samtidig
+## 4. Status
 
-| Tjeneste | Kommando | Merknad |
-|----------|----------|--------|
-| Convex backend | `bun dev:backend` (eller `cd packages/backend && npx convex dev`) | Må være koblet til samme deployment som URL-en over |
-| Widget | `bun dev:widget` | Denne appen |
-| Web (valgfritt) | `bun dev:web` | For dashboard, innstillinger, knowledge, osv. |
-
-## 5. Innebyggingskode (`<script>`)
-
-Snippets under **Integrations** peker på en **deployet** `widget.js` (se `NEXT_PUBLIC_WIDGET_EMBED_SCRIPT_URL` i web). For **lokal** testing bruker du URL-en over (`localhost:3001` + `organizationId`), ikke nødvendigvis script-taggen.
-
-Når dere bygger egen produksjons-widget, oppdater embed-URL og deploy widget-appen.
+Chat, besøkende-sesjon og widget-innstillinger går mot `apps/server`. Booking, innboks
+og valg-skjermen er ikke portert ennå (booking flyttes til MCP).

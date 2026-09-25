@@ -9,8 +9,10 @@ export const Route = createFileRoute(
 
 function RouteComponent() {
   return (
-    <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden">
-      <IntegrationsView />
+    <div className="dash-page">
+      <div className="dash-page-box">
+        <IntegrationsView />
+      </div>
     </div>
   );
 }

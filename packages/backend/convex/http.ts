@@ -1,5 +1,3 @@
-import { Webhook } from "svix";
-import type { WebhookEvent } from "@clerk/backend";
 import { httpRouter } from "convex/server";
 import { httpAction } from "./_generated/server";
 import { internal } from "./_generated/api";
@@ -19,33 +17,6 @@ function planFromSubscription(sub: { items?: { data?: Array<{ price?: { id: stri
 }
 
 const http = httpRouter();
-
-// ── Clerk webhook (user sync only) ──────────────────────────────────────────
-
-http.route({
-  path: "/clerk-webhook",
-  method: "POST",
-  handler: httpAction(async (ctx, request) => {
-    const event = await validateClerkRequest(request);
-    if (!event) return new Response("Error occurred", { status: 400 });
-
-    switch (event.type) {
-      case "user.created":
-      case "user.updated":
-        await ctx.runMutation(internal.users.upsertFromClerk, { data: event.data });
-        break;
-      case "user.deleted": {
-        const clerkUserId = event.data.id!;
-        await ctx.runMutation(internal.users.deleteFromClerk, { clerkUserId });
-        break;
-      }
-      default:
-        console.log("Ignored Clerk webhook event", event.type);
-    }
-
-    return new Response(null, { status: 200 });
-  }),
-});
 
 // ── Stripe webhook ───────────────────────────────────────────────────────────
 
@@ -186,22 +157,6 @@ async function verifyStripeSignature(
     return v1Parts.some((v1) => v1.slice(3) === computed);
   } catch {
     return false;
-  }
-}
-
-async function validateClerkRequest(req: Request): Promise<WebhookEvent | null> {
-  const payloadString = await req.text();
-  const svixHeaders = {
-    "svix-id": req.headers.get("svix-id") ?? "",
-    "svix-timestamp": req.headers.get("svix-timestamp") ?? "",
-    "svix-signature": req.headers.get("svix-signature") ?? "",
-  };
-  const wh = new Webhook(process.env.CLERK_WEBHOOK_SECRET ?? "");
-  try {
-    return wh.verify(payloadString, svixHeaders) as unknown as WebhookEvent;
-  } catch (err) {
-    console.error("Error verifying Clerk webhook", err);
-    return null;
   }
 }
 

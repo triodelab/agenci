@@ -1,7 +1,7 @@
 "use client";
 
 import Bowser from "bowser";
-import { useUser } from "@/lib/auth-compat";
+import { useUser } from "@/lib/auth-hooks";
 import {
   Accordion,
   AccordionContent,
@@ -158,7 +158,7 @@ export const ContactPanel = () => {
 
   const contact = detail.contactSession;
   const { label: statusLabel, cls: statusCls } = STATUS_CFG[detail.status];
-  const assignedName = user?.fullName || user?.primaryEmailAddress?.emailAddress || "Ikke tildelt";
+  const assignedName = user?.name || user?.email || "Ikke tildelt";
   const startedAt = new Date(detail._creationTime);
   const displayName = contact.name?.trim() || "Uten navn";
 

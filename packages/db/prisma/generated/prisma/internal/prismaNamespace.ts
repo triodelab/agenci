@@ -408,6 +408,7 @@ export const ModelName = {
   TeamMember: 'TeamMember',
   Member: 'Member',
   Invitation: 'Invitation',
+  ContactSession: 'ContactSession',
   Document: 'Document'
 } as const
 
@@ -424,7 +425,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "agent" | "agentWidgetBrand" | "user" | "session" | "account" | "verification" | "organization" | "team" | "teamMember" | "member" | "invitation" | "document"
+    modelProps: "agent" | "agentWidgetBrand" | "user" | "session" | "account" | "verification" | "organization" | "team" | "teamMember" | "member" | "invitation" | "contactSession" | "document"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1242,6 +1243,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ContactSession: {
+      payload: Prisma.$ContactSessionPayload<ExtArgs>
+      fields: Prisma.ContactSessionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ContactSessionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContactSessionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ContactSessionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContactSessionPayload>
+        }
+        findFirst: {
+          args: Prisma.ContactSessionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContactSessionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ContactSessionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContactSessionPayload>
+        }
+        findMany: {
+          args: Prisma.ContactSessionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContactSessionPayload>[]
+        }
+        create: {
+          args: Prisma.ContactSessionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContactSessionPayload>
+        }
+        createMany: {
+          args: Prisma.ContactSessionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ContactSessionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContactSessionPayload>[]
+        }
+        delete: {
+          args: Prisma.ContactSessionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContactSessionPayload>
+        }
+        update: {
+          args: Prisma.ContactSessionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContactSessionPayload>
+        }
+        deleteMany: {
+          args: Prisma.ContactSessionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ContactSessionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ContactSessionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContactSessionPayload>[]
+        }
+        upsert: {
+          args: Prisma.ContactSessionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContactSessionPayload>
+        }
+        aggregate: {
+          args: Prisma.ContactSessionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateContactSession>
+        }
+        groupBy: {
+          args: Prisma.ContactSessionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ContactSessionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ContactSessionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ContactSessionCountAggregateOutputType> | number
+        }
+      }
+    }
     Document: {
       payload: Prisma.$DocumentPayload<ExtArgs>
       fields: Prisma.DocumentFieldRefs
@@ -1386,6 +1461,7 @@ export const AgentWidgetBrandScalarFieldEnum = {
   fontFamilyPrimary: 'fontFamilyPrimary',
   fontFamilyHeading: 'fontFamilyHeading',
   fontFamilyCode: 'fontFamilyCode',
+  settings: 'settings',
   extractedAt: 'extractedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -1516,6 +1592,22 @@ export const InvitationScalarFieldEnum = {
 export type InvitationScalarFieldEnum = (typeof InvitationScalarFieldEnum)[keyof typeof InvitationScalarFieldEnum]
 
 
+export const ContactSessionScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  agentId: 'agentId',
+  name: 'name',
+  email: 'email',
+  anonymous: 'anonymous',
+  metadata: 'metadata',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ContactSessionScalarFieldEnum = (typeof ContactSessionScalarFieldEnum)[keyof typeof ContactSessionScalarFieldEnum]
+
+
 export const DocumentScalarFieldEnum = {
   id: 'id',
   organizationId: 'organizationId',
@@ -1542,6 +1634,14 @@ export const SortOrder = {
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
+export const NullableJsonNullValueInput = {
+  DbNull: DbNull,
+  JsonNull: JsonNull
+} as const
+
+export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
 export const QueryMode = {
   default: 'default',
   insensitive: 'insensitive'
@@ -1556,6 +1656,15 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
 
 
@@ -1603,6 +1712,20 @@ export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel
  * Reference to a field of type 'DateTime[]'
  */
 export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Json'
+ */
+export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+/**
+ * Reference to a field of type 'QueryMode'
+ */
+export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
     
 
 
@@ -1830,6 +1953,7 @@ export type GlobalOmitConfig = {
   teamMember?: Prisma.TeamMemberOmit
   member?: Prisma.MemberOmit
   invitation?: Prisma.InvitationOmit
+  contactSession?: Prisma.ContactSessionOmit
   document?: Prisma.DocumentOmit
 }
 

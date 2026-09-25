@@ -10,8 +10,10 @@ export const Route = createFileRoute(
 function RouteComponent() {
   const { agentId } = Route.useParams();
   return (
-    <div className="flex h-full min-h-0 flex-1 flex-col">
-      <FilesView agentId={agentId} />
+    <div className="dash-page">
+      <div className="dash-page-box">
+        <FilesView agentId={agentId} />
+      </div>
     </div>
   );
 }

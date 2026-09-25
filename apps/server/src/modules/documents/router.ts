@@ -77,8 +77,14 @@ export const documentsRouter = {
       if (!document) {
         throw new ORPCError("NOT_FOUND", { message: "Document not found" });
       }
-      await deleteFile(document.s3Key ?? "");
-      
+      if (document.s3Key) await deleteFile(document.s3Key);
+
+      // Remove the embedded chunks too, so the agent stops answering from a
+      // source that no longer exists.
+      await prisma.$executeRaw`DELETE FROM embeddings WHERE metadata->>'documentId' = ${document.id}`.catch(
+        () => 0,
+      );
+
       await prisma.document.delete({ where: { id: input.documentId } });
       return { success: true };
     }),

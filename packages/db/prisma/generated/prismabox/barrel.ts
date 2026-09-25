@@ -13,6 +13,7 @@ export * from "./Team";
 export * from "./TeamMember";
 export * from "./Member";
 export * from "./Invitation";
+export * from "./ContactSession";
 export * from "./Document";
 export * from "./__nullable__";
 export * from "./__transformDate__";

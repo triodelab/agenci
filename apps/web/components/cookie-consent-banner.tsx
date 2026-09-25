@@ -40,18 +40,11 @@ const CATEGORIES: Category[] = [
       "Disse informasjonskapslene er nødvendige for at nettsiden skal fungere og kan ikke deaktiveres. De settes vanligvis kun som svar på handlinger du gjør, f.eks. innlogging, lagring av preferanser eller utfylling av skjemaer.",
     cookies: [
       {
-        name: "__session",
-        provider: "Clerk (clerk.com)",
-        purpose: "Holder deg innlogget. Inneholder kryptert sesjonstoken.",
+        name: "better-auth.session_token",
+        provider: "Agenci",
+        purpose: "Holder deg innlogget. Inneholder et signert sesjonstoken.",
         type: "HTTP-cookie",
-        duration: "Økt",
-      },
-      {
-        name: "__client_uat",
-        provider: "Clerk (clerk.com)",
-        purpose: "Brukes av Clerk for å verifisere at klientsesjonen er gyldig og oppdatert.",
-        type: "HTTP-cookie",
-        duration: "1 år",
+        duration: "7 dager",
       },
       {
         name: "agenci_cookie_consent",

@@ -1,6 +1,5 @@
 /**
- * Task 1.2 — AuthGuard uses Better Auth session instead of Convex Authenticated/Unauthenticated
- * (those depended on Clerk JWT via ConvexProviderWithClerk).
+ * AuthGuard gates children on the Better Auth session.
  */
 "use client";
 

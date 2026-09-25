@@ -1,9 +1,8 @@
 /**
  * Task 1.2 — Root providers.
  *
- * ClerkThemeProvider + ConvexProviderWithClerk removed.
- * Convex stays as a plain provider until Phase 5/8 API cutover (data still on Convex).
  * Auth identity is Better Auth only (cookies via /api/auth rewrite).
+ * Convex stays as a plain provider until Phase 5/8 API cutover (data still on Convex).
  */
 "use client";
 

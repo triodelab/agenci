@@ -21,6 +21,13 @@ export const AgentWidgetBrandPlain = t.Object(
     fontFamilyPrimary: __nullable__(t.String()),
     fontFamilyHeading: __nullable__(t.String()),
     fontFamilyCode: __nullable__(t.String()),
+    settings: __nullable__(
+      t.Any({
+        description: `Customer's own widget customization (appearance overrides, title,
+greeting, suggestions, branding toggle). Brand columns above stay the
+extracted defaults; \`settings\` wins where set.`,
+      }),
+    ),
     extractedAt: t.Date(),
     createdAt: t.Date(),
     updatedAt: t.Date(),
@@ -76,6 +83,15 @@ export const AgentWidgetBrandPlainInputCreate = t.Object(
     fontFamilyPrimary: t.Optional(__nullable__(t.String())),
     fontFamilyHeading: t.Optional(__nullable__(t.String())),
     fontFamilyCode: t.Optional(__nullable__(t.String())),
+    settings: t.Optional(
+      __nullable__(
+        t.Any({
+          description: `Customer's own widget customization (appearance overrides, title,
+greeting, suggestions, branding toggle). Brand columns above stay the
+extracted defaults; \`settings\` wins where set.`,
+        }),
+      ),
+    ),
     extractedAt: t.Optional(t.Date()),
   },
   {
@@ -98,6 +114,15 @@ export const AgentWidgetBrandPlainInputUpdate = t.Object(
     fontFamilyPrimary: t.Optional(__nullable__(t.String())),
     fontFamilyHeading: t.Optional(__nullable__(t.String())),
     fontFamilyCode: t.Optional(__nullable__(t.String())),
+    settings: t.Optional(
+      __nullable__(
+        t.Any({
+          description: `Customer's own widget customization (appearance overrides, title,
+greeting, suggestions, branding toggle). Brand columns above stay the
+extracted defaults; \`settings\` wins where set.`,
+        }),
+      ),
+    ),
     extractedAt: t.Optional(t.Date()),
   },
   {
@@ -171,6 +196,11 @@ export const AgentWidgetBrandWhere = t.Partial(
           fontFamilyPrimary: t.String(),
           fontFamilyHeading: t.String(),
           fontFamilyCode: t.String(),
+          settings: t.Any({
+            description: `Customer's own widget customization (appearance overrides, title,
+greeting, suggestions, branding toggle). Brand columns above stay the
+extracted defaults; \`settings\` wins where set.`,
+          }),
           extractedAt: t.Date(),
           createdAt: t.Date(),
           updatedAt: t.Date(),
@@ -234,6 +264,11 @@ export const AgentWidgetBrandWhereUnique = t.Recursive(
               fontFamilyPrimary: t.String(),
               fontFamilyHeading: t.String(),
               fontFamilyCode: t.String(),
+              settings: t.Any({
+                description: `Customer's own widget customization (appearance overrides, title,
+greeting, suggestions, branding toggle). Brand columns above stay the
+extracted defaults; \`settings\` wins where set.`,
+              }),
               extractedAt: t.Date(),
               createdAt: t.Date(),
               updatedAt: t.Date(),
@@ -266,6 +301,7 @@ export const AgentWidgetBrandSelect = t.Partial(
       fontFamilyPrimary: t.Boolean(),
       fontFamilyHeading: t.Boolean(),
       fontFamilyCode: t.Boolean(),
+      settings: t.Boolean(),
       extractedAt: t.Boolean(),
       createdAt: t.Boolean(),
       updatedAt: t.Boolean(),
@@ -334,6 +370,9 @@ export const AgentWidgetBrandOrderBy = t.Partial(
         additionalProperties: false,
       }),
       fontFamilyCode: t.Union([t.Literal("asc"), t.Literal("desc")], {
+        additionalProperties: false,
+      }),
+      settings: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
       extractedAt: t.Union([t.Literal("asc"), t.Literal("desc")], {

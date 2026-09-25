@@ -4,7 +4,7 @@ type AuthCtx = QueryCtx | MutationCtx | ActionCtx;
 
 /**
  * Leser org fra JWT (Convex `UserIdentity` speiler custom claims).
- * Støtter både `orgId` og `org_id` m.m. — se docs/CONVEX_CLERK_JWT.md
+ * Støtter både `orgId` og `org_id` m.m.
  */
 export async function getOrgIdOrNull(ctx: AuthCtx): Promise<string | null> {
   const identity = await ctx.auth.getUserIdentity();
@@ -25,7 +25,7 @@ export async function getOrgIdOrNull(ctx: AuthCtx): Promise<string | null> {
   return null;
 }
 
-/** E-post fra Clerk JWT (Convex identity), brukes bl.a. til dev team-tilgang for abonnement. */
+/** E-post fra JWT-identiteten, brukes bl.a. til dev team-tilgang for abonnement. */
 export async function getUserEmailOrNull(ctx: AuthCtx): Promise<string | null> {
   const identity = await ctx.auth.getUserIdentity();
   if (!identity) return null;

@@ -1,7 +1,3 @@
-
-# clerk configuration (can include secrets)
-/.clerk/
-
 # Kommersielle skrifter (Gellix, Lineto Circular): repoet er offentlig, så kun
 # filene nettsiden og widgeten faktisk laster ligger i git (app/layout.tsx og
 # apps/widget/app/layout.tsx). Resten av familiene ligger lokalt, utenfor git.

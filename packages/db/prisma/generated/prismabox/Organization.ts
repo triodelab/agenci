@@ -119,6 +119,31 @@ export const OrganizationRelations = t.Object(
       ),
       { additionalProperties: false },
     ),
+    contactSessions: t.Array(
+      t.Object(
+        {
+          id: t.String(),
+          organizationId: t.String(),
+          agentId: __nullable__(t.String()),
+          name: __nullable__(t.String()),
+          email: __nullable__(t.String()),
+          anonymous: t.Boolean(),
+          metadata: __nullable__(t.Any()),
+          expiresAt: t.Date(),
+          createdAt: t.Date(),
+          updatedAt: t.Date(),
+        },
+        {
+          additionalProperties: false,
+          description: `Widget visitor identity — no Better Auth session; anonymous website
+visitors are scoped by this token + org (docs/task.md Phase 4, Task 4.1).
+Conversation history itself lives in Mastra's own thread memory, keyed by
+\`${organizationId}:contact:${contactSession.id}\` + a client-generated
+threadId — this table only tracks the visitor and their contact info.`,
+        },
+      ),
+      { additionalProperties: false },
+    ),
   },
   { additionalProperties: false },
 );
@@ -212,6 +237,22 @@ export const OrganizationRelationsInputCreate = t.Object(
       ),
     ),
     agents: t.Optional(
+      t.Object(
+        {
+          connect: t.Array(
+            t.Object(
+              {
+                id: t.String({ additionalProperties: false }),
+              },
+              { additionalProperties: false },
+            ),
+            { additionalProperties: false },
+          ),
+        },
+        { additionalProperties: false },
+      ),
+    ),
+    contactSessions: t.Optional(
       t.Object(
         {
           connect: t.Array(
@@ -359,6 +400,31 @@ export const OrganizationRelationsInputUpdate = t.Partial(
           { additionalProperties: false },
         ),
       ),
+      contactSessions: t.Partial(
+        t.Object(
+          {
+            connect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+            disconnect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+          },
+          { additionalProperties: false },
+        ),
+      ),
     },
     { additionalProperties: false },
   ),
@@ -447,6 +513,7 @@ export const OrganizationSelect = t.Partial(
       invitations: t.Boolean(),
       documents: t.Boolean(),
       agents: t.Boolean(),
+      contactSessions: t.Boolean(),
       _count: t.Boolean(),
     },
     { additionalProperties: false },
@@ -461,6 +528,7 @@ export const OrganizationInclude = t.Partial(
       invitations: t.Boolean(),
       documents: t.Boolean(),
       agents: t.Boolean(),
+      contactSessions: t.Boolean(),
       _count: t.Boolean(),
     },
     { additionalProperties: false },

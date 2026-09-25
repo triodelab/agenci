@@ -1,12 +1,9 @@
+/**
+ * Legacy Convex backend — no identity provider is configured, so
+ * `ctx.auth.getUserIdentity()` returns null. Auth lives in Better Auth
+ * (`@agenci/auth`) on apps/server; this package is kept only until the
+ * remaining dashboard features are ported (see docs/task.md Phase 9).
+ */
 export default {
-  providers: [
-    {
-      // Replace with your own Clerk Issuer URL from your "convex" JWT template
-      // or with `process.env.CLERK_JWT_ISSUER_DOMAIN`
-      // and configure CLERK_JWT_ISSUER_DOMAIN on the Convex Dashboard
-      // See https://docs.convex.dev/auth/clerk#configuring-dev-and-prod-instances
-      domain: process.env.CLERK_JWT_ISSUER_DOMAIN ?? process.env.CLERK_FRONTEND_API_URL,
-      applicationID: "convex",
-    },
-  ]
+  providers: [],
 };

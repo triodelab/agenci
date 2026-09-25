@@ -62,6 +62,7 @@ export const ModelName = {
   TeamMember: 'TeamMember',
   Member: 'Member',
   Invitation: 'Invitation',
+  ContactSession: 'ContactSession',
   Document: 'Document'
 } as const
 
@@ -112,6 +113,7 @@ export const AgentWidgetBrandScalarFieldEnum = {
   fontFamilyPrimary: 'fontFamilyPrimary',
   fontFamilyHeading: 'fontFamilyHeading',
   fontFamilyCode: 'fontFamilyCode',
+  settings: 'settings',
   extractedAt: 'extractedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -242,6 +244,22 @@ export const InvitationScalarFieldEnum = {
 export type InvitationScalarFieldEnum = (typeof InvitationScalarFieldEnum)[keyof typeof InvitationScalarFieldEnum]
 
 
+export const ContactSessionScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  agentId: 'agentId',
+  name: 'name',
+  email: 'email',
+  anonymous: 'anonymous',
+  metadata: 'metadata',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ContactSessionScalarFieldEnum = (typeof ContactSessionScalarFieldEnum)[keyof typeof ContactSessionScalarFieldEnum]
+
+
 export const DocumentScalarFieldEnum = {
   id: 'id',
   organizationId: 'organizationId',
@@ -268,6 +286,14 @@ export const SortOrder = {
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
+export const NullableJsonNullValueInput = {
+  DbNull: DbNull,
+  JsonNull: JsonNull
+} as const
+
+export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
 export const QueryMode = {
   default: 'default',
   insensitive: 'insensitive'
@@ -282,4 +308,13 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 

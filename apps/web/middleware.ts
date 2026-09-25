@@ -1,7 +1,7 @@
 /**
  * Task 1.2 Step 3 — Middleware using Better Auth session cookie / get-session.
  *
- * Replaces `clerkMiddleware`. Session is read via same-origin `/api/auth/get-session`
+ * Session is read via same-origin `/api/auth/get-session`
  * (Next rewrite → Hono) so cookies stay first-party.
  */
 import { NextResponse } from "next/server";
@@ -12,7 +12,6 @@ const PUBLIC_PATHS = [
   "/",
   "/sign-in",
   "/sign-up",
-  "/sso-callback",
   "/priser",
   "/integrasjoner",
   "/hvordan-det-virker",
@@ -35,7 +34,6 @@ const PUBLIC_PATHS = [
 const ORG_FREE_PREFIXES = [
   "/sign-in",
   "/sign-up",
-  "/sso-callback",
   "/onboarding",
   "/integrasjoner",
   "/hvordan-det-virker",
@@ -62,7 +60,7 @@ export default async function middleware(req: NextRequest) {
   const sessionCookie = getSessionCookie(req);
 
   if (isPublic) {
-    // Signed-in users hitting marketing home → dashboard (same behavior as Clerk middleware)
+    // Signed-in users hitting marketing home → dashboard
     if (sessionCookie && pathname === "/") {
       if (req.nextUrl.searchParams.get("from") !== "marketing") {
         // Confirm session is real (cookie alone can be stale)

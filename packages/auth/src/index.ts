@@ -14,14 +14,22 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { organization } from "better-auth/plugins/organization";
 import { ac, admin, member, owner } from "./permissions";
 
+/**
+ * Browser `Origin` headers never carry a trailing slash — strip it so a `.env`
+ * value like `http://localhost:3004/` still matches.
+ */
+function stripTrailingSlash(origin: string): string {
+  return origin.replace(/\/$/, "");
+}
+
 /** Build the allow-list of browser origins that may call `/api/auth/*` with cookies. */
 export function resolveTrustedOrigins(): string[] {
-  const origins = new Set<string>([env.CORS_ORIGIN]);
+  const origins = new Set<string>([stripTrailingSlash(env.CORS_ORIGIN)]);
   if (env.DASHBOARD_ORIGIN) {
-    origins.add(env.DASHBOARD_ORIGIN);
+    origins.add(stripTrailingSlash(env.DASHBOARD_ORIGIN));
   }
   if (env.WIDGET_ORIGIN) {
-    origins.add(env.WIDGET_ORIGIN);
+    origins.add(stripTrailingSlash(env.WIDGET_ORIGIN));
   }
   return [...origins];
 }

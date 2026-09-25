@@ -1,24 +1,18 @@
 {
-  "extends": "@workspace/typescript-config/nextjs.json",
+  "extends": "@agenci/config/tsconfig.base.json",
+  "include": ["src/**/*.ts", "src/**/*.tsx", "vite.config.ts"],
   "compilerOptions": {
-    "baseUrl": ".",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "jsx": "react-jsx",
+    "types": ["vite/client"],
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "noUncheckedSideEffectImports": true,
     "paths": {
-      "@/*": ["./*"],
+      "@/*": ["./src/*"],
       "@workspace/ui/*": ["../../packages/ui/src/*"],
-      "@workspace/backend/*": ["../../packages/backend/convex/*"],
-    },
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ]
+      "@workspace/backend/*": ["../../packages/backend/convex/*"]
+    }
   },
-  "include": [
-    "next-env.d.ts",
-    "next.config.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts"
-  ],
-  "exclude": ["node_modules"]
+  "references": [{ "path": "../server" }]
 }

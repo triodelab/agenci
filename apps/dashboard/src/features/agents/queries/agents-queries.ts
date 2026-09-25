@@ -1,9 +1,9 @@
-import { useAgentDraftStore } from "@/features/agents/store/agent-draft-store";
-import { client } from "@/lib/api";
-import { getQueryClient } from "@/router";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import { toast } from "sonner";
+import { useAgentDraftStore } from "@/features/agents/store/agent-draft-store";
+import { client } from "@/lib/api";
+import { getQueryClient } from "@/router";
 
 export type AgentSummary = {
   id: string;
@@ -48,13 +48,16 @@ export function invalidateAgentsQueries() {
   void queryClient.invalidateQueries({ queryKey: ["agent-documents"] });
 }
 
-export function useAgentsListQuery() {
+export function useAgentsListQuery(opts?: {
+  refetchInterval?: number | false;
+}) {
   return useQuery({
     queryKey: agentsQueryKey,
     queryFn: async () => {
       const { agents } = await client.private.agents.list();
       return agents;
     },
+    refetchInterval: opts?.refetchInterval,
   });
 }
 
@@ -127,17 +130,54 @@ export function useUploadDocumentMutation(agentId: string) {
   });
 }
 
-export function useCreateAgentMutation() {
+export type AgentListItem = NonNullable<
+  ReturnType<typeof useAgentsListQuery>["data"]
+>[number];
+
+export function useUpdateAgentMutation() {
+  return useMutation({
+    mutationFn: (input: { id: string; name: string; description: string }) =>
+      client.private.agents.update(input),
+    onSuccess: () => {
+      invalidateAgentsQueries();
+      toast.success("Agenten er oppdatert");
+    },
+    onError: (error) => {
+      toast.error(queryErrorMessage(error) || "Kunne ikke lagre endringene.");
+    },
+  });
+}
+
+export function useDeleteAgentMutation() {
+  return useMutation({
+    mutationFn: (input: { id: string }) => client.private.agents.delete(input),
+    onSuccess: (_result, { id }) => {
+      const queryClient = getQueryClient();
+      queryClient.setQueryData<AgentListItem[]>(agentsQueryKey, (list) =>
+        list?.filter((a) => a.id !== id),
+      );
+      queryClient.removeQueries({ queryKey: agentQueryKey(id) });
+      queryClient.removeQueries({ queryKey: agentDocumentsQueryKey(id) });
+      invalidateAgentsQueries();
+    },
+    onError: (error) => {
+      toast.error(queryErrorMessage(error) || "Kunne ikke slette agenten.");
+    },
+  });
+}
+
+/**
+ * `stay: true` keeps the user on the onboarding page (it shows the agent
+ * learning) instead of jumping to the agent right away.
+ */
+export function useCreateAgentMutation(opts?: { stay?: boolean }) {
   const navigate = useNavigate();
   const { orgSlug } = useParams({ from: "/_authed/org/$orgSlug" });
   const clearDraft = useAgentDraftStore((s) => s.clearDraft);
 
   return useMutation({
-    mutationFn: (input: {
-      name: string;
-      description: string;
-      url?: string;
-    }) => client.private.agents.create(input),
+    mutationFn: (input: { name: string; description: string; url?: string }) =>
+      client.private.agents.create(input),
     onSuccess: (result) => {
       if (!result.agent) {
         toast.error("Kunne ikke opprette agent.");
@@ -146,6 +186,7 @@ export function useCreateAgentMutation() {
 
       clearDraft();
       invalidateAgentsQueries();
+      if (opts?.stay) return;
       toast.success("Agent opprettet. Kunnskapsbasen hentes i bakgrunnen.");
       void navigate({
         to: "/org/$orgSlug/agents/$agentId",

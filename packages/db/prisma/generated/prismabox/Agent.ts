@@ -58,6 +58,13 @@ export const AgentRelations = t.Object(
           fontFamilyPrimary: __nullable__(t.String()),
           fontFamilyHeading: __nullable__(t.String()),
           fontFamilyCode: __nullable__(t.String()),
+          settings: __nullable__(
+            t.Any({
+              description: `Customer's own widget customization (appearance overrides, title,
+greeting, suggestions, branding toggle). Brand columns above stay the
+extracted defaults; \`settings\` wins where set.`,
+            }),
+          ),
           extractedAt: t.Date(),
           createdAt: t.Date(),
           updatedAt: t.Date(),

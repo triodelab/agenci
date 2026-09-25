@@ -1,0 +1,36 @@
+/// Widget visitor identity — no Better Auth session; anonymous website
+/// visitors are scoped by this token + org (docs/task.md Phase 4, Task 4.1).
+/// Conversation history itself lives in Mastra's own thread memory, keyed by
+/// `${organizationId}:contact:${contactSession.id}` + a client-generated
+/// threadId — this table only tracks the visitor and their contact info.
+model ContactSession {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  agentId        String?
+  name           String?
+  email          String?
+  anonymous      Boolean      @default(true)
+  metadata       Json?
+  expiresAt      DateTime
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([organizationId])
+  @@map("contact_sessions")
+}
+
+/// Mastra's own RAG vector store (`@mastra/pg`) creates and owns this table
+/// directly — declared here (as `@@ignore`d) only so Prisma stops proposing
+/// to drop it on `db push`/`migrate`. Never queried through Prisma.
+model Embedding {
+  id        Int                          @id @default(autoincrement())
+  vectorId  String                       @map("vector_id")
+  embedding Unsupported("vector(1536)")?
+  metadata  Json?                        @default("{}")
+  namespace String                       @default("default") @db.VarChar(255)
+
+  @@unique([namespace, vectorId])
+  @@map("embeddings")
+  @@ignore
+}

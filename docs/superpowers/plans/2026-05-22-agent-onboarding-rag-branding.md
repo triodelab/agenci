@@ -76,7 +76,7 @@ git commit -m "feat: add agentBranding table to schema"
 
 ### Background
 The current `scrapeWebsiteUrlFn` has two bugs:
-1. It calls `getOrgIdOrNull(ctx)` — `internalAction` runs server-side with no Clerk JWT, so this always returns null and throws.
+1. It calls `getOrgIdOrNull(ctx)` — `internalAction` runs server-side with no user JWT, so this always returns null and throws.
 2. It returns the raw `BrandingProfile` object which contains `fonts: Array<{ [key: string]: unknown }>` — Convex can't serialize `unknown`-typed fields through workflow steps.
 
 Fix: remove the auth check (orgId is not needed for scraping), and return a flat, serializable branding shape extracted from `BrandingProfile`.

@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { useUser, useClerk, useSession } from "@/lib/auth-compat";
+import { useUser, useAuthActions, useSession } from "@/lib/auth-hooks";
 import { toast } from "sonner";
 import {
   LockIcon, ShieldCheckIcon, KeyRoundIcon, Trash2Icon,
-  MonitorIcon, SmartphoneIcon, GlobeIcon, AlertTriangleIcon,
+  MonitorIcon, SmartphoneIcon, AlertTriangleIcon,
   ExternalLinkIcon, LogOutIcon, ClockIcon, CheckCircle2Icon,
 } from "lucide-react";
 import { cn } from "@workspace/ui/lib/utils";
@@ -74,14 +74,15 @@ function formatDate(ts: number | Date | null | undefined) {
 export function SecurityView() {
   const { user } = useUser();
   const { session } = useSession();
-  const { openUserProfile, signOut } = useClerk();
+  const { goToProfileSettings, signOut } = useAuthActions();
   const [signingOut, setSigningOut] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteInput, setDeleteInput] = useState("");
 
-  const hasPassword = user?.passwordEnabled;
-  const hasTwoFactor = user?.twoFactorEnabled;
-  const lastSignIn = user?.lastSignInAt;
+  // packages/auth enables email + password only (no 2FA plugin yet).
+  const hasPassword = Boolean(user);
+  const hasTwoFactor = false;
+  const lastSignIn = session?.createdAt;
 
   const handleSignOut = async () => {
     setSigningOut(true);
@@ -111,7 +112,7 @@ export function SecurityView() {
           status={hasTwoFactor ? "ok" : "warning"}
           action={
             <button
-              onClick={() => openUserProfile()}
+              onClick={() => goToProfileSettings()}
               className="shrink-0 text-[12px] font-medium text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap"
             >
               {hasTwoFactor ? "Administrer" : "Aktiver 2FA"}
@@ -125,24 +126,10 @@ export function SecurityView() {
           status={hasPassword ? "ok" : "info"}
           action={
             <button
-              onClick={() => openUserProfile()}
+              onClick={() => goToProfileSettings()}
               className="shrink-0 text-[12px] font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               {hasPassword ? "Endre passord" : "Legg til passord"}
-            </button>
-          }
-        />
-        <SecurityRow
-          icon={GlobeIcon}
-          title="Tilkoblede kontoer"
-          description={`${(user?.externalAccounts ?? []).length} OAuth-konto${(user?.externalAccounts ?? []).length !== 1 ? "er" : ""} tilkoblet`}
-          status="info"
-          action={
-            <button
-              onClick={() => openUserProfile()}
-              className="shrink-0 text-[12px] font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Administrer
             </button>
           }
         />
@@ -166,7 +153,7 @@ export function SecurityView() {
                 <div>
                   <p className="text-[13px] font-semibold text-foreground">Nåværende økt</p>
                   <p className="text-[11px] text-muted-foreground">
-                    Aktiv siden {formatDate(session.lastActiveAt)}
+                    Aktiv siden {formatDate(session.createdAt)}
                   </p>
                   {session.expireAt && (
                     <p className="text-[11px] text-muted-foreground/60">
@@ -210,7 +197,7 @@ export function SecurityView() {
             </div>
             <div className="space-y-2">
               {[
-                { label: "E-post verifisert", value: user?.primaryEmailAddress?.verification?.status === "verified" ? "Ja" : "Nei", ok: user?.primaryEmailAddress?.verification?.status === "verified" },
+                { label: "E-post verifisert", value: user?.emailVerified ? "Ja" : "Nei", ok: Boolean(user?.emailVerified) },
                 { label: "Passord aktivert", value: hasPassword ? "Ja" : "Nei", ok: hasPassword },
                 { label: "2FA aktivert", value: hasTwoFactor ? "Ja" : "Nei", ok: hasTwoFactor },
               ].map(({ label, value, ok }) => (
@@ -225,7 +212,7 @@ export function SecurityView() {
           </div>
 
           <button
-            onClick={() => openUserProfile()}
+            onClick={() => goToProfileSettings()}
             className="w-full inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-muted px-4 py-2.5 text-[13px] font-medium text-foreground hover:bg-muted/70 transition-colors"
           >
             <ExternalLinkIcon className="size-4" strokeWidth={1.75} />
@@ -277,8 +264,7 @@ export function SecurityView() {
                       toast.error("Skriv «SLETT» for å bekrefte.");
                       return;
                     }
-                    openUserProfile();
-                    toast.info("Åpne Security → Delete account for å fullføre slettingen.");
+                    toast.info("Kontosletting er ikke aktivert ennå. Kontakt post@triodelab.no.");
                     setShowDeleteConfirm(false);
                     setDeleteInput("");
                   }}

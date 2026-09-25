@@ -4,6 +4,10 @@
  */
 import { ORPCError, os } from "@orpc/server";
 import { AuthError, requireOrgFromHeaders } from "@/lib/session";
+import {
+  ContactSessionError,
+  getContactSessionFromHeaders,
+} from "@/lib/contact-session";
 import type { ApiContext } from "./context";
 
 export const base = os.$context<ApiContext>();
@@ -39,3 +43,26 @@ export const requireOrgMiddleware = base.middleware(
 
 /** Base builder for org-scoped private procedures. */
 export const privateProcedure = base.use(requireOrgMiddleware);
+
+/**
+ * Require a valid widget contact-session (`x-contact-session-id` header).
+ * Injects `contactSession` into context for public/widget procedures.
+ */
+export const requireContactSessionMiddleware = base.middleware(
+  async ({ context, next }) => {
+    try {
+      const contactSession = await getContactSessionFromHeaders(
+        context.headers,
+      );
+      return next({ context: { contactSession } });
+    } catch (error) {
+      if (error instanceof ContactSessionError) {
+        throw new ORPCError("UNAUTHORIZED", { message: error.message });
+      }
+      throw error;
+    }
+  },
+);
+
+/** Base builder for widget/public procedures scoped to a contact session. */
+export const contactProcedure = base.use(requireContactSessionMiddleware);

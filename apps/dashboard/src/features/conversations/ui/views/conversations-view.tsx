@@ -1,34 +1,30 @@
+import { cn } from "@workspace/ui/lib/utils";
 import { InboxIcon } from "lucide-react";
+import { cardClass } from "../components/conversation-ui";
 
 export function ConversationsView() {
   return (
-    <div
-      className="dash-conversations-canvas flex h-full min-h-0 flex-1 flex-col"
-      role="main"
-    >
+    <section className={cn(cardClass, "flex min-h-0 flex-1 flex-col")}>
       <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-6 py-12 sm:px-10">
         <div className="flex w-full max-w-lg flex-col items-center text-center">
           <div
             aria-hidden
-            className="mb-7 flex size-[4.25rem] items-center justify-center rounded-2xl border border-border/80 bg-muted/60 shadow-[0_0_48px_-20px_rgba(0,0,0,0.12)] dark:bg-muted/20"
+            className="mb-6 flex size-16 items-center justify-center rounded-2xl bg-[#f3f5f4] text-(--agenci-ink) dark:bg-white/5"
           >
-            <InboxIcon
-              className="size-[1.65rem] text-foreground/80"
-              strokeWidth={1.65}
-            />
+            <InboxIcon className="size-7" strokeWidth={1.5} />
           </div>
-          <p className="text-[11px] font-semibold tracking-[0.14em] text-muted-foreground uppercase">
+          <p className="text-[12px] font-medium tracking-[0.06em] text-(--agenci-ink-3) uppercase [font-family:var(--font-agenci-data)]">
             Konversasjoner
           </p>
-          <h2 className="mt-2 text-[22px] font-semibold tracking-tight text-foreground sm:text-[24px]">
+          <h2 className="mt-2 text-[24px] font-medium leading-[1.15] tracking-[-0.03em] text-(--agenci-ink) [font-family:var(--font-agenci-title)]">
             Velg en samtale
           </h2>
-          <p className="mt-3 max-w-md text-[14px] leading-relaxed text-muted-foreground">
-            Velg en samtale fra listen for å lese tråden, svare på kunden og gi
-            tilbakemelding på AI-svar.
+          <p className="mt-3 max-w-md text-[14px] leading-relaxed text-(--agenci-ink-2)">
+            Velg en samtale fra listen for å lese tråden, følge opp kunden og
+            sette status.
           </p>
         </div>
       </div>
-    </div>
+    </section>
   );
 }

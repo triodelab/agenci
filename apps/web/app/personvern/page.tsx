@@ -202,9 +202,6 @@ export default function PersonvernPage() {
                 <ListItem label="Convex (USA/EU-west-1)">
                   Primær databaseleverandør. Alle data lagres i EU (Irland, AWS eu-west-1).
                 </ListItem>
-                <ListItem label="Clerk (USA)">
-                  Autentisering og kontoadministrasjon. Dataoverføring skjer i henhold til EUs standardkontraktsklausuler (SCC).
-                </ListItem>
                 <ListItem label="OpenAI (USA)">
                   Behandler samtaleinnhold for å generere AI-svar. Dataoverføring skjer i henhold til SCC. OpenAI beholder ikke data for trening av modeller via API.
                 </ListItem>
@@ -257,7 +254,7 @@ export default function PersonvernPage() {
               <p>Vi bruker følgende teknologier:</p>
               <ul className="mt-2 space-y-2">
                 <ListItem label="Påloggingscookies (nødvendig)">
-                  Clerk setter sesjons-cookies for å holde deg innlogget i dashboardet. Disse er strengt nødvendige og kan ikke deaktiveres.
+                  Vi setter en sesjons-cookie for å holde deg innlogget i dashboardet. Den er strengt nødvendig og kan ikke deaktiveres.
                 </ListItem>
                 <ListItem label="Brukerpreferanser (nødvendig)">
                   En cookie lagrer UI-innstillinger (f.eks. sidemenyens tilstand) for påloggede brukere.

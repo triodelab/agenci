@@ -1,6 +1,6 @@
 /**
  * Task 1.2 — Server-side session helpers for Next.js route handlers / RSC.
- * Replaces `@clerk/nextjs/server` `auth()` for new code paths.
+ * Reads the Better Auth session from request headers.
  */
 import { headers } from "next/headers";
 import { authClient } from "@/lib/auth-client";

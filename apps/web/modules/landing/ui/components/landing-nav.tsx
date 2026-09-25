@@ -9,7 +9,7 @@ import {
   type PointerEvent as ReactPointerEvent,
 } from "react";
 import { Menu, X } from "lucide-react";
-import { useUser } from "@/lib/auth-compat";
+import { useUser } from "@/lib/auth-hooks";
 import { cn } from "@workspace/ui/lib/utils";
 import { AgenciNavWordmark } from "@/components/logo";
 import { AuthAwareLink } from "@/components/auth-aware-link";

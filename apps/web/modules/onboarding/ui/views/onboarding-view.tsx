@@ -2,8 +2,8 @@
 
 import { useAction, useMutation, useQuery } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
-import { Id } from "@workspace/backend/_generated/dataModel";
-import { useAuth, useOrganization } from "@/lib/auth-compat";
+import type { Id } from "@workspace/backend/_generated/dataModel";
+import { useOrganization } from "@/lib/auth-hooks";
 import { authClient } from "@/lib/auth-client";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -944,7 +944,7 @@ function OnboardingWidgetPreview({
 
 // ─── Main view ─────────────────────────────────────────────────────────────
 /**
- * Task 1.2 — Create Better Auth org when none is active (Clerk used to create org earlier).
+ * Create a Better Auth organization when none is active.
  */
 function CreateOrganizationForm() {
   const router = useRouter();
@@ -1065,22 +1065,6 @@ export const OnboardingView = () => {
 
   const done = (s: StepId) =>
     setCompleted((prev) => new Set([...prev, s]));
-
-  const { getToken } = useAuth();
-
-  useEffect(() => {
-    if (!organization || agents !== null) return;
-    const params = new URLSearchParams(
-      typeof window !== "undefined" ? window.location.search : "",
-    );
-    if (params.get("_r")) return;
-    void getToken({ template: "convex", skipCache: true }).then(() => {
-      const url = new URL(window.location.href);
-      url.searchParams.set("_r", "1");
-      window.location.replace(url.toString());
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [organization, agents]);
 
   if (!orgLoaded) {
     return (

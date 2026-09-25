@@ -1,5 +1,5 @@
 /**
- * Task 1.2 — Sign-up via Better Auth email/password (replaces Clerk <SignUp />).
+ * Sign-up via Better Auth email/password.
  */
 "use client";
 

@@ -19,7 +19,7 @@ When a user creates an agent and provides a website URL, the `supportAgentOnboar
 
 ## Known Bug to Fix
 
-`scrapeWebsiteUrlFn` calls `getOrgIdOrNull(ctx)` inside an `internalAction`. Internal actions run server-side with no Clerk JWT, so this always returns null and throws. The fix: remove that call entirely — `orgId` is not needed at scrape time and will be passed as args to downstream steps.
+`scrapeWebsiteUrlFn` calls `getOrgIdOrNull(ctx)` inside an `internalAction`. Internal actions run server-side with no user JWT, so this always returns null and throws. The fix: remove that call entirely — `orgId` is not needed at scrape time and will be passed as args to downstream steps.
 
 ---
 

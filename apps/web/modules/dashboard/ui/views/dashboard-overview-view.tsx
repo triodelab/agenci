@@ -1,6 +1,6 @@
 "use client";
 
-import { useOrganization } from "@/lib/auth-compat";
+import { useOrganization } from "@/lib/auth-hooks";
 import { useQuery } from "convex/react";
 import { usePaginatedQuery } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";

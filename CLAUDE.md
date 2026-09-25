@@ -31,7 +31,7 @@ Frontend:
 * TypeScript
 * Tailwind CSS v4
 * shadcn/ui
-* Better Auth (staff dashboard); Clerk still on legacy Next dashboard
+* Better Auth (`@agenci/auth`) — all authentication
 
 Backend:
 
@@ -196,7 +196,7 @@ For normal development tasks:
 Authentication:
 
 * Use getOrgIdOrNull(ctx)
-* Dashboard routes require Clerk auth
+* Dashboard routes require a Better Auth session (`privateProcedure`)
 * Widget routes use anonymous contact sessions
 
 Knowledge Base:

@@ -1,6 +1,5 @@
 /**
- * Task 1.2 — OrganizationGuard uses Better Auth active organization
- * (replaces Clerk `useOrganization`).
+ * OrganizationGuard uses the Better Auth active organization.
  */
 "use client";
 

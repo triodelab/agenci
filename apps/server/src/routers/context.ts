@@ -3,6 +3,7 @@
  * `requireOrgMiddleware` injects org/user fields for private procedures.
  */
 import type { OrgContext } from "@/lib/session";
+import type { getContactSessionById } from "@/lib/contact-session";
 
 export type ApiContext = {
   /** Incoming request headers (cookies, X-Contact-Session-Id, etc.). */
@@ -16,4 +17,9 @@ export type AuthedApiContext = ApiContext & {
   role: OrgContext["role"];
   user: OrgContext["user"];
   session: OrgContext["session"];
+};
+
+/** Context after `requireContactSessionMiddleware` — available on widget/public procedures. */
+export type ContactApiContext = ApiContext & {
+  contactSession: Awaited<ReturnType<typeof getContactSessionById>>;
 };

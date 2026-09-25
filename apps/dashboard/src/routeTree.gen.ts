@@ -23,6 +23,7 @@ import { Route as AuthedOrgOrgSlugAgentsCreateRouteImport } from './routes/_auth
 import { Route as AuthedOrgOrgSlugAgentsAgentIdIndexRouteImport } from './routes/_authed/org/$orgSlug/agents/$agentId/index'
 import { Route as AuthedOrgOrgSlugAgentsAgentIdSplatRouteImport } from './routes/_authed/org/$orgSlug/agents/$agentId/$'
 import { Route as AuthedOrgOrgSlugAgentsAgentIdConversationsRouteImport } from './routes/_authed/org/$orgSlug/agents/$agentId/conversations'
+import { Route as AuthedOrgOrgSlugAgentsAgentIdCustomizationRouteImport } from './routes/_authed/org/$orgSlug/agents/$agentId/customization'
 import { Route as AuthedOrgOrgSlugAgentsAgentIdFilesRouteImport } from './routes/_authed/org/$orgSlug/agents/$agentId/files'
 import { Route as AuthedOrgOrgSlugAgentsAgentIdIntegrationsRouteImport } from './routes/_authed/org/$orgSlug/agents/$agentId/integrations'
 import { Route as AuthedOrgOrgSlugAgentsAgentIdConversationsIndexRouteImport } from './routes/_authed/org/$orgSlug/agents/$agentId/conversations/index'
@@ -103,6 +104,12 @@ const AuthedOrgOrgSlugAgentsAgentIdConversationsRoute =
     path: '/conversations',
     getParentRoute: () => AuthedOrgOrgSlugAgentsAgentIdRouteRoute,
   } as any)
+const AuthedOrgOrgSlugAgentsAgentIdCustomizationRoute =
+  AuthedOrgOrgSlugAgentsAgentIdCustomizationRouteImport.update({
+    id: '/customization',
+    path: '/customization',
+    getParentRoute: () => AuthedOrgOrgSlugAgentsAgentIdRouteRoute,
+  } as any)
 const AuthedOrgOrgSlugAgentsAgentIdFilesRoute =
   AuthedOrgOrgSlugAgentsAgentIdFilesRouteImport.update({
     id: '/files',
@@ -141,6 +148,7 @@ export interface FileRoutesByFullPath {
   '/org/$orgSlug/agents/': typeof AuthedOrgOrgSlugAgentsIndexRoute
   '/org/$orgSlug/agents/$agentId/$': typeof AuthedOrgOrgSlugAgentsAgentIdSplatRoute
   '/org/$orgSlug/agents/$agentId/conversations': typeof AuthedOrgOrgSlugAgentsAgentIdConversationsRouteWithChildren
+  '/org/$orgSlug/agents/$agentId/customization': typeof AuthedOrgOrgSlugAgentsAgentIdCustomizationRoute
   '/org/$orgSlug/agents/$agentId/files': typeof AuthedOrgOrgSlugAgentsAgentIdFilesRoute
   '/org/$orgSlug/agents/$agentId/integrations': typeof AuthedOrgOrgSlugAgentsAgentIdIntegrationsRoute
   '/org/$orgSlug/agents/$agentId/': typeof AuthedOrgOrgSlugAgentsAgentIdIndexRoute
@@ -156,6 +164,7 @@ export interface FileRoutesByTo {
   '/org/$orgSlug/agents/create': typeof AuthedOrgOrgSlugAgentsCreateRoute
   '/org/$orgSlug/agents': typeof AuthedOrgOrgSlugAgentsIndexRoute
   '/org/$orgSlug/agents/$agentId/$': typeof AuthedOrgOrgSlugAgentsAgentIdSplatRoute
+  '/org/$orgSlug/agents/$agentId/customization': typeof AuthedOrgOrgSlugAgentsAgentIdCustomizationRoute
   '/org/$orgSlug/agents/$agentId/files': typeof AuthedOrgOrgSlugAgentsAgentIdFilesRoute
   '/org/$orgSlug/agents/$agentId/integrations': typeof AuthedOrgOrgSlugAgentsAgentIdIntegrationsRoute
   '/org/$orgSlug/agents/$agentId': typeof AuthedOrgOrgSlugAgentsAgentIdIndexRoute
@@ -177,6 +186,7 @@ export interface FileRoutesById {
   '/_authed/org/$orgSlug/agents/': typeof AuthedOrgOrgSlugAgentsIndexRoute
   '/_authed/org/$orgSlug/agents/$agentId/$': typeof AuthedOrgOrgSlugAgentsAgentIdSplatRoute
   '/_authed/org/$orgSlug/agents/$agentId/conversations': typeof AuthedOrgOrgSlugAgentsAgentIdConversationsRouteWithChildren
+  '/_authed/org/$orgSlug/agents/$agentId/customization': typeof AuthedOrgOrgSlugAgentsAgentIdCustomizationRoute
   '/_authed/org/$orgSlug/agents/$agentId/files': typeof AuthedOrgOrgSlugAgentsAgentIdFilesRoute
   '/_authed/org/$orgSlug/agents/$agentId/integrations': typeof AuthedOrgOrgSlugAgentsAgentIdIntegrationsRoute
   '/_authed/org/$orgSlug/agents/$agentId/': typeof AuthedOrgOrgSlugAgentsAgentIdIndexRoute
@@ -198,6 +208,7 @@ export interface FileRouteTypes {
     | '/org/$orgSlug/agents/'
     | '/org/$orgSlug/agents/$agentId/$'
     | '/org/$orgSlug/agents/$agentId/conversations'
+    | '/org/$orgSlug/agents/$agentId/customization'
     | '/org/$orgSlug/agents/$agentId/files'
     | '/org/$orgSlug/agents/$agentId/integrations'
     | '/org/$orgSlug/agents/$agentId/'
@@ -213,6 +224,7 @@ export interface FileRouteTypes {
     | '/org/$orgSlug/agents/create'
     | '/org/$orgSlug/agents'
     | '/org/$orgSlug/agents/$agentId/$'
+    | '/org/$orgSlug/agents/$agentId/customization'
     | '/org/$orgSlug/agents/$agentId/files'
     | '/org/$orgSlug/agents/$agentId/integrations'
     | '/org/$orgSlug/agents/$agentId'
@@ -233,6 +245,7 @@ export interface FileRouteTypes {
     | '/_authed/org/$orgSlug/agents/'
     | '/_authed/org/$orgSlug/agents/$agentId/$'
     | '/_authed/org/$orgSlug/agents/$agentId/conversations'
+    | '/_authed/org/$orgSlug/agents/$agentId/customization'
     | '/_authed/org/$orgSlug/agents/$agentId/files'
     | '/_authed/org/$orgSlug/agents/$agentId/integrations'
     | '/_authed/org/$orgSlug/agents/$agentId/'
@@ -345,6 +358,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedOrgOrgSlugAgentsAgentIdConversationsRouteImport
       parentRoute: typeof AuthedOrgOrgSlugAgentsAgentIdRouteRoute
     }
+    '/_authed/org/$orgSlug/agents/$agentId/customization': {
+      id: '/_authed/org/$orgSlug/agents/$agentId/customization'
+      path: '/customization'
+      fullPath: '/org/$orgSlug/agents/$agentId/customization'
+      preLoaderRoute: typeof AuthedOrgOrgSlugAgentsAgentIdCustomizationRouteImport
+      parentRoute: typeof AuthedOrgOrgSlugAgentsAgentIdRouteRoute
+    }
     '/_authed/org/$orgSlug/agents/$agentId/files': {
       id: '/_authed/org/$orgSlug/agents/$agentId/files'
       path: '/files'
@@ -397,6 +417,7 @@ const AuthedOrgOrgSlugAgentsAgentIdConversationsRouteWithChildren =
 interface AuthedOrgOrgSlugAgentsAgentIdRouteRouteChildren {
   AuthedOrgOrgSlugAgentsAgentIdSplatRoute: typeof AuthedOrgOrgSlugAgentsAgentIdSplatRoute
   AuthedOrgOrgSlugAgentsAgentIdConversationsRoute: typeof AuthedOrgOrgSlugAgentsAgentIdConversationsRouteWithChildren
+  AuthedOrgOrgSlugAgentsAgentIdCustomizationRoute: typeof AuthedOrgOrgSlugAgentsAgentIdCustomizationRoute
   AuthedOrgOrgSlugAgentsAgentIdFilesRoute: typeof AuthedOrgOrgSlugAgentsAgentIdFilesRoute
   AuthedOrgOrgSlugAgentsAgentIdIntegrationsRoute: typeof AuthedOrgOrgSlugAgentsAgentIdIntegrationsRoute
   AuthedOrgOrgSlugAgentsAgentIdIndexRoute: typeof AuthedOrgOrgSlugAgentsAgentIdIndexRoute
@@ -408,6 +429,8 @@ const AuthedOrgOrgSlugAgentsAgentIdRouteRouteChildren: AuthedOrgOrgSlugAgentsAge
       AuthedOrgOrgSlugAgentsAgentIdSplatRoute,
     AuthedOrgOrgSlugAgentsAgentIdConversationsRoute:
       AuthedOrgOrgSlugAgentsAgentIdConversationsRouteWithChildren,
+    AuthedOrgOrgSlugAgentsAgentIdCustomizationRoute:
+      AuthedOrgOrgSlugAgentsAgentIdCustomizationRoute,
     AuthedOrgOrgSlugAgentsAgentIdFilesRoute:
       AuthedOrgOrgSlugAgentsAgentIdFilesRoute,
     AuthedOrgOrgSlugAgentsAgentIdIntegrationsRoute:

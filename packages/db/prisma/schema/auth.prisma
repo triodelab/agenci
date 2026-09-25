@@ -80,6 +80,7 @@ model Organization {
   invitations Invitation[]
   documents   Document[]
   agents      Agent[]
+  contactSessions ContactSession[]
 
   @@unique([slug])
   @@map("organization")

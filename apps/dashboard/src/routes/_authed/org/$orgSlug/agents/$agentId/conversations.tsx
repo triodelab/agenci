@@ -1,4 +1,4 @@
-import { Outlet, createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { ConversationsLayout } from "@/features/conversations/ui/layouts/conversations-layout";
 
 export const Route = createFileRoute(
@@ -9,7 +9,9 @@ export const Route = createFileRoute(
 
 function RouteComponent() {
   return (
-    <div className="flex h-full min-h-0 flex-1 flex-col">
+    // Free-standing cards directly on the glass (no page box), like the
+    // reference mail layout.
+    <div className="dash-page">
       <ConversationsLayout>
         <Outlet />
       </ConversationsLayout>

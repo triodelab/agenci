@@ -1,5 +1,5 @@
 /**
- * Task 1.2 — Sign-in via Better Auth email/password (Clerk removed).
+ * Sign-in via Better Auth email/password.
  * OAuth buttons are disabled until providers are configured on the server.
  */
 "use client";

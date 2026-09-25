@@ -3,6 +3,7 @@ import { create } from "zustand";
 export type AgentDraft = {
   name: string;
   description: string;
+  url?: string;
 };
 
 type AgentDraftStore = {

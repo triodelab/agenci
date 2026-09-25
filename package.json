@@ -65,7 +65,6 @@
     "bun": ">=1.4.2"
   },
   "trustedDependencies": [
-    "@clerk/shared",
     "@prisma/client",
     "@prisma/engines",
     "@swc/core",

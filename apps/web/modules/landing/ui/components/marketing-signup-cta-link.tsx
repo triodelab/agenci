@@ -13,7 +13,7 @@ type Props = Omit<ComponentProps<typeof AuthAwareLink>, "href" | "loggedInHref">
 };
 
 /**
- * «Opprett konto» / «Kom i gang» som går til Clerk når gjest, men ikke alltid til innboks når innlogget.
+ * «Opprett konto» / «Kom i gang»: til registrering når gjest, men ikke alltid til innboks når innlogget.
  */
 export function MarketingSignupCtaLink({
   loggedInBehavior = "landing",

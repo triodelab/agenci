@@ -1,5 +1,5 @@
 /**
- * Task 1.2 Step 2 — Thin user menu (replaces Clerk UserButton).
+ * Thin user menu backed by Better Auth.
  */
 "use client";
 

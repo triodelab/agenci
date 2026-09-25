@@ -1,8 +1,8 @@
-# Convex + Clerk → Self-Hosted Hono Migration Plan
+# Convex → Self-Hosted Hono Migration Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use `superpowers:subagent-driven-development` (recommended) or `superpowers:executing-plans` to implement this plan phase-by-phase. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Replace Convex and Clerk with a self-hosted Node.js/Hono API (`apps/server`), PostgreSQL + Prisma (`@agenci/db`), and Better Auth (`@agenci/auth`, organizations + teams), while migrating **all** existing Convex data. **Staff UI moves from `apps/web` `(dashboard)` routes to `apps/dashboard` (React + TanStack Router).** Keep `apps/widget` and `apps/embed` working; `apps/web` retains marketing/public pages until those are cut over separately.
+**Goal:** Replace Convex (and its hosted auth) with a self-hosted Node.js/Hono API (`apps/server`), PostgreSQL + Prisma (`@agenci/db`), and Better Auth (`@agenci/auth`, organizations + teams), while migrating **all** existing Convex data. **Staff UI moves from `apps/web` `(dashboard)` routes to `apps/dashboard` (React + TanStack Router).** Keep `apps/widget` and `apps/embed` working; `apps/web` retains marketing/public pages until those are cut over separately.
 
 **Architecture:** Strangler migration. Keep production Convex live until each domain is cut over. New stack is scaffolded (`apps/server`, `@agenci/auth`, `@agenci/db`, `@agenci/env`, Docker Postgres with pgvector). **React dashboard** and widget talk to Hono over HTTP (oRPC). Realtime uses **WebSocket**. Background jobs move from Convex workflows/schedulers to Inngest. RAG moves from `@convex-dev/rag` to pgvector. File storage uses **AWS S3**. Embed stays a thin IIFE that iframes the widget.
 
@@ -97,7 +97,7 @@ Marketing / legacy Next dashboard (temporary)
 | `apps/server/src/lib/s3.ts`                  | S3 upload/download helpers                          |
 | `apps/server/src/routers/private/*`          | Org-scoped dashboard APIs (ex-`api.private.*`)      |
 | `apps/server/src/routers/public/*`           | Widget/public APIs (ex-`api.public.*`)              |
-| `apps/server/src/routers/webhooks/*`         | Stripe (+ optional legacy Clerk during transition)  |
+| `apps/server/src/routers/webhooks/*`         | Stripe                                              |
 | `apps/server/src/inngest/*`                  | Background job functions                            |
 | `apps/server/src/ai/*`                       | Mastra adapter + RAG helpers                        |
 | `packages/mastra/`                           | Mastra agents/workflows (e-commerce + healthcare)   |
@@ -112,7 +112,7 @@ Marketing / legacy Next dashboard (temporary)
 | `apps/server/src/lib/ws-protocol.ts`          | WS protocol (clients import `server/ws`)                      |
 | `apps/web/components/providers.tsx`          | Better Auth + oRPC + WS clients                     |
 | `apps/web/middleware.ts`                     | Better Auth session / org gate                      |
-| `apps/widget/components/providers.tsx`       | oRPC + WebSocket (no Clerk)                         |
+| `apps/widget/components/providers.tsx`       | oRPC + WebSocket                                    |
 | `packages/backend/`                          | Freeze feature work; remove only in Phase 9         |
 
 ---
@@ -121,13 +121,13 @@ Marketing / legacy Next dashboard (temporary)
 
 ### Auth & tenancy
 
-| Convex / Clerk today                | Target                                           |
+| Convex / legacy auth today          | Target                                           |
 | ----------------------------------- | ------------------------------------------------ |
-| Clerk users + orgs                  | Better Auth `user` + `organization` + **teams**  |
+| Legacy hosted users + orgs          | Better Auth `user` + `organization` + **teams**  |
 | JWT template `convex` + `orgId`     | Session cookie + active organization             |
 | `getOrgIdOrNull(ctx)`               | `requireOrgSession(request)`                     |
 | `api.public.organizations.validate` | Public org lookup by id/slug in Postgres         |
-| `users` table (`clerk_id`)          | Better Auth user; mapping table during migration |
+| `users` table (`auth_subject`)      | Better Auth user; mapping table during migration |
 
 ### Core product tables (`packages/backend/convex/schema.ts`)
 
@@ -143,7 +143,7 @@ Marketing / legacy Next dashboard (temporary)
 
 ### System / AI / jobs
 
-`system/ai/*`, `system/onboarding`, `system/websites`, `system/bookings`, `system/secrets`, Stripe/Clerk HTTP webhooks → Fastify + Inngest.
+`system/ai/*`, `system/onboarding`, `system/websites`, `system/bookings`, `system/secrets`, Stripe HTTP webhooks → Fastify + Inngest.
 
 ### Frontend touch surface
 
@@ -194,7 +194,7 @@ Marketing / legacy Next dashboard (temporary)
 
 ## Phase 1 — Auth Cutover (Web Dashboard Identity)
 
-**Goal:** Staff sign in with Better Auth instead of Clerk; org + teams membership works.
+**Goal:** Staff sign in with Better Auth; org + teams membership works.
 
 ### Task 1.1 — Harden `@agenci/auth` for Agenci orgs + teams
 
@@ -212,24 +212,23 @@ Marketing / legacy Next dashboard (temporary)
 
 ---
 
-### Task 1.2 — Wire web app to Better Auth (replace Clerk)
+### Task 1.2 — Wire web app to Better Auth
 
 **Files:**
 
 - Modify: `apps/web/components/providers.tsx`
-- Modify: `apps/web/components/clerk-theme-provider.tsx` (remove/replace)
 - Modify: `apps/web/middleware.ts`
 - Modify: `apps/web/modules/auth/**`
 - Modify: `apps/web/package.json`
 - Env: `NEXT_PUBLIC_SERVER_URL` (e.g. `http://localhost:3003`)
 
 - [x] **Step 1:** Add Better Auth client pointing at `${SERVER_URL}/api/auth`.
-- [x] **Step 2:** Replace `ClerkProvider` / org switcher with Better Auth organization (+ team) UI or thin Norwegian custom UI.
+- [x] **Step 2:** Replace the legacy auth provider / org switcher with Better Auth organization (+ team) UI or thin Norwegian custom UI.
 - [x] **Step 3:** Middleware: protect dashboard routes using Better Auth session cookie.
-- [x] **Step 4:** Remove Clerk→Convex `UserSync`; use server-side session user.
-- [x] **Step 5:** Remove or gate Clerk packages once shell works.
+- [x] **Step 4:** Remove the legacy user sync into Convex; use server-side session user.
+- [x] **Step 5:** Remove the legacy auth packages once shell works.
 
-**Done when:** User can sign up, sign in, create org, open dashboard shell without Clerk.
+**Done when:** User can sign up, sign in, create org, open dashboard shell on Better Auth only.
 
 ---
 
@@ -267,7 +266,7 @@ Marketing / legacy Next dashboard (temporary)
 - [x] **Step 4:** Invite member by email/role; show accept link in UI (email provider optional in dev).
 - [x] **Step 5:** Accept invitation route; cancel pending invites for admins/owners.
 
-**Done when:** User can register, create org, invite a teammate, accept invite, and land in `/app` without Clerk/Next dashboard.
+**Done when:** User can register, create org, invite a teammate, accept invite, and land in `/app` without the Next dashboard.
 
 ---
 
@@ -377,15 +376,15 @@ Port tables (Convex `Id<"…">` → UUID/`cuid`; `organizationId` → Better Aut
 
 ---
 
-### Task 3.2 — Clerk → Better Auth identity mapping
+### Task 3.2 — Legacy identity → Better Auth mapping
 
 **Files:**
 
 - Create: mapping table / script under `packages/db/scripts/`
 - Create: `packages/db/scripts/migrate-identities.ts`
 
-- [ ] **Step 1:** Export Clerk users/orgs/memberships (or derive from Convex `organizationId` + `users.clerk_id`).
-- [ ] **Step 2:** Create Better Auth users/orgs/members/teams; write `clerkUserId` / `clerkOrgId` → new id map.
+- [ ] **Step 1:** Export legacy users/orgs/memberships (or derive from Convex `organizationId` + `users.auth_subject`).
+- [ ] **Step 2:** Create Better Auth users/orgs/members/teams; write legacy user/org id → new id map.
 - [ ] **Step 3:** Verify every production org has a Better Auth org id.
 
 **Done when:** Identity map is complete and verified on staging.
@@ -471,7 +470,7 @@ Parity with `api.public.organizations.validate` and `api.public.contactSessions.
 
 ## Phase 5 — Dashboard Private API Cutover
 
-**Goal:** Web dashboard reads/writes Postgres via `private.*`; Clerk/Convex unused for product data.
+**Goal:** Web dashboard reads/writes Postgres via `private.*`; Convex unused for product data.
 
 ### Task 5.1 — Agents, widget settings, dashboard overview
 
@@ -644,7 +643,7 @@ Widget/Dashboard → Fastify (auth, oRPC, WS, Prisma)
 ### Task 7.2 — HTTP webhooks
 
 - [ ] Stripe on Fastify (Task 5.5).
-- [ ] Remove Clerk webhook once auth cut over (`packages/backend/convex/http.ts`).
+- [x] Remove the legacy auth webhook (`packages/backend/convex/http.ts`).
 - [ ] Booking cancel-by-token public page on web → Fastify public procedure.
 
 **Done when:** No runtime dependency on Convex `http.ts`.
@@ -661,7 +660,7 @@ Widget/Dashboard → Fastify (auth, oRPC, WS, Prisma)
 
 ---
 
-## Phase 8 — De-Clerk / De-Convex Frontends
+## Phase 8 — De-Convex Frontends
 
 ### Task 8.1 — Remove Convex from widget
 
@@ -672,10 +671,10 @@ Widget/Dashboard → Fastify (auth, oRPC, WS, Prisma)
 
 ---
 
-### Task 8.2 — Remove Convex + Clerk from web
+### Task 8.2 — Remove Convex from web
 
-- [ ] Remove `ConvexProviderWithClerk`, Clerk middleware, Clerk packages.
-- [ ] Remove `NEXT_PUBLIC_CLERK_*`, Convex URL.
+- [x] Remove the legacy auth provider, middleware and packages.
+- [ ] Remove `NEXT_PUBLIC_CONVEX_URL` (legacy auth env vars already removed).
 - [ ] Update Integrations docs only if server/widget URLs changed (embed script behavior unchanged).
 
 **Done when:** Web builds and runs with Better Auth + oRPC + WS only.
@@ -699,8 +698,8 @@ Widget/Dashboard → Fastify (auth, oRPC, WS, Prisma)
 - [ ] Stop `convex dev` / deploy; archive `packages/backend`.
 - [ ] Remove root scripts `dev:backend`, verify scripts that call Convex.
 - [ ] Remove Convex catalog dependency if unused.
-- [ ] Archive Convex-specific docs (`packages/backend/docs/CONVEX_CLERK_JWT.md`).
-- [ ] Final env scrub: `CLERK_*`, `CONVEX_*` from all apps and secret stores.
+- [x] Archive Convex auth docs.
+- [ ] Final env scrub: `CONVEX_*` from all apps and secret stores.
 
 **Done when:** Repo has no Convex runtime dependency.
 
@@ -720,7 +719,7 @@ Widget/Dashboard → Fastify (auth, oRPC, WS, Prisma)
 |     8 | 1.5   | Port `web/(dashboard)` features → Solid as APIs land         |
 |     9 | 6     | **Mastra** (`@agenci/mastra`) + Inngest + pgvector RAG       |
 |    10 | 7     | WS/webhooks/ops hardening                                    |
-|    11 | 8     | Remove Clerk/Convex; strip Next `(dashboard)`                |
+|    11 | 8     | Remove Convex; strip Next `(dashboard)`                      |
 |    12 | 9     | Archive `@agenci/backend`                                    |
 
 ---
@@ -759,7 +758,7 @@ bun --filter embed dev:embed     # :3002
 | Loss of Convex reactivity          | WebSocket channels + reconnect; short poll fallback only if needed |
 | Better Auth cookies on localhost   | Dev-specific cookie attributes; HTTPS preview                      |
 | Message history in Agent component | Explicit `Message` table + thread export in Task 3.3               |
-| Org ID remap Clerk → Better Auth   | Mapping table (Task 3.2) before domain import                      |
+| Org ID remap legacy → Better Auth  | Mapping table (Task 3.2) before domain import                      |
 | S3 credentials / bucket policy     | Dedicated bucket; least-privilege IAM; env in `@agenci/env`        |
 | RAG quality regression             | Golden-question eval set before cutover                            |
 | Stripe/webhook dual-running        | Single webhook endpoint cutover window                             |

@@ -1,5 +1,5 @@
 /**
- * Task 1.2 Step 2 — Thin Norwegian org switcher (replaces Clerk OrganizationSwitcher).
+ * Thin Norwegian org switcher backed by Better Auth.
  */
 "use client";
 

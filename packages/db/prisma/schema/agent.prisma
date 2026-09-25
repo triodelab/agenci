@@ -47,6 +47,10 @@ model AgentWidgetBrand {
   fontFamilyPrimary  String?
   fontFamilyHeading  String?
   fontFamilyCode     String?
+  /// Customer's own widget customization (appearance overrides, title,
+  /// greeting, suggestions, branding toggle). Brand columns above stay the
+  /// extracted defaults; `settings` wins where set.
+  settings           Json?
   extractedAt        DateTime @default(now())
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt

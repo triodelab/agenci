@@ -95,10 +95,9 @@ Alle priser er ekskl. **25 % MVA**. Ingen bindingstid. Bytt plan når som helst.
 
 ### 3.3 Betaling og fakturering
 
-- Betaling skjer via **Clerk Billing** (Stripe under panseret).
-- Faktura vises på `/billing` i dashboardet — der ligger også `OrganizationProfile` og `PricingTable`.
-- For bedrifter uten Clerk Billing aktivert: settes `NEXT_PUBLIC_HIDE_CLERK_BILLING_UI=true` slik at ikke-utviklere får en plassholder i stedet.
-- **Faktiske abonnement** ligger i Convex-tabellen `subscriptions` (`status: "active"|"trialing"|"canceled"|"free"`). Status oppdateres via Clerk webhook (`subscription.updated`).
+- Betaling skjer via **Stripe** (Stripe Checkout for kjøp, Stripe-kundeportalen for faktura og endringer).
+- Planer og faktura vises på `/billing` i dashboardet (egen pristabell + lenke til Stripe-kundeportalen).
+- **Faktiske abonnement** ligger i Convex-tabellen `subscriptions` (`status: "active"|"trialing"|"canceled"|"free"`). Status oppdateres via Stripe-webhook (`/stripe-webhook`).
 
 ### 3.4 Hva krever aktivt abonnement?
 
@@ -262,14 +261,13 @@ For utviklere/team-brukere finnes bypass-mekanismer:
 ### 4.11 Innstillinger
 
 - `/settings` — kontoinnstillinger
-- `/billing` — Clerk OrganizationProfile + PricingTable
+- `/billing` — plan, pristabell og Stripe-kundeportal
 
 ### 4.12 «Slett konto»-flyt
 
 - Endepunkt: `POST /api/account/delete`
-- Krever Clerk-autentisering.
-- Bruker `clerkClient.users.deleteUser(userId)` — Clerk webhook (`user.deleted`) trigger sletting av tilknyttede data i Convex.
-- Returnerer feilmelding med kontakt til `post@triodelab.no` ved feil.
+- Krever innlogget bruker (Better Auth-sesjon).
+- Automatisk kontosletting er ikke aktivert ennå — endepunktet svarer med beskjed om å kontakte `post@triodelab.no`.
 
 ---
 
@@ -291,7 +289,7 @@ For utviklere/team-brukere finnes bypass-mekanismer:
 
 URL-en til `widget.iife.js` kan overstyres med `NEXT_PUBLIC_WIDGET_EMBED_SCRIPT_URL`.
 
-`data-organization-id` finnes på `/integrations` i dashboardet (samme som Clerk Organization ID, format `org_…`).
+`data-organization-id` finnes på `/integrations` i dashboardet (organisasjonens ID, vises også under Organisasjon).
 
 ### 5.3 Settetid
 
@@ -348,8 +346,8 @@ agenci/
 | Skjema | react-hook-form + Zod |
 | State | Jotai (atomer i widget), Convex React queries |
 | Backend (DB + serverless) | Convex (`@convex-dev/agent`, `@convex-dev/rag`) |
-| Auth | Clerk (org-basert, JWT-mal `convex` med `orgId`) |
-| Billing | Clerk Billing (Stripe) |
+| Auth | Better Auth (selvhostet, e-post + passord, organisasjoner med rollene owner/admin/member) |
+| Billing | Stripe (Checkout + kundeportal) |
 | AI / LLM | OpenAI (`gpt-4o-mini`, `gpt-4o`, `text-embedding-3-small`) via `@ai-sdk/openai` + `ai` SDK |
 | Voice | Vapi (`@vapi-ai/server-sdk`) |
 | Secrets | AWS Secrets Manager (kun Vapi-credentials) |
@@ -366,7 +364,7 @@ Hovedtabeller (`packages/backend/convex/schema.ts`):
 - **`plugins`** — `organizationId`, `service: "vapi"`, `secretName`. Indexes: `by_organization_id`, `by_organization_id_and_service`.
 - **`conversations`** — `agentId`, `threadId`, `organizationId`, `contactSessionId`, `status` (`unresolved`/`escalated`/`resolved`). Indexes: by org, by contact session, by thread, by status+org, by agent, by agent+status.
 - **`contactSessions`** — `name`, `email`, `organizationId`, `expiresAt`, `metadata` (userAgent, language, timezone, referrer, currentUrl + valgfri detaljerte felt). Indexes: by org, by expires_at.
-- **`users`** — `name`, `email`, `clerk_id`. Index: `by_clerk_id`.
+- **`users`** — `name`, `email`, `auth_subject`. Index: `by_auth_subject`.
 - **`agents`** — `organizationId`, `name`, `description`, `slug`, `isBuiltIn`, `modelLabel`, `isActive`, `createdAt`, `updatedAt`. Indexes: by org, by org+slug.
 - **`answerTrainingExamples`** — operatørgodkjente svar fra Playground (Chatbase-lignende). Felter: `organizationId`, `conversationId`, `userMessage`, `assistantMessage`, `expectedResponse`, `createdAt`. Index: by_organization_id.
 
@@ -375,9 +373,9 @@ I tillegg bruker `@convex-dev/rag` og `@convex-dev/agent` egne system-tabeller (
 ### 7.4 Backend-funksjoner (Convex)
 
 - **`private/`** — krever org-autentisering (operatørvisning). Eksempler: `agents`, `conversations`, `messages`, `files`, `widgetSettings`, `dashboard`, `plugins`, `vapi`, `secrets`, `subscription`, `answerTraining`, `config`, `contactSessions`.
-- **`public/`** — endepunkter widgeten bruker (uten operatør-auth, men validerer kontaktsesjon eller org). Eksempler: `conversations`, `messages`, `contactSessions`, `organizations`, `widgetSettings`, `secrets`.
+- **`public/`** — endepunkter widgeten bruker (uten operatør-auth, men validerer kontaktsesjon eller org). Eksempler: `conversations`, `messages`, `contactSessions`, `widgetSettings`, `secrets`.
 - **`system/`** — interne (ikke direkte eksponert). Inkluderer AI-rammeverket, RAG, agent-tools, `subscriptions`-lookup, `plugins` lookup, `contactSessions.purgeExpired`-cron.
-- **`http.ts`** — Clerk webhook-endepunkt (`/clerk-webhook`), verifiseres med `CLERK_WEBHOOK_SECRET`.
+- **`http.ts`** — Stripe-webhook (`/stripe-webhook`) som oppdaterer `subscriptions`.
 - **`crons.ts`** — daglig cron `02:00 UTC` som anonymiserer utløpte `contactSessions` (GDPR).
 
 ### 7.5 Sesjons- og samtalemodell
@@ -392,21 +390,19 @@ I tillegg bruker `@convex-dev/rag` og `@convex-dev/agent` egne system-tabeller (
 1. `embed.ts` lastes via script-tag på kundens nettside.
 2. Leser `data-organization-id` og `data-position` fra script-taggen.
 3. Lager flytende boble + skjult container (iframe).
-4. Iframen peker til widget-appen (`apps/widget`) med `?organizationId=org_…`.
+4. Iframen peker til widget-appen (`apps/widget`) med `?organizationId=<organisasjons-ID>`.
 5. PostMessage-er styrer størrelse, knappefarger og åpne/lukke.
 
-### 7.7 Auth-flyt (Clerk)
+### 7.7 Auth-flyt (Better Auth)
 
-- Bruker logger inn via Clerk på `/sign-in`.
-- Hvis bruker ikke har valgt organisasjon → omdirigeres til `/org-selection`.
-- JWT-mal `convex` må inkludere `orgId`-claim (og helst `email`, `name`).
-- Convex bruker `CLERK_JWT_ISSUER_DOMAIN` for verifisering.
-- Clerk webhook (`/clerk-webhook` på Convex) lytter på: `user.created`, `user.updated`, `user.deleted`, `subscription.updated`.
-- Webhook bruker `CLERK_WEBHOOK_SECRET` (Svix-signatur).
+- Ansatte registrerer seg og logger inn med e-post + passord (Better Auth, kjører i `apps/server`, data i Agencis egen Postgres).
+- Uten aktiv organisasjon sendes brukeren til onboarding for å opprette eller velge en.
+- Sesjonen lagres i en HttpOnly-cookie (`better-auth.session_token`, 7 dager); aktiv organisasjon følger sesjonen.
+- Serverens private API-ruter krever gyldig sesjon + aktiv organisasjon; widgetens offentlige ruter bruker i stedet en anonym kontaktsesjon.
 
 ### 7.8 Multi-tenancy
 
-- Alle data segmenteres per `organizationId` (Clerk org).
+- Alle data segmenteres per `organizationId` (Better Auth-organisasjon).
 - Convex-funksjoner bruker `getOrgIdOrNull(ctx)` som leser `orgId` fra JWT.
 - RAG-namespaces bygges med `{orgId}` eller `{orgId}:{agentId}`.
 
@@ -447,7 +443,7 @@ I tillegg bruker `@convex-dev/rag` og `@convex-dev/agent` egne system-tabeller (
 | `/kontakt` | Kontaktskjema |
 | `/personvern` | Personvernerklæring (GDPR) |
 | `/vilkar` | Vilkår for bruk |
-| `/sign-in`, `/sign-up` | Clerk-autentisering |
+| `/sign-in`, `/sign-up` | Innlogging og registrering (Better Auth) |
 | `/org-selection` | Velg organisasjon |
 | `/sitemap.xml`, `/robots.txt` | SEO |
 
@@ -480,7 +476,7 @@ I tillegg bruker `@convex-dev/rag` og `@convex-dev/agent` egne system-tabeller (
 |-----|--------|-------------|
 | `/api/contact` | POST | Kontaktskjema → Resend |
 | `/api/newsletter` | POST | Nyhetsbrev-påmelding → Resend |
-| `/api/account/delete` | POST | Sletter Clerk-bruker (krever auth) |
+| `/api/account/delete` | POST | Kontosletting (ikke aktivert ennå — svarer med kontaktinfo) |
 | `/api/sentry-example-api` | GET | Sentry test-endepunkt |
 
 ### 8.4 Widget-app (`apps/widget`)
@@ -498,7 +494,7 @@ Hassan Triodelab DA. Personvernkontakt: `post@triodelab.no` (merk «Personvern»
 
 ### 9.2 Hva slags data behandles
 
-- **Konto/identitet:** navn, e-post, telefonnummer, innloggingsidentifikatorer (Clerk).
+- **Konto/identitet:** navn, e-post, telefonnummer, innloggingsidentifikatorer (Better Auth-konto).
 - **Drift/sikkerhet:** IP, enhets-/nettleserinfo, tidspunkter, logger.
 - **Innhold i tjenesten:** tekst, filer, samtaler operatøren laster inn eller som genereres.
 - **Kundeservice:** opplysninger ved henvendelse (kontaktskjema).
@@ -510,7 +506,7 @@ Hassan Triodelab DA. Personvernkontakt: `post@triodelab.no` (merk «Personvern»
 | Data | Lagringstid |
 |------|-------------|
 | Widget-besøkende (`contactSessions`) | Anonymiseres etter **24 timer** via daglig cron `02:00 UTC` (navn → "Slettet", e-post → "slettet@agenci.local", metadata fjernes) |
-| Brukerkontoer | Slettes ved Clerk webhook `user.deleted` |
+| Brukerkontoer | Slettes på forespørsel (kontakt post@triodelab.no) — automatisk sletting er ikke aktivert ennå |
 | Samtalehistorikk | Holdes i avtaleperioden — slettes på forespørsel |
 | Kontaktskjema | Lagres ikke i DB — videresendes via Resend |
 | Nyhetsbrev | Behandles til samtykke trekkes (ingen automatisert unsubscribe — manuell prosess) |
@@ -520,7 +516,6 @@ Hassan Triodelab DA. Personvernkontakt: `post@triodelab.no` (merk «Personvern»
 | Leverandør | Land/Region | Formål |
 |-----------|-------------|--------|
 | **Convex** | EU (Irland, AWS eu-west-1) | Primær database |
-| **Clerk** | USA | Autentisering/kontoadministrasjon (SCC) |
 | **OpenAI** | USA | AI-svar, embeddings, tekstuttrekk (SCC; ingen training-data via API) |
 | **Sentry** | EU (Tyskland) | Feilsporing (Session Replay deaktivert) |
 | **Resend** | USA | E-postformidling (kontakt + nyhetsbrev) |
@@ -530,7 +525,7 @@ Hassan Triodelab DA. Personvernkontakt: `post@triodelab.no` (merk «Personvern»
 
 ### 9.5 Tredjelandsoverføring
 
-Skjer via **EU-kommisjonens standardkontraktsklausuler (SCC)** for leverandører i USA. Clerk er US-hostet — SCC-aksept anbefales formelt i Clerk dashboard.
+Skjer via **EU-kommisjonens standardkontraktsklausuler (SCC)** for leverandører i USA.
 
 ### 9.6 Brukerrettigheter (GDPR)
 
@@ -546,7 +541,7 @@ Henvendelser besvares innen **én måned**. Klage kan rettes til Datatilsynet.
 
 ### 9.7 Cookies og localStorage
 
-- **Clerk session cookie** (nødvendig)
+- **Sesjons-cookie** (`better-auth.session_token`, nødvendig)
 - **UI-preferanse-cookie** (sidebar-state, nødvendig)
 - **Sentry** — feilsporing (ingen sesjonsopptak)
 - **Widget localStorage** — anonym sesjons-ID (`echo_contact_session`) og siste samtale per org (`echo_conversation`). Ingen cookies fra embed-skriptet.
@@ -554,7 +549,7 @@ Henvendelser besvares innen **én måned**. Klage kan rettes til Datatilsynet.
 ### 9.8 Sikkerhetstiltak
 
 - TLS i transitt
-- Tilgangskontroll per organisasjon (Clerk)
+- Tilgangskontroll per organisasjon (Better Auth-roller: owner/admin/member)
 - Dataminimering (widget-metadata redusert; platform/vendor/screenResolution/viewportSize/cookieEnabled/languages er fjernet)
 - Sentry Session Replay **deaktivert** (var tidligere aktiv på 10 % av sesjoner + 100 % på feil — slått av 2026-05-04)
 - Privacy-link på widget-auth-skjerm peker til `/personvern`
@@ -575,7 +570,6 @@ Henvendelser besvares innen **én måned**. Klage kan rettes til Datatilsynet.
 - Cookie consent banner (kun nødvendig hvis analytics/session replay legges til)
 - DPA-mal for bedriftskunder som deployer widgeten
 - Automatisert nyhetsbrev-unsubscribe
-- Formell SCC-aksept i Clerk dashboard
 - Vapi voice-disclosure i personvernerklæringen
 - Retensjonspolicy for `answerTrainingExamples`
 
@@ -736,7 +730,7 @@ Ja, alle priser er ekskl. 25 % MVA.
 1) Logg inn → `/integrations`. 2) Kopier embed-koden (HTML/React/Next.js/JS). 3) Lim inn i `<body>` (eller `layout.tsx` for Next.js).
 
 **Hvor finner jeg organisasjons-ID?**
-På `/integrations`-siden. Det er Clerk Org-ID i format `org_…`.
+På `/integrations`-siden. Det er organisasjonens ID (vises også under Organisasjon i dashboardet).
 
 **Hva er forskjellen på `apps/web` og `apps/widget`?**
 Web er hoved-Next.js-appen (markedsføring + dashboard). Widget er en egen Next.js-app som kjører **inni en iframe** på kundens nettside via embed-skriptet.
@@ -749,7 +743,7 @@ En reactive backend-as-a-service med database, queries, mutations og actions. Vi
 
 **Hva er forskjellen på public og private Convex-funksjoner?**
 - `public/` brukes av widgeten (autentisert via kontaktsesjon eller org-ID).
-- `private/` brukes av dashboardet og krever Clerk-auth med org.
+- `private/` brukes av dashboardet og krever innlogget bruker med aktiv organisasjon.
 
 ### Personvern
 
@@ -757,10 +751,10 @@ En reactive backend-as-a-service med database, queries, mutations og actions. Vi
 24 timer. Etter ekspirasjon anonymiserer en daglig cron navn, e-post og metadata.
 
 **Hva om jeg vil slette kontoen min?**
-`POST /api/account/delete` — sletter Clerk-bruker og trigger Convex-sletting via webhook. UI-flyt mangler per nå (på roadmap).
+Automatisk kontosletting er ikke aktivert ennå. Kontakt post@triodelab.no. En synlig «Slett konto»-flyt er på roadmap.
 
 **Bruker dere cookies?**
-- Clerk session-cookie (nødvendig)
+- Sesjons-cookie (nødvendig)
 - UI-preferanse-cookie (nødvendig)
 - Ingen analytics- eller marketingcookies som standard
 - Embed-skriptet setter ingen cookies — bruker localStorage
@@ -771,7 +765,7 @@ En reactive backend-as-a-service med database, queries, mutations og actions. Vi
 
 ### 15.1 Konfigurere widget på kundens nettside
 1. Logg inn på `app.agenci.no`
-2. Velg organisasjon (Clerk)
+2. Velg organisasjon
 3. Gå til `/integrations` → kopier embed-snippet
 4. Lim inn på kundens nettside (rett før `</body>`)
 5. Test: bobla skal dukke opp nede til høyre
@@ -807,24 +801,19 @@ En reactive backend-as-a-service med database, queries, mutations og actions. Vi
 
 ### `apps/web/.env`
 - `NEXT_PUBLIC_CONVEX_URL`
-- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`
-- `CLERK_SECRET_KEY`
+- `NEXT_PUBLIC_SERVER_URL` (adressen til `apps/server`)
 - `NEXT_PUBLIC_COMPANY_LEGAL_LINE` (overstyrer hardkodet fallback)
 - `NEXT_PUBLIC_DEV_BYPASS_PREMIUM` (UI-gate, ikke Convex)
 - `NEXT_PUBLIC_TEAM_DEVELOPER_EMAILS`
-- `NEXT_PUBLIC_HIDE_CLERK_BILLING_UI`
 - `NEXT_PUBLIC_WIDGET_EMBED_SCRIPT_URL` (egen widget-deploy)
 - `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `NOTIFY_TO_EMAIL`
 - `SENTRY_AUTH_TOKEN`
 
-### `apps/widget/.env.local`
-- `NEXT_PUBLIC_CONVEX_URL` (samme som web)
+### `apps/widget/.env`
+- `NEXT_PUBLIC_SERVER_URL` (valgfri, standard `http://localhost:3003`)
 
 ### Convex environment (`packages/backend`)
 - `OPENAI_API_KEY` — obligatorisk for RAG, agent, Enhance, filuttrekk
-- `CLERK_JWT_ISSUER_DOMAIN` — verifisering av JWT
-- `CLERK_SECRET_KEY` — widget validerer org via Clerk
-- `CLERK_WEBHOOK_SECRET` — Svix-signatur for Clerk webhook
 - `CONVEX_DEV_BYPASS_SUBSCRIPTION`, `CONVEX_DEV_ORGANIZATION_IDS`, `CONVEX_DEV_TEAM_EMAILS`
 - AWS credentials (for Vapi-secrets-manager)
 
@@ -856,7 +845,7 @@ En reactive backend-as-a-service med database, queries, mutations og actions. Vi
 - DPA-mal for B2B-kunder mangler.
 - Vapi voice-disclosure mangler i personvernerklæringen (kun relevant ved aktivering).
 - `answerTrainingExamples` har ingen retensjonspolicy.
-- Sentry SCC-aksept i Clerk dashboard ikke bekreftet formelt.
+- Sentry SCC-aksept ikke bekreftet formelt.
 
 ### På roadmap
 - Egen «Slett konto»-knapp i dashboard
@@ -891,15 +880,15 @@ En reactive backend-as-a-service med database, queries, mutations og actions. Vi
 | **Escalation** | Når AI gir samtalen videre til et menneske. |
 | **Knowledge base / KB** | Filer/nettsider operatør har lastet opp. RAG-indekseres. |
 | **Namespace (RAG)** | Isolert vektor-indeks per `{orgId}` eller `{orgId}:{agentId}`. |
-| **Organization** | Clerk-organisasjon. Kunder = orgs. Brukere = medlemmer. |
+| **Organization** | Better Auth-organisasjon. Kunder = orgs. Brukere = medlemmer. |
 | **Plugin** | Tredjeparts-integrasjon (per nå: Vapi). Lagret som secret-referanse. |
 | **RAG** | Retrieval-Augmented Generation — vector-søk + LLM-svar. |
 | **Resolve** | Markere en samtale som lukket. |
 | **Subscription** | Org-abonnement. Status: `active`/`trialing`/`canceled`/`free`. |
 | **Thread** | Convex Agent-tråd som holder meldingshistorikk. |
 | **Vapi** | Voice AI-plattform (telefoni). Premium-plugin. |
-| **Webhook** | Clerk → Convex på `/clerk-webhook`. Synker users + subscriptions. |
-| **Widget** | Chat-widgeten som vises på kundens nettside (egen Next.js-app i iframe). |
+| **Webhook** | Stripe → `/stripe-webhook`. Oppdaterer abonnementsstatus. |
+| **Widget** | Chat-widgeten som vises på kundens nettside (egen React-app i iframe). |
 
 ---
 
