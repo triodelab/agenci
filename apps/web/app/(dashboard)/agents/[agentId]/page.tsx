@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { AgentOverviewView } from "@/modules/dashboard/ui/views/agent-overview-view";
-import { Id } from "@workspace/backend/_generated/dataModel";
+import type { Id } from "@workspace/backend/_generated/dataModel";
 
 export const metadata: Metadata = { title: "Agent" };
 
