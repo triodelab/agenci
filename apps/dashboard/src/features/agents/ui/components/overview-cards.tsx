@@ -6,14 +6,16 @@
  */
 import { Link, useParams } from "@tanstack/react-router";
 import { cn } from "@workspace/ui/lib/utils";
-import { ChevronRightIcon, Maximize2Icon, SunIcon } from "lucide-react";
-import { Fragment, useEffect, useId, useMemo, useState } from "react";
+import { ClockIcon, Maximize2Icon, MessageCircleIcon } from "lucide-react";
+import { Fragment, useId, useMemo, useState } from "react";
 import { Segment } from "@/components/segment";
 import type { AgentDocument } from "@/features/agents/queries/agents-queries";
 import type { ConversationSummary } from "@/features/conversations/queries/conversations-queries";
 import {
+  ContactAvatar,
   contactName,
   dataTextClass,
+  StatusPill,
 } from "@/features/conversations/ui/components/conversation-ui";
 
 // ─── Palette (reference: warm neutrals, peach, soft blue) ───────────────────
@@ -162,7 +164,7 @@ function DeltaChip({
         good === false && "bg-[#F9E2DF] text-[#B2463A]",
       )}
     >
-      {value > 0 ? "+ " : value < 0 ? "− " : ""}
+      {value > 0 ? "↑ " : value < 0 ? "↓ " : ""}
       {Math.abs(value)}
       {suffix}
     </span>
@@ -205,70 +207,7 @@ function niceMax(n: number) {
   return step * pow;
 }
 
-// ─── Alerts ──────────────────────────────────────────────────────────────────
-
-type Alert = {
-  key: string;
-  title: string;
-  detail: string;
-  tone: "warn" | "bad";
-  conversationId?: string;
-  at?: string;
-};
-
-export function buildAlerts(
-  conversations: ConversationSummary[],
-  documents: AgentDocument[],
-  agentStatus: string | undefined,
-): Alert[] {
-  const alerts: Alert[] = [];
-  if (agentStatus === "FAILED") {
-    alerts.push({
-      key: "agent-failed",
-      title: "Indekseringen feilet",
-      detail: "Agenten kan ikke svare før kunnskapsbasen er indeksert.",
-      tone: "bad",
-    });
-  }
-  const conv = (
-    c: ConversationSummary,
-    title: string,
-    tone: Alert["tone"],
-  ) => ({
-    key: c.threadId,
-    title,
-    detail: `${contactName(c.contact)} · ${c.firstMessage ?? "Ny samtale"}`,
-    tone,
-    conversationId: c.threadId,
-    at: c.updatedAt,
-  });
-  for (const c of conversations.filter((c) => c.status === "escalated")) {
-    alerts.push(conv(c, "Eskalert til et menneske", "bad"));
-  }
-  for (const d of documents.filter((d) => d.status === "FAILED")) {
-    alerts.push({
-      key: d.id,
-      title: "Kilde feilet",
-      detail: sourceName(d),
-      tone: "bad",
-    });
-  }
-  for (const c of conversations.filter((c) => c.status === "unresolved")) {
-    alerts.push(conv(c, "Venter på oppfølging", "warn"));
-  }
-  for (const d of documents.filter((d) =>
-    ["PENDING", "PROCESSING", "INDEXING"].includes(d.status),
-  )) {
-    alerts.push({
-      key: d.id,
-      title: "Kilde indekseres",
-      detail: sourceName(d),
-      tone: "warn",
-    });
-  }
-  return alerts;
-}
-
+// ─── Recent conversations ────────────────────────────────────────────────────
 function sourceName(d: AgentDocument) {
   return (
     d.documentName ??
@@ -285,112 +224,96 @@ function ago(iso: string) {
   return `${Math.round(min / 1440)} d`;
 }
 
-export function AlertsTile({ alerts }: { alerts: Alert[] }) {
+/** The latest conversations and how each one ended — calm, at a glance. */
+export function RecentTile({
+  conversations,
+}: {
+  conversations: ConversationSummary[];
+}) {
   const params = useAgentParams();
-  const [filter, setFilter] = useState<"all" | "bad">("all");
-  const shown =
-    filter === "bad" ? alerts.filter((a) => a.tone === "bad") : alerts;
-  const rowClass =
-    "group -mx-2 flex items-center gap-3 rounded-[10px] border-b border-[#EEF0EF] px-2 py-2.5 transition-colors duration-150 last:border-b-0 hover:bg-white dark:border-white/5 dark:hover:bg-white/5";
+  const recent = conversations.slice(0, 6);
+  const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0);
+  const resolvedToday = conversations.filter(
+    (c) =>
+      c.status === "resolved" &&
+      new Date(c.updatedAt).getTime() >= startOfDay.getTime(),
+  ).length;
 
   return (
     <section className={tileClass}>
       <TileTitle
         aside={
-          <Segment
-            label="Varsler"
-            options={[
-              { value: "all", label: "Alle" },
-              { value: "bad", label: "Kritiske" },
-            ]}
-            value={filter}
-            onChange={setFilter}
-          />
+          resolvedToday > 0 ? (
+            <TonePill tone="ok">↑ {resolvedToday} løst i dag</TonePill>
+          ) : null
         }
       >
-        <span
-          aria-hidden
-          className="flex size-4 items-center justify-center rounded-full bg-(--agenci-ink) text-[10px] leading-none font-semibold text-white dark:text-[#0b0c0e]"
-        >
-          !
-        </span>
-        Varsler
-        <span
-          className={cn(dataTextClass, "font-normal text-(--agenci-ink-3)")}
-        >
-          {alerts.length}
-        </span>
+        <MessageCircleIcon
+          className="size-4"
+          strokeWidth={1.5}
+          absoluteStrokeWidth
+        />
+        Siste samtaler
       </TileTitle>
 
-      {shown.length === 0 ? (
+      {recent.length === 0 ? (
         <div className="flex flex-1 flex-col items-center justify-center text-center">
           <p className="text-[13px] font-medium text-(--agenci-ink)">
-            Ingen varsler
+            Ingen samtaler ennå
           </p>
           <p className="mt-1 text-[12px] text-(--agenci-ink-3)">
-            Alt er i orden akkurat nå.
+            De dukker opp her så snart kundene skriver.
           </p>
         </div>
       ) : (
         <ul className="mt-2 min-h-0 flex-1 overflow-y-auto pb-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {shown.map((a) => {
-            const body = (
-              <>
-                <span
-                  aria-hidden
-                  className={cn(
-                    "size-1.5 shrink-0 rounded-full",
-                    a.tone === "bad" ? "bg-[#D9493E]" : "bg-[#E49A62]",
-                  )}
-                />
+          {recent.map((c) => (
+            <li key={c.threadId}>
+              <Link
+                to="/org/$orgSlug/agents/$agentId/conversations/$conversationId"
+                params={{ ...params, conversationId: c.threadId }}
+                className="group -mx-2 flex items-center gap-3 rounded-[10px] border-b border-[#EEF0EF] px-2 py-2.5 transition-colors duration-150 last:border-b-0 hover:bg-[#f7f8f7] dark:border-white/5 dark:hover:bg-white/5"
+              >
+                <span className="relative">
+                  <ContactAvatar contact={c.contact} size={32} />
+                  <span
+                    aria-hidden
+                    className={cn(
+                      "absolute -right-0.5 -bottom-0.5 size-2.5 rounded-full border-2 border-white dark:border-(--card)",
+                      c.status === "resolved"
+                        ? "bg-[#5FA06F]"
+                        : c.status === "escalated"
+                          ? "bg-[#D9493E]"
+                          : "bg-[#E49A62]",
+                    )}
+                  />
+                </span>
                 <span className="min-w-0 flex-1">
-                  <span className="flex items-baseline gap-2">
-                    <span className="truncate text-[13px] font-medium text-(--agenci-ink)">
-                      {a.title}
-                    </span>
-                    {a.at ? (
-                      <span
-                        className={cn(
-                          dataTextClass,
-                          "ml-auto shrink-0 text-[12px] text-(--agenci-ink-3)",
-                        )}
-                      >
-                        {ago(a.at)}
-                      </span>
-                    ) : null}
+                  <span className="block truncate text-[13px] font-medium text-(--agenci-ink)">
+                    {contactName(c.contact)}
                   </span>
                   <span className="block truncate text-[12px] text-(--agenci-ink-3)">
-                    {a.detail}
+                    {c.firstMessage ?? "Ny samtale"}
                   </span>
                 </span>
-                <ChevronRightIcon
-                  className="size-4 shrink-0 text-(--agenci-ink-3) transition-transform duration-150 group-hover:translate-x-0.5"
-                  strokeWidth={1.5}
-                  absoluteStrokeWidth
-                />
-              </>
-            );
-            return (
-              <li key={a.key}>
-                {a.conversationId ? (
-                  <Link
-                    to="/org/$orgSlug/agents/$agentId/conversations/$conversationId"
-                    params={{ ...params, conversationId: a.conversationId }}
-                    className={rowClass}
+                <span className="flex shrink-0 flex-col items-end gap-1">
+                  <span
+                    className={cn(
+                      dataTextClass,
+                      "text-[11.5px] text-(--agenci-ink-3)",
+                    )}
                   >
-                    {body}
-                  </Link>
-                ) : (
-                  <TargetLink
-                    to={a.conversationId ? "conversations" : "files"}
-                    className={rowClass}
-                  >
-                    {body}
-                  </TargetLink>
-                )}
-              </li>
-            );
-          })}
+                    {ago(c.updatedAt)}
+                  </span>
+                  <StatusPill
+                    status={c.status}
+                    className="px-2 text-[11px] leading-4"
+                  />
+                </span>
+              </Link>
+            </li>
+          ))}
         </ul>
       )}
       <ExpandLink to="conversations" label="Åpne samtaler" />
@@ -422,107 +345,19 @@ function rateIn(
   };
 }
 
-/**
- * One wave period is half the SVG, so sliding it by -50 % loops seamlessly.
- * The line is the surface (for the shine); the shape fills down to the body.
- */
-const WAVE_LINE =
-  "M0 30 C100 6 200 6 300 30 S500 54 600 30 S800 6 900 30 S1100 54 1200 30";
-const WAVE_SHAPE = `${WAVE_LINE} V60 H0 Z`;
+/** Minutes a person would spend on one routine enquiry (for "timer spart"). */
+const MINUTES_PER_ENQUIRY = 10;
 
-/** Colour follows quality: red (low) → amber → green (high). */
-function waterHue(rate: number | null) {
-  if (rate === null) return 210; // no data: calm neutral blue-grey
-  return rate < 50 ? 4 + rate * 0.62 : 35 + (rate - 50) * 2.2;
-}
-
-const WAVE_LAYERS = [
-  // back → front: taller/lighter/slower behind, lower/deeper/faster in front
-  { cls: "agenci-water-back", h: 46, speed: 11, reverse: true, delay: -3 },
-  { cls: "agenci-water-mid", h: 38, speed: 7.5, reverse: false, delay: -5 },
-  { cls: "agenci-water-front", h: 30, speed: 5, reverse: true, delay: 0 },
-];
-
-const BUBBLES = [
-  { left: "14%", size: 6, delay: 0, dur: 5.5 },
-  { left: "33%", size: 4, delay: 2.2, dur: 4.6 },
-  { left: "58%", size: 7, delay: 1.1, dur: 6.2 },
-  { left: "79%", size: 5, delay: 3.4, dur: 5 },
-];
+const RING_PARTS = [
+  { key: "resolved", label: "Agent", color: "url(#agenci-ring)", dot: "#1F2224" },
+  { key: "escalated", label: "Team", color: PEACH, dot: PEACH },
+  { key: "unresolved", label: "Venter", color: "#D9DCDA", dot: "#C9CDCB" },
+] as const;
 
 /**
- * Water that rises to `level` % of the tile: three drifting wave layers, a
- * shine on the surface and a few rising bubbles. Colour eases from red to
- * green with the rate. It fills up from empty on mount; all motion is
- * dropped for prefers-reduced-motion.
+ * Share of the last 30 days the agent closed on its own, as a ring, with the
+ * team time that saved. Every number comes from the conversations passed in.
  */
-function WaterFill({ level }: { level: number | null }) {
-  const [shown, setShown] = useState<number | null>(null);
-  useEffect(() => {
-    const id = window.requestAnimationFrame(() => setShown(level));
-    return () => window.cancelAnimationFrame(id);
-  }, [level]);
-  // Keep some water even at 0 % so the surface is visible.
-  const height = 10 + ((shown ?? 0) / 100) * 70;
-
-  return (
-    <div
-      aria-hidden
-      className="agenci-water pointer-events-none absolute inset-x-0 bottom-0 -z-10 dark:opacity-40"
-      style={
-        {
-          height: `${height}%`,
-          "--water-h": waterHue(shown),
-        } as React.CSSProperties
-      }
-    >
-      {WAVE_LAYERS.map((w) => (
-        <svg
-          key={w.cls}
-          aria-hidden="true"
-          viewBox="0 0 1200 60"
-          preserveAspectRatio="none"
-          className={cn("agenci-wave absolute left-0 w-[200%]", w.cls)}
-          style={{
-            height: w.h,
-            bottom: "calc(100% - 2px)",
-            animationDuration: `${w.speed}s`,
-            animationDirection: w.reverse ? "reverse" : "normal",
-            animationDelay: `${w.delay}s`,
-          }}
-        >
-          <path d={WAVE_SHAPE} />
-          {w.cls === "agenci-water-front" ? (
-            <path
-              d={WAVE_LINE}
-              fill="none"
-              stroke="white"
-              strokeOpacity={0.55}
-              strokeWidth={2}
-              vectorEffect="non-scaling-stroke"
-            />
-          ) : null}
-        </svg>
-      ))}
-      <div className="agenci-water-body absolute inset-0 overflow-hidden">
-        {BUBBLES.map((b) => (
-          <span
-            key={b.left}
-            className="agenci-bubble absolute bottom-0 rounded-full border border-white/70 bg-white/25"
-            style={{
-              left: b.left,
-              width: b.size,
-              height: b.size,
-              animationDelay: `${b.delay}s`,
-              animationDuration: `${b.dur}s`,
-            }}
-          />
-        ))}
-      </div>
-    </div>
-  );
-}
-
 export function ResolutionTile({
   agentName,
   conversations,
@@ -530,38 +365,85 @@ export function ResolutionTile({
   agentName: string;
   conversations: ConversationSummary[];
 }) {
-  const [range, setRange] = useState<Range>("30");
-  const days = Number(range);
   const now = Date.now();
-  const cur = rateIn(conversations, now - days * DAY, now + 1);
-  const prev = rateIn(conversations, now - 2 * days * DAY, now - days * DAY);
+  const cur = rateIn(conversations, now - 30 * DAY, now + 1);
+  const prev = rateIn(conversations, now - 60 * DAY, now - 30 * DAY);
   const trend =
     cur.rate !== null && prev.rate !== null ? cur.rate - prev.rate : null;
-
-  const stats = [
-    { label: "Løst", value: cur.resolved },
-    { label: "Uavkl.", value: cur.unresolved },
-    { label: "Eskal.", value: cur.escalated },
-  ];
+  const hours = Math.round((cur.resolved * MINUTES_PER_ENQUIRY) / 60);
+  const gap = cur.total ? 1.6 : 0;
+  let start = 0;
+  const arcs = RING_PARTS.map((p) => {
+    const len = cur.total ? (cur[p.key] / cur.total) * 100 : 0;
+    const arc = { ...p, from: start, len: Math.max(0, len - gap) };
+    start += len;
+    return arc;
+  });
 
   return (
-    <section className={cn(tileClass, "isolate")}>
-      <WaterFill level={cur.rate} />
+    <section className={tileClass}>
       <TileTitle
         aside={
-          <Segment
-            label="Periode"
-            options={RANGES}
-            value={range}
-            onChange={setRange}
-          />
+          hours > 0 ? (
+            <span
+              className={cn(
+                dataTextClass,
+                "inline-flex items-center gap-1.5 rounded-full bg-(--agenci-ink) px-2.5 py-0.5 text-[12px] text-white dark:text-[#0b0c0e]",
+              )}
+            >
+              <ClockIcon className="size-3" strokeWidth={2} />≈ {hours} t spart
+            </span>
+          ) : null
         }
       >
-        {agentName}
+        Løst av {agentName}
       </TileTitle>
 
-      <div className="relative mt-3 flex items-start justify-between">
-        <div>
+      <TargetLink
+        to="conversations"
+        className="relative grid min-h-0 flex-1 place-items-center"
+        aria-label="Åpne samtaler"
+      >
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 140 140"
+          className="size-[min(190px,100%)] -rotate-90 drop-shadow-[0_12px_20px_rgb(28_28_26/0.12)]"
+        >
+          <defs>
+            <linearGradient id="agenci-ring" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stopColor="#1F2224" />
+              <stop offset="1" stopColor="#5A5E5C" />
+            </linearGradient>
+          </defs>
+          <circle
+            cx="70"
+            cy="70"
+            r="56"
+            fill="none"
+            stroke="#F0F1F0"
+            strokeWidth={13}
+            pathLength={100}
+          />
+          {arcs.map((a) =>
+            a.len > 0 ? (
+              <circle
+                key={a.key}
+                cx="70"
+                cy="70"
+                r="56"
+                fill="none"
+                stroke={a.color}
+                strokeWidth={13}
+                strokeLinecap="round"
+                pathLength={100}
+                strokeDasharray={`${a.len} ${100 - a.len}`}
+                strokeDashoffset={-a.from}
+                className="transition-[stroke-dasharray,stroke-dashoffset] duration-700 ease-[cubic-bezier(.16,1,.3,1)]"
+              />
+            ) : null,
+          )}
+        </svg>
+        <div className="absolute grid justify-items-center text-center">
           <p className={bigNumberClass}>
             {cur.rate ?? "—"}
             {cur.rate !== null ? (
@@ -570,46 +452,42 @@ export function ResolutionTile({
               </span>
             ) : null}
           </p>
-          <p
-            className={cn(
-              dataTextClass,
-              "mt-2 flex gap-3 text-[12px] text-(--agenci-ink-2)",
-            )}
-          >
-            {stats.map((s) => (
-              <span key={s.label}>
-                <span className="text-(--agenci-ink-3)">{s.label}</span>{" "}
-                {s.value}
-              </span>
-            ))}
+          <p className="mt-1 text-[12px] text-(--agenci-ink-3)">
+            løst uten team
           </p>
-        </div>
-        <SunIcon
-          className="size-5 text-(--agenci-ink-2)"
-          strokeWidth={1.5}
-          absoluteStrokeWidth
-        />
-      </div>
-
-      <TargetLink
-        to="conversations"
-        className="group relative mt-auto block pb-1 transition-opacity"
-      >
-        <p className="text-[13px] font-medium text-(--agenci-ink)">
-          Løsningsgrad
-          {trend !== null && trend !== 0 ? (
-            <span className="font-normal text-(--agenci-ink-2)">
-              {" "}
-              · {trend > 0 ? "opp" : "ned"} {Math.abs(trend)} poeng
+          {trend !== null && trend > 0 ? (
+            <span className="mt-1.5">
+              <TonePill tone="ok">↑ {trend} poeng</TonePill>
             </span>
           ) : null}
-        </p>
-        <p className="text-[12px] text-(--agenci-ink-2)">
-          {cur.total
-            ? `${cur.resolved} av ${cur.total} samtaler merket som løst`
-            : `Ingen samtaler siste ${days} dager`}
-        </p>
+        </div>
       </TargetLink>
+
+      <div className="mt-3 grid grid-cols-3 gap-2">
+        {RING_PARTS.map((p) => (
+          <div
+            key={p.key}
+            className="rounded-[12px] bg-[#f5f6f5] px-3 py-2 dark:bg-white/5"
+          >
+            <p
+              className={cn(
+                dataTextClass,
+                "text-[17px] leading-tight text-(--agenci-ink)",
+              )}
+            >
+              {cur[p.key]}
+            </p>
+            <p className="flex items-center gap-1.5 text-[12px] text-(--agenci-ink-3)">
+              <span
+                aria-hidden
+                className="size-1.5 rounded-full"
+                style={{ background: p.dot }}
+              />
+              {p.label}
+            </p>
+          </div>
+        ))}
+      </div>
     </section>
   );
 }
@@ -631,12 +509,6 @@ const PERIOD_COMPARE: Record<Period, string> = {
   month: "mot forrige 30 d",
 };
 const WEEKDAY_SHORT = ["S", "M", "T", "O", "T", "F", "L"];
-
-const OUTCOME = [
-  { key: "resolved", label: "Løst", color: "#5FA06F" },
-  { key: "unresolved", label: "Uavklart", color: PEACH },
-  { key: "escalated", label: "Eskalert", color: "#D9493E" },
-] as const;
 
 function periodBuckets(period: Period, now: Date, offset: number) {
   if (period === "day") {
@@ -729,16 +601,11 @@ export function ConversationsChartTile({
     });
     const prev = periodBuckets(period, now, 1).map((b) => count(b).length);
     const all = cur.flatMap((b) => b.list);
-    const outcome = OUTCOME.map((o) => ({
-      ...o,
-      value: all.filter((c) => c.status === o.key).length,
-    }));
     return {
       cur,
       prev,
       total: all.length,
       prevTotal: prev.reduce((s, v) => s + v, 0),
-      outcome,
     };
   }, [conversations, period]);
 
@@ -756,6 +623,11 @@ export function ConversationsChartTile({
       ? null
       : Math.round(((data.total - data.prevTotal) / data.prevTotal) * 100);
   const active = hover !== null ? data.cur[hover] : undefined;
+  const peakIndex = data.cur.reduce(
+    (best, b, i) => (b.total > (data.cur[best]?.total ?? -1) ? i : best),
+    0,
+  );
+  const peak = data.cur[peakIndex];
   const activeX = hover !== null ? x(hover) : 0;
 
   return (
@@ -778,30 +650,9 @@ export function ConversationsChartTile({
 
       <div className="mt-3 flex items-end gap-2">
         <p className={bigNumberClass}>{data.total}</p>
-        <div className="mb-0.5 flex flex-col gap-1">
+        <div className="mb-1" title={PERIOD_COMPARE[period]}>
           <DeltaChip value={delta} />
-          <span className="text-[12px] text-(--agenci-ink-3)">
-            {PERIOD_COMPARE[period]}
-          </span>
         </div>
-      </div>
-
-      <div className={cn(captionClass, "mt-4 flex items-center gap-4")}>
-        <span className="flex items-center gap-1.5">
-          <span
-            aria-hidden
-            className="h-[2px] w-3 rounded-full"
-            style={{ background: PEACH }}
-          />
-          Nå
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span
-            aria-hidden
-            className="w-3 border-t border-dashed border-[#A9AEB3]"
-          />
-          Forrige
-        </span>
       </div>
 
       {/* Area chart */}
@@ -848,6 +699,24 @@ export function ConversationsChartTile({
             vectorEffect="non-scaling-stroke"
           />
         </svg>
+
+        {/* Peak of the period: a glowing dot with its value. */}
+        {!active && peak && peak.total > 0 ? (
+          <span
+            aria-hidden
+            className="pointer-events-none absolute size-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-[2.5px] border-white bg-[#D9743A] shadow-[0_0_0_5px_rgb(217_116_58/0.18),0_4px_10px_rgb(217_116_58/0.35)]"
+            style={{ left: `${x(peakIndex)}%`, top: `${y(peak.total)}%` }}
+          >
+            <span
+              className={cn(
+                dataTextClass,
+                "absolute bottom-[calc(100%+8px)] left-1/2 -translate-x-1/2 rounded-[7px] bg-(--agenci-ink) px-2 py-0.5 text-[11.5px] font-medium text-white dark:text-[#0b0c0e]",
+              )}
+            >
+              {peak.total}
+            </span>
+          </span>
+        ) : null}
 
         {/* hover crosshair, dot and tooltip (HTML so they stay round/crisp) */}
         {active ? (
@@ -917,7 +786,8 @@ export function ConversationsChartTile({
                 "absolute -translate-x-1/2",
                 i === 0 && "translate-x-0",
                 i === n - 1 && "-translate-x-full",
-                hover === i && "text-(--agenci-ink)",
+                (hover === i || (hover === null && i === peakIndex)) &&
+                  "text-(--agenci-ink)",
               )}
               style={{ left: `${x(i)}%` }}
             >
@@ -927,49 +797,7 @@ export function ConversationsChartTile({
         )}
       </div>
 
-      {/* Outcome */}
-      <div className="mt-4 pb-6">
-        <div className="flex h-2 gap-0.5 overflow-hidden rounded-full bg-[#f3f5f4]">
-          {data.total > 0
-            ? data.outcome.map((o) =>
-                o.value > 0 ? (
-                  <span
-                    key={o.key}
-                    className="h-full transition-[width] duration-500 ease-[cubic-bezier(.16,1,.3,1)]"
-                    style={{
-                      width: `${(o.value / data.total) * 100}%`,
-                      background: o.color,
-                    }}
-                  />
-                ) : null,
-              )
-            : null}
-        </div>
-        <div className="mt-2 grid grid-cols-3 gap-2">
-          {data.outcome.map((o) => (
-            <div key={o.key} className="min-w-0">
-              <p className="flex items-center gap-1.5 text-[12px] text-(--agenci-ink-3)">
-                <span
-                  aria-hidden
-                  className="size-1.5 rounded-full"
-                  style={{ background: o.color }}
-                />
-                {o.label}
-              </p>
-              <p
-                className={cn(dataTextClass, "text-[13px] text-(--agenci-ink)")}
-              >
-                {o.value}
-                <span className="ml-1 text-(--agenci-ink-3)">
-                  {data.total
-                    ? `${Math.round((o.value / data.total) * 100)} %`
-                    : "–"}
-                </span>
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
+      <div className="pb-6" />
       <ExpandLink to="conversations" label="Åpne samtaler" />
     </section>
   );
