@@ -42,6 +42,28 @@ const ORG_FREE_PREFIXES = [
   "/kontakt",
 ];
 
+/** The staff dashboard is its own app (apps/dashboard). */
+const DASHBOARD_URL = (
+  process.env.NEXT_PUBLIC_DASHBOARD_URL ?? "http://localhost:3004"
+).replace(/\/$/, "");
+
+/**
+ * The old Next dashboard + onboarding here were built on Convex, which is
+ * gone. Their URLs now forward to the new dashboard instead of crashing.
+ */
+const LEGACY_APP_PREFIXES = [
+  "/dashboard",
+  "/agents",
+  "/conversations",
+  "/customization",
+  "/files",
+  "/integrations",
+  "/plugins",
+  "/settings",
+  "/billing",
+  "/onboarding",
+];
+
 function matchesPrefix(pathname: string, prefixes: string[]) {
   return prefixes.some(
     (p) => pathname === p || pathname.startsWith(`${p}/`),
@@ -56,24 +78,16 @@ export default async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
+  if (matchesPrefix(pathname, LEGACY_APP_PREFIXES)) {
+    return NextResponse.redirect(`${DASHBOARD_URL}/`);
+  }
+
   const isPublic = matchesPrefix(pathname, PUBLIC_PATHS);
   const sessionCookie = getSessionCookie(req);
 
+  // The website is always reachable, signed in or not; the nav links to the
+  // dashboard (no automatic bounce from "/" any more).
   if (isPublic) {
-    // Signed-in users hitting marketing home → dashboard
-    if (sessionCookie && pathname === "/") {
-      if (req.nextUrl.searchParams.get("from") !== "marketing") {
-        // Confirm session is real (cookie alone can be stale)
-        try {
-          const session = await fetchSession(req);
-          if (session?.user && session.session?.activeOrganizationId) {
-            return NextResponse.redirect(new URL("/dashboard", req.url));
-          }
-        } catch {
-          // ignore — show marketing
-        }
-      }
-    }
     return NextResponse.next();
   }
 

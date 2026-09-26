@@ -292,14 +292,22 @@ function SidebarBrand({
   return (
     <SidebarHeader className="px-4 pt-5 pb-4 group-data-[collapsible=icon]:px-2">
       <div className="flex items-center justify-between gap-2 group-data-[collapsible=icon]:justify-center">
-        <div className="flex min-w-0 items-center gap-2.5 group-data-[collapsible=icon]:hidden">
+        {/* Wordmark: the big A mark is the first letter, "genci" follows it. */}
+        <div
+          role="img"
+          aria-label="Agenci"
+          className="flex min-w-0 items-end group-data-[collapsible=icon]:hidden"
+        >
           <img
             src="/AgenciLogo.png"
             alt=""
-            className="size-8 shrink-0 rounded-lg dark:invert"
+            className="size-8 shrink-0 dark:invert"
           />
-          <span className="truncate text-[19px] font-medium tracking-[-0.03em] text-(--agenci-ink)">
-            Agenci
+          <span
+            aria-hidden="true"
+            className="-ml-[3px] -translate-y-[2.5px] whitespace-nowrap text-[20px] leading-none font-medium tracking-[-0.03em] text-(--agenci-ink)"
+          >
+            genci
           </span>
         </div>
         <button

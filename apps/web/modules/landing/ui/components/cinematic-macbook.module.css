@@ -1,0 +1,99 @@
+/* CSS MacBook for the cinematic product clips (see cinematic-macbook.tsx). */
+
+.scene {
+  position: relative;
+  width: min(94%, 980px);
+  margin-inline: auto;
+  perspective: 2200px;
+  perspective-origin: 50% 40%;
+}
+
+.camera {
+  transform-origin: 50% 44%;
+  will-change: transform;
+}
+
+.device {
+  position: relative;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* Lid: black bezel with a hairline edge, like the real thing. */
+.lid {
+  position: relative;
+  padding: 1.9% 1.9% 2.3%;
+  border-radius: 3.2% / 4.8%;
+  background: #0d0f10;
+  box-shadow:
+    inset 0 0 0 1px #2c3033,
+    inset 0 0 0 3px #0d0f10,
+    inset 0 0 0 4px #1b1e20,
+    0 50px 90px -40px rgb(0 0 0 / 0.65);
+}
+.notch {
+  position: absolute;
+  z-index: 2;
+  top: 1.9%;
+  left: 50%;
+  width: 10%;
+  height: 2.6%;
+  translate: -50% 0;
+  border-radius: 0 0 7px 7px;
+  background: #0d0f10;
+}
+.screen {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 16 / 10;
+  border-radius: 0.5% / 0.8%;
+  background: #f4f5f4;
+}
+.screen :is(video, img) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.glare {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(118deg, rgb(255 255 255 / 0.13) 0%, rgb(255 255 255 / 0) 38%);
+  pointer-events: none;
+}
+
+/* Base: thin aluminium slab, a little wider than the lid, with the thumb notch. */
+.base {
+  position: relative;
+  width: 114%;
+  margin-left: -7%;
+  padding-top: 2.4%;
+  border-radius: 0 0 22px 22px / 0 0 70% 70%;
+  background: linear-gradient(180deg, #eef0f1 0%, #cfd3d6 38%, #a4aaaf 100%);
+  box-shadow: inset 0 1px 0 #ffffffb0;
+}
+.base::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 14%;
+  height: 46%;
+  translate: -50% 0;
+  border-radius: 0 0 12px 12px;
+  background: linear-gradient(180deg, #b7bcc0, #d9dcde);
+}
+
+.shadow {
+  width: 104%;
+  height: 34px;
+  margin: -8px 0 0 -2%;
+  background: radial-gradient(ellipse at 50% 30%, rgb(0 0 0 / 0.38), transparent 70%);
+  filter: blur(8px);
+  pointer-events: none;
+}
+
+/* Hero: straight on, a little larger. */
+.sceneStill {
+  width: min(100%, 1120px);
+}

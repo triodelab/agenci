@@ -1,350 +1,360 @@
 import type { Metadata } from "next";
-import type { ReactNode } from "react";
 import Link from "next/link";
-import { MarketingPageLayout } from "@/modules/landing/ui/components/marketing-page-layout";
-import { MarketingSubpageCta } from "@/modules/landing/ui/components/marketing-subpage-cta";
+import { CookieSettingsButton } from "@/components/cookie-settings-button";
 import { LANDING_CONTACT_PAGE_PATH } from "@/modules/landing/constants";
-
-const accentLink =
-  "text-[#9ca3af] underline-offset-2 decoration-[#9ca3af]/30 hover:text-[#f2f3f5] hover:underline transition-colors";
-
-const updated = new Date("2026-03-27");
-
-const COMPANY_LEGAL_LINE =
-  process.env.NEXT_PUBLIC_COMPANY_LEGAL_LINE ??
-  "Hassan Triodelab DA, org.nr. 835 796 892, Gildevangen 16 B, 0585 Oslo";
-
-const PRIVACY_EMAIL = "post@triodelab.no";
+import l from "@/modules/legal/legal.module.css";
+import { Clause, COMPANY, LegalPage, Terms } from "@/modules/legal/legal-page";
 
 export const metadata: Metadata = {
-  title: "Personvernerklæring",
-  description:
-    "Hvordan Agenci samler inn, bruker og beskytter personopplysninger i tråd med GDPR og personopplysningsloven.",
-  alternates: { canonical: "/personvern" },
-  robots: { index: true, follow: true },
+	title: "Personvernerklæring",
+	description:
+		"Hvordan Agenci samler inn, bruker og beskytter personopplysninger — for kunder, brukere og besøkende som chatter med en Agenci-assistent. I tråd med GDPR.",
+	alternates: { canonical: "/personvern" },
+	robots: { index: true, follow: true },
 };
 
-const toc = [
-  { id: "innledning", label: "Innledning" },
-  { id: "behandlingsansvarlig", label: "Behandlingsansvarlig" },
-  { id: "opplysninger", label: "Hvilke opplysninger vi behandler" },
-  { id: "formal-grunnlag", label: "Formål og rettslig grunnlag" },
-  { id: "lagring", label: "Lagring og sletting" },
-  { id: "deling", label: "Deling og underleverandører" },
-  { id: "tredjeland", label: "Overføring til andre land" },
-  { id: "rettigheter", label: "Dine rettigheter" },
-  { id: "cookies", label: "Informasjonskapsler (cookies)" },
-  { id: "sikkerhet", label: "Sikkerhet" },
-  { id: "endringer", label: "Endringer i erklæringen" },
-  { id: "kontakt-klage", label: "Kontakt og klage" },
-] as const;
+const TOC = [
+	{ id: "innledning", label: "Innledning" },
+	{ id: "roller", label: "Hvem er ansvarlig" },
+	{ id: "opplysninger", label: "Hvilke opplysninger vi behandler" },
+	{ id: "formal", label: "Formål og rettslig grunnlag" },
+	{ id: "ki", label: "Kunstig intelligens" },
+	{ id: "lagring", label: "Lagring og sletting" },
+	{ id: "underleverandorer", label: "Underleverandører" },
+	{ id: "tredjeland", label: "Overføring utenfor EØS" },
+	{ id: "rettigheter", label: "Dine rettigheter" },
+	{ id: "cookies", label: "Informasjonskapsler" },
+	{ id: "sikkerhet", label: "Sikkerhet" },
+	{ id: "barn", label: "Barn" },
+	{ id: "endringer", label: "Endringer" },
+	{ id: "kontakt", label: "Kontakt og klage" },
+];
+
+const mail = (
+	<a href={`mailto:${COMPANY.email}`} className={l.link}>
+		{COMPANY.email}
+	</a>
+);
 
 export default function PersonvernPage() {
-  return (
-    <MarketingPageLayout>
-      <div className="bg-[#1C1C1C]">
-        <div className="mx-auto max-w-[720px] px-6 py-20 md:py-24 xl:px-8">
+	return (
+		<LegalPage
+			eyebrow="Juridisk"
+			title="Personvernerklæring"
+			lead="Slik behandler vi personopplysninger når du bruker Agenci — enten du er kunde, bruker av dashboardet eller besøkende som chatter med en Agenci-assistent på en nettside."
+			updated="2026-09-26"
+			version="2.0"
+			toc={TOC}
+			related={{ href: "/vilkar", label: "Les vilkårene" }}
+			summary={[
+				"Vi selger aldri personopplysninger, og deler dem ikke for andres markedsføring.",
+				"Når du chatter med en bedrift via Agenci, er det bedriften som bestemmer over samtalen — vi behandler den på deres vegne.",
+				"Samtaler brukes til å gi svar, ikke til å trene AI-modeller.",
+				"Du kan be om innsyn, retting og sletting når som helst.",
+			]}
+		>
+			<Clause id="innledning" n={1} title="Innledning">
+				<p>
+					Denne erklæringen forklarer hvilke personopplysninger vi behandler,
+					hvorfor, og hvilke rettigheter du har. Den gjelder nettstedet
+					agenci.no, Agenci-dashboardet, chat-widgeten som bedrifter legger på
+					sine nettsider, og kontakt med oss. Vi følger personopplysningsloven
+					og EUs personvernforordning (GDPR).
+				</p>
+			</Clause>
 
-          {/* Header */}
-          <header className="border-b border-[#2a2a2a] pb-10">
-            <p className="text-[13px] font-medium uppercase tracking-[0.4px] text-[#4b5563]">
-              Juridisk
-            </p>
-            <h1 className="mt-5 text-[40px] font-semibold leading-[1.15] tracking-[-1px] text-[#f2f3f5]">
-              Personvernerklæring
-            </h1>
-            <p className="mt-4 text-[15px] leading-[1.5] text-[#9ca3af]">
-              Gjelder bruk av nettside og tjenester levert av Agenci.
-            </p>
-            <dl className="mt-6 flex flex-wrap gap-x-8 gap-y-2 text-[13px] text-[#4b5563]">
-              <div>
-                <dt className="sr-only">Sist oppdatert</dt>
-                <dd>
-                  Sist oppdatert:{" "}
-                  {updated.toLocaleDateString("no-NO", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
-                </dd>
-              </div>
-              <div>
-                <dt className="sr-only">Versjon</dt>
-                <dd>Versjon: 1.0</dd>
-              </div>
-            </dl>
-          </header>
+			<Clause id="roller" n={2} title="Hvem er ansvarlig">
+				<p>
+					<strong>{COMPANY.legalLine}</strong> («Agenci», «vi») er
+					behandlingsansvarlig for opplysninger om kunder, brukere av
+					dashboardet, besøkende på agenci.no og alle som kontakter oss.
+				</p>
+				<p>
+					Når du chatter med en bedrift gjennom en Agenci-assistent på
+					bedriftens nettside, er{" "}
+					<strong>bedriften behandlingsansvarlig</strong> for samtalen. Vi er da{" "}
+					<strong>databehandler</strong> og behandler opplysningene kun etter
+					bedriftens instruks, i tråd med databehandleravtalen vi har med dem.
+					Spørsmål om slike samtaler bør rettes til bedriften — kontakter du
+					oss, videreformidler vi henvendelsen.
+				</p>
+			</Clause>
 
-          {/* TOC */}
-          <nav
-            aria-label="Innhold i personvernerklæringen"
-            className="my-10 rounded-[12px] border border-[#2a2a2a] bg-[#161616] p-6"
-          >
-            <p className="text-[12px] font-medium uppercase tracking-[0.4px] text-[#4b5563]">
-              Innhold
-            </p>
-            <ol className="mt-4 list-decimal space-y-2 pl-5 text-[14px] leading-[1.5] text-[#9ca3af] marker:font-medium marker:text-[#6b7280]">
-              {toc.map((item) => (
-                <li key={item.id}>
-                  <a
-                    href={`#${item.id}`}
-                    className="transition-colors hover:text-[#f7f8f8]"
-                  >
-                    {item.label}
-                  </a>
-                </li>
-              ))}
-            </ol>
-          </nav>
+			<Clause id="opplysninger" n={3} title="Hvilke opplysninger vi behandler">
+				<Terms
+					items={[
+						{
+							label: "Konto og brukere",
+							text: "Navn, e-postadresse, organisasjon, rolle og innloggingsinformasjon for dem som bruker dashboardet.",
+						},
+						{
+							label: "Samtaler i widgeten",
+							text: "Meldinger besøkende skriver og svarene assistenten gir, samt navn og e-post dersom den besøkende selv oppgir det. I tillegg tekniske opplysninger som språk, tidssone, nettleser og hvilken side samtalen startet fra.",
+						},
+						{
+							label: "Kundens kunnskap",
+							text: "Innhold bedriften legger inn: tekst fra egen nettside, opplastede dokumenter og innstillinger. Slikt innhold kan inneholde personopplysninger dersom bedriften har lagt dem der.",
+						},
+						{
+							label: "Betaling",
+							text: "Faktura- og abonnementsopplysninger. Kortinformasjon behandles av Stripe — vi lagrer aldri kortnummer.",
+						},
+						{
+							label: "Henvendelser",
+							text: "Det du skriver i kontaktskjema, e-post eller påmelding til nyhetsbrev.",
+						},
+						{
+							label: "Drift og sikkerhet",
+							text: "IP-adresse, tidspunkter, feillogger og tekniske data som trengs for å drive tjenesten sikkert og rette feil.",
+						},
+					]}
+				/>
+			</Clause>
 
-          {/* Body */}
-          <div className="space-y-14">
-            <LegalSection id="innledning" title="1. Innledning">
-              <p>
-                Denne personvernerklæringen forklarer hvordan vi behandler personopplysninger når du
-                besøker våre nettsider, oppretter konto, bruker Agenci-plattformen (herunder
-                dashboard, widget og relaterte funksjoner), eller kontakter oss. Vi følger
-                personopplysningsloven og EUs personvernforordning (GDPR).
-              </p>
-              <p>
-                Ved å bruke tjenesten aksepterer du denne erklæringen i den utstrekning den gjelder for
-                ditt forhold til oss. Avtalevilkår og databehandleravtaler (DPA) med bedriftskunder kan
-                gi ytterligere detaljer der det er relevant.
-              </p>
-            </LegalSection>
+			<Clause id="formal" n={4} title="Formål og rettslig grunnlag">
+				<Terms
+					items={[
+						{
+							label: "Levere tjenesten",
+							text: "Opprette konto, drive assistenten, lagre samtaler og kunnskap — avtale (GDPR art. 6 nr. 1 b).",
+						},
+						{
+							label: "Support og kundeforhold",
+							text: "Svare på henvendelser og følge opp kunder — avtale og berettiget interesse (art. 6 nr. 1 b og f).",
+						},
+						{
+							label: "Sikkerhet og feilretting",
+							text: "Forhindre misbruk, sikre stabil drift og rette feil — berettiget interesse (art. 6 nr. 1 f).",
+						},
+						{
+							label: "Regnskap og lovkrav",
+							text: "Fakturering og bokføring — rettslig forpliktelse (art. 6 nr. 1 c).",
+						},
+						{
+							label: "Statistikk og markedsføring",
+							text: "Ytelsesmåling og nyhetsbrev kun med samtykke (art. 6 nr. 1 a). Samtykket kan trekkes tilbake når som helst.",
+						},
+					]}
+				/>
+			</Clause>
 
-            <LegalSection id="behandlingsansvarlig" title="2. Behandlingsansvarlig">
-              <p>
-                <strong className="font-medium text-[#9ca3af]">{COMPANY_LEGAL_LINE}</strong> er
-                behandlingsansvarlig for personopplysninger som behandles i forbindelse med vår
-                markedsføring, kundekontakt og leveranse av tjenesten Agenci, med mindre annet følger av
-                avtale med din arbeidsgiver eller organisasjon.
-              </p>
-              <p>
-                For henvendelser om personvern kan du kontakte oss på{" "}
-                <a href={`mailto:${PRIVACY_EMAIL}`} className={accentLink}>
-                  {PRIVACY_EMAIL}
-                </a>{" "}
-                eller via{" "}
-                <Link href={LANDING_CONTACT_PAGE_PATH} className={accentLink}>
-                  kontaktskjemaet
-                </Link>
-                . Merk henvendelsen med «Personvern».
-              </p>
-            </LegalSection>
+			<Clause id="ki" n={5} title="Kunstig intelligens">
+				<p>
+					Assistenten bruker språkmodeller fra OpenAI via deres API for å forstå
+					spørsmål og skrive svar ut fra bedriftens kunnskap. Samtaleinnholdet
+					sendes til modellen for å lage svaret. Etter OpenAIs vilkår for
+					API-bruk brukes ikke disse dataene til å trene modellene deres.
+				</p>
+				<p>
+					Assistenten tar ikke automatiserte avgjørelser som har rettslig
+					virkning for deg eller på lignende måte påvirker deg betydelig (GDPR
+					art. 22). Du kan alltid be om å få snakke med et menneske der
+					bedriften tilbyr det.
+				</p>
+			</Clause>
 
-            <LegalSection id="opplysninger" title="3. Hvilke opplysninger vi behandler">
-              <p>Vi kan behandle følgende kategorier av opplysninger, avhengig av hvordan du bruker oss:</p>
-              <ul className="mt-2 space-y-2">
-                <ListItem label="Konto og identitet">
-                  f.eks. navn, e-postadresse, telefonnummer og innloggingsidentifikatorer (f.eks. via innloggingsleverandør).
-                </ListItem>
-                <ListItem label="Drift og sikkerhet">
-                  f.eks. IP-adresse, enhets- og nettleserinformasjon, tidspunkt for henvendelser, logger som er nødvendige for feilsøking, misbruksforebygging og informasjonssikkerhet.
-                </ListItem>
-                <ListItem label="Innhold i tjenesten">
-                  tekst, filer og annet materiale du eller din organisasjon velger å laste inn i plattformen, samt samtale- og henvendelsesdata som genereres i tråd med produktets funksjon.
-                </ListItem>
-                <ListItem label="Kundeservice">
-                  opplysninger du gir når du kontakter oss (f.eks. i skjema, e-post eller chat).
-                </ListItem>
-                <ListItem label="Markedsføring">
-                  hvis du melder deg på nyhetsbrev eller samtykker til tilsvarende — typisk e-postadresse og preferanser.
-                </ListItem>
-              </ul>
-            </LegalSection>
+			<Clause id="lagring" n={6} title="Lagring og sletting">
+				<p>Vi lagrer ikke opplysninger lenger enn nødvendig for formålet:</p>
+				<Terms
+					items={[
+						{
+							label: "Besøksøkter",
+							text: "En anonym besøksøkt i widgeten utløper etter 24 timer. Den besøkende kan selv slette økten og samtalene sine fra widgeten.",
+						},
+						{
+							label: "Samtaler",
+							text: "Lagres så lenge bedriften har konto hos oss, slik at de kan følges opp. De slettes når bedriften sletter samtalen, assistenten eller kontoen.",
+						},
+						{
+							label: "Kunnskap og filer",
+							text: "Lagres til bedriften fjerner kilden, assistenten eller kontoen.",
+						},
+						{
+							label: "Konto",
+							text: "Slettes når kontoen avsluttes, med unntak av det vi må oppbevare etter lov.",
+						},
+						{
+							label: "Regnskap",
+							text: "Faktura- og betalingsopplysninger oppbevares i fem år etter bokføringsloven.",
+						},
+						{
+							label: "Henvendelser",
+							text: "Kontaktskjemaet lagres ikke i databasen vår, men sendes til vår e-post. Nyhetsbrevadresser beholdes til du melder deg av.",
+						},
+					]}
+				/>
+			</Clause>
 
-            <LegalSection id="formal-grunnlag" title="4. Formål og rettslig grunnlag">
-              <p>Vi behandler personopplysninger for blant annet følgende formål:</p>
-              <ul className="mt-2 space-y-2">
-                <ListItem label="Levere og forbedre tjenesten">
-                  utføre avtale med deg eller din organisasjon (GDPR art. 6 nr. 1 bokstav b).
-                </ListItem>
-                <ListItem label="Kundeservice og kommunikasjon">
-                  svare på henvendelser og administrere kundeforhold (avtale og berettiget interesse, jf. art. 6 nr. 1 bokstav b og f).
-                </ListItem>
-                <ListItem label="Sikkerhet og misbruksforebygging">
-                  berettiget interesse i å sikre stabile og trygge tjenester (art. 6 nr. 1 bokstav f).
-                </ListItem>
-                <ListItem label="Regnskaps- og rettslige krav">
-                  oppfylle lovpålagte plikter (art. 6 nr. 1 bokstav c).
-                </ListItem>
-                <ListItem label="Nyhetsbrev og markedsføring">
-                  der det kreves, innhentes samtykke særskilt (art. 6 nr. 1 bokstav a); du kan når som helst trekke samtykket tilbake.
-                </ListItem>
-              </ul>
-            </LegalSection>
+			<Clause id="underleverandorer" n={7} title="Underleverandører">
+				<p>
+					Vi bruker nøye utvalgte leverandører for å drive tjenesten. De
+					behandler opplysninger kun på våre vegne og etter databehandleravtale:
+				</p>
+				<Terms
+					items={[
+						{
+							label: "OpenAI",
+							text: "Språkmodeller som skriver svar og gjør kunnskapen søkbar.",
+						},
+						{
+							label: "Firecrawl",
+							text: "Henter innhold og profil fra bedriftens nettside når en assistent opprettes.",
+						},
+						{
+							label: "LlamaIndex",
+							text: "Leser og strukturerer opplastede dokumenter.",
+						},
+						{
+							label: "Inngest",
+							text: "Kjører bakgrunnsjobber, som innlesing av kunnskap.",
+						},
+						{ label: "Stripe", text: "Betaling og abonnement." },
+						{
+							label: "Sentry",
+							text: "Feilsporing, med lagring i EU. Ytelsesmåling kun med samtykke.",
+						},
+						{
+							label: "Resend",
+							text: "Sender e-post fra kontaktskjema og nyhetsbrev.",
+						},
+						{
+							label: "Cookiebot",
+							text: "Håndterer samtykke til informasjonskapsler.",
+						},
+						{
+							label: "Skyleverandør",
+							text: "Drift av database og fillagring for tjenesten.",
+						},
+					]}
+				/>
+				<p>
+					Oppdatert oversikt over underleverandører får du ved å kontakte oss.
+				</p>
+			</Clause>
 
-            <LegalSection id="lagring" title="5. Lagring og sletting">
-              <p>Vi lagrer personopplysninger så lenge det er nødvendig for formålene:</p>
-              <ul className="mt-2 space-y-2">
-                <ListItem label="Widget-besøkende (navn, e-post, metadata)">
-                  Anonymiseres automatisk etter 24 timer (ekspirasjon av sesjonen). En daglig rutine erstatter navn og e-post med anonymiserte verdier og sletter enhetsdata.
-                </ListItem>
-                <ListItem label="Brukerkontoer (dashboard)">
-                  Slettes ved opphør av konto. Sletting i autentiseringssystemet trigges automatisk en sletting av tilknyttede data i vår database.
-                </ListItem>
-                <ListItem label="Samtalehistorikk">
-                  Oppbevares i avtaleperioden for å muliggjøre oppfølging. Kan slettes på forespørsel.
-                </ListItem>
-                <ListItem label="Kontaktskjema og nyhetsbrev">
-                  Kontaktskjema-data lagres ikke i vår database — det videresendes til vår e-postinnboks. Nyhetsbrev-adresser behandles frem til samtykke trekkes tilbake.
-                </ListItem>
-              </ul>
-            </LegalSection>
+			<Clause id="tredjeland" n={8} title="Overføring utenfor EØS">
+				<p>
+					Noen leverandører er etablert i USA. Overføring skjer bare med gyldig
+					overføringsgrunnlag etter GDPR, som EU–US Data Privacy Framework eller
+					EU-kommisjonens standardkontraktsklausuler, med nødvendige
+					tilleggstiltak.
+				</p>
+			</Clause>
 
-            <LegalSection id="deling" title="6. Deling og underleverandører">
-              <p>
-                Vi deler ikke personopplysninger med tredjeparter for deres egne markedsføringsformål.
-                Vi bruker følgende databehandlere (underleverandører) for å drifte tjenesten:
-              </p>
-              <ul className="mt-2 space-y-2">
-                <ListItem label="Convex (USA/EU-west-1)">
-                  Primær databaseleverandør. Alle data lagres i EU (Irland, AWS eu-west-1).
-                </ListItem>
-                <ListItem label="OpenAI (USA)">
-                  Behandler samtaleinnhold for å generere AI-svar. Dataoverføring skjer i henhold til SCC. OpenAI beholder ikke data for trening av modeller via API.
-                </ListItem>
-                <ListItem label="Sentry / Functional Software (USA/EU)">
-                  Feilsporing og overvåking. Data lagres i Sentrys EU-region (Tyskland). Ingen video- eller sesjonsopptak er aktivert.
-                </ListItem>
-                <ListItem label="Resend (USA)">
-                  E-postformidling (kontaktskjema og nyhetsbrev). Kun brukt til å levere e-post; innhold lagres ikke permanent hos Resend.
-                </ListItem>
-              </ul>
-              <p>
-                Der din arbeidsgiver eller organisasjon er kunde hos oss, kan opplysninger deles internt
-                i tråd med avtalen og tilgangsstyring i produktet.
-              </p>
-            </LegalSection>
+			<Clause id="rettigheter" n={9} title="Dine rettigheter">
+				<Terms
+					items={[
+						{
+							label: "Innsyn",
+							text: "Få vite hvilke opplysninger vi har om deg, og få en kopi.",
+						},
+						{
+							label: "Retting",
+							text: "Få rettet feil eller ufullstendige opplysninger.",
+						},
+						{
+							label: "Sletting",
+							text: "Få opplysninger slettet når vilkårene i GDPR er oppfylt.",
+						},
+						{
+							label: "Begrensning",
+							text: "Kreve at behandlingen begrenses i visse tilfeller.",
+						},
+						{
+							label: "Dataportabilitet",
+							text: "Få opplysninger du har gitt oss i et maskinlesbart format.",
+						},
+						{
+							label: "Protest",
+							text: "Protestere mot behandling som bygger på berettiget interesse.",
+						},
+						{
+							label: "Trekke samtykke",
+							text: "Når som helst, uten at det påvirker behandlingen før du trakk det.",
+						},
+					]}
+				/>
+				<p>
+					Send en e-post til {mail} eller bruk{" "}
+					<Link href={LANDING_CONTACT_PAGE_PATH} className={l.link}>
+						kontaktskjemaet
+					</Link>{" "}
+					og merk henvendelsen «Personvern». Vi svarer innen én måned. Gjelder
+					det en samtale med en bedrift, hjelper vi bedriften med å svare deg.
+				</p>
+			</Clause>
 
-            <LegalSection id="tredjeland" title="7. Overføring til andre land">
-              <p>
-                Dine opplysninger behandles primært innen EU/EØS. Dersom vi bruker leverandører utenfor
-                EU/EØS, sikrer vi overføring i samsvar med GDPR, for eksempel gjennom EU-kommisjonens
-                standardkontraktsklausuler eller andre godkjente mekanismer.
-              </p>
-            </LegalSection>
+			<Clause id="cookies" n={10} title="Informasjonskapsler">
+				<p>
+					Vi bruker Cookiebot til å be om og lagre samtykket ditt. Bare det som
+					er strengt nødvendig, settes uten samtykke.
+				</p>
+				<Terms
+					items={[
+						{
+							label: "Nødvendige",
+							text: "Innlogging i dashboardet, sikkerhet og lagring av samtykkevalget ditt.",
+						},
+						{
+							label: "Statistikk",
+							text: "Ytelsesmåling i Sentry, kun hvis du samtykker.",
+						},
+						{
+							label: "Chat-widgeten",
+							text: "Lagrer en anonym økt-ID i nettleserens lokale lagring, slik at samtalen ikke forsvinner når du bytter side. Widgeten setter ingen informasjonskapsler.",
+						},
+					]}
+				/>
+				<p>
+					Du kan endre eller trekke samtykket når som helst:{" "}
+					<CookieSettingsButton />
+				</p>
+			</Clause>
 
-            <LegalSection id="rettigheter" title="8. Dine rettigheter">
-              <p>Du har følgende rettigheter etter personvernregelverket, med de begrensningene loven setter:</p>
-              <ul className="mt-2 space-y-2">
-                <ListItem label="Innsyn">få informasjon om hvilke opplysninger vi behandler om deg.</ListItem>
-                <ListItem label="Retting">få rettet uriktige eller ufullstendige opplysninger.</ListItem>
-                <ListItem label="Sletting">be om sletting når vilkårene i GDPR er oppfylt.</ListItem>
-                <ListItem label="Begrensning">i visse tilfeller kreve begrenset behandling.</ListItem>
-                <ListItem label="Dataportabilitet">
-                  der behandlingen er automatisert og basert på samtykke eller avtale, kan du i visse tilfeller motta opplysningene i et strukturert, maskinlesbart format.
-                </ListItem>
-                <ListItem label="Innsigelse">
-                  mot behandling som er basert på berettiget interesse, med mindre vi har tungtveiende berettigede grunner.
-                </ListItem>
-                <ListItem label="Trekke samtykke">når behandlingen er basert på samtykke.</ListItem>
-              </ul>
-              <p>
-                For å utøve rettighetene, ta kontakt via{" "}
-                <Link href={LANDING_CONTACT_PAGE_PATH} className={accentLink}>
-                  kontaktskjemaet
-                </Link>
-                . Vi besvarer henvendelser uten ugrunnlagt opphold og senest innen én måned.
-              </p>
-            </LegalSection>
+			<Clause id="sikkerhet" n={11} title="Sikkerhet">
+				<p>
+					Vi beskytter opplysningene med tekniske og organisatoriske tiltak:
+					kryptert overføring, tilgangsstyring per organisasjon, adskilte data
+					mellom kunder, begrenset tilgang for ansatte og løpende overvåking.
+					Ved et sikkerhetsbrudd som kan ramme deg, varsler vi Datatilsynet
+					innen 72 timer der loven krever det — og deg og berørte kunder uten
+					ugrunnet opphold.
+				</p>
+			</Clause>
 
-            <LegalSection id="cookies" title="9. Informasjonskapsler og lignende teknologi">
-              <p>Vi bruker følgende teknologier:</p>
-              <ul className="mt-2 space-y-2">
-                <ListItem label="Påloggingscookies (nødvendig)">
-                  Vi setter en sesjons-cookie for å holde deg innlogget i dashboardet. Den er strengt nødvendig og kan ikke deaktiveres.
-                </ListItem>
-                <ListItem label="Brukerpreferanser (nødvendig)">
-                  En cookie lagrer UI-innstillinger (f.eks. sidemenyens tilstand) for påloggede brukere.
-                </ListItem>
-                <ListItem label="Feilsporing (Sentry)">
-                  Sentry registrerer tekniske feil og ytelsesdata for å feilsøke problemer. Ingen sesjonsopptak er aktivert. Data lagres i EU (Germany).
-                </ListItem>
-                <ListItem label="Widget — localStorage">
-                  Chat-widgeten lagrer en anonym sesjons-ID i nettleserens localStorage for å bevare samtalehistorikk mellom sideinnlastinger. Ingen cookies settes av embed-skriptet.
-                </ListItem>
-              </ul>
-              <p>
-                Du kan endre innstillinger i nettleseren for å blokkere eller slette cookies og localStorage; merk at deler av tjenesten da kan slutte å fungere som forventet.
-              </p>
-            </LegalSection>
+			<Clause id="barn" n={12} title="Barn">
+				<p>
+					Agenci er laget for virksomheter og retter seg ikke mot barn under 16
+					år. Oppdager vi at vi har opplysninger om et barn uten gyldig
+					grunnlag, sletter vi dem.
+				</p>
+			</Clause>
 
-            <LegalSection id="sikkerhet" title="10. Sikkerhet">
-              <p>
-                Vi iverksetter tekniske og organisatoriske tiltak som er rimelige etter risiko og art av
-                opplysningene, herunder tilgangskontroll, kryptering i transitt der det er hensiktsmessig,
-                og prinsippet om dataminimering. Ingen løsninger er fullstendig uten risiko; vi arbeider
-                løpende med å opprettholde et forsvarlig sikkerhetsnivå.
-              </p>
-            </LegalSection>
+			<Clause id="endringer" n={13} title="Endringer">
+				<p>
+					Vi oppdaterer erklæringen når tjenesten eller regelverket endres.
+					Gjeldende versjon ligger alltid her, med dato og versjonsnummer
+					øverst. Vesentlige endringer varsler vi på e-post eller i dashboardet.
+				</p>
+			</Clause>
 
-            <LegalSection id="endringer" title="11. Endringer i erklæringen">
-              <p>
-                Vi kan oppdatere denne personvernerklæringen ved endringer i praksis, teknologi eller
-                lovkrav. Den gjeldende versjonen publiseres alltid på denne siden med oppdatert dato. Ved
-                vesentlige endringer kan vi varsle via e-post eller i produktet der det er relevant.
-              </p>
-            </LegalSection>
-
-            <LegalSection id="kontakt-klage" title="12. Kontakt og klage">
-              <p>
-                Har du spørsmål om hvordan vi behandler personopplysninger, ta kontakt via{" "}
-                <Link href={LANDING_CONTACT_PAGE_PATH} className={accentLink}>
-                  kontaktskjemaet
-                </Link>
-                .
-              </p>
-              <p>
-                Du har rett til å klage til tilsynsmyndigheten. I Norge er det{" "}
-                <a
-                  href="https://www.datatilsynet.no"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={accentLink}
-                >
-                  Datatilsynet
-                </a>
-                .
-              </p>
-            </LegalSection>
-          </div>
-
-        </div>
-
-        <MarketingSubpageCta />
-      </div>
-    </MarketingPageLayout>
-  );
-}
-
-function LegalSection({
-  id,
-  title,
-  children,
-}: {
-  id: string;
-  title: string;
-  children: ReactNode;
-}) {
-  return (
-    <section id={id} className="scroll-mt-24">
-      <h2 className="text-[18px] font-semibold leading-[1.25] tracking-[-0.4px] text-[#f2f3f5]">
-        {title}
-      </h2>
-      <div className="mt-4 space-y-4 text-[15px] leading-[1.65] text-[#9ca3af]">{children}</div>
-    </section>
-  );
-}
-
-function ListItem({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <li className="flex items-start gap-3 text-[14px] leading-[1.6] text-[#9ca3af]">
-      <span aria-hidden className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#6b7280]" />
-      <span>
-        <span className="font-medium text-[#9ca3af]">{label}:</span> {children}
-      </span>
-    </li>
-  );
+			<Clause id="kontakt" n={14} title="Kontakt og klage">
+				<p>
+					Spørsmål om personvern: {mail}. Mener du at vi behandler opplysninger
+					i strid med regelverket, kan du klage til{" "}
+					<a
+						href="https://www.datatilsynet.no"
+						target="_blank"
+						rel="noopener noreferrer"
+						className={l.link}
+					>
+						Datatilsynet
+					</a>
+					. Vi setter pris på om du tar kontakt med oss først, så vi kan rydde
+					opp.
+				</p>
+				<p>Behandlingsansvarlig: {COMPANY.legalLine}.</p>
+			</Clause>
+		</LegalPage>
+	);
 }

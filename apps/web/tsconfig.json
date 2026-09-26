@@ -1,6 +1,11 @@
 {
   "extends": "@agenci/config/tsconfig.base.json",
   "compilerOptions": {
+    // The shared base is for Bun/server code; a Next app needs JSX + the DOM.
+    "jsx": "react-jsx",
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "noEmit": true,
+    "incremental": true,
     "paths": {
       "@/*": ["./*"],
       "@workspace/ui/*": ["../../packages/ui/src/*"],
