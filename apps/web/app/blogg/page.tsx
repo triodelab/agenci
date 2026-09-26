@@ -1,80 +1,124 @@
+import { ArrowRight } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { MarketingPageLayout } from "@/modules/landing/ui/components/marketing-page-layout";
-import { MarketingSubpageCta } from "@/modules/landing/ui/components/marketing-subpage-cta";
+import { getSiteUrl } from "@/lib/site-url";
+import { allPosts, formatDate } from "@/modules/blog/posts";
+import { blogLd, breadcrumbLd, JsonLd } from "@/modules/blog/seo";
+import s from "@/modules/blog/ui/blog.module.css";
+import { PostCover } from "@/modules/blog/ui/post-cover";
+import { LandingFooter } from "@/modules/landing/ui/components/landing-footer";
+import { LandingNav } from "@/modules/landing/ui/components/landing-nav";
 
 export const metadata: Metadata = {
-  title: "Blogg — AI, chatbot og kundeservice for norske bedrifter",
-  description:
-    "Artikler og guider om AI-chatbot, kundeservice og automatisering for norske bedrifter. Lær hvordan du får mer ut av teknologien.",
-  alternates: { canonical: "/blogg" },
-  robots: { index: true, follow: true },
+	title: "Blogg — AI, chatbot og kundeservice for norske bedrifter",
+	description:
+		"Artikler og guider om AI-chatbot, kundeservice og automatisering for norske bedrifter. Lær hvordan du får mer ut av teknologien.",
+	alternates: {
+		canonical: "/blogg",
+		types: { "application/rss+xml": "/blogg/rss.xml" },
+	},
+	openGraph: {
+		type: "website",
+		url: "/blogg",
+		title: "Agenci-bloggen",
+		description:
+			"Artikler og guider om AI-chatbot, kundeservice og automatisering for norske bedrifter.",
+	},
+	robots: { index: true, follow: true },
 };
 
-const articles = [
-  {
-    slug: "chatbot",
-    title: "Chatbot: forbedre kundeservice, reduser kostnader og frigjør tid",
-    description:
-      "Lær hvordan en AI-chatbot kan svare kunder 24/7, redusere driftskostnader og frigjøre tid for teamet ditt. Alt om chatbot-teknologi for norske bedrifter.",
-    category: "Kundeservice & AI",
-    date: "26. mai 2026",
-    readTime: "8 min",
-  },
-];
-
 export default function BloggPage() {
-  return (
-    <MarketingPageLayout>
-      <div>
-        {/* Header — dark */}
-        <div className="bg-[#1C1C1C]">
-          <header className="border-b border-[#2a2a2a]">
-            <div className="mx-auto max-w-[900px] px-6 py-16 md:py-20 xl:px-8">
-              <p className="text-[12px] font-semibold uppercase tracking-[0.5px] text-[#6b7280]">
-                Blogg
-              </p>
-              <h1 className="mt-4 text-[36px] font-semibold leading-[1.15] tracking-[-1px] text-[#f2f3f5] md:text-[44px]">
-                Artikler og guider
-              </h1>
-              <p className="mt-4 max-w-[500px] text-[16px] leading-[1.6] text-[#9ca3af]">
-                Alt om AI-chatbot, kundeservice og automatisering — skrevet for norske bedrifter.
-              </p>
-            </div>
-          </header>
-        </div>
+	const posts = allPosts();
+	const [featured, ...rest] = posts;
+	const base = getSiteUrl();
 
-        {/* Articles — light */}
-        <div className="bg-[#F9F9F9]">
-          <div className="mx-auto max-w-[900px] px-6 py-12 xl:px-8">
-            <div className="grid gap-4 sm:grid-cols-2">
-              {articles.map((article) => (
-                <Link
-                  key={article.slug}
-                  href={`/blogg/${article.slug}`}
-                  className="group rounded-[14px] border border-[#E4DFD9] bg-white p-6 transition-colors hover:border-[#d1cbc3]"
-                >
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.4px] text-[#9ca3af]">
-                    {article.category}
-                  </p>
-                  <h2 className="mt-3 text-[16px] font-semibold leading-snug tracking-[-0.3px] text-[#111827] transition-colors group-hover:text-[#1C1C1C]">
-                    {article.title}
-                  </h2>
-                  <p className="mt-2 text-[13px] leading-[1.6] text-[#6b7280]">
-                    {article.description}
-                  </p>
-                  <div className="mt-4 flex items-center gap-4 text-[12px] text-[#9ca3af]">
-                    <span>{article.date}</span>
-                    <span>{article.readTime} lesetid</span>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </div>
+	return (
+		<>
+			<JsonLd data={blogLd(posts)} />
+			<JsonLd
+				data={breadcrumbLd([
+					{ name: "Agenci", url: `${base}/` },
+					{ name: "Blogg", url: `${base}/blogg` },
+				])}
+			/>
+			<LandingNav variant="auto" />
+			<main
+				className={`${s.page} landing-warp min-h-svh overflow-x-clip antialiased`}
+				data-agenci-product-sections
+			>
+				<section
+					className={`${s.indexHero} ${s.dotted}`}
+					data-landing-nav-surface="light"
+					aria-labelledby="blog-heading"
+				>
+					<div className={s.container}>
+						<span className={s.eyebrow}>Blogg</span>
+						<h1 id="blog-heading" className={s.title}>
+							Bedre kundeservice.
+							<br />
+							<span>Forklart enkelt.</span>
+						</h1>
+						<p className={s.lead}>
+							Artikler og guider om AI-chatbot, kundeservice og automatisering —
+							skrevet for norske bedrifter.
+						</p>
+					</div>
+				</section>
 
-        <MarketingSubpageCta />
-      </div>
-    </MarketingPageLayout>
-  );
+				<section
+					className={s.container}
+					style={{ paddingBottom: 96 }}
+					data-landing-nav-surface="light"
+					aria-label="Artikler"
+				>
+					{featured ? (
+						<Link href={`/blogg/${featured.slug}`} className={s.featured}>
+							<PostCover post={featured} />
+							<div className={s.featuredCopy}>
+								<span className={s.pill}>{featured.category}</span>
+								<h2>{featured.title}</h2>
+								<p>{featured.description}</p>
+								<div className={s.meta}>
+									<time dateTime={featured.publishedAt}>
+										{formatDate(featured.publishedAt)}
+									</time>
+									<span>{featured.readingMinutes} min lesetid</span>
+								</div>
+								<span className={s.readMore}>
+									Les artikkelen <ArrowRight size={17} aria-hidden="true" />
+								</span>
+							</div>
+						</Link>
+					) : null}
+
+					{rest.length ? (
+						<div className={s.grid}>
+							{rest.map((post) => (
+								<Link
+									key={post.slug}
+									href={`/blogg/${post.slug}`}
+									className={s.postCard}
+								>
+									<PostCover post={post} />
+									<h3>{post.title}</h3>
+									<p>{post.description}</p>
+									<div className={s.meta}>
+										<time dateTime={post.publishedAt}>
+											{formatDate(post.publishedAt)}
+										</time>
+										<span>{post.readingMinutes} min</span>
+									</div>
+								</Link>
+							))}
+						</div>
+					) : (
+						<p className={s.soon}>Flere artikler er på vei.</p>
+					)}
+				</section>
+			</main>
+			<div className="bg-[#FAFAFA]">
+				<LandingFooter />
+			</div>
+		</>
+	);
 }

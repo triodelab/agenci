@@ -97,6 +97,23 @@ export type Member = Prisma.MemberModel
  */
 export type Invitation = Prisma.InvitationModel
 /**
+ * Model ContactSession
+ * Widget visitor identity — no Better Auth session; anonymous website
+ * visitors are scoped by this token + org (docs/task.md Phase 4, Task 4.1).
+ * Conversation history itself lives in Mastra's own thread memory, keyed by
+ * `${organizationId}:contact:${contactSession.id}` + a client-generated
+ * threadId — this table only tracks the visitor and their contact info.
+ */
+export type ContactSession = Prisma.ContactSessionModel
+/**
+ * Model Conversation
+ * One row per widget conversation — the index the inbox, overview and agent
+ * list read from. The messages themselves stay in the Mastra memory thread
+ * with the same id; this row is kept in step on every message
+ * (`modules/conversations/service.ts`).
+ */
+export type Conversation = Prisma.ConversationModel
+/**
  * Model Document
  * 
  */

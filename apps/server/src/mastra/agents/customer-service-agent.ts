@@ -2,13 +2,18 @@ import { Agent } from "@mastra/core/agent";
 import { SUPPORT_AGENT_PROMPT } from "../constants";
 import { createKnowledgeSearchTool } from "../tools/knowledge-search-tool";
 import { CUSTOMER_AGENT_MODEL, customerAgentMemory } from "../store";
-
+import {
+  type AgentBehaviorInput,
+  buildBehaviorInstructions,
+} from "../agent-behavior";
 
 export type CustomerServiceAgentInput = {
   /** Prisma `Agent.id` — also used as the Mastra registration key. */
   id: string;
   name: string;
   description: string;
+  /** Customer's behaviour settings (tone, rules, model …), if any. */
+  behavior?: AgentBehaviorInput | null;
 };
 
 function buildInstructions(name: string, description: string) {
@@ -31,12 +36,14 @@ export function createCustomerServiceAgent({
   id,
   name,
   description,
+  behavior,
 }: CustomerServiceAgentInput): Agent {
   return new Agent({
     id,
     name,
-    instructions: buildInstructions(name, description),
-    model: CUSTOMER_AGENT_MODEL,
+    instructions:
+      buildInstructions(name, description) + buildBehaviorInstructions(behavior),
+    model: behavior?.model || CUSTOMER_AGENT_MODEL,
     tools: {
       // Key must stay `searchTool` — the system prompt refers to it by name.
       searchTool: createKnowledgeSearchTool(id),

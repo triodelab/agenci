@@ -82,6 +82,7 @@ export type AgentWidgetBrandCountAggregateOutputType = {
   fontFamilyPrimary: number
   fontFamilyHeading: number
   fontFamilyCode: number
+  settings: number
   extractedAt: number
   createdAt: number
   updatedAt: number
@@ -147,6 +148,7 @@ export type AgentWidgetBrandCountAggregateInputType = {
   fontFamilyPrimary?: true
   fontFamilyHeading?: true
   fontFamilyCode?: true
+  settings?: true
   extractedAt?: true
   createdAt?: true
   updatedAt?: true
@@ -241,6 +243,7 @@ export type AgentWidgetBrandGroupByOutputType = {
   fontFamilyPrimary: string | null
   fontFamilyHeading: string | null
   fontFamilyCode: string | null
+  settings: runtime.JsonValue | null
   extractedAt: Date
   createdAt: Date
   updatedAt: Date
@@ -283,6 +286,7 @@ export type AgentWidgetBrandWhereInput = {
   fontFamilyPrimary?: Prisma.StringNullableFilter<"AgentWidgetBrand"> | string | null
   fontFamilyHeading?: Prisma.StringNullableFilter<"AgentWidgetBrand"> | string | null
   fontFamilyCode?: Prisma.StringNullableFilter<"AgentWidgetBrand"> | string | null
+  settings?: Prisma.JsonNullableFilter<"AgentWidgetBrand">
   extractedAt?: Prisma.DateTimeFilter<"AgentWidgetBrand"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"AgentWidgetBrand"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"AgentWidgetBrand"> | Date | string
@@ -305,6 +309,7 @@ export type AgentWidgetBrandOrderByWithRelationInput = {
   fontFamilyPrimary?: Prisma.SortOrderInput | Prisma.SortOrder
   fontFamilyHeading?: Prisma.SortOrderInput | Prisma.SortOrder
   fontFamilyCode?: Prisma.SortOrderInput | Prisma.SortOrder
+  settings?: Prisma.SortOrderInput | Prisma.SortOrder
   extractedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -330,6 +335,7 @@ export type AgentWidgetBrandWhereUniqueInput = Prisma.AtLeast<{
   fontFamilyPrimary?: Prisma.StringNullableFilter<"AgentWidgetBrand"> | string | null
   fontFamilyHeading?: Prisma.StringNullableFilter<"AgentWidgetBrand"> | string | null
   fontFamilyCode?: Prisma.StringNullableFilter<"AgentWidgetBrand"> | string | null
+  settings?: Prisma.JsonNullableFilter<"AgentWidgetBrand">
   extractedAt?: Prisma.DateTimeFilter<"AgentWidgetBrand"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"AgentWidgetBrand"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"AgentWidgetBrand"> | Date | string
@@ -352,6 +358,7 @@ export type AgentWidgetBrandOrderByWithAggregationInput = {
   fontFamilyPrimary?: Prisma.SortOrderInput | Prisma.SortOrder
   fontFamilyHeading?: Prisma.SortOrderInput | Prisma.SortOrder
   fontFamilyCode?: Prisma.SortOrderInput | Prisma.SortOrder
+  settings?: Prisma.SortOrderInput | Prisma.SortOrder
   extractedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -379,6 +386,7 @@ export type AgentWidgetBrandScalarWhereWithAggregatesInput = {
   fontFamilyPrimary?: Prisma.StringNullableWithAggregatesFilter<"AgentWidgetBrand"> | string | null
   fontFamilyHeading?: Prisma.StringNullableWithAggregatesFilter<"AgentWidgetBrand"> | string | null
   fontFamilyCode?: Prisma.StringNullableWithAggregatesFilter<"AgentWidgetBrand"> | string | null
+  settings?: Prisma.JsonNullableWithAggregatesFilter<"AgentWidgetBrand">
   extractedAt?: Prisma.DateTimeWithAggregatesFilter<"AgentWidgetBrand"> | Date | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"AgentWidgetBrand"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"AgentWidgetBrand"> | Date | string
@@ -399,6 +407,7 @@ export type AgentWidgetBrandCreateInput = {
   fontFamilyPrimary?: string | null
   fontFamilyHeading?: string | null
   fontFamilyCode?: string | null
+  settings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   extractedAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -421,6 +430,7 @@ export type AgentWidgetBrandUncheckedCreateInput = {
   fontFamilyPrimary?: string | null
   fontFamilyHeading?: string | null
   fontFamilyCode?: string | null
+  settings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   extractedAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -441,6 +451,7 @@ export type AgentWidgetBrandUpdateInput = {
   fontFamilyPrimary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fontFamilyHeading?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fontFamilyCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  settings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   extractedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -463,6 +474,7 @@ export type AgentWidgetBrandUncheckedUpdateInput = {
   fontFamilyPrimary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fontFamilyHeading?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fontFamilyCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  settings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   extractedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -484,6 +496,7 @@ export type AgentWidgetBrandCreateManyInput = {
   fontFamilyPrimary?: string | null
   fontFamilyHeading?: string | null
   fontFamilyCode?: string | null
+  settings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   extractedAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -504,6 +517,7 @@ export type AgentWidgetBrandUpdateManyMutationInput = {
   fontFamilyPrimary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fontFamilyHeading?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fontFamilyCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  settings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   extractedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -525,6 +539,7 @@ export type AgentWidgetBrandUncheckedUpdateManyInput = {
   fontFamilyPrimary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fontFamilyHeading?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fontFamilyCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  settings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   extractedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -551,6 +566,7 @@ export type AgentWidgetBrandCountOrderByAggregateInput = {
   fontFamilyPrimary?: Prisma.SortOrder
   fontFamilyHeading?: Prisma.SortOrder
   fontFamilyCode?: Prisma.SortOrder
+  settings?: Prisma.SortOrder
   extractedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -645,6 +661,7 @@ export type AgentWidgetBrandCreateWithoutAgentInput = {
   fontFamilyPrimary?: string | null
   fontFamilyHeading?: string | null
   fontFamilyCode?: string | null
+  settings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   extractedAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -665,6 +682,7 @@ export type AgentWidgetBrandUncheckedCreateWithoutAgentInput = {
   fontFamilyPrimary?: string | null
   fontFamilyHeading?: string | null
   fontFamilyCode?: string | null
+  settings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   extractedAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -701,6 +719,7 @@ export type AgentWidgetBrandUpdateWithoutAgentInput = {
   fontFamilyPrimary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fontFamilyHeading?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fontFamilyCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  settings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   extractedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -721,6 +740,7 @@ export type AgentWidgetBrandUncheckedUpdateWithoutAgentInput = {
   fontFamilyPrimary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fontFamilyHeading?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fontFamilyCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  settings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   extractedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -744,6 +764,7 @@ export type AgentWidgetBrandSelect<ExtArgs extends runtime.Types.Extensions.Inte
   fontFamilyPrimary?: boolean
   fontFamilyHeading?: boolean
   fontFamilyCode?: boolean
+  settings?: boolean
   extractedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -766,6 +787,7 @@ export type AgentWidgetBrandSelectCreateManyAndReturn<ExtArgs extends runtime.Ty
   fontFamilyPrimary?: boolean
   fontFamilyHeading?: boolean
   fontFamilyCode?: boolean
+  settings?: boolean
   extractedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -788,6 +810,7 @@ export type AgentWidgetBrandSelectUpdateManyAndReturn<ExtArgs extends runtime.Ty
   fontFamilyPrimary?: boolean
   fontFamilyHeading?: boolean
   fontFamilyCode?: boolean
+  settings?: boolean
   extractedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -810,12 +833,13 @@ export type AgentWidgetBrandSelectScalar = {
   fontFamilyPrimary?: boolean
   fontFamilyHeading?: boolean
   fontFamilyCode?: boolean
+  settings?: boolean
   extractedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type AgentWidgetBrandOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "agentId" | "organizationId" | "sourceUrl" | "logoUrl" | "colorScheme" | "primaryColor" | "secondaryColor" | "accentColor" | "backgroundColor" | "textPrimaryColor" | "textSecondaryColor" | "fontFamilyPrimary" | "fontFamilyHeading" | "fontFamilyCode" | "extractedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["agentWidgetBrand"]>
+export type AgentWidgetBrandOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "agentId" | "organizationId" | "sourceUrl" | "logoUrl" | "colorScheme" | "primaryColor" | "secondaryColor" | "accentColor" | "backgroundColor" | "textPrimaryColor" | "textSecondaryColor" | "fontFamilyPrimary" | "fontFamilyHeading" | "fontFamilyCode" | "settings" | "extractedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["agentWidgetBrand"]>
 export type AgentWidgetBrandInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   agent?: boolean | Prisma.AgentDefaultArgs<ExtArgs>
 }
@@ -847,6 +871,12 @@ export type $AgentWidgetBrandPayload<ExtArgs extends runtime.Types.Extensions.In
     fontFamilyPrimary: string | null
     fontFamilyHeading: string | null
     fontFamilyCode: string | null
+    /**
+     * Customer's own widget customization (appearance overrides, title,
+     * greeting, suggestions, branding toggle). Brand columns above stay the
+     * extracted defaults; `settings` wins where set.
+     */
+    settings: runtime.JsonValue | null
     extractedAt: Date
     createdAt: Date
     updatedAt: Date
@@ -1289,6 +1319,7 @@ export interface AgentWidgetBrandFieldRefs {
   readonly fontFamilyPrimary: Prisma.FieldRef<"AgentWidgetBrand", 'String'>
   readonly fontFamilyHeading: Prisma.FieldRef<"AgentWidgetBrand", 'String'>
   readonly fontFamilyCode: Prisma.FieldRef<"AgentWidgetBrand", 'String'>
+  readonly settings: Prisma.FieldRef<"AgentWidgetBrand", 'Json'>
   readonly extractedAt: Prisma.FieldRef<"AgentWidgetBrand", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"AgentWidgetBrand", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"AgentWidgetBrand", 'DateTime'>

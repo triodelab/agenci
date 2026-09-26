@@ -1,5 +1,6 @@
 export * from "./AgentStatus";
 export * from "./AgentVertical";
+export * from "./ConversationStatus";
 export * from "./DocumentSourceType";
 export * from "./DocumentStatus";
 export * from "./Agent";
@@ -13,6 +14,8 @@ export * from "./Team";
 export * from "./TeamMember";
 export * from "./Member";
 export * from "./Invitation";
+export * from "./ContactSession";
+export * from "./Conversation";
 export * from "./Document";
 export * from "./__nullable__";
 export * from "./__transformDate__";

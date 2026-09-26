@@ -1,5 +1,5 @@
 /**
- * Task 1.2 — Stripe checkout uses Better Auth session (was Clerk `auth()`).
+ * Stripe checkout scoped to the Better Auth session.
  */
 import { NextResponse } from "next/server";
 import { getServerSession } from "@/lib/auth-server";

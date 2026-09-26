@@ -127,8 +127,8 @@ export default defineSchema({
   users: defineTable({
     name: v.string(),
     email: v.string(),
-    clerk_id: v.string(),
-  }).index("by_clerk_id", ["clerk_id"]),
+    auth_subject: v.string(),
+  }).index("by_auth_subject", ["auth_subject"]),
   agents: defineTable({
     organizationId: v.string(),
     name: v.string(),

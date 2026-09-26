@@ -4,7 +4,7 @@ import { useInfiniteScroll } from "@workspace/ui/hooks/use-infinite-scroll";
 import { InfiniteScrollTrigger } from "@workspace/ui/components/infinite-scroll-trigger";
 import { toUIMessages, useThreadMessages } from "@convex-dev/agent/react";
 import { api } from "@workspace/backend/_generated/api";
-import type { Id } from "@workspace/backend/_generated/dataModel";
+import { Id } from "@workspace/backend/_generated/dataModel";
 import { Button } from "@workspace/ui/components/button";
 import { useAction, useMutation, useQuery } from "convex/react";
 import { ClipboardListIcon, Wand2Icon, ChevronLeftIcon } from "lucide-react";

@@ -1,5 +1,5 @@
 /**
- * Task 1.2 — Stripe portal uses Better Auth session (was Clerk `auth()`).
+ * Stripe customer portal scoped to the Better Auth session.
  */
 import { NextResponse } from "next/server";
 import { getServerSession } from "@/lib/auth-server";

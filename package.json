@@ -9,11 +9,30 @@
       "packages/*"
     ],
     "catalog": {
-      "@types/node": "^20.19.25",
-      "convex": "^1.31.2",
-      "dotenv": "^17.2.3",
-      "typescript": "^5",
-      "zod": "^4.1.13"
+      "lucide-react": "^1.27.0",
+      "convex": "^1.39.1",
+      "typescript": "^7.0.2",
+      "dotenv": "^17.4.2",
+      "zod": "^4.4.3",
+      "@types/node": "^26.2.0",
+      "@orpc/server": "^1.14.12",
+      "@orpc/openapi": "^1.14.12",
+      "@orpc/zod": "^1.14.12",
+      "better-auth": "1.7.1",
+      "next-themes": "^0.4.6",
+      "react": "^19.2.8",
+      "react-dom": "^19.2.8",
+      "sonner": "^2.0.7",
+      "@orpc/client": "^1.14.12",
+      "@types/react": "^19.2.17",
+      "@types/react-dom": "^19.2.3",
+      "tailwindcss": "^4.3.3",
+      "@orpc/tanstack-query": "^1.14.12",
+      "@tanstack/react-query": "^5.101.4",
+      "@tanstack/react-form": "^1.33.2",
+      "hono": "^4.13.8",
+      "@types/bun": "^1.4.2",
+      "elysia": "^1.4.29"
     }
   },
   "scripts": {
@@ -23,23 +42,45 @@
     "dev:web:clean": "rm -rf apps/web/.next && turbo dev --filter=web",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "dev:widget": "npx turbo -F widget dev",
-    "dev:web": "npx turbo -F web dev",
-    "dev:backend": "npx turbo -F @agenci/backend dev",
-    "dev:setup": "npx turbo -F @agenci/backend dev:setup",
-    "verify": "pnpm exec tsc --noEmit -p apps/web && pnpm exec tsc --noEmit -p apps/widget && pnpm -F @agenci/backend test:openai-mini && pnpm -F @agenci/backend test:openai-mini:convex"
+    "dev:widget": "turbo -F widget dev",
+    "dev:web": "turbo -F web dev",
+    "dev:dashboard": "turbo -F dashboard dev",
+    "docker:down": "docker compose down",
+    "dev:server": "bun --filter server dev",
+    "verify": "bunx tsc --noEmit -p apps/web && bunx tsc --noEmit -p apps/widget && bun --filter dashboard check-types && bun --filter server check-types",
+    "infra:up": "docker compose up -d postgres inngest minio minio-setup",
+    "server:up": "docker compose up -d server postgres inngest minio minio-setup"
   },
   "devDependencies": {
-    "@types/node": "catalog:",
+    "@types/bun": "catalog:",
     "@workspace/eslint-config": "workspace:*",
-    "@workspace/typescript-config": "workspace:*",
+    "@agenci/config": "workspace:*",
     "prettier": "^3.5.1",
     "turbo": "^2.7.5",
-    "typescript": "catalog:",
-    "@types/bun": "catalog:"
+    "typescript": "catalog:"
   },
-  "packageManager": "pnpm@11.2.1",
+  "packageManager": "bun@1.4.2",
   "engines": {
-    "node": ">=20"
+    "node": ">=20",
+    "bun": ">=1.4.2"
+  },
+  "trustedDependencies": [
+    "@prisma/client",
+    "@prisma/engines",
+    "@swc/core",
+    "bufferutil",
+    "core-js",
+    "core-js-pure",
+    "esbuild",
+    "lightningcss",
+    "msgpackr-extract",
+    "prisma",
+    "protobufjs",
+    "sharp",
+    "utf-8-validate"
+  ],
+  "dependencies": {
+    "@mastra/pg": "^1.25.0",
+    "ai": "5"
   }
 }

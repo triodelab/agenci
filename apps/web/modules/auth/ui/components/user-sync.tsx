@@ -1,8 +1,7 @@
 /**
  * Task 1.2 Step 4 — UserSync no-op.
  *
- * Previously upserted the Clerk user into Convex (`api.users.add`).
- * Identity now lives in Better Auth / Postgres; Convex user sync is removed.
+ * Identity lives in Better Auth / Postgres; no user sync is needed.
  * Keep the component mounted so dashboard-layout does not need a larger refactor.
  */
 "use client";

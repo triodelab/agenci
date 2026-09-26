@@ -2,14 +2,14 @@
 
 import { useQuery } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
-import { useUser } from "@/lib/auth-compat";
+import { useUser } from "@/lib/auth-hooks";
 import { hasUiPremiumBypass } from "@/lib/dev-bypass";
 import { PremiumFeatureOverlay } from "./premium-feature-overlay";
 import { CardGridSkeleton } from "@/modules/dashboard/ui/components/dashboard-skeleton";
 
 export function ProPlanGate({ children }: { children: React.ReactNode }) {
   const { user, isLoaded } = useUser();
-  const email = user?.primaryEmailAddress?.emailAddress;
+  const email = user?.email;
   const subscription = useQuery(api.private.subscription.getOwn);
 
   if (hasUiPremiumBypass(email)) {

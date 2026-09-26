@@ -10,7 +10,6 @@ import {
 } from "lucide-react";
 import { ProductDemo } from "./product-demo";
 import { InteractiveProductDemo } from "./interactive-demo";
-import { LandingPricingSection } from "./landing-pricing-section";
 import type { ProductDemoScene } from "../../product-demo-config";
 import styles from "./product-story.module.css";
 export { LandingOutcomeDemosSection } from "./landing-outcome-section";
@@ -276,12 +275,6 @@ export function LandingWorkflowSection() {
           </div>
         </div>
         <div className={styles.practical}>
-          <details id="pricing" className={styles.disclosure}>
-            <summary>
-              Se priser og finn din plan <Plus size={20} />
-            </summary>
-            <LandingPricingSection embedded />
-          </details>
           <details id="faq" className={styles.disclosure}>
             <summary>
               Et par ting du kanskje lurer på <Plus size={20} />

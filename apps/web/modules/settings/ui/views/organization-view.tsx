@@ -1,10 +1,8 @@
-// @ts-nocheck
-// TODO(Clerk → Better Auth): typesjekk av for denne fila fordi den bruker Clerk-felt (memberships, inviteMember, membersCount, createdAt) som Better Auth-laget i @/lib/auth-compat ikke har ennå.
-// Samme feil finnes på migrate/convex-to-server. Fjern når fila er ferdig migrert.
 "use client";
 
 import { useState } from "react";
-import { useOrganization, useClerk } from "@/lib/auth-compat";
+import { authClient } from "@/lib/auth-client";
+import { useAuthActions } from "@/lib/auth-hooks";
 import { toast } from "sonner";
 import {
   Building2, CopyIcon, CheckIcon, UsersIcon,
@@ -63,8 +61,14 @@ function Card({ title, description, children, action }: {
   );
 }
 
+/** Better Auth org roles (packages/auth): owner | admin | member. */
+function canManageMembers(role: string | undefined) {
+  return role === "owner" || role === "admin";
+}
+
 function RoleBadge({ role }: { role: string }) {
-  const isAdmin = role === "org:admin";
+  const isAdmin = canManageMembers(role);
+  const label = role === "owner" ? "Eier" : role === "admin" ? "Admin" : "Medlem";
   return (
     <span className={cn(
       "inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide",
@@ -73,7 +77,7 @@ function RoleBadge({ role }: { role: string }) {
         : "bg-muted text-muted-foreground",
     )}>
       {isAdmin ? <ShieldCheckIcon className="size-3" strokeWidth={2} /> : <UserIcon className="size-3" strokeWidth={1.75} />}
-      {isAdmin ? "Admin" : "Medlem"}
+      {label}
     </span>
   );
 }
@@ -81,15 +85,17 @@ function RoleBadge({ role }: { role: string }) {
 // ─── Organization view ────────────────────────────────────────────────────────
 
 export function OrganizationView() {
-  const { organization, membership, memberships, isLoaded } = useOrganization({
-    memberships: { pageSize: 50 },
-  });
-  const { openOrganizationProfile } = useClerk();
+  const { data: organization, isPending, refetch } = authClient.useActiveOrganization();
+  const { data: session } = authClient.useSession();
+  const { goToOrganizationSettings } = useAuthActions();
   const { copy: copyId, copied: copiedId } = useCopy(organization?.id);
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviting, setInviting] = useState(false);
 
-  if (!isLoaded) {
+  const members = organization?.members ?? [];
+  const myRole = members.find((m) => m.userId === session?.user.id)?.role;
+
+  if (isPending) {
     return (
       <div className="space-y-4">
         {[1, 2, 3].map((i) => (
@@ -115,9 +121,17 @@ export function OrganizationView() {
     if (!inviteEmail.trim() || !organization) return;
     setInviting(true);
     try {
-      await organization.inviteMember({ emailAddress: inviteEmail.trim(), role: "org:member" });
+      const { error } = await authClient.organization.inviteMember({
+        email: inviteEmail.trim(),
+        role: "member",
+      });
+      if (error) {
+        toast.error(error.message ?? "Kunne ikke sende invitasjon.");
+        return;
+      }
       toast.success(`Invitasjon sendt til ${inviteEmail.trim()}`);
       setInviteEmail("");
+      await refetch();
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "Kunne ikke sende invitasjon.";
       toast.error(msg);
@@ -135,7 +149,7 @@ export function OrganizationView() {
         description="Navn og identifikasjon"
         action={
           <button
-            onClick={() => openOrganizationProfile()}
+            onClick={() => goToOrganizationSettings()}
             className="shrink-0 inline-flex items-center gap-1.5 rounded-lg border border-border bg-muted px-3 py-1.5 text-[12px] font-medium text-foreground hover:bg-muted/70 transition-colors"
           >
             <ExternalLinkIcon className="size-3.5" strokeWidth={1.75} />
@@ -144,9 +158,9 @@ export function OrganizationView() {
         }
       >
         <div className="flex items-start gap-4 mb-5">
-          {organization.imageUrl ? (
+          {organization.logo ? (
             <img
-              src={organization.imageUrl}
+              src={organization.logo}
               alt={organization.name}
               className="size-16 rounded-xl object-cover ring-2 ring-border/40 shrink-0"
             />
@@ -159,7 +173,7 @@ export function OrganizationView() {
             <p className="text-[17px] font-semibold text-foreground">{organization.name}</p>
             <p className="text-[12px] text-muted-foreground mt-0.5 flex items-center gap-1.5">
               <UsersIcon className="size-3.5" strokeWidth={1.75} />
-              {organization.membersCount ?? 0} {(organization.membersCount ?? 0) === 1 ? "medlem" : "medlemmer"}
+              {members.length} {members.length === 1 ? "medlem" : "medlemmer"}
             </p>
             {organization.createdAt && (
               <p className="mt-1 flex items-center gap-1.5 text-[11px] text-muted-foreground/60">
@@ -177,7 +191,7 @@ export function OrganizationView() {
           </div>
           <div className="flex items-center justify-between py-3 px-4 border-b border-border/40">
             <span className="text-[13px] text-muted-foreground">Din rolle</span>
-            <RoleBadge role={membership?.role ?? "org:member"} />
+            <RoleBadge role={myRole ?? "member"} />
           </div>
           <div className="flex items-center justify-between py-3 px-4">
             <span className="text-[13px] text-muted-foreground">Org-ID</span>
@@ -200,7 +214,7 @@ export function OrganizationView() {
       </Card>
 
       {/* Invite member */}
-      {membership?.role === "org:admin" && (
+      {canManageMembers(myRole) && (
         <Card title="Inviter medlem" description="Send invitasjon til ny bruker">
           <div className="flex gap-2">
             <div className="relative flex-1">
@@ -232,23 +246,23 @@ export function OrganizationView() {
       {/* Members list */}
       <Card
         title="Medlemmer"
-        description={`${memberships?.data?.length ?? 0} ${(memberships?.data?.length ?? 0) === 1 ? "person" : "personer"} i organisasjonen`}
+        description={`${members.length} ${members.length === 1 ? "person" : "personer"} i organisasjonen`}
       >
-        {!memberships?.data || memberships.data.length === 0 ? (
+        {members.length === 0 ? (
           <p className="text-[13px] text-muted-foreground text-center py-4">Ingen medlemmer å vise.</p>
         ) : (
           <ul className="divide-y divide-border/40">
-            {memberships.data.map((m) => {
-              const member = m.publicUserData;
-              const name = [member?.firstName, member?.lastName].filter(Boolean).join(" ") || "—";
+            {members.map((m) => {
+              const member = m.user;
+              const name = member?.name?.trim() || "—";
               const initials = name !== "—"
                 ? name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase()
                 : "?";
               return (
                 <li key={m.id} className="flex items-center gap-3 py-3">
-                  {member?.imageUrl ? (
+                  {member?.image ? (
                     <img
-                      src={member.imageUrl}
+                      src={member.image}
                       alt={name}
                       className="size-8 rounded-lg object-cover shrink-0"
                     />
@@ -260,7 +274,7 @@ export function OrganizationView() {
                   <div className="min-w-0 flex-1">
                     <p className="text-[13px] font-medium text-foreground truncate">{name}</p>
                     <p className="text-[11px] text-muted-foreground truncate">
-                      {member?.identifier ?? ""}
+                      {member?.email ?? ""}
                       {m.createdAt && (
                         <span className="ml-2 text-muted-foreground/50">· Ble med {formatTimeAgo(m.createdAt)}</span>
                       )}

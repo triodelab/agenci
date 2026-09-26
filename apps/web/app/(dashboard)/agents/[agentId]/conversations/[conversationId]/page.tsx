@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { ConversationIdView } from "@/modules/dashboard/ui/views/conversation-id-view";
-import type { Id } from "@workspace/backend/_generated/dataModel";
+import { Id } from "@workspace/backend/_generated/dataModel";
 
 export const metadata: Metadata = { title: "Samtale" };
 

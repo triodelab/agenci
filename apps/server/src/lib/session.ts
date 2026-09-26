@@ -1,7 +1,7 @@
 /**
  * Task 1.3 — Session helpers for private HTTP routes.
  *
- * Mirrors Convex `getOrgIdOrNull` / Clerk org JWT scoping using Better Auth:
+ * Org-scoped session helpers on Better Auth:
  * - `getSession` — soft read (null if anonymous)
  * - `requireSession` — 401 if not signed in
  * - `requireOrg` — 401 if not signed in, 403 if no active organization

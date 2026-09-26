@@ -15,7 +15,8 @@ model Agent {
   id             String            @id @default(cuid())
   organizationId String
   organization   Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  name           String            @unique
+  /// Unique within the organization (not across all customers).
+  name           String
   description    String
   slug           String            @unique
   modelLabel     String?
@@ -24,7 +25,9 @@ model Agent {
   updatedAt      DateTime          @updatedAt
   widgetBrand    AgentWidgetBrand?
   documents      Document[]
+  conversations  Conversation[]
 
+  @@unique([organizationId, name])
   @@index([organizationId, slug, name])
   @@map("agents")
 }
@@ -47,6 +50,10 @@ model AgentWidgetBrand {
   fontFamilyPrimary  String?
   fontFamilyHeading  String?
   fontFamilyCode     String?
+  /// Customer's own widget customization (appearance overrides, title,
+  /// greeting, suggestions, branding toggle). Brand columns above stay the
+  /// extracted defaults; `settings` wins where set.
+  settings           Json?
   extractedAt        DateTime @default(now())
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt

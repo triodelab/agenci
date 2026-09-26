@@ -1,0 +1,13 @@
+@import "@workspace/ui/globals.css";
+@import "./fonts.css";
+
+/**
+ * `--font-bot-voice` is what `AIMessageContent` (packages/ui) reads for the
+ * bot's chat bubbles — same variable/value as apps/web's styles/tokens.css,
+ * kept in sync manually since the widget no longer imports that file.
+ */
+body {
+  --font-agenci-voice: "Circular", var(--font-sans), ui-sans-serif, sans-serif;
+  --font-bot-voice: var(--font-agenci-voice);
+  font-family: var(--font-sans), ui-sans-serif, sans-serif;
+}

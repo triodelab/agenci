@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "@/lib/auth-compat";
+import { useAuth } from "@/lib/auth-hooks";
 import { useInfiniteScroll } from "@workspace/ui/hooks/use-infinite-scroll";
 import { InfiniteScrollTrigger } from "@workspace/ui/components/infinite-scroll-trigger";
 import { formatDistanceToNow } from "date-fns";
@@ -49,7 +49,7 @@ export const ConversationsPanel = () => {
   const pathname = usePathname();
   const router = useRouter();
   const params = useParams();
-  const { isLoaded: authLoaded, orgId: clerkOrgId } = useAuth();
+  const { isLoaded: authLoaded, orgId } = useAuth();
 
   const agentId =
     typeof params?.agentId === "string"
@@ -62,7 +62,7 @@ export const ConversationsPanel = () => {
 
   const conversations = usePaginatedQuery(
     api.private.conversations.getMany,
-    !authLoaded || !clerkOrgId
+    !authLoaded || !orgId
       ? "skip"
       : { status: statusFilter, agentId },
     { initialNumItems: 10 },

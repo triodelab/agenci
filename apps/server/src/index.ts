@@ -13,6 +13,7 @@ import {
   getSession,
 } from "./lib/session";
 import { issueWsTicket } from "./lib/ws-tickets";
+import { SITE_PREVIEW_PORT, sitePreviewApp } from "./lib/site-proxy";
 import { registerOrpc } from "./plugins/orpc";
 import { registerWebsocket } from "./plugins/websocket";
 import { registerInngest } from "./plugins/inngest";
@@ -114,3 +115,29 @@ serve(
     console.log(`Inngest serve: http://${info.address}:${info.port}/api/inngest`);
   },
 );
+
+// Live-site preview proxy for the widget customization page, on its own
+// origin (`<id>.localhost:3005`) so previewed sites are isolated from the
+// dashboard. See lib/site-proxy.ts.
+// Started once; always dispatches to the latest app so `bun --hot` reloads
+// don't leave an old listener with stale code.
+const previewGlobal = globalThis as {
+  __sitePreviewFetch?: typeof sitePreviewApp.fetch;
+  __sitePreviewListening?: boolean;
+};
+previewGlobal.__sitePreviewFetch = sitePreviewApp.fetch;
+if (!previewGlobal.__sitePreviewListening) {
+  previewGlobal.__sitePreviewListening = true;
+  serve(
+    {
+      fetch: (req, ...rest) =>
+        (previewGlobal.__sitePreviewFetch ?? sitePreviewApp.fetch)(req, ...rest),
+      port: SITE_PREVIEW_PORT,
+      hostname: "127.0.0.1",
+      overrideGlobalObjects: false,
+    },
+    (info) => {
+      console.log(`Site preview proxy on http://*.localhost:${info.port}`);
+    },
+  );
+}

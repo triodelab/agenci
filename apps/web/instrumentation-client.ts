@@ -1,7 +1,16 @@
 import * as Sentry from "@sentry/nextjs";
-import { readStoredConsent } from "@/hooks/use-cookie-consent";
 
-const consent = readStoredConsent();
+/** Statistics consent from Cookiebot's `CookieConsent` cookie. */
+function statisticsConsent() {
+  if (typeof document === "undefined") return false;
+  const raw = document.cookie.match(/(?:^|;\s*)CookieConsent=([^;]*)/)?.[1];
+  if (!raw) return false;
+  try {
+    return /statistics:\s*true/.test(decodeURIComponent(raw));
+  } catch {
+    return false;
+  }
+}
 
 Sentry.init({
   dsn: "https://5089b2c668fa9f8e18478882aeca2cec@o4509747803848704.ingest.de.sentry.io/4509747901825104",
@@ -12,7 +21,7 @@ Sentry.init({
   replaysOnErrorSampleRate: 0,
 
   // Performance tracing only if user accepted statistics cookies.
-  tracesSampleRate: consent?.statistics ? 0.2 : 0,
+  tracesSampleRate: statisticsConsent() ? 0.2 : 0,
   enableLogs: true,
   debug: false,
 });

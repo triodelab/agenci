@@ -11,7 +11,6 @@ import {
 import storyStyles from "@/modules/landing/ui/components/product-story.module.css";
 import { LandingFooter } from "@/modules/landing/ui/components/landing-footer";
 import { LandingFeatureCarousel } from "@/modules/landing/ui/components/landing-feature-carousel";
-import { CookieConsentBanner } from "@/components/cookie-consent-banner";
 
 export function LandingPageView() {
   return (
@@ -44,7 +43,6 @@ export function LandingPageView() {
       <div className="bg-[#FAFAFA]">
         <LandingFooter />
       </div>
-      <CookieConsentBanner />
     </>
   );
 }

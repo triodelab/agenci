@@ -1,6 +1,6 @@
 /**
  * Task 1.2 — Account delete temporarily gated.
- * Clerk `users.deleteUser` removed; full Better Auth deleteUser lands with email confirm later.
+ * Full Better Auth deleteUser lands with email confirmation later.
  */
 import { NextResponse } from "next/server";
 import { getServerSession } from "@/lib/auth-server";

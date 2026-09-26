@@ -1,5 +1,6 @@
 import { createPrismaClient } from "@agenci/db";
 import type { Agent } from "@mastra/core/agent";
+import type { AgentBehaviorInput } from "./agent-behavior";
 import { createCustomerServiceAgent } from "./agents/customer-service-agent";
 import { mastra } from "./index";
 
@@ -38,10 +39,49 @@ export function registerCustomerServiceAgent(input: {
   });
 
   mastra.addAgent(agent, input.id);
-  console.log(
-    `[mastra] registered customer agent ${input.id} (${input.name})`,
-  );
+  console.log(`[mastra] registered customer agent ${input.id} (${input.name})`);
   return agent;
+}
+
+/**
+ * Agent for a chat turn. Without behaviour settings this is the registered
+ * agent; with them, a variant built for exactly those settings (cached by
+ * their content, so a saved change takes effect on the next message).
+ */
+const customised = new Map<string, Agent>();
+
+export function getCustomerServiceAgent(
+  row: { id: string; name: string; description: string | null },
+  behavior: AgentBehaviorInput | null | undefined,
+): Agent {
+  if (!behavior || Object.keys(behavior).length === 0) {
+    return registerCustomerServiceAgent(row);
+  }
+  const key = `${row.id}:${row.name}:${row.description ?? ""}:${JSON.stringify(behavior)}`;
+  const hit = customised.get(key);
+  if (hit) return hit;
+  // Drop older variants of this agent so the cache stays small.
+  for (const k of customised.keys())
+    if (k.startsWith(`${row.id}:`)) customised.delete(k);
+  const agent = createCustomerServiceAgent({
+    id: row.id,
+    name: row.name,
+    description: row.description?.trim() || row.name,
+    behavior,
+  });
+  customised.set(key, agent);
+  return agent;
+}
+
+/**
+ * Drop the registered agent and its variants (after a rename or delete); the
+ * next chat turn rebuilds it from the current row.
+ */
+export function forgetCustomerServiceAgent(agentId: string) {
+  for (const k of customised.keys()) {
+    if (k.startsWith(`${agentId}:`)) customised.delete(k);
+  }
+  if (getRegisteredAgent(agentId)) mastra.removeAgent(agentId);
 }
 
 /** After ingest: load Prisma row and register the Mastra agent. */

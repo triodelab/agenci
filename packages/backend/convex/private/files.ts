@@ -32,7 +32,7 @@ export const generateUploadUrl = mutation({
   handler: async (ctx) => {
     const orgId = await getOrgIdOrNull(ctx);
     if (!orgId) {
-      throw new ConvexError("No organization in session. Select an organization in Clerk.");
+      throw new ConvexError("No organization in session. Select an organization.");
     }
     return await ctx.storage.generateUploadUrl();
   },
@@ -44,7 +44,7 @@ export const deleteFile = mutation({
   handler: async (ctx, args) => {
     const orgId = await getOrgIdOrNull(ctx);
     if (!orgId) {
-      throw new ConvexError("No organization in session. Select an organization in Clerk.");
+      throw new ConvexError("No organization in session. Select an organization.");
     }
 
     const entry = await rag.getEntry(ctx, { entryId: args.entryId });
@@ -88,7 +88,7 @@ export const addFile = action({
   handler: async (ctx, args) => {
     const orgId = await getOrgIdOrNull(ctx);
     if (!orgId) {
-      throw new ConvexError("No organization in session. Select an organization in Clerk.");
+      throw new ConvexError("No organization in session. Select an organization.");
     }
 
     const subscription = await ctx.runQuery(
@@ -165,7 +165,7 @@ export const addFileByStorageId = action({
   handler: async (ctx, args) => {
     const orgId = await getOrgIdOrNull(ctx);
     if (!orgId) {
-      throw new ConvexError("No organization in session. Select an organization in Clerk.");
+      throw new ConvexError("No organization in session. Select an organization.");
     }
 
     const subscription = await ctx.runQuery(
@@ -240,7 +240,7 @@ export const addWebpage = action({
   handler: async (ctx, args) => {
     const orgId = await getOrgIdOrNull(ctx);
     if (!orgId) {
-      throw new ConvexError("No organization in session. Select an organization in Clerk.");
+      throw new ConvexError("No organization in session. Select an organization.");
     }
 
     const subscription = await ctx.runQuery(
@@ -280,7 +280,7 @@ export const deleteWebsiteSource = action({
   handler: async (ctx, args) => {
     const orgId = await getOrgIdOrNull(ctx);
     if (!orgId) {
-      throw new ConvexError("No organization in session. Select an organization in Clerk.");
+      throw new ConvexError("No organization in session. Select an organization.");
     }
 
     const source = await ctx.runQuery(internalApi.system.websites.getSourceById, {
@@ -311,7 +311,7 @@ export const pauseWebsiteSource = action({
   handler: async (ctx, args) => {
     const orgId = await getOrgIdOrNull(ctx);
     if (!orgId) {
-      throw new ConvexError("No organization in session. Select an organization in Clerk.");
+      throw new ConvexError("No organization in session. Select an organization.");
     }
 
     const source = await ctx.runQuery(internalApi.system.websites.getSourceById, {
@@ -334,7 +334,7 @@ export const resumeWebsiteSource = action({
   handler: async (ctx, args) => {
     const orgId = await getOrgIdOrNull(ctx);
     if (!orgId) {
-      throw new ConvexError("No organization in session. Select an organization in Clerk.");
+      throw new ConvexError("No organization in session. Select an organization.");
     }
 
     const source = await ctx.runQuery(internalApi.system.websites.getSourceById, {

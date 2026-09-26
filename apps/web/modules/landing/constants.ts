@@ -38,6 +38,9 @@ const hash = (id: string) => `/?from=marketing#${id}`;
 /** Bare forsiden (uten anker), for «Hjem» i nav */
 export const LANDING_HOME_MARKETING_HREF = "/?from=marketing" as const;
 
+/** Egen side med priser — vises kun via denne lenken, ikke embedded på forsiden */
+export const LANDING_PRICING_PAGE_PATH = "/priser" as const;
+
 /** Lenke til anker på forsiden (typed keys) */
 export function landingSectionHref(key: keyof typeof LANDING_SECTION_IDS): string {
   return hash(LANDING_SECTION_IDS[key]);
@@ -47,7 +50,7 @@ export function landingSectionHref(key: keyof typeof LANDING_SECTION_IDS): strin
 export const LANDING_NAV_PRIMARY_LINKS = [
   { name: "Hjem", href: LANDING_HOME_MARKETING_HREF },
   { name: "Produktet", href: hash(LANDING_SECTION_IDS.workflow) },
-  { name: "Priser", href: hash(LANDING_SECTION_IDS.pricing) },
+  { name: "Priser", href: LANDING_PRICING_PAGE_PATH },
   { name: "Slik det fungerer", href: "/hvordan-det-virker" },
   { name: "Blogg", href: "/blogg" },
   { name: "Kontakt", href: LANDING_CONTACT_PAGE_PATH },
@@ -62,7 +65,7 @@ export const LANDING_MARKETING_PAGE_LINKS = [
 
 /** Footer / «Utforsk» */
 export const LANDING_FORSIDE_SECTION_LINKS = [
-  { name: "Priser", href: hash(LANDING_SECTION_IDS.pricing) },
+  { name: "Priser", href: LANDING_PRICING_PAGE_PATH },
   { name: "Integrasjoner", href: hash(LANDING_SECTION_IDS.integrations) },
   { name: "Slik det fungerer", href: "/hvordan-det-virker" },
   { name: "Kontakt", href: LANDING_CONTACT_PAGE_PATH },
@@ -75,13 +78,13 @@ export const LANDING_APP_NAV_LINKS = [
 ] as const;
 
 export const LANDING_DESKTOP_NAV_LINKS = [
-  { name: "Priser", href: hash(LANDING_SECTION_IDS.pricing) },
+  { name: "Priser", href: LANDING_PRICING_PAGE_PATH },
   { name: "FAQ", href: hash(LANDING_SECTION_IDS.faq) },
   { name: "Kontakt", href: LANDING_CONTACT_PAGE_PATH },
 ] as const;
 
 export const LANDING_FOOTER_PRODUCT_LINKS = [
-  { href: hash(LANDING_SECTION_IDS.pricing), label: "Priser" },
+  { href: LANDING_PRICING_PAGE_PATH, label: "Priser" },
   { href: hash(LANDING_SECTION_IDS.faq), label: "FAQ" },
   { href: LANDING_CONTACT_PAGE_PATH, label: "Kontakt" },
 ] as const;

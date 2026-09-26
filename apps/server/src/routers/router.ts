@@ -5,7 +5,11 @@ import { z } from "zod";
 import { base, privateProcedure, requireOrgMiddleware } from "./procedures";
 import { agentsRouter } from "@/modules/agents/router";
 import { documentsRouter } from "@/modules/documents/router";
+import { knowledgeRouter } from "@/modules/knowledge/router";
+import { widgetCustomizationRouter } from "@/modules/widget/customization-router";
 import { chatRouter } from "@/modules/chat/router";
+import { conversationsRouter } from "@/modules/conversations/router";
+import { widgetPublicRouter } from "@/modules/widget/router";
 
 const health = base
   .output(z.object({ ok: z.literal(true) }))
@@ -13,6 +17,7 @@ const health = base
 
 export const publicRouter = {
   health,
+  ...widgetPublicRouter,
 };
 
 export { privateProcedure, requireOrgMiddleware };
@@ -36,6 +41,9 @@ export const privateRouter = {
   agents: agentsRouter,
   documents: documentsRouter,
   chat: chatRouter,
+  conversations: conversationsRouter,
+  knowledge: knowledgeRouter,
+  widgetCustomization: widgetCustomizationRouter,
 };
 
 export const appRouter = {

@@ -1,0 +1,97 @@
+/* Legal pages — additions on top of the blog's reading layout. */
+
+.facts {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px 32px;
+	margin: 0;
+}
+.facts dt {
+	font-size: 12.5px;
+	color: var(--agenci-subtle);
+}
+.facts dd {
+	margin: 2px 0 0;
+	font-size: 14.5px;
+	color: var(--agenci-ink);
+}
+
+.summary {
+	margin: 0 0 56px;
+	padding: 24px 28px;
+	border: 1px solid var(--agenci-border);
+	border-radius: 20px;
+	background: #fff;
+}
+.summary h2 {
+	margin: 0 0 12px !important;
+	font-size: 21px !important;
+}
+.summary ul {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+.summary li {
+	position: relative;
+	padding: 7px 0 7px 26px;
+	font-size: 16.5px;
+	line-height: 1.55;
+}
+.summary li::before {
+	content: "";
+	position: absolute;
+	top: 15px;
+	left: 4px;
+	width: 9px;
+	height: 5px;
+	border-left: 2px solid var(--agenci-accent);
+	border-bottom: 2px solid var(--agenci-accent);
+	rotate: -45deg;
+}
+
+.num {
+	color: var(--agenci-subtle);
+	font-variant-numeric: tabular-nums;
+}
+
+.terms {
+	margin: 8px 0 24px;
+	border-top: 1px solid var(--agenci-border);
+}
+.terms > div {
+	display: grid;
+	grid-template-columns: minmax(150px, 0.38fr) 1fr;
+	gap: 6px 24px;
+	padding: 14px 0;
+	border-bottom: 1px solid var(--agenci-border);
+}
+.terms dt {
+	font-weight: 600;
+	font-size: 16px;
+	color: var(--agenci-ink);
+}
+.terms dd {
+	margin: 0;
+	font-size: 16px;
+	line-height: 1.6;
+}
+
+.link {
+	color: var(--agenci-ink);
+	text-decoration: underline;
+	text-decoration-color: var(--agenci-border-strong);
+	text-underline-offset: 3px;
+}
+.link:hover {
+	text-decoration-color: var(--agenci-ink);
+}
+
+@media (max-width: 640px) {
+	.terms > div {
+		grid-template-columns: 1fr;
+	}
+	.summary {
+		padding: 20px;
+	}
+}

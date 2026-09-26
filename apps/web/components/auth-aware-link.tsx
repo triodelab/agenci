@@ -2,11 +2,10 @@
 
 import Link from "next/link";
 import type { ComponentProps } from "react";
-import { useAuth } from "@/lib/auth-compat";
+import { useAuth } from "@/lib/auth-hooks";
 
 /**
  * Task 1.2 — Points to the app when signed in (Better Auth), otherwise sign-in.
- * Previously used Clerk `useAuth`.
  */
 export function AuthAwareLink({
   href = "/sign-in",

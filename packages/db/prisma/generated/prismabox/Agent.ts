@@ -8,7 +8,9 @@ export const AgentPlain = t.Object(
   {
     id: t.String(),
     organizationId: t.String(),
-    name: t.String(),
+    name: t.String({
+      description: `Unique within the organization (not across all customers).`,
+    }),
     description: t.String(),
     slug: t.String(),
     modelLabel: __nullable__(t.String()),
@@ -58,6 +60,13 @@ export const AgentRelations = t.Object(
           fontFamilyPrimary: __nullable__(t.String()),
           fontFamilyHeading: __nullable__(t.String()),
           fontFamilyCode: __nullable__(t.String()),
+          settings: __nullable__(
+            t.Any({
+              description: `Customer's own widget customization (appearance overrides, title,
+greeting, suggestions, branding toggle). Brand columns above stay the
+extracted defaults; \`settings\` wins where set.`,
+            }),
+          ),
           extractedAt: t.Date(),
           createdAt: t.Date(),
           updatedAt: t.Date(),
@@ -100,13 +109,52 @@ export const AgentRelations = t.Object(
       ),
       { additionalProperties: false },
     ),
+    conversations: t.Array(
+      t.Object(
+        {
+          id: t.String({ description: `Same id as the Mastra memory thread.` }),
+          organizationId: t.String(),
+          agentId: t.String(),
+          contactSessionId: t.String(),
+          status: t.Union(
+            [
+              t.Literal("unresolved"),
+              t.Literal("escalated"),
+              t.Literal("resolved"),
+            ],
+            { additionalProperties: false },
+          ),
+          firstMessage: __nullable__(
+            t.String({
+              description: `First visitor message — the conversation's headline.`,
+            }),
+          ),
+          lastMessage: __nullable__(t.String()),
+          lastMessageRole: __nullable__(t.String()),
+          messageCount: t.Integer(),
+          lastMessageAt: t.Date(),
+          createdAt: t.Date(),
+          updatedAt: t.Date(),
+        },
+        {
+          additionalProperties: false,
+          description: `One row per widget conversation — the index the inbox, overview and agent
+list read from. The messages themselves stay in the Mastra memory thread
+with the same id; this row is kept in step on every message
+(\`modules/conversations/service.ts\`).`,
+        },
+      ),
+      { additionalProperties: false },
+    ),
   },
   { additionalProperties: false },
 );
 
 export const AgentPlainInputCreate = t.Object(
   {
-    name: t.String(),
+    name: t.String({
+      description: `Unique within the organization (not across all customers).`,
+    }),
     description: t.String(),
     slug: t.String(),
     modelLabel: t.Optional(__nullable__(t.String())),
@@ -127,7 +175,11 @@ export const AgentPlainInputCreate = t.Object(
 
 export const AgentPlainInputUpdate = t.Object(
   {
-    name: t.Optional(t.String()),
+    name: t.Optional(
+      t.String({
+        description: `Unique within the organization (not across all customers).`,
+      }),
+    ),
     description: t.Optional(t.String()),
     slug: t.Optional(t.String()),
     modelLabel: t.Optional(__nullable__(t.String())),
@@ -173,6 +225,22 @@ export const AgentRelationsInputCreate = t.Object(
       ),
     ),
     documents: t.Optional(
+      t.Object(
+        {
+          connect: t.Array(
+            t.Object(
+              {
+                id: t.String({ additionalProperties: false }),
+              },
+              { additionalProperties: false },
+            ),
+            { additionalProperties: false },
+          ),
+        },
+        { additionalProperties: false },
+      ),
+    ),
+    conversations: t.Optional(
       t.Object(
         {
           connect: t.Array(
@@ -245,6 +313,31 @@ export const AgentRelationsInputUpdate = t.Partial(
           { additionalProperties: false },
         ),
       ),
+      conversations: t.Partial(
+        t.Object(
+          {
+            connect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+            disconnect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+          },
+          { additionalProperties: false },
+        ),
+      ),
     },
     { additionalProperties: false },
   ),
@@ -260,7 +353,9 @@ export const AgentWhere = t.Partial(
           OR: t.Array(Self, { additionalProperties: false }),
           id: t.String(),
           organizationId: t.String(),
-          name: t.String(),
+          name: t.String({
+            description: `Unique within the organization (not across all customers).`,
+          }),
           description: t.String(),
           slug: t.String(),
           modelLabel: t.String(),
@@ -288,7 +383,19 @@ export const AgentWhereUnique = t.Recursive(
       [
         t.Partial(
           t.Object(
-            { id: t.String(), name: t.String(), slug: t.String() },
+            {
+              id: t.String(),
+              slug: t.String(),
+              organizationId_name: t.Object(
+                {
+                  organizationId: t.String(),
+                  name: t.String({
+                    description: `Unique within the organization (not across all customers).`,
+                  }),
+                },
+                { additionalProperties: false },
+              ),
+            },
             { additionalProperties: false },
           ),
           { additionalProperties: false },
@@ -296,8 +403,18 @@ export const AgentWhereUnique = t.Recursive(
         t.Union(
           [
             t.Object({ id: t.String() }),
-            t.Object({ name: t.String() }),
             t.Object({ slug: t.String() }),
+            t.Object({
+              organizationId_name: t.Object(
+                {
+                  organizationId: t.String(),
+                  name: t.String({
+                    description: `Unique within the organization (not across all customers).`,
+                  }),
+                },
+                { additionalProperties: false },
+              ),
+            }),
           ],
           { additionalProperties: false },
         ),
@@ -320,7 +437,9 @@ export const AgentWhereUnique = t.Recursive(
             {
               id: t.String(),
               organizationId: t.String(),
-              name: t.String(),
+              name: t.String({
+                description: `Unique within the organization (not across all customers).`,
+              }),
               description: t.String(),
               slug: t.String(),
               modelLabel: t.String(),
@@ -360,6 +479,7 @@ export const AgentSelect = t.Partial(
       updatedAt: t.Boolean(),
       widgetBrand: t.Boolean(),
       documents: t.Boolean(),
+      conversations: t.Boolean(),
       _count: t.Boolean(),
     },
     { additionalProperties: false },
@@ -373,6 +493,7 @@ export const AgentInclude = t.Partial(
       status: t.Boolean(),
       widgetBrand: t.Boolean(),
       documents: t.Boolean(),
+      conversations: t.Boolean(),
       _count: t.Boolean(),
     },
     { additionalProperties: false },

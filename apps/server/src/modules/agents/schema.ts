@@ -28,8 +28,34 @@ export const AgentSummarySchema = z.object({
 
 export type AgentSummary = z.infer<typeof AgentSummarySchema>;
 
+export const AgentListItemSchema = AgentSummarySchema.extend({
+  /** Onboarding website + branding, for the agent card. */
+  websiteUrl: z.string().nullable(),
+  logoUrl: z.string().nullable(),
+  brandColor: z.string().nullable(),
+  sourceCount: z.number(),
+  failedSourceCount: z.number(),
+  conversationCount: z.number(),
+  lastActivityAt: z.string().nullable(),
+  /** New conversations per day for the last 14 days, oldest first. */
+  activity: z.array(z.number()),
+});
+
 export const ListAgentsResponseSchema = z.object({
-  agents: z.array(AgentSummarySchema),
+  agents: z.array(AgentListItemSchema),
+});
+
+export const UpdateAgentSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().trim().min(1, "Navn er påkrevd").max(80),
+  description: z.string().trim().max(500),
+});
+
+export const DeleteAgentSchema = z.object({ id: z.string().min(1) });
+
+export const DeleteAgentResponseSchema = z.object({
+  success: z.boolean(),
+  deleted: z.object({ sources: z.number(), conversations: z.number() }),
 });
 
 export const GetAgentSchema = z.object({

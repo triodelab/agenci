@@ -1,6 +1,6 @@
 "use client";
 
-import { useOrganization } from "@/lib/auth-compat";
+import { useOrganization } from "@/lib/auth-hooks";
 import {
   useQuery,
   useAction,
@@ -822,7 +822,7 @@ export function KnowledgeTrainingPlayground({
                   Velg en organisasjon
                 </p>
                 <p className="mt-2 text-[13px] leading-relaxed text-muted-foreground">
-                  Widget krever aktiv organisasjon i Clerk.
+                  Widget krever en aktiv organisasjon.
                 </p>
               </div>
             ) : (

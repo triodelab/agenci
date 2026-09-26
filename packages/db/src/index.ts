@@ -3,6 +3,8 @@ import { PrismaPg } from "@prisma/adapter-pg";
 
 import { PrismaClient } from "../prisma/generated/prisma/client";
 
+export type { Prisma } from "../prisma/generated/prisma/client";
+
 export {AgentPlain, AgentPlainInputCreate} from "../prisma/generated/prismabox/Agent"
 export {DocumentPlain, DocumentPlainInputCreate, DocumentPlainInputUpdate} from "../prisma/generated/prismabox/Document"
 

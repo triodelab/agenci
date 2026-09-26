@@ -1,6 +1,6 @@
 "use client";
 
-import { useOrganization } from "@/lib/auth-compat";
+import { useOrganization } from "@/lib/auth-hooks";
 import { useState } from "react";
 import {
   CopyIcon,

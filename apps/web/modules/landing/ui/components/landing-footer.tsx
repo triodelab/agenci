@@ -6,7 +6,7 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { AgenciLoader } from "@/components/agenci-loader";
 import { AgenciNavWordmark } from "@/components/logo";
-import { useUser } from "@/lib/auth-compat";
+import { useUser } from "@/lib/auth-hooks";
 import {
   LANDING_AUTH_PATHS,
   LANDING_FOOTER_NAV_GROUPS,

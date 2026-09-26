@@ -1,10 +1,13 @@
 {
-  "extends": "@workspace/typescript-config/nextjs.json",
+  "extends": "@agenci/config/tsconfig.base.json",
   "compilerOptions": {
-    "declaration": false,
-    "declarationMap": false,
+    // The shared base is for Bun/server code; a Next app needs JSX + the DOM.
+    "jsx": "react-jsx",
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "noEmit": true,
+    "incremental": true,
     "paths": {
-      "@/*": ["./*", "../server/src/*"],
+      "@/*": ["./*"],
       "@workspace/ui/*": ["../../packages/ui/src/*"],
       "@workspace/backend/*": ["../../packages/backend/convex/*"],
     },
@@ -21,5 +24,5 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
   ],
-  "exclude": ["node_modules", "**/*.test.ts"],
+  "exclude": ["node_modules"],
 }

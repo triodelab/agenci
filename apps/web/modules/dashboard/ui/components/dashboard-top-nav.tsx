@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Task 1.2 — Clerk OrganizationSwitcher / UserButton replaced with Better Auth menus.
+ * Top nav with Better Auth org switcher and user menu.
  */
 import {
   BellIcon,
@@ -445,7 +445,7 @@ export function DashboardTopNav() {
         />
 
         <Suspense fallback={<div className="h-8 w-32 animate-pulse rounded-lg bg-muted" />}>
-          {/* Task 1.2: Better Auth org switcher (was Clerk OrganizationSwitcher) */}
+          {/* Better Auth org switcher */}
           <OrgSwitcher />
         </Suspense>
 
@@ -458,7 +458,7 @@ export function DashboardTopNav() {
         </QueryErrorBoundary>
 
         <Suspense fallback={<div className="size-8 animate-pulse rounded-lg bg-muted" />}>
-          {/* Task 1.2: Better Auth user menu (was Clerk UserButton) */}
+          {/* Better Auth user menu */}
           <UserMenu />
         </Suspense>
       </div>

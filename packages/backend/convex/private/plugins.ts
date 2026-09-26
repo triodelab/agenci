@@ -13,7 +13,7 @@ export const remove = mutation({
       throw new ConvexError({
         code: "BAD_REQUEST",
         message:
-          "No organization in session. Select an organization in Clerk (JWT template must include orgId).",
+          "No organization in session. Select an organization (JWT must include orgId).",
       });
     }
 

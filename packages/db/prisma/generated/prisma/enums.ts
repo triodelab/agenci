@@ -27,6 +27,15 @@ export const AgentVertical = {
 export type AgentVertical = (typeof AgentVertical)[keyof typeof AgentVertical]
 
 
+export const ConversationStatus = {
+  unresolved: 'unresolved',
+  escalated: 'escalated',
+  resolved: 'resolved'
+} as const
+
+export type ConversationStatus = (typeof ConversationStatus)[keyof typeof ConversationStatus]
+
+
 export const DocumentSourceType = {
   DOCUMENT: 'DOCUMENT',
   WEBPAGE: 'WEBPAGE',
