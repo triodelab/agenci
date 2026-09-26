@@ -2,7 +2,6 @@
 
 import { LandingFooter } from "./landing-footer";
 import { LandingNav } from "./landing-nav";
-import { CookieConsentBanner } from "@/components/cookie-consent-banner";
 
 /** Offentlige undersider: lys toppnav + footer */
 export function MarketingPageLayout({
@@ -17,7 +16,6 @@ export function MarketingPageLayout({
         {children}
       </div>
       <LandingFooter />
-      <CookieConsentBanner />
     </>
   );
 }

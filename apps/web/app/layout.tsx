@@ -118,6 +118,16 @@ export default function RootLayout({
       <body
         className={`${fontSans.variable} ${fontDisplay.variable} ${fontGellix.variable} ${fontCircular.variable} font-sans antialiased`}
       >
+        {/* Cookie consent (Cookiebot). Loads before any app code so auto
+            blocking can hold back cookie-setting scripts until consent. */}
+        <Script
+          id="Cookiebot"
+          src="https://consent.cookiebot.com/uc.js"
+          data-cbid="dd791730-a0c2-4186-b0c3-0ff08912f17f"
+          data-blockingmode="auto"
+          type="text/javascript"
+          strategy="beforeInteractive"
+        />
         <Providers>
           {children}
           <Toaster />
