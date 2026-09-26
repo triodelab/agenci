@@ -6,6 +6,7 @@ import localFont from "next/font/local"
 import "@workspace/ui/globals.css";
 import "@/styles/tokens.css";
 import "@/styles/marketing.css";
+import { CookiebotScrollLock } from "@/components/cookiebot-scroll-lock"
 import { Providers } from "@/components/providers"
 import { Toaster } from "@workspace/ui/components/sonner";
 
@@ -128,6 +129,7 @@ export default function RootLayout({
           type="text/javascript"
           strategy="beforeInteractive"
         />
+        <CookiebotScrollLock />
         <Providers>
           {children}
           <Toaster />
