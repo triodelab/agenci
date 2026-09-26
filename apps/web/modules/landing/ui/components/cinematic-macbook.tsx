@@ -25,7 +25,7 @@ const lerp = (a: number, b: number, k: number) => a + (b - a) * k;
 
 /** How strongly the camera is on mark `m` at time `t` (0–1). */
 function focusWeight(m: VideoTrack["marks"][number], t: number) {
-	return smooth(m.t - 2.2, m.t - 0.2, t) * (1 - smooth(m.t + 2.6, m.t + 4.6, t));
+	return smooth(m.t - 1.9, m.t - 0.25, t) * (1 - smooth(m.t + 2.2, m.t + 4, t));
 }
 
 export function CinematicMacbook({
@@ -84,34 +84,25 @@ export function CinematicMacbook({
 			const v = player.current;
 			const t = v && track ? v.currentTime : (now - start) / 1000;
 
-			// Blend every click in reach instead of jumping to the strongest one:
-			// clicks close together keep the zoom and the focus glides between
-			// them, so the camera never pumps in and out.
-			let sum = 0;
-			let x = 0;
-			let y = 0;
-			let zoom = 0;
+			// Strongest current focus from the recording's clicks.
+			let w = 0;
+			let mark: VideoTrack["marks"][number] | null = null;
 			for (const m of track?.marks ?? []) {
 				const mw = focusWeight(m, t);
-				if (mw <= 0) continue;
-				sum += mw;
-				x += m.x * mw;
-				y += m.y * mw;
-				zoom += (m.kind === "drag" ? 0.45 : 0.6) * mw;
+				if (mw > w) {
+					w = mw;
+					mark = m;
+				}
 			}
-			// Settle back to the full screen before the clip loops, so the
-			// restart is not a jump.
-			const end = track?.duration ?? Number.POSITIVE_INFINITY;
-			const w = Math.min(1, sum) * (1 - smooth(end - 2, end - 0.3, t));
 			const target = {
-				z: 1 + (sum ? zoom / sum : 0) * w,
-				fx: lerp(0.5, sum ? x / sum : 0.5, w),
-				fy: lerp(0.5, sum ? y / sum : 0.5, w),
+				z: 1 + (mark?.kind === "drag" ? 0.45 : 0.65) * w,
+				fx: lerp(0.5, mark?.x ?? 0.5, w),
+				fy: lerp(0.5, mark?.y ?? 0.5, w),
 				rx: 0,
 				ry: 0,
 			};
 			// Unhurried camera: eases toward the target rather than snapping.
-			const k = 1 - Math.exp(-dt * 1.6);
+			const k = 1 - Math.exp(-dt * 2.4);
 			for (const key of Object.keys(cur) as (keyof typeof cur)[]) {
 				cur[key] += (target[key] - cur[key]) * k;
 			}
