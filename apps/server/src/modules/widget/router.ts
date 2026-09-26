@@ -6,7 +6,11 @@ import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 import { createPrismaClient } from "@agenci/db";
 import { base, contactProcedure } from "@/routers/procedures";
-import { reopenIfResolved } from "@/modules/conversations/router";
+import {
+  deleteConversationThreads,
+  recordAgentReply,
+  recordVisitorMessage,
+} from "@/modules/conversations/service";
 import {
   createContactSession,
   deleteContactSession,
@@ -110,6 +114,12 @@ const contactSessionsRouter = {
     }),
 
   deleteMySession: contactProcedure.output(OkResponseSchema).handler(async ({ context }) => {
+    // The visitor's conversations go too (rows cascade; threads by id).
+    const conversations = await prisma.conversation.findMany({
+      where: { contactSessionId: context.contactSession.id },
+      select: { id: true },
+    });
+    await deleteConversationThreads(conversations.map((c) => c.id));
     await deleteContactSession(context.contactSession.id);
     return { ok: true as const };
   }),
@@ -180,15 +190,25 @@ const publicChatRouter = {
     .input(SendPublicChatMessageSchema)
     .output(SendPublicChatMessageResponseSchema)
     .handler(async ({ input, context }) => {
-      const memoryResourceId = `${context.contactSession.organizationId}:contact:${context.contactSession.id}`;
+      const { organizationId, id: contactSessionId } = context.contactSession;
+      const threadId = input.threadId ?? crypto.randomUUID();
+      // Index row first: also stops a visitor from writing into someone
+      // else's thread, and reopens a resolved conversation.
+      await recordVisitorMessage({
+        threadId,
+        organizationId,
+        agentId: input.agentId,
+        contactSessionId,
+        text: input.message,
+      });
       const result = await sendChatMessage({
-        organizationId: context.contactSession.organizationId,
+        organizationId,
         agentId: input.agentId,
         message: input.message,
-        threadId: input.threadId,
-        memoryResourceId,
+        threadId,
+        memoryResourceId: `${organizationId}:contact:${contactSessionId}`,
       });
-      await reopenIfResolved(result.threadId, memoryResourceId);
+      await recordAgentReply(threadId, result.message);
       return result;
     }),
 };

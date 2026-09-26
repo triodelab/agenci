@@ -3,6 +3,7 @@ import { ORPCError } from "@orpc/server";
 import { agentOnboardingEvent, inngest } from "@/inngest/client";
 import { deleteFile } from "@/lib/s3-client";
 import { forgetCustomerServiceAgent } from "@/mastra/register-customer-agent";
+import { deleteConversationThreads } from "@/modules/conversations/service";
 import { privateProcedure } from "@/routers/procedures";
 import {
   AddWebpageResponseSchema,
@@ -32,6 +33,16 @@ function slugFromName(name: string) {
   return `${base || "agent"}-${crypto.randomUUID().slice(0, 8)}`;
 }
 
+/** Agent names are unique per organization (Prisma P2002 on conflict). */
+function nameConflict(error: unknown, name: string) {
+  if ((error as { code?: string } | null)?.code === "P2002") {
+    return new ORPCError("CONFLICT", {
+      message: `Du har allerede en agent som heter «${name}»`,
+    });
+  }
+  return error;
+}
+
 function toAgentSummary(agent: {
   id: string;
   name: string;
@@ -58,7 +69,7 @@ export const agentsRouter = {
     .output(ListAgentsResponseSchema)
     .handler(async ({ context }) => {
       const organizationId = context.organizationId;
-      const [agents, sources, failed, sessions, daily] = await Promise.all([
+      const [agents, sources, failed, chats, daily] = await Promise.all([
         prisma.agent.findMany({
           where: { organizationId },
           orderBy: { createdAt: "desc" },
@@ -84,18 +95,20 @@ export const agentsRouter = {
           where: { organizationId, status: "FAILED" },
           _count: { _all: true },
         }),
-        prisma.contactSession.groupBy({
+        // Same source as the inbox, so the numbers always match.
+        prisma.conversation.groupBy({
           by: ["agentId"],
-          where: { organizationId },
+          where: { organizationId, messageCount: { gt: 0 } },
           _count: { _all: true },
-          _max: { updatedAt: true },
+          _max: { lastMessageAt: true },
         }),
         prisma.$queryRaw<{ agentId: string | null; day: number; n: bigint }[]>`
           SELECT "agentId",
                  floor(extract(epoch FROM (now() - "createdAt")) / 86400)::int AS day,
                  count(*) AS n
-          FROM contact_sessions
+          FROM conversations
           WHERE "organizationId" = ${organizationId}
+            AND "messageCount" > 0
             AND "createdAt" > now() - interval '14 days'
           GROUP BY 1, 2`,
       ]);
@@ -106,8 +119,8 @@ export const agentsRouter = {
 
       return {
         agents: agents.map((agent) => {
-          const chat = sessions.find((r) => r.agentId === agent.id);
-          const lastChat = chat?._max.updatedAt ?? null;
+          const chat = chats.find((r) => r.agentId === agent.id);
+          const lastChat = chat?._max.lastMessageAt ?? null;
           const last =
             lastChat && lastChat > agent.updatedAt ? lastChat : agent.updatedAt;
           return {
@@ -164,17 +177,21 @@ export const agentsRouter = {
           message: "Agenten ble ikke funnet",
         });
       }
-      const agent = await prisma.agent.update({
-        where: { id: found.id },
-        data: { name: input.name, description: input.description },
-        select: {
-          id: true,
-          name: true,
-          description: true,
-          status: true,
-          createdAt: true,
-        },
-      });
+      const agent = await prisma.agent
+        .update({
+          where: { id: found.id },
+          data: { name: input.name, description: input.description },
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            status: true,
+            createdAt: true,
+          },
+        })
+        .catch((error: unknown) => {
+          throw nameConflict(error, input.name);
+        });
       // The chat agent carries its name/description in the prompt.
       forgetCustomerServiceAgent(agent.id);
       return { agent: toAgentSummary(agent) };
@@ -182,7 +199,8 @@ export const agentsRouter = {
 
   /**
    * Deletes the agent and everything it owns: uploaded files, knowledge
-   * (documents + vectors), visitor sessions and widget settings.
+   * (documents + vectors), conversations, visitor sessions and widget
+   * settings.
    */
   delete: privateProcedure
     .input(DeleteAgentSchema)
@@ -210,16 +228,25 @@ export const agentsRouter = {
           .map((key) => deleteFile(key).catch(() => undefined)),
       );
       await prisma.$executeRaw`DELETE FROM embeddings WHERE metadata->>'agentId' = ${agent.id}`;
-      const sessions = await prisma.contactSession.deleteMany({
+      // Conversation messages live in Mastra threads; remove them first.
+      const conversations = await prisma.conversation.findMany({
+        where: { agentId: agent.id, organizationId },
+        select: { id: true },
+      });
+      await deleteConversationThreads(conversations.map((c) => c.id));
+      await prisma.contactSession.deleteMany({
         where: { agentId: agent.id, organizationId },
       });
-      // Documents and widget settings cascade with the agent row.
+      // Documents, conversations and widget settings cascade with the agent.
       await prisma.agent.delete({ where: { id: agent.id } });
       forgetCustomerServiceAgent(agent.id);
 
       return {
         success: true,
-        deleted: { sources: documents.length, conversations: sessions.count },
+        deleted: {
+          sources: documents.length,
+          conversations: conversations.length,
+        },
       };
     }),
 
@@ -326,15 +353,19 @@ export const agentsRouter = {
         });
       }
 
-      const agent = await prisma.agent.create({
-        data: {
-          name: input.name,
-          description: input.description,
-          slug: slugFromName(input.name),
-          organizationId: context.organizationId,
-          status: input.url ? "PROCESSING" : "PENDING",
-        },
-      });
+      const agent = await prisma.agent
+        .create({
+          data: {
+            name: input.name,
+            description: input.description,
+            slug: slugFromName(input.name),
+            organizationId: context.organizationId,
+            status: input.url ? "PROCESSING" : "PENDING",
+          },
+        })
+        .catch((error: unknown) => {
+          throw nameConflict(error, input.name);
+        });
 
       if (input.url) {
         const document = await prisma.document.create({

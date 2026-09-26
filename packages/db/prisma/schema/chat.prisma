@@ -15,9 +15,44 @@ model ContactSession {
   expiresAt      DateTime
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
+  conversations  Conversation[]
 
   @@index([organizationId])
   @@map("contact_sessions")
+}
+
+enum ConversationStatus {
+  unresolved
+  escalated
+  resolved
+}
+
+/// One row per widget conversation — the index the inbox, overview and agent
+/// list read from. The messages themselves stay in the Mastra memory thread
+/// with the same id; this row is kept in step on every message
+/// (`modules/conversations/service.ts`).
+model Conversation {
+  /// Same id as the Mastra memory thread.
+  id               String             @id
+  organizationId   String
+  organization     Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  agentId          String
+  agent            Agent              @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  contactSessionId String
+  contactSession   ContactSession     @relation(fields: [contactSessionId], references: [id], onDelete: Cascade)
+  status           ConversationStatus @default(unresolved)
+  /// First visitor message — the conversation's headline.
+  firstMessage     String?
+  lastMessage      String?
+  lastMessageRole  String?
+  messageCount     Int                @default(0)
+  lastMessageAt    DateTime           @default(now())
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  @@index([organizationId, agentId, lastMessageAt])
+  @@index([contactSessionId])
+  @@map("conversations")
 }
 
 /// Mastra's own RAG vector store (`@mastra/pg`) creates and owns this table

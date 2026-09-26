@@ -1,2 +1,6 @@
 # deps
 node_modules/
+
+# Lokale Mastra-databaser (brukes ikke lenger)
+mastra.db*
+mastra.duckdb*

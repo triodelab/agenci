@@ -44,7 +44,9 @@ export const AgentWidgetBrandRelations = t.Object(
       {
         id: t.String(),
         organizationId: t.String(),
-        name: t.String(),
+        name: t.String({
+          description: `Unique within the organization (not across all customers).`,
+        }),
         description: t.String(),
         slug: t.String(),
         modelLabel: __nullable__(t.String()),

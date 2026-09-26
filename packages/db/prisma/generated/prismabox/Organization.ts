@@ -99,7 +99,9 @@ export const OrganizationRelations = t.Object(
         {
           id: t.String(),
           organizationId: t.String(),
-          name: t.String(),
+          name: t.String({
+            description: `Unique within the organization (not across all customers).`,
+          }),
           description: t.String(),
           slug: t.String(),
           modelLabel: __nullable__(t.String()),
@@ -140,6 +142,43 @@ visitors are scoped by this token + org (docs/task.md Phase 4, Task 4.1).
 Conversation history itself lives in Mastra's own thread memory, keyed by
 \`${organizationId}:contact:${contactSession.id}\` + a client-generated
 threadId — this table only tracks the visitor and their contact info.`,
+        },
+      ),
+      { additionalProperties: false },
+    ),
+    conversations: t.Array(
+      t.Object(
+        {
+          id: t.String({ description: `Same id as the Mastra memory thread.` }),
+          organizationId: t.String(),
+          agentId: t.String(),
+          contactSessionId: t.String(),
+          status: t.Union(
+            [
+              t.Literal("unresolved"),
+              t.Literal("escalated"),
+              t.Literal("resolved"),
+            ],
+            { additionalProperties: false },
+          ),
+          firstMessage: __nullable__(
+            t.String({
+              description: `First visitor message — the conversation's headline.`,
+            }),
+          ),
+          lastMessage: __nullable__(t.String()),
+          lastMessageRole: __nullable__(t.String()),
+          messageCount: t.Integer(),
+          lastMessageAt: t.Date(),
+          createdAt: t.Date(),
+          updatedAt: t.Date(),
+        },
+        {
+          additionalProperties: false,
+          description: `One row per widget conversation — the index the inbox, overview and agent
+list read from. The messages themselves stay in the Mastra memory thread
+with the same id; this row is kept in step on every message
+(\`modules/conversations/service.ts\`).`,
         },
       ),
       { additionalProperties: false },
@@ -253,6 +292,22 @@ export const OrganizationRelationsInputCreate = t.Object(
       ),
     ),
     contactSessions: t.Optional(
+      t.Object(
+        {
+          connect: t.Array(
+            t.Object(
+              {
+                id: t.String({ additionalProperties: false }),
+              },
+              { additionalProperties: false },
+            ),
+            { additionalProperties: false },
+          ),
+        },
+        { additionalProperties: false },
+      ),
+    ),
+    conversations: t.Optional(
       t.Object(
         {
           connect: t.Array(
@@ -425,6 +480,31 @@ export const OrganizationRelationsInputUpdate = t.Partial(
           { additionalProperties: false },
         ),
       ),
+      conversations: t.Partial(
+        t.Object(
+          {
+            connect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+            disconnect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+          },
+          { additionalProperties: false },
+        ),
+      ),
     },
     { additionalProperties: false },
   ),
@@ -514,6 +594,7 @@ export const OrganizationSelect = t.Partial(
       documents: t.Boolean(),
       agents: t.Boolean(),
       contactSessions: t.Boolean(),
+      conversations: t.Boolean(),
       _count: t.Boolean(),
     },
     { additionalProperties: false },
@@ -529,6 +610,7 @@ export const OrganizationInclude = t.Partial(
       documents: t.Boolean(),
       agents: t.Boolean(),
       contactSessions: t.Boolean(),
+      conversations: t.Boolean(),
       _count: t.Boolean(),
     },
     { additionalProperties: false },

@@ -16,11 +16,9 @@ import {
   FilmIcon,
   GlobeIcon,
   LoaderIcon,
-  PlusIcon,
   RotateCcwIcon,
   SearchIcon,
   Trash2Icon,
-  UploadIcon,
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Segment } from "@/components/segment";
@@ -444,8 +442,6 @@ export function KnowledgeLibrary({
   onSelect,
   onRetry,
   onRemove,
-  onAddWebpage,
-  onUpload,
 }: {
   sources: KnowledgeSource[];
   pending: PendingUpload[];
@@ -456,8 +452,6 @@ export function KnowledgeLibrary({
   onSelect: (id: string) => void;
   onRetry: (source: KnowledgeSource) => void;
   onRemove: (id: string) => void;
-  onAddWebpage: () => void;
-  onUpload: () => void;
 }) {
   const [sort, setSort] = useState<Sort>("new");
   const [search, setSearch] = useState("");
@@ -659,46 +653,6 @@ export function KnowledgeLibrary({
               : "Ingen kilder her ennå."}
           </p>
         ) : null}
-      </div>
-
-      {/* Add / drop row */}
-      <div className="mx-2 mb-2 flex flex-wrap items-center gap-3 rounded-[14px] border border-dashed border-(--agenci-ink-3)/35 px-4 py-3">
-        <span className="flex size-7 items-center justify-center rounded-full bg-[#f3f5f4] text-(--agenci-ink-2) dark:bg-white/5">
-          <UploadIcon
-            className="size-3.5"
-            strokeWidth={1.5}
-            absoluteStrokeWidth
-          />
-        </span>
-        <span className="text-[13px] text-(--agenci-ink-2)">
-          Slipp filer hvor som helst på siden, eller
-        </span>
-        <span className="ml-auto flex gap-2">
-          <button
-            type="button"
-            onClick={onUpload}
-            className="inline-flex h-8 items-center gap-1.5 rounded-full bg-(--agenci-ink) px-3 text-[12.5px] font-medium text-white transition-transform active:scale-[0.97] dark:text-[#0b0c0e]"
-          >
-            <UploadIcon
-              className="size-3.5"
-              strokeWidth={1.5}
-              absoluteStrokeWidth
-            />
-            Last opp
-          </button>
-          <button
-            type="button"
-            onClick={onAddWebpage}
-            className="inline-flex h-8 items-center gap-1.5 rounded-full border border-(--agenci-line) bg-white px-3 text-[12.5px] font-medium text-(--agenci-ink) transition-transform active:scale-[0.97] dark:bg-transparent"
-          >
-            <PlusIcon
-              className="size-3.5"
-              strokeWidth={1.5}
-              absoluteStrokeWidth
-            />
-            Nettside
-          </button>
-        </span>
       </div>
     </section>
   );

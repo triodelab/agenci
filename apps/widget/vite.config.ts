@@ -16,10 +16,6 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.join(rootDir, "src"),
-      // Legacy Convex path — only the not-yet-ported screens (booking, inbox,
-      // selection) import it, lazily. Mirrors tsconfig `paths`, which Vite
-      // doesn't read on its own. Remove once those screens use apps/server.
-      "@workspace/backend": path.join(rootDir, "../../packages/backend/convex"),
     },
   },
   server: {

@@ -26,17 +26,6 @@ export const agentOnboardingEvent = eventType("agent-onboarding/process", {
   }),
 });
 
-export const messageRespondEvent = eventType("message/respond", {
-  schema: z.object({
-    organizationId: z.string().min(1),
-    agentId: z.string().min(1),
-    conversationId: z.string().min(1),
-    messageId: z.string().min(1),
-    message: z.string().min(1),
-    vertical: z.enum(["ECOMMERCE", "HEALTHCARE"]),
-  }),
-});
-
 export const uploadDocumentEvent = eventType("document/upload", {
   schema: z.object({
     agentId: z.string().min(1),

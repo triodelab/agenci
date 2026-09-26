@@ -11,7 +11,7 @@ const embedScriptSrc =
   import.meta.env.VITE_WIDGET_EMBED_SCRIPT_URL?.trim() ||
   "https://agenci-embed.vercel.app/widget.iife.js";
 
-export const HTML_SCRIPT = `<script src="${embedScriptSrc}" data-organization-id="{{ORGANIZATION_ID}}"></script>`;
-export const REACT_SCRIPT = `<script src="${embedScriptSrc}" data-organization-id="{{ORGANIZATION_ID}}"></script>`;
-export const NEXTJS_SCRIPT = `<script src="${embedScriptSrc}" data-organization-id="{{ORGANIZATION_ID}}"></script>`;
-export const JAVASCRIPT_SCRIPT = `<script src="${embedScriptSrc}" data-organization-id="{{ORGANIZATION_ID}}"></script>`;
+export const HTML_SCRIPT = `<script src="${embedScriptSrc}" data-organization-id="{{ORGANIZATION_ID}}" data-agent-id="{{AGENT_ID}}"></script>`;
+export const REACT_SCRIPT = `<script src="${embedScriptSrc}" data-organization-id="{{ORGANIZATION_ID}}" data-agent-id="{{AGENT_ID}}"></script>`;
+export const NEXTJS_SCRIPT = `<script src="${embedScriptSrc}" data-organization-id="{{ORGANIZATION_ID}}" data-agent-id="{{AGENT_ID}}"></script>`;
+export const JAVASCRIPT_SCRIPT = `<script src="${embedScriptSrc}" data-organization-id="{{ORGANIZATION_ID}}" data-agent-id="{{AGENT_ID}}"></script>`;

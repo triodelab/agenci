@@ -5,7 +5,13 @@
  * open the chunk in the graph + panel.
  */
 import { cn } from "@workspace/ui/lib/utils";
-import { ArrowUpIcon, SparklesIcon, XIcon } from "lucide-react";
+import {
+  ArrowUpIcon,
+  ArrowUpRightIcon,
+  RotateCcwIcon,
+  SparklesIcon,
+  XIcon,
+} from "lucide-react";
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import {
   type KnowledgeCitation,
@@ -154,8 +160,8 @@ function AssistantTurn({
   const text = useTypewriter(turn.text, live);
   const done = text.length === turn.text.length;
   return (
-    <div className="kb-card-in flex gap-3">
-      <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full bg-(--agenci-ink) text-white dark:text-[#0b0c0e]">
+    <div className="kb-card-in flex gap-2.5">
+      <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-(--agenci-ink) text-white dark:text-[#0b0c0e]">
         <SparklesIcon
           className="size-3.5"
           strokeWidth={1.5}
@@ -165,7 +171,7 @@ function AssistantTurn({
       <div className="min-w-0 flex-1">
         <div
           className={cn(
-            "rounded-[16px] rounded-tl-[6px] border px-4 py-3 text-[14px] leading-relaxed text-(--agenci-ink) [font-family:var(--font-agenci-voice)]",
+            "rounded-[14px] rounded-tl-[5px] border px-3.5 py-2.5 text-[13.5px] leading-relaxed text-(--agenci-ink) [font-family:var(--font-agenci-voice)]",
             turn.error
               ? "border-[#F0CFCB] bg-[#FFF9F8] text-[#B2463A]"
               : "border-(--agenci-line) bg-white dark:bg-transparent",
@@ -181,7 +187,7 @@ function AssistantTurn({
             <p className="mb-1.5 text-[12px] font-medium tracking-[0.06em] text-(--agenci-ink-3) uppercase [font-family:var(--font-agenci-data)]">
               Kilder brukt
             </p>
-            <div className="grid gap-2 [grid-template-columns:repeat(auto-fill,minmax(220px,1fr))]">
+            <div className="grid gap-2 grid-cols-1">
               {turn.citations.map((c) => (
                 <button
                   key={`${c.documentId}:${c.chunkIndex}`}
@@ -269,6 +275,8 @@ export function KnowledgeAssistant({
   demo,
   onClearFocus,
   onShowChunk,
+  open,
+  onOpenChange,
 }: {
   agentId: string;
   agentName: string;
@@ -277,6 +285,9 @@ export function KnowledgeAssistant({
   demo: boolean;
   onClearFocus: () => void;
   onShowChunk: (documentId: string, index: number) => void;
+  /** The assistant is a slide-over panel; the page controls it. */
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }) {
   const ask = useAskKnowledgeMutation(agentId);
   const [turns, setTurns] = useState<Turn[]>([]);
@@ -297,8 +308,22 @@ export function KnowledgeAssistant({
       "Hva mangler kunnskapsbasen for å svare kundene godt?",
       "Hva svarer agenten om retur og levering?",
     ];
-    return list.filter((s): s is string => Boolean(s)).slice(0, 4);
+    return list.filter((s): s is string => Boolean(s)).slice(0, 3);
   }, [sources, focusSource]);
+
+  // Focus the composer when the panel opens; Esc closes it.
+  useEffect(() => {
+    if (!open) return;
+    const t = window.setTimeout(() => inputRef.current?.focus(), 250);
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onOpenChange(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      window.clearTimeout(t);
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [open, onOpenChange]);
 
   useEffect(() => {
     listRef.current?.scrollTo({
@@ -358,159 +383,249 @@ export function KnowledgeAssistant({
     inputRef.current?.focus();
   };
 
+  const orb = (size: "sm" | "lg") => (
+    <span
+      className={cn(
+        "relative flex shrink-0 items-center justify-center rounded-full text-white shadow-[0_8px_20px_-10px_rgb(5_6_7/0.6)] dark:text-[#0b0c0e]",
+        size === "lg" ? "size-10" : "size-7",
+      )}
+      style={{
+        background:
+          "radial-gradient(circle at 30% 25%, #4a5a5e, #243236 55%, #111a1c)",
+      }}
+    >
+      <span className="kb-breathe absolute inset-0 rounded-full shadow-[0_0_0_4px_rgb(36_50_54/0.07)]" />
+      <SparklesIcon
+        className={size === "lg" ? "size-[18px]" : "size-3.5"}
+        strokeWidth={1.5}
+        absoluteStrokeWidth
+      />
+    </span>
+  );
+
   return (
-    <section className="mt-6 overflow-hidden rounded-[24px] border border-(--agenci-line) bg-white shadow-[0_1px_3px_rgb(5_6_7/0.07),0_14px_34px_-14px_rgb(5_6_7/0.22)] dark:bg-(--card)">
-      {/* Header */}
-      <div className="flex flex-wrap items-center gap-3 border-b border-(--agenci-line) px-5 py-4">
-        <span className="kb-breathe flex size-9 items-center justify-center rounded-full bg-(--agenci-ink) text-white dark:text-[#0b0c0e]">
-          <SparklesIcon
-            className="size-4"
-            strokeWidth={1.5}
-            absoluteStrokeWidth
-          />
-        </span>
-        <div className="min-w-0">
-          <h2 className="[font-family:var(--font-agenci-title)] text-[20px] leading-tight font-medium tracking-[-0.025em] text-(--agenci-ink)">
-            Kunnskapsassistent
-          </h2>
-          <p className="text-[13px] text-(--agenci-ink-2)">
-            Spør om hva {agentName} vet. Svarene hentes fra kunnskapsbasen i
-            sanntid, med kildene de bygger på.
-          </p>
-        </div>
-        {turns.length ? (
+    <>
+      {/* Floating launcher — small, but in colour so it's easy to spot */}
+      <button
+        type="button"
+        onClick={() => onOpenChange(true)}
+        aria-hidden={open}
+        tabIndex={open ? -1 : 0}
+        aria-label={
+          focusSource ? `Spør om ${focusSource.name}` : "Spør kunnskapsbasen"
+        }
+        title={
+          focusSource
+            ? `Spør om ${focusSource.name} (⌘J)`
+            : "Spør kunnskapsbasen (⌘J)"
+        }
+        className={cn(
+          // Sits in the page's fixed bottom strip, below the scroll area, so
+          // it never covers content.
+          "absolute right-5 bottom-2 z-30 flex size-10 items-center justify-center rounded-full text-white shadow-[0_10px_28px_-10px_rgb(5_6_7/0.55)] transition-[transform,opacity,box-shadow] duration-300 ease-[cubic-bezier(.23,1,.32,1)] hover:-translate-y-0.5 hover:shadow-[0_14px_32px_-10px_rgb(5_6_7/0.6)] active:scale-[0.95]",
+          open ? "pointer-events-none scale-90 opacity-0" : "opacity-100",
+        )}
+        style={{
+          background:
+            "radial-gradient(circle at 30% 25%, #4a5a5e, #243236 55%, #111a1c)",
+        }}
+      >
+        <span className="kb-breathe absolute inset-0 rounded-full shadow-[0_0_0_5px_rgb(36_50_54/0.12)]" />
+        <SparklesIcon
+          className="relative size-5"
+          strokeWidth={1.5}
+          absoluteStrokeWidth
+        />
+        {focusSource ? (
+          <span className="absolute top-0 right-0 size-3 rounded-full border-2 border-white bg-[#E49A62]" />
+        ) : null}
+      </button>
+
+      {/* Panel */}
+      <section
+        aria-label="Kunnskapsassistent"
+        aria-hidden={!open}
+        inert={!open}
+        className={cn(
+          "absolute right-3 bottom-3 z-40 flex h-[min(540px,calc(100%-1.5rem))] w-[min(380px,calc(100vw-2rem))] origin-bottom-right flex-col overflow-hidden rounded-[20px] border border-(--agenci-line) bg-white shadow-[0_24px_60px_-24px_rgb(5_6_7/0.4)] transition-[transform,opacity] duration-300 ease-[cubic-bezier(.23,1,.32,1)] dark:bg-(--card)",
+          open
+            ? "scale-100 opacity-100"
+            : "pointer-events-none translate-y-2 scale-95 opacity-0",
+        )}
+      >
+        {/* Header */}
+        <div className="flex items-center gap-2.5 border-b border-(--agenci-line) py-2.5 pr-2 pl-3">
+          {orb("sm")}
+          <div className="min-w-0 flex-1">
+            <h2 className="truncate text-[13.5px] font-semibold text-(--agenci-ink)">
+              Kunnskapsassistent
+            </h2>
+            <p className="truncate text-[12px] text-(--agenci-ink-3)">
+              Svarer fra {sources.length}{" "}
+              {sources.length === 1 ? "kilde" : "kilder"} i sanntid
+            </p>
+          </div>
+          {turns.length ? (
+            <button
+              type="button"
+              onClick={() => setTurns([])}
+              aria-label="Ny samtale"
+              title="Ny samtale"
+              className="flex size-8 items-center justify-center rounded-full text-(--agenci-ink-3) transition-colors hover:bg-[#f1f3f2] hover:text-(--agenci-ink) dark:hover:bg-white/5"
+            >
+              <RotateCcwIcon
+                className="size-4"
+                strokeWidth={1.5}
+                absoluteStrokeWidth
+              />
+            </button>
+          ) : null}
           <button
             type="button"
-            onClick={() => setTurns([])}
-            className="ml-auto text-[12.5px] text-(--agenci-ink-3) hover:text-(--agenci-ink)"
+            onClick={() => onOpenChange(false)}
+            aria-label="Lukk"
+            title="Lukk (Esc)"
+            className="flex size-8 items-center justify-center rounded-full text-(--agenci-ink-3) transition-colors hover:bg-[#f1f3f2] hover:text-(--agenci-ink) dark:hover:bg-white/5"
           >
-            Ny samtale
-          </button>
-        ) : null}
-      </div>
-
-      {/* Conversation */}
-      <div
-        ref={listRef}
-        className="max-h-[520px] min-h-[180px] space-y-5 overflow-y-auto px-5 py-5"
-      >
-        {turns.length === 0 ? (
-          <div className="flex flex-col items-start gap-3">
-            <p className="text-[13.5px] text-(--agenci-ink-2)">
-              Prøv for eksempel:
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {suggestions.map((s) => (
-                <button
-                  key={s}
-                  type="button"
-                  onClick={() => void send(s)}
-                  className="rounded-full border border-(--agenci-line) bg-[#f7f8f7] px-3.5 py-1.5 text-[13px] text-(--agenci-ink) transition-[background-color,transform] duration-150 hover:-translate-y-px hover:bg-white active:scale-[0.98] dark:bg-white/5"
-                >
-                  {s}
-                </button>
-              ))}
-            </div>
-            {demo ? (
-              <p className="text-[12px] text-(--agenci-ink-3)">
-                Assistenten svarer alltid ut fra den ekte kunnskapsbasen, også
-                når demodata vises over.
-              </p>
-            ) : null}
-          </div>
-        ) : null}
-        {turns.map((t) =>
-          t.role === "user" ? (
-            <div key={t.id} className="kb-card-in flex justify-end">
-              <p className="max-w-[80%] rounded-[16px] rounded-br-[6px] bg-(--agenci-ink) px-4 py-2.5 text-[14px] leading-relaxed whitespace-pre-wrap text-white dark:text-[#0b0c0e]">
-                {t.text}
-              </p>
-            </div>
-          ) : (
-            <AssistantTurn
-              key={t.id}
-              turn={t}
-              live={t.id === liveId}
-              onCite={(c) => onShowChunk(c.documentId, c.chunkIndex)}
-            />
-          ),
-        )}
-        {ask.isPending ? <Thinking /> : null}
-      </div>
-
-      {/* Composer */}
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          void send(draft);
-        }}
-        className="border-t border-(--agenci-line) bg-[#fafbfa] px-4 py-3 dark:bg-white/[0.02]"
-      >
-        {focusSource ? (
-          <div className="mb-2 flex">
-            <span className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-white py-1 pr-1 pl-2.5 text-[12px] text-(--agenci-ink-2) shadow-[0_1px_2px_rgb(5_6_7/0.06)] dark:bg-white/5">
-              <span
-                aria-hidden
-                className="size-1.5 rounded-full"
-                style={{ background: TYPE_META[focusSource.type].color }}
-              />
-              Fokus:{" "}
-              <span className="truncate font-medium text-(--agenci-ink)">
-                {focusSource.name}
-              </span>
-              <button
-                type="button"
-                aria-label="Fjern fokus"
-                onClick={onClearFocus}
-                className="flex size-5 items-center justify-center rounded-full text-(--agenci-ink-3) hover:bg-[#f3f5f4] hover:text-(--agenci-ink)"
-              >
-                <XIcon
-                  className="size-3"
-                  strokeWidth={1.5}
-                  absoluteStrokeWidth
-                />
-              </button>
-            </span>
-          </div>
-        ) : null}
-        <div className="flex items-end gap-2 rounded-[16px] border border-(--agenci-line) bg-white p-1.5 pl-4 transition-shadow focus-within:shadow-[0_0_0_3px_rgb(36_50_54/0.08)] dark:bg-transparent">
-          <textarea
-            ref={inputRef}
-            value={draft}
-            rows={1}
-            onChange={(e) => {
-              setDraft(e.target.value);
-              e.target.style.height = "auto";
-              e.target.style.height = `${Math.min(e.target.scrollHeight, 140)}px`;
-            }}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                void send(draft);
-              }
-            }}
-            placeholder={
-              focusSource
-                ? `Spør om ${focusSource.name}…`
-                : "Spør om hva agenten vet… (Enter for å sende)"
-            }
-            aria-label="Spørsmål til kunnskapsassistenten"
-            className="max-h-[140px] min-h-[36px] flex-1 resize-none bg-transparent py-2 text-[14px] text-(--agenci-ink) outline-none placeholder:text-(--agenci-ink-3)"
-          />
-          <button
-            type="submit"
-            aria-label="Send"
-            disabled={!draft.trim() || ask.isPending}
-            className="flex size-9 shrink-0 items-center justify-center rounded-full bg-(--agenci-ink) text-white transition-[transform,opacity] duration-150 hover:scale-105 active:scale-95 disabled:opacity-30 dark:text-[#0b0c0e]"
-          >
-            <ArrowUpIcon
-              className="size-4"
-              strokeWidth={1.5}
-              absoluteStrokeWidth
-            />
+            <XIcon className="size-4" strokeWidth={1.5} absoluteStrokeWidth />
           </button>
         </div>
-      </form>
-    </section>
+
+        {/* Conversation */}
+        <div
+          ref={listRef}
+          className="min-h-0 flex-1 space-y-4 overflow-y-auto px-3.5 py-4"
+        >
+          {turns.length === 0 ? (
+            <div className="flex min-h-full flex-col justify-center py-4">
+              <div className="flex flex-col items-center text-center">
+                {orb("lg")}
+                <h3 className="mt-3.5 [font-family:var(--font-agenci-title)] text-[17px] leading-tight font-medium tracking-[-0.025em] text-(--agenci-ink)">
+                  Hva vil du vite?
+                </h3>
+                <p className="mt-1.5 max-w-[260px] text-[12.5px] leading-relaxed text-(--agenci-ink-3)">
+                  Spør om hva {agentName} vet. Svarene viser kildene de bygger
+                  på.
+                </p>
+              </div>
+              <div className="mt-5 space-y-1.5">
+                {suggestions.map((s) => (
+                  <button
+                    key={s}
+                    type="button"
+                    onClick={() => void send(s)}
+                    className="group flex w-full items-center gap-3 rounded-[12px] border border-(--agenci-line) bg-white px-3 py-2.5 text-left text-[13px] text-(--agenci-ink) transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-px hover:border-[#d5dad7] hover:shadow-[0_10px_24px_-16px_rgb(5_6_7/0.35)] active:scale-[0.99] dark:bg-transparent"
+                  >
+                    <span className="min-w-0 flex-1">{s}</span>
+                    <ArrowUpRightIcon
+                      className="size-4 shrink-0 text-(--agenci-ink-3) transition-[color,transform] duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-(--agenci-ink)"
+                      strokeWidth={1.5}
+                      absoluteStrokeWidth
+                    />
+                  </button>
+                ))}
+              </div>
+              {demo ? (
+                <p className="mt-3 text-center text-[12px] text-(--agenci-ink-3)">
+                  Svarer alltid ut fra den ekte kunnskapsbasen, også når
+                  demodata vises.
+                </p>
+              ) : null}
+            </div>
+          ) : null}
+          {turns.map((t) =>
+            t.role === "user" ? (
+              <div key={t.id} className="kb-card-in flex justify-end">
+                <p className="max-w-[85%] rounded-[14px] rounded-br-[5px] bg-(--agenci-ink) px-3.5 py-2 text-[13.5px] leading-relaxed whitespace-pre-wrap text-white dark:text-[#0b0c0e]">
+                  {t.text}
+                </p>
+              </div>
+            ) : (
+              <AssistantTurn
+                key={t.id}
+                turn={t}
+                live={t.id === liveId}
+                onCite={(c) => onShowChunk(c.documentId, c.chunkIndex)}
+              />
+            ),
+          )}
+          {ask.isPending ? <Thinking /> : null}
+        </div>
+
+        {/* Composer */}
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            void send(draft);
+          }}
+          className="border-t border-(--agenci-line) p-2.5"
+        >
+          {focusSource ? (
+            <div className="mb-2 flex">
+              <span className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-[#f1f3f2] py-1 pr-1 pl-2.5 text-[12px] text-(--agenci-ink-2) dark:bg-white/5">
+                <span
+                  aria-hidden
+                  className="size-1.5 rounded-full"
+                  style={{ background: TYPE_META[focusSource.type].color }}
+                />
+                Fokus:{" "}
+                <span className="truncate font-medium text-(--agenci-ink)">
+                  {focusSource.name}
+                </span>
+                <button
+                  type="button"
+                  aria-label="Fjern fokus"
+                  onClick={onClearFocus}
+                  className="flex size-5 items-center justify-center rounded-full text-(--agenci-ink-3) hover:bg-white hover:text-(--agenci-ink) dark:hover:bg-white/10"
+                >
+                  <XIcon
+                    className="size-3"
+                    strokeWidth={1.5}
+                    absoluteStrokeWidth
+                  />
+                </button>
+              </span>
+            </div>
+          ) : null}
+          <div className="flex items-end gap-2 rounded-[14px] border border-(--agenci-line) bg-[#fafbfa] p-1 pl-3 transition-[box-shadow,border-color,background-color] focus-within:border-(--agenci-ink-3) focus-within:bg-white focus-within:shadow-[0_0_0_4px_rgb(36_50_54/0.07)] dark:bg-transparent">
+            <textarea
+              ref={inputRef}
+              value={draft}
+              rows={1}
+              onChange={(e) => {
+                setDraft(e.target.value);
+                e.target.style.height = "auto";
+                e.target.style.height = `${Math.min(e.target.scrollHeight, 140)}px`;
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  void send(draft);
+                }
+              }}
+              placeholder={
+                focusSource
+                  ? `Spør om ${focusSource.name}…`
+                  : "Spør om kunnskapen…"
+              }
+              aria-label="Spørsmål til kunnskapsassistenten"
+              className="max-h-[120px] min-h-[32px] flex-1 resize-none bg-transparent py-1.5 text-[13.5px] text-(--agenci-ink) outline-none placeholder:text-(--agenci-ink-3)"
+            />
+            <button
+              type="submit"
+              aria-label="Send"
+              disabled={!draft.trim() || ask.isPending}
+              className="flex size-8 shrink-0 items-center justify-center rounded-full bg-(--agenci-ink) text-white transition-[transform,opacity] duration-150 hover:scale-105 active:scale-95 disabled:opacity-30 dark:text-[#0b0c0e]"
+            >
+              <ArrowUpIcon
+                className="size-4"
+                strokeWidth={1.5}
+                absoluteStrokeWidth
+              />
+            </button>
+          </div>
+        </form>
+      </section>
+    </>
   );
 }

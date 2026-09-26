@@ -196,6 +196,7 @@ export type OrganizationWhereInput = {
   documents?: Prisma.DocumentListRelationFilter
   agents?: Prisma.AgentListRelationFilter
   contactSessions?: Prisma.ContactSessionListRelationFilter
+  conversations?: Prisma.ConversationListRelationFilter
 }
 
 export type OrganizationOrderByWithRelationInput = {
@@ -211,6 +212,7 @@ export type OrganizationOrderByWithRelationInput = {
   documents?: Prisma.DocumentOrderByRelationAggregateInput
   agents?: Prisma.AgentOrderByRelationAggregateInput
   contactSessions?: Prisma.ContactSessionOrderByRelationAggregateInput
+  conversations?: Prisma.ConversationOrderByRelationAggregateInput
 }
 
 export type OrganizationWhereUniqueInput = Prisma.AtLeast<{
@@ -229,6 +231,7 @@ export type OrganizationWhereUniqueInput = Prisma.AtLeast<{
   documents?: Prisma.DocumentListRelationFilter
   agents?: Prisma.AgentListRelationFilter
   contactSessions?: Prisma.ContactSessionListRelationFilter
+  conversations?: Prisma.ConversationListRelationFilter
 }, "id" | "slug">
 
 export type OrganizationOrderByWithAggregationInput = {
@@ -268,6 +271,7 @@ export type OrganizationCreateInput = {
   documents?: Prisma.DocumentCreateNestedManyWithoutOrganizationInput
   agents?: Prisma.AgentCreateNestedManyWithoutOrganizationInput
   contactSessions?: Prisma.ContactSessionCreateNestedManyWithoutOrganizationInput
+  conversations?: Prisma.ConversationCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateInput = {
@@ -283,6 +287,7 @@ export type OrganizationUncheckedCreateInput = {
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutOrganizationInput
   agents?: Prisma.AgentUncheckedCreateNestedManyWithoutOrganizationInput
   contactSessions?: Prisma.ContactSessionUncheckedCreateNestedManyWithoutOrganizationInput
+  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUpdateInput = {
@@ -298,6 +303,7 @@ export type OrganizationUpdateInput = {
   documents?: Prisma.DocumentUpdateManyWithoutOrganizationNestedInput
   agents?: Prisma.AgentUpdateManyWithoutOrganizationNestedInput
   contactSessions?: Prisma.ContactSessionUpdateManyWithoutOrganizationNestedInput
+  conversations?: Prisma.ConversationUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateInput = {
@@ -313,6 +319,7 @@ export type OrganizationUncheckedUpdateInput = {
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   agents?: Prisma.AgentUncheckedUpdateManyWithoutOrganizationNestedInput
   contactSessions?: Prisma.ContactSessionUncheckedUpdateManyWithoutOrganizationNestedInput
+  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateManyInput = {
@@ -444,6 +451,20 @@ export type OrganizationUpdateOneRequiredWithoutContactSessionsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.OrganizationUpdateToOneWithWhereWithoutContactSessionsInput, Prisma.OrganizationUpdateWithoutContactSessionsInput>, Prisma.OrganizationUncheckedUpdateWithoutContactSessionsInput>
 }
 
+export type OrganizationCreateNestedOneWithoutConversationsInput = {
+  create?: Prisma.XOR<Prisma.OrganizationCreateWithoutConversationsInput, Prisma.OrganizationUncheckedCreateWithoutConversationsInput>
+  connectOrCreate?: Prisma.OrganizationCreateOrConnectWithoutConversationsInput
+  connect?: Prisma.OrganizationWhereUniqueInput
+}
+
+export type OrganizationUpdateOneRequiredWithoutConversationsNestedInput = {
+  create?: Prisma.XOR<Prisma.OrganizationCreateWithoutConversationsInput, Prisma.OrganizationUncheckedCreateWithoutConversationsInput>
+  connectOrCreate?: Prisma.OrganizationCreateOrConnectWithoutConversationsInput
+  upsert?: Prisma.OrganizationUpsertWithoutConversationsInput
+  connect?: Prisma.OrganizationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.OrganizationUpdateToOneWithWhereWithoutConversationsInput, Prisma.OrganizationUpdateWithoutConversationsInput>, Prisma.OrganizationUncheckedUpdateWithoutConversationsInput>
+}
+
 export type OrganizationCreateNestedOneWithoutDocumentsInput = {
   create?: Prisma.XOR<Prisma.OrganizationCreateWithoutDocumentsInput, Prisma.OrganizationUncheckedCreateWithoutDocumentsInput>
   connectOrCreate?: Prisma.OrganizationCreateOrConnectWithoutDocumentsInput
@@ -470,6 +491,7 @@ export type OrganizationCreateWithoutAgentsInput = {
   invitations?: Prisma.InvitationCreateNestedManyWithoutOrganizationInput
   documents?: Prisma.DocumentCreateNestedManyWithoutOrganizationInput
   contactSessions?: Prisma.ContactSessionCreateNestedManyWithoutOrganizationInput
+  conversations?: Prisma.ConversationCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutAgentsInput = {
@@ -484,6 +506,7 @@ export type OrganizationUncheckedCreateWithoutAgentsInput = {
   invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutOrganizationInput
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutOrganizationInput
   contactSessions?: Prisma.ContactSessionUncheckedCreateNestedManyWithoutOrganizationInput
+  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutAgentsInput = {
@@ -514,6 +537,7 @@ export type OrganizationUpdateWithoutAgentsInput = {
   invitations?: Prisma.InvitationUpdateManyWithoutOrganizationNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutOrganizationNestedInput
   contactSessions?: Prisma.ContactSessionUpdateManyWithoutOrganizationNestedInput
+  conversations?: Prisma.ConversationUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutAgentsInput = {
@@ -528,6 +552,7 @@ export type OrganizationUncheckedUpdateWithoutAgentsInput = {
   invitations?: Prisma.InvitationUncheckedUpdateManyWithoutOrganizationNestedInput
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   contactSessions?: Prisma.ContactSessionUncheckedUpdateManyWithoutOrganizationNestedInput
+  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutTeamsInput = {
@@ -542,6 +567,7 @@ export type OrganizationCreateWithoutTeamsInput = {
   documents?: Prisma.DocumentCreateNestedManyWithoutOrganizationInput
   agents?: Prisma.AgentCreateNestedManyWithoutOrganizationInput
   contactSessions?: Prisma.ContactSessionCreateNestedManyWithoutOrganizationInput
+  conversations?: Prisma.ConversationCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutTeamsInput = {
@@ -556,6 +582,7 @@ export type OrganizationUncheckedCreateWithoutTeamsInput = {
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutOrganizationInput
   agents?: Prisma.AgentUncheckedCreateNestedManyWithoutOrganizationInput
   contactSessions?: Prisma.ContactSessionUncheckedCreateNestedManyWithoutOrganizationInput
+  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutTeamsInput = {
@@ -586,6 +613,7 @@ export type OrganizationUpdateWithoutTeamsInput = {
   documents?: Prisma.DocumentUpdateManyWithoutOrganizationNestedInput
   agents?: Prisma.AgentUpdateManyWithoutOrganizationNestedInput
   contactSessions?: Prisma.ContactSessionUpdateManyWithoutOrganizationNestedInput
+  conversations?: Prisma.ConversationUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutTeamsInput = {
@@ -600,6 +628,7 @@ export type OrganizationUncheckedUpdateWithoutTeamsInput = {
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   agents?: Prisma.AgentUncheckedUpdateManyWithoutOrganizationNestedInput
   contactSessions?: Prisma.ContactSessionUncheckedUpdateManyWithoutOrganizationNestedInput
+  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutMembersInput = {
@@ -614,6 +643,7 @@ export type OrganizationCreateWithoutMembersInput = {
   documents?: Prisma.DocumentCreateNestedManyWithoutOrganizationInput
   agents?: Prisma.AgentCreateNestedManyWithoutOrganizationInput
   contactSessions?: Prisma.ContactSessionCreateNestedManyWithoutOrganizationInput
+  conversations?: Prisma.ConversationCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutMembersInput = {
@@ -628,6 +658,7 @@ export type OrganizationUncheckedCreateWithoutMembersInput = {
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutOrganizationInput
   agents?: Prisma.AgentUncheckedCreateNestedManyWithoutOrganizationInput
   contactSessions?: Prisma.ContactSessionUncheckedCreateNestedManyWithoutOrganizationInput
+  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutMembersInput = {
@@ -658,6 +689,7 @@ export type OrganizationUpdateWithoutMembersInput = {
   documents?: Prisma.DocumentUpdateManyWithoutOrganizationNestedInput
   agents?: Prisma.AgentUpdateManyWithoutOrganizationNestedInput
   contactSessions?: Prisma.ContactSessionUpdateManyWithoutOrganizationNestedInput
+  conversations?: Prisma.ConversationUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutMembersInput = {
@@ -672,6 +704,7 @@ export type OrganizationUncheckedUpdateWithoutMembersInput = {
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   agents?: Prisma.AgentUncheckedUpdateManyWithoutOrganizationNestedInput
   contactSessions?: Prisma.ContactSessionUncheckedUpdateManyWithoutOrganizationNestedInput
+  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutInvitationsInput = {
@@ -686,6 +719,7 @@ export type OrganizationCreateWithoutInvitationsInput = {
   documents?: Prisma.DocumentCreateNestedManyWithoutOrganizationInput
   agents?: Prisma.AgentCreateNestedManyWithoutOrganizationInput
   contactSessions?: Prisma.ContactSessionCreateNestedManyWithoutOrganizationInput
+  conversations?: Prisma.ConversationCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutInvitationsInput = {
@@ -700,6 +734,7 @@ export type OrganizationUncheckedCreateWithoutInvitationsInput = {
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutOrganizationInput
   agents?: Prisma.AgentUncheckedCreateNestedManyWithoutOrganizationInput
   contactSessions?: Prisma.ContactSessionUncheckedCreateNestedManyWithoutOrganizationInput
+  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutInvitationsInput = {
@@ -730,6 +765,7 @@ export type OrganizationUpdateWithoutInvitationsInput = {
   documents?: Prisma.DocumentUpdateManyWithoutOrganizationNestedInput
   agents?: Prisma.AgentUpdateManyWithoutOrganizationNestedInput
   contactSessions?: Prisma.ContactSessionUpdateManyWithoutOrganizationNestedInput
+  conversations?: Prisma.ConversationUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutInvitationsInput = {
@@ -744,6 +780,7 @@ export type OrganizationUncheckedUpdateWithoutInvitationsInput = {
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   agents?: Prisma.AgentUncheckedUpdateManyWithoutOrganizationNestedInput
   contactSessions?: Prisma.ContactSessionUncheckedUpdateManyWithoutOrganizationNestedInput
+  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutContactSessionsInput = {
@@ -758,6 +795,7 @@ export type OrganizationCreateWithoutContactSessionsInput = {
   invitations?: Prisma.InvitationCreateNestedManyWithoutOrganizationInput
   documents?: Prisma.DocumentCreateNestedManyWithoutOrganizationInput
   agents?: Prisma.AgentCreateNestedManyWithoutOrganizationInput
+  conversations?: Prisma.ConversationCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutContactSessionsInput = {
@@ -772,6 +810,7 @@ export type OrganizationUncheckedCreateWithoutContactSessionsInput = {
   invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutOrganizationInput
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutOrganizationInput
   agents?: Prisma.AgentUncheckedCreateNestedManyWithoutOrganizationInput
+  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutContactSessionsInput = {
@@ -802,6 +841,7 @@ export type OrganizationUpdateWithoutContactSessionsInput = {
   invitations?: Prisma.InvitationUpdateManyWithoutOrganizationNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutOrganizationNestedInput
   agents?: Prisma.AgentUpdateManyWithoutOrganizationNestedInput
+  conversations?: Prisma.ConversationUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutContactSessionsInput = {
@@ -816,6 +856,83 @@ export type OrganizationUncheckedUpdateWithoutContactSessionsInput = {
   invitations?: Prisma.InvitationUncheckedUpdateManyWithoutOrganizationNestedInput
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   agents?: Prisma.AgentUncheckedUpdateManyWithoutOrganizationNestedInput
+  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutOrganizationNestedInput
+}
+
+export type OrganizationCreateWithoutConversationsInput = {
+  id: string
+  name: string
+  slug: string
+  logo?: string | null
+  createdAt: Date | string
+  metadata?: string | null
+  teams?: Prisma.TeamCreateNestedManyWithoutOrganizationInput
+  members?: Prisma.MemberCreateNestedManyWithoutOrganizationInput
+  invitations?: Prisma.InvitationCreateNestedManyWithoutOrganizationInput
+  documents?: Prisma.DocumentCreateNestedManyWithoutOrganizationInput
+  agents?: Prisma.AgentCreateNestedManyWithoutOrganizationInput
+  contactSessions?: Prisma.ContactSessionCreateNestedManyWithoutOrganizationInput
+}
+
+export type OrganizationUncheckedCreateWithoutConversationsInput = {
+  id: string
+  name: string
+  slug: string
+  logo?: string | null
+  createdAt: Date | string
+  metadata?: string | null
+  teams?: Prisma.TeamUncheckedCreateNestedManyWithoutOrganizationInput
+  members?: Prisma.MemberUncheckedCreateNestedManyWithoutOrganizationInput
+  invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutOrganizationInput
+  documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutOrganizationInput
+  agents?: Prisma.AgentUncheckedCreateNestedManyWithoutOrganizationInput
+  contactSessions?: Prisma.ContactSessionUncheckedCreateNestedManyWithoutOrganizationInput
+}
+
+export type OrganizationCreateOrConnectWithoutConversationsInput = {
+  where: Prisma.OrganizationWhereUniqueInput
+  create: Prisma.XOR<Prisma.OrganizationCreateWithoutConversationsInput, Prisma.OrganizationUncheckedCreateWithoutConversationsInput>
+}
+
+export type OrganizationUpsertWithoutConversationsInput = {
+  update: Prisma.XOR<Prisma.OrganizationUpdateWithoutConversationsInput, Prisma.OrganizationUncheckedUpdateWithoutConversationsInput>
+  create: Prisma.XOR<Prisma.OrganizationCreateWithoutConversationsInput, Prisma.OrganizationUncheckedCreateWithoutConversationsInput>
+  where?: Prisma.OrganizationWhereInput
+}
+
+export type OrganizationUpdateToOneWithWhereWithoutConversationsInput = {
+  where?: Prisma.OrganizationWhereInput
+  data: Prisma.XOR<Prisma.OrganizationUpdateWithoutConversationsInput, Prisma.OrganizationUncheckedUpdateWithoutConversationsInput>
+}
+
+export type OrganizationUpdateWithoutConversationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  metadata?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  teams?: Prisma.TeamUpdateManyWithoutOrganizationNestedInput
+  members?: Prisma.MemberUpdateManyWithoutOrganizationNestedInput
+  invitations?: Prisma.InvitationUpdateManyWithoutOrganizationNestedInput
+  documents?: Prisma.DocumentUpdateManyWithoutOrganizationNestedInput
+  agents?: Prisma.AgentUpdateManyWithoutOrganizationNestedInput
+  contactSessions?: Prisma.ContactSessionUpdateManyWithoutOrganizationNestedInput
+}
+
+export type OrganizationUncheckedUpdateWithoutConversationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  metadata?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  teams?: Prisma.TeamUncheckedUpdateManyWithoutOrganizationNestedInput
+  members?: Prisma.MemberUncheckedUpdateManyWithoutOrganizationNestedInput
+  invitations?: Prisma.InvitationUncheckedUpdateManyWithoutOrganizationNestedInput
+  documents?: Prisma.DocumentUncheckedUpdateManyWithoutOrganizationNestedInput
+  agents?: Prisma.AgentUncheckedUpdateManyWithoutOrganizationNestedInput
+  contactSessions?: Prisma.ContactSessionUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutDocumentsInput = {
@@ -830,6 +947,7 @@ export type OrganizationCreateWithoutDocumentsInput = {
   invitations?: Prisma.InvitationCreateNestedManyWithoutOrganizationInput
   agents?: Prisma.AgentCreateNestedManyWithoutOrganizationInput
   contactSessions?: Prisma.ContactSessionCreateNestedManyWithoutOrganizationInput
+  conversations?: Prisma.ConversationCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutDocumentsInput = {
@@ -844,6 +962,7 @@ export type OrganizationUncheckedCreateWithoutDocumentsInput = {
   invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutOrganizationInput
   agents?: Prisma.AgentUncheckedCreateNestedManyWithoutOrganizationInput
   contactSessions?: Prisma.ContactSessionUncheckedCreateNestedManyWithoutOrganizationInput
+  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutDocumentsInput = {
@@ -874,6 +993,7 @@ export type OrganizationUpdateWithoutDocumentsInput = {
   invitations?: Prisma.InvitationUpdateManyWithoutOrganizationNestedInput
   agents?: Prisma.AgentUpdateManyWithoutOrganizationNestedInput
   contactSessions?: Prisma.ContactSessionUpdateManyWithoutOrganizationNestedInput
+  conversations?: Prisma.ConversationUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutDocumentsInput = {
@@ -888,6 +1008,7 @@ export type OrganizationUncheckedUpdateWithoutDocumentsInput = {
   invitations?: Prisma.InvitationUncheckedUpdateManyWithoutOrganizationNestedInput
   agents?: Prisma.AgentUncheckedUpdateManyWithoutOrganizationNestedInput
   contactSessions?: Prisma.ContactSessionUncheckedUpdateManyWithoutOrganizationNestedInput
+  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 
@@ -902,6 +1023,7 @@ export type OrganizationCountOutputType = {
   documents: number
   agents: number
   contactSessions: number
+  conversations: number
 }
 
 export type OrganizationCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -911,6 +1033,7 @@ export type OrganizationCountOutputTypeSelect<ExtArgs extends runtime.Types.Exte
   documents?: boolean | OrganizationCountOutputTypeCountDocumentsArgs
   agents?: boolean | OrganizationCountOutputTypeCountAgentsArgs
   contactSessions?: boolean | OrganizationCountOutputTypeCountContactSessionsArgs
+  conversations?: boolean | OrganizationCountOutputTypeCountConversationsArgs
 }
 
 /**
@@ -965,6 +1088,13 @@ export type OrganizationCountOutputTypeCountContactSessionsArgs<ExtArgs extends 
   where?: Prisma.ContactSessionWhereInput
 }
 
+/**
+ * OrganizationCountOutputType without action
+ */
+export type OrganizationCountOutputTypeCountConversationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ConversationWhereInput
+}
+
 
 export type OrganizationSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -979,6 +1109,7 @@ export type OrganizationSelect<ExtArgs extends runtime.Types.Extensions.Internal
   documents?: boolean | Prisma.Organization$documentsArgs<ExtArgs>
   agents?: boolean | Prisma.Organization$agentsArgs<ExtArgs>
   contactSessions?: boolean | Prisma.Organization$contactSessionsArgs<ExtArgs>
+  conversations?: boolean | Prisma.Organization$conversationsArgs<ExtArgs>
   _count?: boolean | Prisma.OrganizationCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["organization"]>
 
@@ -1017,6 +1148,7 @@ export type OrganizationInclude<ExtArgs extends runtime.Types.Extensions.Interna
   documents?: boolean | Prisma.Organization$documentsArgs<ExtArgs>
   agents?: boolean | Prisma.Organization$agentsArgs<ExtArgs>
   contactSessions?: boolean | Prisma.Organization$contactSessionsArgs<ExtArgs>
+  conversations?: boolean | Prisma.Organization$conversationsArgs<ExtArgs>
   _count?: boolean | Prisma.OrganizationCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type OrganizationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1031,6 +1163,7 @@ export type $OrganizationPayload<ExtArgs extends runtime.Types.Extensions.Intern
     documents: Prisma.$DocumentPayload<ExtArgs>[]
     agents: Prisma.$AgentPayload<ExtArgs>[]
     contactSessions: Prisma.$ContactSessionPayload<ExtArgs>[]
+    conversations: Prisma.$ConversationPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1439,6 +1572,7 @@ export interface Prisma__OrganizationClient<T, Null = never, ExtArgs extends run
   documents<T extends Prisma.Organization$documentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$documentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   agents<T extends Prisma.Organization$agentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$agentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   contactSessions<T extends Prisma.Organization$contactSessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$contactSessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ContactSessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  conversations<T extends Prisma.Organization$conversationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$conversationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ConversationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2008,6 +2142,30 @@ export type Organization$contactSessionsArgs<ExtArgs extends runtime.Types.Exten
   take?: number
   skip?: number
   distinct?: Prisma.ContactSessionScalarFieldEnum | Prisma.ContactSessionScalarFieldEnum[]
+}
+
+/**
+ * Organization.conversations
+ */
+export type Organization$conversationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Conversation
+   */
+  select?: Prisma.ConversationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Conversation
+   */
+  omit?: Prisma.ConversationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ConversationInclude<ExtArgs> | null
+  where?: Prisma.ConversationWhereInput
+  orderBy?: Prisma.ConversationOrderByWithRelationInput | Prisma.ConversationOrderByWithRelationInput[]
+  cursor?: Prisma.ConversationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ConversationScalarFieldEnum | Prisma.ConversationScalarFieldEnum[]
 }
 
 /**

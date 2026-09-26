@@ -78,21 +78,6 @@ export const widgetSettingsAtom = atom(
     set(widgetSettingsBaseAtom, next);
   },
 );
-export const vapiSecretsAtom = atom<{
-  publicApiKey: string;
-} | null>(null);
-export const hasVapiSecretsAtom = atom((get) => get(vapiSecretsAtom) !== null);
-
-export type BookingDraft = {
-  serviceId?: string;
-  serviceName?: string;
-  serviceDurationMinutes?: number;
-  dateString?: string;
-  timeString?: string;
-};
-
-export const bookingDraftAtom = atom<BookingDraft>({});
-
 export const sessionIsAnonymousAtomFamily = atomFamily(
   (organizationId: string) =>
     atomWithStorage<boolean>(

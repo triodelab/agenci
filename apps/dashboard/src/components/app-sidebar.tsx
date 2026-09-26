@@ -37,7 +37,6 @@ import {
   PanelLeftIcon,
   PlugIcon,
   PlusIcon,
-  SettingsIcon,
   UsersIcon,
   ZapIcon,
 } from "lucide-react";
@@ -131,13 +130,8 @@ function globalNavItems(orgSlug: string) {
       exact: true,
       action: { url: `${base}/agents/create`, label: "Ny agent" },
     },
-    {
-      title: "Innstillinger",
-      url: `${base}/settings`,
-      icon: SettingsIcon,
-      badge: false,
-      exact: false,
-    },
+    // "Innstillinger" comes back when there is an org settings page
+    // (`/settings` has no route yet and led to a 404).
     {
       title: "Medlemmer",
       url: "/org/organization",

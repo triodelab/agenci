@@ -17,13 +17,9 @@
   "dependencies": {
     "@orpc/client": "catalog:",
     "@orpc/server": "catalog:",
-    "@convex-dev/agent": "^0.1.16",
     "@hookform/resolvers": "^5.2.0",
-    "@vapi-ai/web": "^2.3.8",
-    "@agenci/backend": "workspace:*",
     "server": "workspace:*",
     "@workspace/ui": "workspace:*",
-    "convex": "catalog:",
     "date-fns": "^4.1.0",
     "jotai": "^2.12.5",
     "lucide-react": "^0.475.0",
@@ -32,7 +28,6 @@
     "react-hook-form": "^7.61.1",
     "zod": "catalog:",
     "@agenci/auth": "workspace:*"
-
   },
   "devDependencies": {
     "@types/node": "catalog:",

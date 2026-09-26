@@ -63,6 +63,7 @@ export const ModelName = {
   Member: 'Member',
   Invitation: 'Invitation',
   ContactSession: 'ContactSession',
+  Conversation: 'Conversation',
   Document: 'Document'
 } as const
 
@@ -258,6 +259,24 @@ export const ContactSessionScalarFieldEnum = {
 } as const
 
 export type ContactSessionScalarFieldEnum = (typeof ContactSessionScalarFieldEnum)[keyof typeof ContactSessionScalarFieldEnum]
+
+
+export const ConversationScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  agentId: 'agentId',
+  contactSessionId: 'contactSessionId',
+  status: 'status',
+  firstMessage: 'firstMessage',
+  lastMessage: 'lastMessage',
+  lastMessageRole: 'lastMessageRole',
+  messageCount: 'messageCount',
+  lastMessageAt: 'lastMessageAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ConversationScalarFieldEnum = (typeof ConversationScalarFieldEnum)[keyof typeof ConversationScalarFieldEnum]
 
 
 export const DocumentScalarFieldEnum = {

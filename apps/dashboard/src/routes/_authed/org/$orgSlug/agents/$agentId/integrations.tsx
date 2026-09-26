@@ -8,10 +8,11 @@ export const Route = createFileRoute(
 });
 
 function RouteComponent() {
+  const { agentId } = Route.useParams();
   return (
     <div className="dash-page">
       <div className="dash-page-box">
-        <IntegrationsView />
+        <IntegrationsView agentId={agentId} />
       </div>
     </div>
   );

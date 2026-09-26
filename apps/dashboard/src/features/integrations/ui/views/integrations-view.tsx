@@ -50,7 +50,7 @@ const COMING_SOON: ComingSoonIntegration[] = [
   { id: "teams", name: "Microsoft Teams", category: "Meldinger", color: "#464EB8", letter: "T" },
 ];
 
-export function IntegrationsView() {
+export function IntegrationsView({ agentId }: { agentId: string }) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedPlatform, setSelectedPlatform] =
     useState<IntegrationId | null>(null);
@@ -66,7 +66,7 @@ export function IntegrationsView() {
       return;
     }
     setSelectedPlatform(integrationId);
-    setSelectedSnippet(createScript(integrationId, organization.id));
+    setSelectedSnippet(createScript(integrationId, organization.id, agentId));
     setDialogOpen(true);
   };
 
@@ -141,7 +141,7 @@ export function IntegrationsView() {
                 onClick={() => {
                   if (!organization) return;
                   window.open(
-                    getWidgetPreviewUrl(organization.id),
+                    getWidgetPreviewUrl(organization.id, { agentId }),
                     "_blank",
                     "noopener,noreferrer",
                   );

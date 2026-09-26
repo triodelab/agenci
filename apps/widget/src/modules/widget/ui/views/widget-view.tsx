@@ -4,7 +4,7 @@ import {
   widgetAppearanceToStandaloneStyle,
 } from "@workspace/ui/lib/widget-appearance";
 import { useAtomValue } from "jotai";
-import { lazy, useEffect } from "react";
+import { useEffect } from "react";
 import {
   screenAtom,
   widgetSettingsAtom,
@@ -14,26 +14,6 @@ import { WidgetChatScreen } from "@/modules/widget/ui/screens/widget-chat-screen
 import { WidgetErrorScreen } from "@/modules/widget/ui/screens/widget-error-screen";
 import { WidgetLoadingScreen } from "@/modules/widget/ui/screens/widget-loading-screen";
 import { WidgetBranding } from "../components/widget-branding";
-import { WidgetContactScreen } from "../screens/widget-contact-screen";
-import { WidgetVoiceScreen } from "../screens/widget-voice-screen";
-
-// Still on legacy Convex (not yet ported to apps/server — booking moves to MCP).
-// Lazy so their Convex imports never load unless someone navigates there.
-const WidgetSelectionScreen = lazy(() =>
-  import("../screens/widget-selection-screen").then((m) => ({
-    default: m.WidgetSelectionScreen,
-  })),
-);
-const WidgetInboxScreen = lazy(() =>
-  import("../screens/widget-inbox-screen").then((m) => ({
-    default: m.WidgetInboxScreen,
-  })),
-);
-const WidgetBookingScreen = lazy(() =>
-  import("../screens/widget-booking-screen").then((m) => ({
-    default: m.WidgetBookingScreen,
-  })),
-);
 
 interface Props {
   organizationId: string | null;
@@ -126,12 +106,7 @@ export const WidgetView = ({
     ),
     error: <WidgetErrorScreen />,
     auth: <WidgetAuthScreen />,
-    voice: <WidgetVoiceScreen />,
-    inbox: <WidgetInboxScreen />,
-    selection: <WidgetSelectionScreen />,
     chat: <WidgetChatScreen />,
-    contact: <WidgetContactScreen />,
-    booking: <WidgetBookingScreen />,
   };
 
   return (

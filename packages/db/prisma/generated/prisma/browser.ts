@@ -82,6 +82,14 @@ export type Invitation = Prisma.InvitationModel
  */
 export type ContactSession = Prisma.ContactSessionModel
 /**
+ * Model Conversation
+ * One row per widget conversation — the index the inbox, overview and agent
+ * list read from. The messages themselves stay in the Mastra memory thread
+ * with the same id; this row is kept in step on every message
+ * (`modules/conversations/service.ts`).
+ */
+export type Conversation = Prisma.ConversationModel
+/**
  * Model Document
  * 
  */

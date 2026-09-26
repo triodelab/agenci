@@ -223,6 +223,7 @@ export type ContactSessionWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"ContactSession"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ContactSession"> | Date | string
   organization?: Prisma.XOR<Prisma.OrganizationScalarRelationFilter, Prisma.OrganizationWhereInput>
+  conversations?: Prisma.ConversationListRelationFilter
 }
 
 export type ContactSessionOrderByWithRelationInput = {
@@ -237,6 +238,7 @@ export type ContactSessionOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   organization?: Prisma.OrganizationOrderByWithRelationInput
+  conversations?: Prisma.ConversationOrderByRelationAggregateInput
 }
 
 export type ContactSessionWhereUniqueInput = Prisma.AtLeast<{
@@ -254,6 +256,7 @@ export type ContactSessionWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"ContactSession"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ContactSession"> | Date | string
   organization?: Prisma.XOR<Prisma.OrganizationScalarRelationFilter, Prisma.OrganizationWhereInput>
+  conversations?: Prisma.ConversationListRelationFilter
 }, "id">
 
 export type ContactSessionOrderByWithAggregationInput = {
@@ -299,6 +302,7 @@ export type ContactSessionCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   organization: Prisma.OrganizationCreateNestedOneWithoutContactSessionsInput
+  conversations?: Prisma.ConversationCreateNestedManyWithoutContactSessionInput
 }
 
 export type ContactSessionUncheckedCreateInput = {
@@ -312,6 +316,7 @@ export type ContactSessionUncheckedCreateInput = {
   expiresAt: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
+  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutContactSessionInput
 }
 
 export type ContactSessionUpdateInput = {
@@ -325,6 +330,7 @@ export type ContactSessionUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutContactSessionsNestedInput
+  conversations?: Prisma.ConversationUpdateManyWithoutContactSessionNestedInput
 }
 
 export type ContactSessionUncheckedUpdateInput = {
@@ -338,6 +344,7 @@ export type ContactSessionUncheckedUpdateInput = {
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutContactSessionNestedInput
 }
 
 export type ContactSessionCreateManyInput = {
@@ -425,6 +432,11 @@ export type ContactSessionMinOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
 }
 
+export type ContactSessionScalarRelationFilter = {
+  is?: Prisma.ContactSessionWhereInput
+  isNot?: Prisma.ContactSessionWhereInput
+}
+
 export type ContactSessionCreateNestedManyWithoutOrganizationInput = {
   create?: Prisma.XOR<Prisma.ContactSessionCreateWithoutOrganizationInput, Prisma.ContactSessionUncheckedCreateWithoutOrganizationInput> | Prisma.ContactSessionCreateWithoutOrganizationInput[] | Prisma.ContactSessionUncheckedCreateWithoutOrganizationInput[]
   connectOrCreate?: Prisma.ContactSessionCreateOrConnectWithoutOrganizationInput | Prisma.ContactSessionCreateOrConnectWithoutOrganizationInput[]
@@ -467,6 +479,20 @@ export type ContactSessionUncheckedUpdateManyWithoutOrganizationNestedInput = {
   deleteMany?: Prisma.ContactSessionScalarWhereInput | Prisma.ContactSessionScalarWhereInput[]
 }
 
+export type ContactSessionCreateNestedOneWithoutConversationsInput = {
+  create?: Prisma.XOR<Prisma.ContactSessionCreateWithoutConversationsInput, Prisma.ContactSessionUncheckedCreateWithoutConversationsInput>
+  connectOrCreate?: Prisma.ContactSessionCreateOrConnectWithoutConversationsInput
+  connect?: Prisma.ContactSessionWhereUniqueInput
+}
+
+export type ContactSessionUpdateOneRequiredWithoutConversationsNestedInput = {
+  create?: Prisma.XOR<Prisma.ContactSessionCreateWithoutConversationsInput, Prisma.ContactSessionUncheckedCreateWithoutConversationsInput>
+  connectOrCreate?: Prisma.ContactSessionCreateOrConnectWithoutConversationsInput
+  upsert?: Prisma.ContactSessionUpsertWithoutConversationsInput
+  connect?: Prisma.ContactSessionWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ContactSessionUpdateToOneWithWhereWithoutConversationsInput, Prisma.ContactSessionUpdateWithoutConversationsInput>, Prisma.ContactSessionUncheckedUpdateWithoutConversationsInput>
+}
+
 export type ContactSessionCreateWithoutOrganizationInput = {
   id?: string
   agentId?: string | null
@@ -477,6 +503,7 @@ export type ContactSessionCreateWithoutOrganizationInput = {
   expiresAt: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
+  conversations?: Prisma.ConversationCreateNestedManyWithoutContactSessionInput
 }
 
 export type ContactSessionUncheckedCreateWithoutOrganizationInput = {
@@ -489,6 +516,7 @@ export type ContactSessionUncheckedCreateWithoutOrganizationInput = {
   expiresAt: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
+  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutContactSessionInput
 }
 
 export type ContactSessionCreateOrConnectWithoutOrganizationInput = {
@@ -533,6 +561,74 @@ export type ContactSessionScalarWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"ContactSession"> | Date | string
 }
 
+export type ContactSessionCreateWithoutConversationsInput = {
+  id?: string
+  agentId?: string | null
+  name?: string | null
+  email?: string | null
+  anonymous?: boolean
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  expiresAt: Date | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  organization: Prisma.OrganizationCreateNestedOneWithoutContactSessionsInput
+}
+
+export type ContactSessionUncheckedCreateWithoutConversationsInput = {
+  id?: string
+  organizationId: string
+  agentId?: string | null
+  name?: string | null
+  email?: string | null
+  anonymous?: boolean
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  expiresAt: Date | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type ContactSessionCreateOrConnectWithoutConversationsInput = {
+  where: Prisma.ContactSessionWhereUniqueInput
+  create: Prisma.XOR<Prisma.ContactSessionCreateWithoutConversationsInput, Prisma.ContactSessionUncheckedCreateWithoutConversationsInput>
+}
+
+export type ContactSessionUpsertWithoutConversationsInput = {
+  update: Prisma.XOR<Prisma.ContactSessionUpdateWithoutConversationsInput, Prisma.ContactSessionUncheckedUpdateWithoutConversationsInput>
+  create: Prisma.XOR<Prisma.ContactSessionCreateWithoutConversationsInput, Prisma.ContactSessionUncheckedCreateWithoutConversationsInput>
+  where?: Prisma.ContactSessionWhereInput
+}
+
+export type ContactSessionUpdateToOneWithWhereWithoutConversationsInput = {
+  where?: Prisma.ContactSessionWhereInput
+  data: Prisma.XOR<Prisma.ContactSessionUpdateWithoutConversationsInput, Prisma.ContactSessionUncheckedUpdateWithoutConversationsInput>
+}
+
+export type ContactSessionUpdateWithoutConversationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  agentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  anonymous?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutContactSessionsNestedInput
+}
+
+export type ContactSessionUncheckedUpdateWithoutConversationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  agentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  anonymous?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 export type ContactSessionCreateManyOrganizationInput = {
   id?: string
   agentId?: string | null
@@ -555,6 +651,7 @@ export type ContactSessionUpdateWithoutOrganizationInput = {
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  conversations?: Prisma.ConversationUpdateManyWithoutContactSessionNestedInput
 }
 
 export type ContactSessionUncheckedUpdateWithoutOrganizationInput = {
@@ -567,6 +664,7 @@ export type ContactSessionUncheckedUpdateWithoutOrganizationInput = {
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutContactSessionNestedInput
 }
 
 export type ContactSessionUncheckedUpdateManyWithoutOrganizationInput = {
@@ -582,6 +680,35 @@ export type ContactSessionUncheckedUpdateManyWithoutOrganizationInput = {
 }
 
 
+/**
+ * Count Type ContactSessionCountOutputType
+ */
+
+export type ContactSessionCountOutputType = {
+  conversations: number
+}
+
+export type ContactSessionCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  conversations?: boolean | ContactSessionCountOutputTypeCountConversationsArgs
+}
+
+/**
+ * ContactSessionCountOutputType without action
+ */
+export type ContactSessionCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ContactSessionCountOutputType
+   */
+  select?: Prisma.ContactSessionCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * ContactSessionCountOutputType without action
+ */
+export type ContactSessionCountOutputTypeCountConversationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ConversationWhereInput
+}
+
 
 export type ContactSessionSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -595,6 +722,8 @@ export type ContactSessionSelect<ExtArgs extends runtime.Types.Extensions.Intern
   createdAt?: boolean
   updatedAt?: boolean
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
+  conversations?: boolean | Prisma.ContactSession$conversationsArgs<ExtArgs>
+  _count?: boolean | Prisma.ContactSessionCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["contactSession"]>
 
 export type ContactSessionSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -641,6 +770,8 @@ export type ContactSessionSelectScalar = {
 export type ContactSessionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "agentId" | "name" | "email" | "anonymous" | "metadata" | "expiresAt" | "createdAt" | "updatedAt", ExtArgs["result"]["contactSession"]>
 export type ContactSessionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
+  conversations?: boolean | Prisma.ContactSession$conversationsArgs<ExtArgs>
+  _count?: boolean | Prisma.ContactSessionCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ContactSessionIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
@@ -653,6 +784,7 @@ export type $ContactSessionPayload<ExtArgs extends runtime.Types.Extensions.Inte
   name: "ContactSession"
   objects: {
     organization: Prisma.$OrganizationPayload<ExtArgs>
+    conversations: Prisma.$ConversationPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1060,6 +1192,7 @@ readonly fields: ContactSessionFieldRefs;
 export interface Prisma__ContactSessionClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   organization<T extends Prisma.OrganizationDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OrganizationDefaultArgs<ExtArgs>>): Prisma.Prisma__OrganizationClient<runtime.Types.Result.GetResult<Prisma.$OrganizationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  conversations<T extends Prisma.ContactSession$conversationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ContactSession$conversationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ConversationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1497,6 +1630,30 @@ export type ContactSessionDeleteManyArgs<ExtArgs extends runtime.Types.Extension
    * Limit how many ContactSessions to delete.
    */
   limit?: number
+}
+
+/**
+ * ContactSession.conversations
+ */
+export type ContactSession$conversationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Conversation
+   */
+  select?: Prisma.ConversationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Conversation
+   */
+  omit?: Prisma.ConversationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ConversationInclude<ExtArgs> | null
+  where?: Prisma.ConversationWhereInput
+  orderBy?: Prisma.ConversationOrderByWithRelationInput | Prisma.ConversationOrderByWithRelationInput[]
+  cursor?: Prisma.ConversationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ConversationScalarFieldEnum | Prisma.ConversationScalarFieldEnum[]
 }
 
 /**

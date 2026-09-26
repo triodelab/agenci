@@ -217,6 +217,7 @@ export type AgentWhereInput = {
   organization?: Prisma.XOR<Prisma.OrganizationScalarRelationFilter, Prisma.OrganizationWhereInput>
   widgetBrand?: Prisma.XOR<Prisma.AgentWidgetBrandNullableScalarRelationFilter, Prisma.AgentWidgetBrandWhereInput> | null
   documents?: Prisma.DocumentListRelationFilter
+  conversations?: Prisma.ConversationListRelationFilter
 }
 
 export type AgentOrderByWithRelationInput = {
@@ -232,16 +233,18 @@ export type AgentOrderByWithRelationInput = {
   organization?: Prisma.OrganizationOrderByWithRelationInput
   widgetBrand?: Prisma.AgentWidgetBrandOrderByWithRelationInput
   documents?: Prisma.DocumentOrderByRelationAggregateInput
+  conversations?: Prisma.ConversationOrderByRelationAggregateInput
 }
 
 export type AgentWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  name?: string
   slug?: string
+  organizationId_name?: Prisma.AgentOrganizationIdNameCompoundUniqueInput
   AND?: Prisma.AgentWhereInput | Prisma.AgentWhereInput[]
   OR?: Prisma.AgentWhereInput[]
   NOT?: Prisma.AgentWhereInput | Prisma.AgentWhereInput[]
   organizationId?: Prisma.StringFilter<"Agent"> | string
+  name?: Prisma.StringFilter<"Agent"> | string
   description?: Prisma.StringFilter<"Agent"> | string
   modelLabel?: Prisma.StringNullableFilter<"Agent"> | string | null
   status?: Prisma.EnumAgentStatusFilter<"Agent"> | $Enums.AgentStatus
@@ -250,7 +253,8 @@ export type AgentWhereUniqueInput = Prisma.AtLeast<{
   organization?: Prisma.XOR<Prisma.OrganizationScalarRelationFilter, Prisma.OrganizationWhereInput>
   widgetBrand?: Prisma.XOR<Prisma.AgentWidgetBrandNullableScalarRelationFilter, Prisma.AgentWidgetBrandWhereInput> | null
   documents?: Prisma.DocumentListRelationFilter
-}, "id" | "name" | "slug">
+  conversations?: Prisma.ConversationListRelationFilter
+}, "id" | "slug" | "organizationId_name">
 
 export type AgentOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -294,6 +298,7 @@ export type AgentCreateInput = {
   organization: Prisma.OrganizationCreateNestedOneWithoutAgentsInput
   widgetBrand?: Prisma.AgentWidgetBrandCreateNestedOneWithoutAgentInput
   documents?: Prisma.DocumentCreateNestedManyWithoutAgentInput
+  conversations?: Prisma.ConversationCreateNestedManyWithoutAgentInput
 }
 
 export type AgentUncheckedCreateInput = {
@@ -308,6 +313,7 @@ export type AgentUncheckedCreateInput = {
   updatedAt?: Date | string
   widgetBrand?: Prisma.AgentWidgetBrandUncheckedCreateNestedOneWithoutAgentInput
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutAgentInput
+  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutAgentInput
 }
 
 export type AgentUpdateInput = {
@@ -322,6 +328,7 @@ export type AgentUpdateInput = {
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutAgentsNestedInput
   widgetBrand?: Prisma.AgentWidgetBrandUpdateOneWithoutAgentNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutAgentNestedInput
+  conversations?: Prisma.ConversationUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentUncheckedUpdateInput = {
@@ -336,6 +343,7 @@ export type AgentUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   widgetBrand?: Prisma.AgentWidgetBrandUncheckedUpdateOneWithoutAgentNestedInput
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutAgentNestedInput
+  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentCreateManyInput = {
@@ -371,6 +379,11 @@ export type AgentUncheckedUpdateManyInput = {
   status?: Prisma.EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type AgentOrganizationIdNameCompoundUniqueInput = {
+  organizationId: string
+  name: string
 }
 
 export type AgentCountOrderByAggregateInput = {
@@ -501,6 +514,20 @@ export type AgentUncheckedUpdateManyWithoutOrganizationNestedInput = {
   deleteMany?: Prisma.AgentScalarWhereInput | Prisma.AgentScalarWhereInput[]
 }
 
+export type AgentCreateNestedOneWithoutConversationsInput = {
+  create?: Prisma.XOR<Prisma.AgentCreateWithoutConversationsInput, Prisma.AgentUncheckedCreateWithoutConversationsInput>
+  connectOrCreate?: Prisma.AgentCreateOrConnectWithoutConversationsInput
+  connect?: Prisma.AgentWhereUniqueInput
+}
+
+export type AgentUpdateOneRequiredWithoutConversationsNestedInput = {
+  create?: Prisma.XOR<Prisma.AgentCreateWithoutConversationsInput, Prisma.AgentUncheckedCreateWithoutConversationsInput>
+  connectOrCreate?: Prisma.AgentCreateOrConnectWithoutConversationsInput
+  upsert?: Prisma.AgentUpsertWithoutConversationsInput
+  connect?: Prisma.AgentWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AgentUpdateToOneWithWhereWithoutConversationsInput, Prisma.AgentUpdateWithoutConversationsInput>, Prisma.AgentUncheckedUpdateWithoutConversationsInput>
+}
+
 export type AgentCreateNestedOneWithoutDocumentsInput = {
   create?: Prisma.XOR<Prisma.AgentCreateWithoutDocumentsInput, Prisma.AgentUncheckedCreateWithoutDocumentsInput>
   connectOrCreate?: Prisma.AgentCreateOrConnectWithoutDocumentsInput
@@ -528,6 +555,7 @@ export type AgentCreateWithoutWidgetBrandInput = {
   updatedAt?: Date | string
   organization: Prisma.OrganizationCreateNestedOneWithoutAgentsInput
   documents?: Prisma.DocumentCreateNestedManyWithoutAgentInput
+  conversations?: Prisma.ConversationCreateNestedManyWithoutAgentInput
 }
 
 export type AgentUncheckedCreateWithoutWidgetBrandInput = {
@@ -541,6 +569,7 @@ export type AgentUncheckedCreateWithoutWidgetBrandInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutAgentInput
+  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutAgentInput
 }
 
 export type AgentCreateOrConnectWithoutWidgetBrandInput = {
@@ -570,6 +599,7 @@ export type AgentUpdateWithoutWidgetBrandInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutAgentsNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutAgentNestedInput
+  conversations?: Prisma.ConversationUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentUncheckedUpdateWithoutWidgetBrandInput = {
@@ -583,6 +613,7 @@ export type AgentUncheckedUpdateWithoutWidgetBrandInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutAgentNestedInput
+  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentCreateWithoutOrganizationInput = {
@@ -596,6 +627,7 @@ export type AgentCreateWithoutOrganizationInput = {
   updatedAt?: Date | string
   widgetBrand?: Prisma.AgentWidgetBrandCreateNestedOneWithoutAgentInput
   documents?: Prisma.DocumentCreateNestedManyWithoutAgentInput
+  conversations?: Prisma.ConversationCreateNestedManyWithoutAgentInput
 }
 
 export type AgentUncheckedCreateWithoutOrganizationInput = {
@@ -609,6 +641,7 @@ export type AgentUncheckedCreateWithoutOrganizationInput = {
   updatedAt?: Date | string
   widgetBrand?: Prisma.AgentWidgetBrandUncheckedCreateNestedOneWithoutAgentInput
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutAgentInput
+  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutAgentInput
 }
 
 export type AgentCreateOrConnectWithoutOrganizationInput = {
@@ -652,6 +685,78 @@ export type AgentScalarWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Agent"> | Date | string
 }
 
+export type AgentCreateWithoutConversationsInput = {
+  id?: string
+  name: string
+  description: string
+  slug: string
+  modelLabel?: string | null
+  status?: $Enums.AgentStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  organization: Prisma.OrganizationCreateNestedOneWithoutAgentsInput
+  widgetBrand?: Prisma.AgentWidgetBrandCreateNestedOneWithoutAgentInput
+  documents?: Prisma.DocumentCreateNestedManyWithoutAgentInput
+}
+
+export type AgentUncheckedCreateWithoutConversationsInput = {
+  id?: string
+  organizationId: string
+  name: string
+  description: string
+  slug: string
+  modelLabel?: string | null
+  status?: $Enums.AgentStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  widgetBrand?: Prisma.AgentWidgetBrandUncheckedCreateNestedOneWithoutAgentInput
+  documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutAgentInput
+}
+
+export type AgentCreateOrConnectWithoutConversationsInput = {
+  where: Prisma.AgentWhereUniqueInput
+  create: Prisma.XOR<Prisma.AgentCreateWithoutConversationsInput, Prisma.AgentUncheckedCreateWithoutConversationsInput>
+}
+
+export type AgentUpsertWithoutConversationsInput = {
+  update: Prisma.XOR<Prisma.AgentUpdateWithoutConversationsInput, Prisma.AgentUncheckedUpdateWithoutConversationsInput>
+  create: Prisma.XOR<Prisma.AgentCreateWithoutConversationsInput, Prisma.AgentUncheckedCreateWithoutConversationsInput>
+  where?: Prisma.AgentWhereInput
+}
+
+export type AgentUpdateToOneWithWhereWithoutConversationsInput = {
+  where?: Prisma.AgentWhereInput
+  data: Prisma.XOR<Prisma.AgentUpdateWithoutConversationsInput, Prisma.AgentUncheckedUpdateWithoutConversationsInput>
+}
+
+export type AgentUpdateWithoutConversationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  modelLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutAgentsNestedInput
+  widgetBrand?: Prisma.AgentWidgetBrandUpdateOneWithoutAgentNestedInput
+  documents?: Prisma.DocumentUpdateManyWithoutAgentNestedInput
+}
+
+export type AgentUncheckedUpdateWithoutConversationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  modelLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumAgentStatusFieldUpdateOperationsInput | $Enums.AgentStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  widgetBrand?: Prisma.AgentWidgetBrandUncheckedUpdateOneWithoutAgentNestedInput
+  documents?: Prisma.DocumentUncheckedUpdateManyWithoutAgentNestedInput
+}
+
 export type AgentCreateWithoutDocumentsInput = {
   id?: string
   name: string
@@ -663,6 +768,7 @@ export type AgentCreateWithoutDocumentsInput = {
   updatedAt?: Date | string
   organization: Prisma.OrganizationCreateNestedOneWithoutAgentsInput
   widgetBrand?: Prisma.AgentWidgetBrandCreateNestedOneWithoutAgentInput
+  conversations?: Prisma.ConversationCreateNestedManyWithoutAgentInput
 }
 
 export type AgentUncheckedCreateWithoutDocumentsInput = {
@@ -676,6 +782,7 @@ export type AgentUncheckedCreateWithoutDocumentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   widgetBrand?: Prisma.AgentWidgetBrandUncheckedCreateNestedOneWithoutAgentInput
+  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutAgentInput
 }
 
 export type AgentCreateOrConnectWithoutDocumentsInput = {
@@ -705,6 +812,7 @@ export type AgentUpdateWithoutDocumentsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutAgentsNestedInput
   widgetBrand?: Prisma.AgentWidgetBrandUpdateOneWithoutAgentNestedInput
+  conversations?: Prisma.ConversationUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentUncheckedUpdateWithoutDocumentsInput = {
@@ -718,6 +826,7 @@ export type AgentUncheckedUpdateWithoutDocumentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   widgetBrand?: Prisma.AgentWidgetBrandUncheckedUpdateOneWithoutAgentNestedInput
+  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentCreateManyOrganizationInput = {
@@ -742,6 +851,7 @@ export type AgentUpdateWithoutOrganizationInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   widgetBrand?: Prisma.AgentWidgetBrandUpdateOneWithoutAgentNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutAgentNestedInput
+  conversations?: Prisma.ConversationUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentUncheckedUpdateWithoutOrganizationInput = {
@@ -755,6 +865,7 @@ export type AgentUncheckedUpdateWithoutOrganizationInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   widgetBrand?: Prisma.AgentWidgetBrandUncheckedUpdateOneWithoutAgentNestedInput
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutAgentNestedInput
+  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentUncheckedUpdateManyWithoutOrganizationInput = {
@@ -775,10 +886,12 @@ export type AgentUncheckedUpdateManyWithoutOrganizationInput = {
 
 export type AgentCountOutputType = {
   documents: number
+  conversations: number
 }
 
 export type AgentCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   documents?: boolean | AgentCountOutputTypeCountDocumentsArgs
+  conversations?: boolean | AgentCountOutputTypeCountConversationsArgs
 }
 
 /**
@@ -798,6 +911,13 @@ export type AgentCountOutputTypeCountDocumentsArgs<ExtArgs extends runtime.Types
   where?: Prisma.DocumentWhereInput
 }
 
+/**
+ * AgentCountOutputType without action
+ */
+export type AgentCountOutputTypeCountConversationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ConversationWhereInput
+}
+
 
 export type AgentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -812,6 +932,7 @@ export type AgentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
   widgetBrand?: boolean | Prisma.Agent$widgetBrandArgs<ExtArgs>
   documents?: boolean | Prisma.Agent$documentsArgs<ExtArgs>
+  conversations?: boolean | Prisma.Agent$conversationsArgs<ExtArgs>
   _count?: boolean | Prisma.AgentCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["agent"]>
 
@@ -858,6 +979,7 @@ export type AgentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
   widgetBrand?: boolean | Prisma.Agent$widgetBrandArgs<ExtArgs>
   documents?: boolean | Prisma.Agent$documentsArgs<ExtArgs>
+  conversations?: boolean | Prisma.Agent$conversationsArgs<ExtArgs>
   _count?: boolean | Prisma.AgentCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type AgentIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -873,10 +995,14 @@ export type $AgentPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     organization: Prisma.$OrganizationPayload<ExtArgs>
     widgetBrand: Prisma.$AgentWidgetBrandPayload<ExtArgs> | null
     documents: Prisma.$DocumentPayload<ExtArgs>[]
+    conversations: Prisma.$ConversationPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     organizationId: string
+    /**
+     * Unique within the organization (not across all customers).
+     */
     name: string
     description: string
     slug: string
@@ -1281,6 +1407,7 @@ export interface Prisma__AgentClient<T, Null = never, ExtArgs extends runtime.Ty
   organization<T extends Prisma.OrganizationDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OrganizationDefaultArgs<ExtArgs>>): Prisma.Prisma__OrganizationClient<runtime.Types.Result.GetResult<Prisma.$OrganizationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   widgetBrand<T extends Prisma.Agent$widgetBrandArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Agent$widgetBrandArgs<ExtArgs>>): Prisma.Prisma__AgentWidgetBrandClient<runtime.Types.Result.GetResult<Prisma.$AgentWidgetBrandPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   documents<T extends Prisma.Agent$documentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Agent$documentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  conversations<T extends Prisma.Agent$conversationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Agent$conversationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ConversationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1760,6 +1887,30 @@ export type Agent$documentsArgs<ExtArgs extends runtime.Types.Extensions.Interna
   take?: number
   skip?: number
   distinct?: Prisma.DocumentScalarFieldEnum | Prisma.DocumentScalarFieldEnum[]
+}
+
+/**
+ * Agent.conversations
+ */
+export type Agent$conversationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Conversation
+   */
+  select?: Prisma.ConversationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Conversation
+   */
+  omit?: Prisma.ConversationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ConversationInclude<ExtArgs> | null
+  where?: Prisma.ConversationWhereInput
+  orderBy?: Prisma.ConversationOrderByWithRelationInput | Prisma.ConversationOrderByWithRelationInput[]
+  cursor?: Prisma.ConversationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ConversationScalarFieldEnum | Prisma.ConversationScalarFieldEnum[]
 }
 
 /**

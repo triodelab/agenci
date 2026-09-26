@@ -16,6 +16,7 @@
  * All motion respects prefers-reduced-motion.
  */
 import { cn } from "@workspace/ui/lib/utils";
+import { Maximize2Icon, ZoomInIcon, ZoomOutIcon } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type {
   KnowledgeChunk,
@@ -416,6 +417,146 @@ function useOrbit({
   return { ...angles, dragging, goHome, handlers };
 }
 
+// ─── Zoom: pinch / ⌘-scroll / double-click / buttons ────────────────────────
+
+const MAX_ZOOM = 4;
+
+/**
+ * Zooms the graph by shrinking the SVG viewBox, so small dots (and their hit
+ * areas) get bigger on screen. Zooming keeps the point under the cursor in
+ * place. Labels are HTML, so they use `pct()` to follow the view.
+ */
+function useZoom(svgRef: React.RefObject<SVGSVGElement | null>) {
+  const [goal, setGoal] = useState({ k: 1, cx: C, cy: C });
+  const goalRef = useRef(goal);
+  goalRef.current = goal;
+
+  const k = useAnimatedValue(goal.k, 14);
+  const cx = useAnimatedValue(goal.cx, 14);
+  const cy = useAnimatedValue(goal.cy, 14);
+  const half = SIZE / (2 * k);
+  const vx = cx - half;
+  const vy = cy - half;
+
+  const fit = (nk: number, ncx: number, ncy: number) => {
+    const kk = Math.min(MAX_ZOOM, Math.max(1, nk));
+    const h = SIZE / (2 * kk);
+    return {
+      k: kk,
+      cx: Math.min(SIZE - h, Math.max(h, ncx)),
+      cy: Math.min(SIZE - h, Math.max(h, ncy)),
+    };
+  };
+
+  /** Zoom by `factor`, keeping SVG point (px, py) under the same spot. */
+  const zoomAt = (
+    factor: number,
+    px = goalRef.current.cx,
+    py = goalRef.current.cy,
+  ) => {
+    const cur = goalRef.current;
+    const nk = Math.min(MAX_ZOOM, Math.max(1, cur.k * factor));
+    const h0 = SIZE / (2 * cur.k);
+    const h1 = SIZE / (2 * nk);
+    const rx = (px - (cur.cx - h0)) / (2 * h0);
+    const ry = (py - (cur.cy - h0)) / (2 * h0);
+    setGoal(fit(nk, px - rx * 2 * h1 + h1, py - ry * 2 * h1 + h1));
+  };
+
+  const toSvg = (clientX: number, clientY: number) => {
+    const el = svgRef.current;
+    const cur = goalRef.current;
+    if (!el) return { x: cur.cx, y: cur.cy };
+    const r = el.getBoundingClientRect();
+    const h = SIZE / (2 * cur.k);
+    return {
+      x: cur.cx - h + ((clientX - r.left) / r.width) * 2 * h,
+      y: cur.cy - h + ((clientY - r.top) / r.height) * 2 * h,
+    };
+  };
+  const toSvgRef = useRef(toSvg);
+  toSvgRef.current = toSvg;
+  const zoomAtRef = useRef(zoomAt);
+  zoomAtRef.current = zoomAt;
+
+  // Pinch on a trackpad arrives as ctrl+wheel; ⌘/Ctrl+scroll works too.
+  // Needs a non-passive listener so the page doesn't zoom/scroll instead.
+  useEffect(() => {
+    const el = svgRef.current;
+    if (!el) return;
+    const onWheel = (e: WheelEvent) => {
+      if (!e.ctrlKey && !e.metaKey) return;
+      e.preventDefault();
+      const p = toSvgRef.current(e.clientX, e.clientY);
+      zoomAtRef.current(Math.exp(-e.deltaY * 0.01), p.x, p.y);
+    };
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
+  }, [svgRef]);
+
+  return {
+    k,
+    zoomed: goal.k > 1.01,
+    viewBox: `${vx} ${vy} ${2 * half} ${2 * half}`,
+    /** Screen position (in % of the box) of an SVG coordinate. */
+    pct: (x: number, y: number) => ({
+      left: `${((x - vx) / (2 * half)) * 100}%`,
+      top: `${((y - vy) / (2 * half)) * 100}%`,
+    }),
+    zoomIn: () => zoomAt(1.6),
+    zoomOut: () => zoomAt(1 / 1.6),
+    reset: () => setGoal({ k: 1, cx: C, cy: C }),
+    onDoubleClick: (e: React.MouseEvent) => {
+      const p = toSvg(e.clientX, e.clientY);
+      zoomAt(1.8, p.x, p.y);
+    },
+  };
+}
+
+function ZoomControls({ zoom }: { zoom: ReturnType<typeof useZoom> }) {
+  const btn =
+    "flex size-8 items-center justify-center text-(--agenci-ink-2) transition-colors hover:bg-[#f1f3f2] hover:text-(--agenci-ink) disabled:opacity-35 disabled:hover:bg-transparent dark:hover:bg-white/5";
+  return (
+    <div className="absolute top-2 right-2 z-10 flex flex-col overflow-hidden rounded-[12px] border border-(--agenci-line) bg-white/90 shadow-[0_4px_14px_-8px_rgb(5_6_7/0.25)] backdrop-blur dark:bg-(--card)/90">
+      <button
+        type="button"
+        onClick={zoom.zoomIn}
+        disabled={zoom.k >= MAX_ZOOM - 0.01}
+        aria-label="Zoom inn"
+        title="Zoom inn (eller knip / ⌘ + rull)"
+        className={btn}
+      >
+        <ZoomInIcon className="size-4" strokeWidth={1.5} absoluteStrokeWidth />
+      </button>
+      <button
+        type="button"
+        onClick={zoom.zoomOut}
+        disabled={!zoom.zoomed}
+        aria-label="Zoom ut"
+        title="Zoom ut"
+        className={cn(btn, "border-t border-(--agenci-line)")}
+      >
+        <ZoomOutIcon className="size-4" strokeWidth={1.5} absoluteStrokeWidth />
+      </button>
+      {zoom.zoomed ? (
+        <button
+          type="button"
+          onClick={zoom.reset}
+          aria-label="Tilbakestill zoom"
+          title="Vis hele grafen"
+          className={cn(btn, "border-t border-(--agenci-line)")}
+        >
+          <Maximize2Icon
+            className="size-3.5"
+            strokeWidth={1.5}
+            absoluteStrokeWidth
+          />
+        </button>
+      ) : null}
+    </div>
+  );
+}
+
 function useEscape(fn: () => void) {
   const ref = useRef(fn);
   ref.current = fn;
@@ -526,6 +667,7 @@ export function KnowledgeGraph({
   const q = query.trim();
 
   const orbit = useOrbit({ home: HOME_2D, autoSpin: 0, paused: false });
+  const zoom = useZoom(svgRef);
   // At rest the starburst turns slowly in its own plane; it stops the moment
   // the pointer is over it (or something is selected / being dragged).
   // On entering the page the graph rests as a tight cluster; after a short
@@ -617,7 +759,8 @@ export function KnowledgeGraph({
         ref={svgRef}
         role="group"
         aria-label="Kunnskapsgraf — dra for å rotere"
-        viewBox={`0 0 ${SIZE} ${SIZE}`}
+        viewBox={zoom.viewBox}
+        onDoubleClick={zoom.onDoubleClick}
         className={cn(
           "absolute inset-0 size-full touch-none",
           orbit.dragging ? "cursor-grabbing" : "cursor-grab",
@@ -849,12 +992,11 @@ export function KnowledgeGraph({
       </svg>
 
       {/* Labels */}
-      <div className="pointer-events-none absolute inset-0">
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <span
           className="absolute rounded-full bg-white/90 px-2.5 py-0.5 text-[12px] font-medium whitespace-nowrap text-(--agenci-ink) shadow-[0_1px_2px_rgb(5_6_7/0.06)] backdrop-blur"
           style={{
-            left: `${(center.x / SIZE) * 100}%`,
-            top: `${(center.y / SIZE) * 100}%`,
+            ...zoom.pct(center.x, center.y),
             transform: "translate(-50%, 46px)",
           }}
         >
@@ -872,8 +1014,7 @@ export function KnowledgeGraph({
               key={s.source.id}
               className="absolute max-w-[170px] truncate rounded-full bg-white/90 px-2 py-0.5 text-[12px] text-(--agenci-ink-2) shadow-[0_1px_2px_rgb(5_6_7/0.06)] backdrop-blur"
               style={{
-                left: `${(p.x / SIZE) * 100}%`,
-                top: `${(p.y / SIZE) * 100}%`,
+                ...zoom.pct(p.x, p.y),
                 transform: `translate(${dx < -40 ? "-100%" : dx > 40 ? "0" : "-50%"}, -50%)`,
                 opacity:
                   (focusSource === s.source.id ? 1 : spread) * depthFade(p.z),
@@ -885,12 +1026,13 @@ export function KnowledgeGraph({
         })}
       </div>
 
+      <ZoomControls zoom={zoom} />
       <HoverCard target={hover.target} box={box} />
 
       <p className="pointer-events-none absolute inset-x-0 bottom-0 text-center text-[12px] text-(--agenci-ink-3)">
         {spread < 0.8
           ? "Hold over grafen for å utforske · dra for å rotere"
-          : "Dra for å rotere 360° · klikk utenfor for å samle"}
+          : "Dra for å rotere · knip eller ⌘ + rull for å zoome · klikk utenfor for å samle"}
       </p>
     </div>
   );
@@ -1119,6 +1261,7 @@ export function KnowledgeGraph3D({
     autoSpin: 0.22,
     paused: hover.target !== null,
   });
+  const zoom = useZoom(svgRef);
   const intro = useAnimatedValue(1, 3.2, 0);
   const q = query.trim();
   const hoverSourceId = hover.target?.source.id ?? highlight ?? undefined;
@@ -1165,7 +1308,8 @@ export function KnowledgeGraph3D({
         ref={svgRef}
         role="group"
         aria-label={`${TYPE_META[type].plural} i 3D — dra for å rotere`}
-        viewBox={`0 0 ${SIZE} ${SIZE}`}
+        viewBox={zoom.viewBox}
+        onDoubleClick={zoom.onDoubleClick}
         className={cn(
           "absolute inset-0 size-full touch-none",
           orbit.dragging ? "cursor-grabbing" : "cursor-grab",
@@ -1298,7 +1442,7 @@ export function KnowledgeGraph3D({
       </svg>
 
       {/* Front-facing page labels */}
-      <div className="pointer-events-none absolute inset-0">
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
         {projected
           .filter(
             ({ n, z }) =>
@@ -1311,8 +1455,7 @@ export function KnowledgeGraph3D({
               key={n.id}
               className="absolute max-w-[180px] truncate rounded-full bg-white/90 px-2 py-0.5 text-[12px] text-(--agenci-ink-2) shadow-[0_1px_2px_rgb(5_6_7/0.06)] backdrop-blur"
               style={{
-                left: `${(x / SIZE) * 100}%`,
-                top: `${(y / SIZE) * 100}%`,
+                ...zoom.pct(x, y),
                 transform: "translate(12px, -50%)",
                 opacity: lerp(1, 0.2, clamp01((z + 200) / 240)) * intro,
               }}
@@ -1322,12 +1465,13 @@ export function KnowledgeGraph3D({
           ))}
       </div>
 
+      <ZoomControls zoom={zoom} />
       <HoverCard target={hover.target} box={box} />
 
       <p className="pointer-events-none absolute inset-x-0 bottom-0 text-center text-[12px] text-(--agenci-ink-3)">
         {type === "WEBPAGE"
-          ? `${pageCount} ${pageCount === 1 ? "side" : "sider"}${hostCount > 1 ? ` fra ${hostCount} nettsteder` : ""} · koblet slik nettstedet er bygget · dra for å rotere`
-          : `${pageCount} ${type === "DOCUMENT" ? "dokumenter" : "filer"} rundt agenten · dra for å rotere`}
+          ? `${pageCount} ${pageCount === 1 ? "side" : "sider"}${hostCount > 1 ? ` fra ${hostCount} nettsteder` : ""} · dra for å rotere · knip for å zoome`
+          : `${pageCount} ${type === "DOCUMENT" ? "dokumenter" : "filer"} rundt agenten · dra for å rotere · knip for å zoome`}
       </p>
     </div>
   );

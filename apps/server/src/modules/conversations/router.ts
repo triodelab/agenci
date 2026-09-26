@@ -1,16 +1,14 @@
 /**
- * Staff inbox over widget conversations (docs/task.md Task 5.2, read side).
- * A conversation = one Mastra memory thread whose resource is
- * `${organizationId}:contact:${contactSessionId}` (see `widget.chat.send`).
- * Status lives in the thread's metadata (`status`), default "unresolved".
+ * Staff inbox over widget conversations.
+ * The list, status and counts come from the `conversations` table (kept in
+ * step on every message, see ./service.ts); the full message history of one
+ * conversation is read from its Mastra memory thread (same id).
  */
+import prisma from "@agenci/db";
 import { ORPCError } from "@orpc/server";
-import { createPrismaClient } from "@agenci/db";
-import { privateProcedure } from "@/routers/procedures";
 import { memoryStore } from "@/mastra/store";
+import { privateProcedure } from "@/routers/procedures";
 import {
-  type ConversationStatus,
-  ConversationStatusSchema,
   GetConversationResponseSchema,
   GetConversationSchema,
   ListConversationsResponseSchema,
@@ -18,8 +16,6 @@ import {
   SetConversationStatusResponseSchema,
   SetConversationStatusSchema,
 } from "./schema";
-
-const prisma = createPrismaClient();
 
 async function memoryStorage() {
   const storage = await memoryStore.getStore("memory");
@@ -32,29 +28,9 @@ async function memoryStorage() {
 }
 
 type MemoryStorage = Awaited<ReturnType<typeof memoryStorage>>;
-type Thread = NonNullable<Awaited<ReturnType<MemoryStorage["getThreadById"]>>>;
-type DbMessage = Awaited<ReturnType<MemoryStorage["listMessages"]>>["messages"][number];
-type ContactSessionRow = NonNullable<
-  Awaited<ReturnType<typeof prisma.contactSession.findFirst>>
->;
-
-const resourcePrefix = (organizationId: string) => `${organizationId}:contact:`;
-
-/**
- * A visitor writing again in a resolved conversation reopens it, so it shows
- * up in the staff inbox again (standard helpdesk behaviour).
- */
-export async function reopenIfResolved(threadId: string, resourceId: string) {
-  const storage = await memoryStorage();
-  const thread = await storage.getThreadById({ threadId });
-  if (!thread || thread.resourceId !== resourceId) return;
-  if (thread.metadata?.status !== "resolved") return;
-  await storage.updateThread({
-    id: thread.id,
-    title: thread.title ?? "",
-    metadata: { ...thread.metadata, status: "unresolved" },
-  });
-}
+type DbMessage = Awaited<
+  ReturnType<MemoryStorage["listMessages"]>
+>["messages"][number];
 
 function textOf(message: DbMessage): string {
   const content = message.content as unknown as {
@@ -66,7 +42,10 @@ function textOf(message: DbMessage): string {
     .map((p) => p.text as string)
     .join("\n")
     .trim();
-  return fromParts || (typeof content?.content === "string" ? content.content.trim() : "");
+  return (
+    fromParts ||
+    (typeof content?.content === "string" ? content.content.trim() : "")
+  );
 }
 
 function toMessages(raw: DbMessage[]) {
@@ -82,87 +61,69 @@ function toMessages(raw: DbMessage[]) {
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
 }
 
-function statusOf(thread: Thread): ConversationStatus {
-  const parsed = ConversationStatusSchema.safeParse(thread.metadata?.status);
-  return parsed.success ? parsed.data : "unresolved";
-}
-
 function metaString(meta: unknown, key: string): string | null {
   if (!meta || typeof meta !== "object") return null;
   const value = (meta as Record<string, unknown>)[key];
   return typeof value === "string" && value.trim() ? value : null;
 }
 
-function toContact(session: ContactSessionRow) {
+const conversationInclude = {
+  contactSession: true,
+  agent: { select: { name: true } },
+} as const;
+
+type ConversationRow = NonNullable<
+  Awaited<
+    ReturnType<
+      typeof prisma.conversation.findFirst<{
+        include: typeof conversationInclude;
+      }>
+    >
+  >
+>;
+
+function toSummary(row: ConversationRow) {
+  const session = row.contactSession;
   return {
-    contactSessionId: session.id,
-    name: session.name,
-    email: session.email,
-    anonymous: session.anonymous,
-    language: metaString(session.metadata, "language"),
-    timezone: metaString(session.metadata, "timezone"),
-    userAgent: metaString(session.metadata, "userAgent"),
-    referrer: metaString(session.metadata, "referrer"),
-    currentUrl: metaString(session.metadata, "currentUrl"),
-    expiresAt: session.expiresAt.toISOString(),
+    threadId: row.id,
+    status: row.status,
+    contact: {
+      contactSessionId: session.id,
+      name: session.name,
+      email: session.email,
+      anonymous: session.anonymous,
+      language: metaString(session.metadata, "language"),
+      timezone: metaString(session.metadata, "timezone"),
+      userAgent: metaString(session.metadata, "userAgent"),
+      referrer: metaString(session.metadata, "referrer"),
+      currentUrl: metaString(session.metadata, "currentUrl"),
+      expiresAt: session.expiresAt.toISOString(),
+    },
+    firstMessage: row.firstMessage,
+    lastMessage: row.lastMessage
+      ? {
+          id: `${row.id}:last`,
+          role: (row.lastMessageRole === "user" ? "user" : "assistant") as
+            | "user"
+            | "assistant",
+          text: row.lastMessage,
+          createdAt: row.lastMessageAt.toISOString(),
+        }
+      : null,
+    messageCount: row.messageCount,
+    createdAt: row.createdAt.toISOString(),
+    updatedAt: row.lastMessageAt.toISOString(),
   };
 }
 
-function summarize(thread: Thread, session: ContactSessionRow, raw: DbMessage[]) {
-  const messages = toMessages(raw);
-  const last = messages[messages.length - 1] ?? null;
-  return {
-    threadId: thread.id,
-    status: statusOf(thread),
-    contact: toContact(session),
-    firstMessage: messages.find((m) => m.role === "user")?.text ?? null,
-    lastMessage: last,
-    messageCount: messages.length,
-    createdAt: new Date(thread.createdAt).toISOString(),
-    updatedAt: (last?.createdAt ?? new Date(thread.updatedAt).toISOString()),
-  };
-}
-
-/** Org-scoped agent + whether it's the widget's default (used when no agentId is embedded). */
-async function resolveAgent(organizationId: string, agentId: string) {
+async function assertAgent(organizationId: string, agentId: string) {
   const agent = await prisma.agent.findFirst({
     where: { id: agentId, organizationId },
-    select: { id: true, name: true },
+    select: { id: true },
   });
   if (!agent) {
     throw new ORPCError("NOT_FOUND", { message: "Agenten ble ikke funnet" });
   }
-  const defaultAgent = await prisma.agent.findFirst({
-    where: { organizationId, status: "COMPLETED" },
-    select: { id: true },
-    orderBy: { createdAt: "asc" },
-  });
-  return { ...agent, isDefault: defaultAgent?.id === agent.id };
-}
-
-function belongsToAgent(
-  session: ContactSessionRow,
-  agent: { id: string; isDefault: boolean },
-) {
-  return session.agentId === agent.id || (session.agentId === null && agent.isDefault);
-}
-
-/** Thread → its contact session, verifying the thread belongs to this org + agent. */
-async function loadOwnedThread(
-  storage: MemoryStorage,
-  organizationId: string,
-  agent: { id: string; isDefault: boolean },
-  threadId: string,
-) {
-  const thread = await storage.getThreadById({ threadId });
-  const prefix = resourcePrefix(organizationId);
-  if (!thread || !thread.resourceId.startsWith(prefix)) return null;
-
-  const session = await prisma.contactSession.findFirst({
-    where: { id: thread.resourceId.slice(prefix.length), organizationId },
-  });
-  if (!session || !belongsToAgent(session, agent)) return null;
-  return { thread, session };
 }
 
 export const conversationsRouter = {
@@ -170,56 +131,42 @@ export const conversationsRouter = {
     .input(ListConversationsSchema)
     .output(ListConversationsResponseSchema)
     .handler(async ({ input, context }) => {
-      const agent = await resolveAgent(context.organizationId, input.agentId);
-      const storage = await memoryStorage();
-
-      const sessions = await prisma.contactSession.findMany({
-        where: { organizationId: context.organizationId },
-        orderBy: { updatedAt: "desc" },
+      await assertAgent(context.organizationId, input.agentId);
+      const rows = await prisma.conversation.findMany({
+        where: {
+          organizationId: context.organizationId,
+          agentId: input.agentId,
+          messageCount: { gt: 0 },
+        },
+        include: conversationInclude,
+        orderBy: { lastMessageAt: "desc" },
       });
-
-      const conversations = [];
-      for (const session of sessions.filter((s) => belongsToAgent(s, agent))) {
-        const { threads } = await storage.listThreads({
-          filter: { resourceId: `${resourcePrefix(context.organizationId)}${session.id}` },
-          perPage: false,
-        });
-        for (const thread of threads) {
-          const { messages } = await storage.listMessages({
-            threadId: thread.id,
-            perPage: false,
-          });
-          const summary = summarize(thread, session, messages);
-          if (summary.messageCount > 0) conversations.push(summary);
-        }
-      }
-
-      conversations.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
-      return { conversations };
+      return { conversations: rows.map(toSummary) };
     }),
 
   getOne: privateProcedure
     .input(GetConversationSchema)
     .output(GetConversationResponseSchema)
     .handler(async ({ input, context }) => {
-      const agent = await resolveAgent(context.organizationId, input.agentId);
-      const storage = await memoryStorage();
-      const owned = await loadOwnedThread(
-        storage,
-        context.organizationId,
-        agent,
-        input.threadId,
-      );
-      if (!owned) return { conversation: null };
+      const row = await prisma.conversation.findFirst({
+        where: {
+          id: input.threadId,
+          organizationId: context.organizationId,
+          agentId: input.agentId,
+        },
+        include: conversationInclude,
+      });
+      if (!row) return { conversation: null };
 
+      const storage = await memoryStorage();
       const { messages } = await storage.listMessages({
-        threadId: owned.thread.id,
+        threadId: row.id,
         perPage: false,
       });
       return {
         conversation: {
-          ...summarize(owned.thread, owned.session, messages),
-          agentName: agent.name,
+          ...toSummary(row),
+          agentName: row.agent.name,
           messages: toMessages(messages),
         },
       };
@@ -229,23 +176,19 @@ export const conversationsRouter = {
     .input(SetConversationStatusSchema)
     .output(SetConversationStatusResponseSchema)
     .handler(async ({ input, context }) => {
-      const agent = await resolveAgent(context.organizationId, input.agentId);
-      const storage = await memoryStorage();
-      const owned = await loadOwnedThread(
-        storage,
-        context.organizationId,
-        agent,
-        input.threadId,
-      );
-      if (!owned) {
-        throw new ORPCError("NOT_FOUND", { message: "Samtalen ble ikke funnet" });
-      }
-
-      await storage.updateThread({
-        id: owned.thread.id,
-        title: owned.thread.title ?? "",
-        metadata: { ...(owned.thread.metadata ?? {}), status: input.status },
+      const { count } = await prisma.conversation.updateMany({
+        where: {
+          id: input.threadId,
+          organizationId: context.organizationId,
+          agentId: input.agentId,
+        },
+        data: { status: input.status },
       });
+      if (count === 0) {
+        throw new ORPCError("NOT_FOUND", {
+          message: "Samtalen ble ikke funnet",
+        });
+      }
       return { status: input.status };
     }),
 };
