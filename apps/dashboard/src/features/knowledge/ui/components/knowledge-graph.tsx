@@ -421,15 +421,34 @@ function useOrbit({
 
 const MAX_ZOOM = 4;
 
+type PointerHandlers = {
+  onPointerDown: (e: React.PointerEvent) => void;
+  onPointerMove: (e: React.PointerEvent) => void;
+  onPointerUp: (e: React.PointerEvent) => void;
+};
+
 /**
  * Zooms the graph by shrinking the SVG viewBox, so small dots (and their hit
  * areas) get bigger on screen. Zooming keeps the point under the cursor in
- * place. Labels are HTML, so they use `pct()` to follow the view.
+ * place. While zoomed, dragging (or two-finger scrolling) pans the view;
+ * Shift + drag still rotates. Selecting a node zooms in on it (`focusOn`),
+ * and an automatic zoom is undone again when the selection is cleared.
+ * Labels are HTML, so they use `pct()` to follow the view.
  */
 function useZoom(svgRef: React.RefObject<SVGSVGElement | null>) {
   const [goal, setGoal] = useState({ k: 1, cx: C, cy: C });
   const goalRef = useRef(goal);
   goalRef.current = goal;
+  /** True while the current zoom came from selecting a node. */
+  const auto = useRef(false);
+  const pan = useRef<{
+    x: number;
+    y: number;
+    cx: number;
+    cy: number;
+    moved: number;
+  } | null>(null);
+  const [panning, setPanning] = useState(false);
 
   const k = useAnimatedValue(goal.k, 14);
   const cx = useAnimatedValue(goal.cx, 14);
@@ -454,6 +473,7 @@ function useZoom(svgRef: React.RefObject<SVGSVGElement | null>) {
     px = goalRef.current.cx,
     py = goalRef.current.cy,
   ) => {
+    auto.current = false;
     const cur = goalRef.current;
     const nk = Math.min(MAX_ZOOM, Math.max(1, cur.k * factor));
     const h0 = SIZE / (2 * cur.k);
@@ -461,6 +481,16 @@ function useZoom(svgRef: React.RefObject<SVGSVGElement | null>) {
     const rx = (px - (cur.cx - h0)) / (2 * h0);
     const ry = (py - (cur.cy - h0)) / (2 * h0);
     setGoal(fit(nk, px - rx * 2 * h1 + h1, py - ry * 2 * h1 + h1));
+  };
+
+  /** Move the view by a screen-pixel delta. */
+  const panBy = (dxPx: number, dyPx: number) => {
+    const el = svgRef.current;
+    if (!el) return;
+    auto.current = false;
+    const cur = goalRef.current;
+    const scale = SIZE / (cur.k * el.getBoundingClientRect().width);
+    setGoal(fit(cur.k, cur.cx + dxPx * scale, cur.cy + dyPx * scale));
   };
 
   const toSvg = (clientX: number, clientY: number) => {
@@ -478,17 +508,23 @@ function useZoom(svgRef: React.RefObject<SVGSVGElement | null>) {
   toSvgRef.current = toSvg;
   const zoomAtRef = useRef(zoomAt);
   zoomAtRef.current = zoomAt;
+  const panByRef = useRef(panBy);
+  panByRef.current = panBy;
 
   // Pinch on a trackpad arrives as ctrl+wheel; ⌘/Ctrl+scroll works too.
-  // Needs a non-passive listener so the page doesn't zoom/scroll instead.
+  // While zoomed, plain scrolling pans. Non-passive so the page stays put.
   useEffect(() => {
     const el = svgRef.current;
     if (!el) return;
     const onWheel = (e: WheelEvent) => {
-      if (!e.ctrlKey && !e.metaKey) return;
-      e.preventDefault();
-      const p = toSvgRef.current(e.clientX, e.clientY);
-      zoomAtRef.current(Math.exp(-e.deltaY * 0.01), p.x, p.y);
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault();
+        const p = toSvgRef.current(e.clientX, e.clientY);
+        zoomAtRef.current(Math.exp(-e.deltaY * 0.01), p.x, p.y);
+      } else if (goalRef.current.k > 1.01) {
+        e.preventDefault();
+        panByRef.current(e.deltaX, e.deltaY);
+      }
     };
     el.addEventListener("wheel", onWheel, { passive: false });
     return () => el.removeEventListener("wheel", onWheel);
@@ -497,6 +533,7 @@ function useZoom(svgRef: React.RefObject<SVGSVGElement | null>) {
   return {
     k,
     zoomed: goal.k > 1.01,
+    panning,
     viewBox: `${vx} ${vy} ${2 * half} ${2 * half}`,
     /** Screen position (in % of the box) of an SVG coordinate. */
     pct: (x: number, y: number) => ({
@@ -505,13 +542,106 @@ function useZoom(svgRef: React.RefObject<SVGSVGElement | null>) {
     }),
     zoomIn: () => zoomAt(1.6),
     zoomOut: () => zoomAt(1 / 1.6),
-    reset: () => setGoal({ k: 1, cx: C, cy: C }),
+    reset: () => {
+      auto.current = false;
+      setGoal({ k: 1, cx: C, cy: C });
+    },
+    /** Centre on (x, y), zooming in to at least `minK` (auto zoom). */
+    focusOn: (x: number, y: number, minK = 2) => {
+      const cur = goalRef.current;
+      if (cur.k <= 1.01) auto.current = true;
+      setGoal(fit(Math.max(cur.k, minK), x, y));
+    },
+    /** Undo the zoom if it was only there because of a selection. */
+    releaseAuto: () => {
+      if (!auto.current) return;
+      auto.current = false;
+      setGoal({ k: 1, cx: C, cy: C });
+    },
     onDoubleClick: (e: React.MouseEvent) => {
       const p = toSvg(e.clientX, e.clientY);
       zoomAt(1.8, p.x, p.y);
     },
+    /**
+     * Background pointer handling: pans while zoomed (Shift + drag rotates),
+     * otherwise hands over to the orbit (rotate). A click without dragging
+     * still means "click outside".
+     */
+    bind: (orbit: PointerHandlers, onClick: () => void): PointerHandlers => ({
+      onPointerDown: (e) => {
+        if (goalRef.current.k > 1.01 && !e.shiftKey) {
+          const cur = goalRef.current;
+          pan.current = {
+            x: e.clientX,
+            y: e.clientY,
+            cx: cur.cx,
+            cy: cur.cy,
+            moved: 0,
+          };
+          setPanning(true);
+          svgRef.current?.setPointerCapture(e.pointerId);
+          return;
+        }
+        orbit.onPointerDown(e);
+      },
+      onPointerMove: (e) => {
+        const p = pan.current;
+        if (!p) return orbit.onPointerMove(e);
+        const el = svgRef.current;
+        if (!el) return;
+        const dx = e.clientX - p.x;
+        const dy = e.clientY - p.y;
+        p.moved = Math.abs(dx) + Math.abs(dy);
+        auto.current = false;
+        const scale =
+          SIZE / (goalRef.current.k * el.getBoundingClientRect().width);
+        setGoal(fit(goalRef.current.k, p.cx - dx * scale, p.cy - dy * scale));
+      },
+      onPointerUp: (e) => {
+        const p = pan.current;
+        if (!p) return orbit.onPointerUp(e);
+        pan.current = null;
+        setPanning(false);
+        svgRef.current?.releasePointerCapture(e.pointerId);
+        if (p.moved < 4) onClick();
+      },
+    }),
   };
 }
+
+/**
+ * Zooms in on the selected node, following it while the layout settles
+ * (the graph spreads out on select). Clearing the selection undoes a zoom
+ * that only happened because of it.
+ */
+function useFocusSelection(
+  zoom: ReturnType<typeof useZoom>,
+  key: string | null,
+  pos: React.RefObject<{ x: number; y: number } | null>,
+) {
+  const zoomRef = useRef(zoom);
+  zoomRef.current = zoom;
+  useEffect(() => {
+    if (!key) {
+      zoomRef.current.releaseAuto();
+      return;
+    }
+    const focus = () => {
+      const p = pos.current;
+      if (p) zoomRef.current.focusOn(p.x, p.y);
+    };
+    focus();
+    const t1 = window.setTimeout(focus, 350);
+    const t2 = window.setTimeout(focus, 800);
+    return () => {
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+    };
+  }, [key, pos]);
+}
+
+const selectionKey = (s: GraphSelection) =>
+  s ? `${s.kind}:${s.sourceId}:${s.kind === "chunk" ? s.index : ""}` : null;
 
 function ZoomControls({ zoom }: { zoom: ReturnType<typeof useZoom> }) {
   const btn =
@@ -736,6 +866,25 @@ export function KnowledgeGraph({
     tilted ? lerp(1, 0.4, clamp01((z + 300) / 600)) : 1;
   const center = project(0, 0);
 
+  const selectedPos = (() => {
+    if (!selection) return null;
+    const s = nodes.find((n) => n.source.id === selection.sourceId);
+    if (!s) return null;
+    if (selection.kind === "chunk") {
+      const c = s.chunks.find((c) => c.chunk.index === selection.index);
+      if (c)
+        return project(
+          c.angle,
+          c.dist * chunkScale * lerp(1, 1.12, selectPush),
+          c.depth * spread,
+        );
+    }
+    return project(s.angle, s.dist * sourceScale);
+  })();
+  const selectedPosRef = useRef(selectedPos);
+  selectedPosRef.current = selectedPos;
+  useFocusSelection(zoom, selectionKey(selection), selectedPosRef);
+
   const opacityFor = (id: string, hasMatch: boolean) => {
     if (focusSource) return focusSource === id ? 1 : lerp(1, 0.16, dimT);
     if (q) return hasMatch ? 1 : 0.16;
@@ -763,12 +912,12 @@ export function KnowledgeGraph({
         onDoubleClick={zoom.onDoubleClick}
         className={cn(
           "absolute inset-0 size-full touch-none",
-          orbit.dragging ? "cursor-grabbing" : "cursor-grab",
+          orbit.dragging || zoom.panning ? "cursor-grabbing" : "cursor-grab",
         )}
         onKeyDown={(e) => {
           if (e.key === "Escape") settle();
         }}
-        {...orbit.handlers(svgRef, settle)}
+        {...zoom.bind(orbit.handlers(svgRef, settle), settle)}
       >
         {!tilted ? (
           <>
@@ -1032,7 +1181,9 @@ export function KnowledgeGraph({
       <p className="pointer-events-none absolute inset-x-0 bottom-0 text-center text-[12px] text-(--agenci-ink-3)">
         {spread < 0.8
           ? "Hold over grafen for å utforske · dra for å rotere"
-          : "Dra for å rotere · knip eller ⌘ + rull for å zoome · klikk utenfor for å samle"}
+          : zoom.zoomed
+            ? "Dra for å flytte · Shift + dra for å rotere · knip for å zoome"
+            : "Dra for å rotere · knip eller ⌘ + rull for å zoome · klikk utenfor for å samle"}
       </p>
     </div>
   );
@@ -1259,7 +1410,7 @@ export function KnowledgeGraph3D({
   const orbit = useOrbit({
     home: HOME_3D,
     autoSpin: 0.22,
-    paused: hover.target !== null,
+    paused: hover.target !== null || selection !== null,
   });
   const zoom = useZoom(svgRef);
   const intro = useAnimatedValue(1, 3.2, 0);
@@ -1282,6 +1433,22 @@ export function KnowledgeGraph3D({
     })
     .sort((a, b) => b.z - a.z);
   const at = new Map(projected.map((p) => [p.n.id, p]));
+
+  const selectedNode = selection
+    ? graph.nodes.find(
+        (n) =>
+          n.sourceId === selection.sourceId &&
+          (selection.kind === "chunk"
+            ? n.kind === "chunk" && n.chunk?.index === selection.index
+            : n.kind === "source"),
+      )
+    : undefined;
+  const selectedAt = selectedNode ? at.get(selectedNode.id) : undefined;
+  const selectedPosRef = useRef<{ x: number; y: number } | null>(null);
+  selectedPosRef.current = selectedAt
+    ? { x: selectedAt.x, y: selectedAt.y }
+    : null;
+  useFocusSelection(zoom, selectionKey(selection), selectedPosRef);
   const depthFade = (z: number) => lerp(1, 0.35, clamp01((z + 260) / 520));
 
   const dim = (n: Node3D) => {
@@ -1312,9 +1479,9 @@ export function KnowledgeGraph3D({
         onDoubleClick={zoom.onDoubleClick}
         className={cn(
           "absolute inset-0 size-full touch-none",
-          orbit.dragging ? "cursor-grabbing" : "cursor-grab",
+          orbit.dragging || zoom.panning ? "cursor-grabbing" : "cursor-grab",
         )}
-        {...orbit.handlers(svgRef, settle)}
+        {...zoom.bind(orbit.handlers(svgRef, settle), settle)}
       >
         {graph.edges.map((e) => {
           const a = at.get(e.a);
@@ -1469,9 +1636,11 @@ export function KnowledgeGraph3D({
       <HoverCard target={hover.target} box={box} />
 
       <p className="pointer-events-none absolute inset-x-0 bottom-0 text-center text-[12px] text-(--agenci-ink-3)">
-        {type === "WEBPAGE"
-          ? `${pageCount} ${pageCount === 1 ? "side" : "sider"}${hostCount > 1 ? ` fra ${hostCount} nettsteder` : ""} · dra for å rotere · knip for å zoome`
-          : `${pageCount} ${type === "DOCUMENT" ? "dokumenter" : "filer"} rundt agenten · dra for å rotere · knip for å zoome`}
+        {zoom.zoomed
+          ? "Dra for å flytte · Shift + dra for å rotere · knip for å zoome"
+          : type === "WEBPAGE"
+            ? `${pageCount} ${pageCount === 1 ? "side" : "sider"}${hostCount > 1 ? ` fra ${hostCount} nettsteder` : ""} · dra for å rotere · knip for å zoome`
+            : `${pageCount} ${type === "DOCUMENT" ? "dokumenter" : "filer"} rundt agenten · dra for å rotere · knip for å zoome`}
       </p>
     </div>
   );
