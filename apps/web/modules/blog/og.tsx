@@ -20,12 +20,16 @@ const circular = () => {
 };
 
 const photos = new Map<string, Promise<string>>();
-/** JPEG as a data URL (next/og cannot read WebP, so covers have JPEG twins). */
+/**
+ * JPEG as a data URL (next/og cannot read WebP, so covers have JPEG twins).
+ * `path` is a public/images/og/… path; scoping the join keeps tracing small.
+ */
 const photo = (path: string) => {
 	if (!photos.has(path)) {
+		const file = path.replace(/^public\/images\/og\//, "");
 		photos.set(
 			path,
-			readFile(join(process.cwd(), path)).then(
+			readFile(join(process.cwd(), "public/images/og", file)).then(
 				(b) => `data:image/jpeg;base64,${b.toString("base64")}`,
 			),
 		);
