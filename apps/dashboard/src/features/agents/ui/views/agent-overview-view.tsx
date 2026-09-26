@@ -8,10 +8,9 @@ import {
 } from "@/features/agents/queries/agents-queries";
 import {
   ActivityTile,
-  AlertsTile,
-  buildAlerts,
   ConversationsChartTile,
   KnowledgeTile,
+  RecentTile,
   ResolutionTile,
   tileClass,
 } from "@/features/agents/ui/components/overview-cards";
@@ -80,7 +79,6 @@ export default function AgentOverviewView() {
     dot: "bg-[#3F7A4A]",
   };
   const firstName = session?.user?.name?.trim().split(/\s+/)[0];
-  const alerts = buildAlerts(conversations, documents, agent?.status);
 
   return (
     <div className="flex min-h-full w-full flex-col gap-5">
@@ -126,7 +124,7 @@ export default function AgentOverviewView() {
         </div>
       ) : (
         <div className="grid auto-rows-[480px] gap-5 md:grid-cols-2 xl:grid-cols-3">
-          <AlertsTile alerts={alerts} />
+          <RecentTile conversations={conversations} />
           <ResolutionTile
             agentName={agent?.name ?? ""}
             conversations={conversations}

@@ -20,6 +20,9 @@ export type DemoConversation = {
   status: ConversationStatus;
   messages: DemoMessage[];
   booking?: string;
+  email?: string;
+  /** e.g. "26. sep. · 10:28" */
+  started: string;
 };
 export type KnowledgeSource = {
   id: string;
@@ -83,7 +86,9 @@ export function createDemoState(): DemoState {
     conversations: [
       {
         id: "delivery",
-        name: "Emma",
+        name: "Emma Solberg",
+        email: "emma@eksempel.no",
+        started: "26. sep. · 10:28",
         topic: "Levering i helgen",
         time: "Nå",
         status: "agenci",
@@ -97,10 +102,12 @@ export function createDemoState(): DemoState {
       },
       {
         id: "return",
-        name: "Sofie",
+        name: "Sofie Haugen",
+        email: "sofie.h@eksempel.no",
+        started: "26. sep. · 10:12",
         topic: "Retur og bytte",
         time: "4 min",
-        status: "agenci",
+        status: "team",
         messages: [
           {
             sender: "customer",
@@ -118,7 +125,8 @@ export function createDemoState(): DemoState {
       },
       {
         id: "booking",
-        name: "Arne",
+        name: "Arne Berg",
+        started: "26. sep. · 09:47",
         topic: "Flytte en time",
         time: "8 min",
         status: "agenci",
@@ -135,7 +143,9 @@ export function createDemoState(): DemoState {
       },
       {
         id: "hours",
-        name: "Jonas",
+        name: "Jonas Lie",
+        email: "jonas@eksempel.no",
+        started: "25. sep. · 17:32",
         topic: "Åpningstider",
         time: "12 min",
         status: "resolved",
@@ -263,8 +273,9 @@ export function demoReducer(state: DemoState, action: DemoAction): DemoState {
   }
 }
 
+/** Same words as the real inbox: open → Uavklart, handed over → Eskalert. */
 export const statusLabels: Record<ConversationStatus, string> = {
-  agenci: "Besvart av Agenci",
-  team: "Til teamet",
+  agenci: "Uavklart",
+  team: "Eskalert",
   resolved: "Løst",
 };

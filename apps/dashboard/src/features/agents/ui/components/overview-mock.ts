@@ -42,7 +42,7 @@ const QUESTIONS = [
   "Tilbyr dere studentrabatt?",
   "Hvordan returnerer jeg en vare?",
   "Kan jeg betale med Vipps?",
-  "Produktet kom skadet, hva gjør jeg?",
+  "Kan jeg hente i butikk i dag?",
   "Har dere denne i størrelse M?",
   "Hvordan bytter jeg passord?",
 ];
@@ -51,7 +51,7 @@ const ANSWERS = [
   "Vi har åpent 10–16 på lørdager og stengt på søndager.",
   "Det kan du! Gå til Mine ordre og velg «Endre».",
   "Normalt 2–3 virkedager til Bergen.",
-  "Jeg setter deg over til en av mine kolleger.",
+  "Pakken er på vei — du får sporingslenke på SMS i dag.",
   "Ja, studenter får 10 % med gyldig studentbevis.",
 ];
 
@@ -93,18 +93,15 @@ export function demoConversations(now = new Date()): ConversationSummary[] {
         : (NAMES[Math.floor(r() * NAMES.length)] ?? null);
       const age = now.getTime() - d.getTime();
       const roll = r();
+      // A healthy agent: most conversations closed by the agent itself, and the
+      // share keeps improving as it learns (older weeks resolve a bit less).
+      const resolvedShare = dayAgo > 30 ? 0.9 : age > 2 * DAY ? 0.97 : 0.9;
       const status: ConversationSummary["status"] =
-        age > 2 * DAY
-          ? roll < 0.82
-            ? "resolved"
-            : roll < 0.93
-              ? "unresolved"
-              : "escalated"
-          : roll < 0.4
-            ? "resolved"
-            : roll < 0.85
-              ? "unresolved"
-              : "escalated";
+        roll < resolvedShare
+          ? "resolved"
+          : roll < resolvedShare + (1 - resolvedShare) * 0.85
+            ? "unresolved"
+            : "escalated";
       const messageCount = 2 + Math.floor(r() * 9);
       const updated = new Date(d.getTime() + messageCount * 45_000);
       const q = QUESTIONS[Math.floor(r() * QUESTIONS.length)] ?? "Hei";
@@ -177,7 +174,7 @@ export function demoDocuments(): AgentDocument[] {
     docs.push({
       id: `${DEMO_PREFIX}d${i}`,
       type: "DOCUMENT",
-      status: i === 5 ? "FAILED" : "COMPLETED",
+      status: "COMPLETED",
       documentName: name,
     });
   }
@@ -206,7 +203,7 @@ export function demoDocuments(): AgentDocument[] {
 
 const FOLLOW_UPS = [
   "Takk! Og hva med retur etter 30 dager?",
-  "Ok, kan jeg få snakke med et menneske?",
+  "Perfekt, tusen takk for rask hjelp!",
   "Supert, det var det jeg lurte på.",
   "Gjelder det også i nettbutikken?",
   "Hvor finner jeg ordrenummeret?",
@@ -214,7 +211,7 @@ const FOLLOW_UPS = [
 
 const REPLIES = [
   "Retur er gratis innen 30 dager. Etter det kan vi se på det fra sak til sak.",
-  "Selvfølgelig — jeg har gitt beskjed til teamet, de tar kontakt så snart som mulig.",
+  "Bare hyggelig! Ha en fin dag.",
   "Så bra! Er det noe annet jeg kan hjelpe deg med?",
   "Ja, det gjelder både i butikk og i nettbutikken.",
   "Ordrenummeret står øverst i bekreftelsen du fikk på e-post.",
