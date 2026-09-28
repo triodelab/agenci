@@ -4,6 +4,7 @@ import { z } from "zod";
 
 import { AuthShell } from "@/components/auth-shell";
 import { authClient } from "@/lib/auth-client";
+import { takePendingInvite } from "@/lib/pending-invite";
 import { btnPrimaryCls, errCls, inputCls, labelCls } from "@/lib/ui";
 
 const signUpSchema = z.object({
@@ -44,7 +45,14 @@ export default function SignUpForm({
         setError(signUpError.message ?? "Kunne ikke opprette konto.");
         return;
       }
-      await navigate({ to: "/org/create" });
+      // Invited people join the existing team instead of creating their own.
+      const invite = takePendingInvite();
+      await (invite
+        ? navigate({
+            to: "/accept-invitation/$invitationId",
+            params: { invitationId: invite },
+          })
+        : navigate({ to: "/org/create" }));
     } catch (err: unknown) {
       setError(
         err instanceof Error ? err.message : "Kunne ikke opprette konto.",

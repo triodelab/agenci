@@ -68,3 +68,13 @@ export const SetConversationStatusSchema = z.object({
 export const SetConversationStatusResponseSchema = z.object({
   status: ConversationStatusSchema,
 });
+
+/** Conversations started this calendar month (Europe/Oslo), per day. */
+export const ConversationUsageResponseSchema = z.object({
+  /** e.g. "2026-09" */
+  month: z.string(),
+  /** Index 0 is the 1st of the month; only days so far are included. */
+  days: z.array(z.number().int().nonnegative()),
+  total: z.number().int().nonnegative(),
+  previousTotal: z.number().int().nonnegative(),
+});

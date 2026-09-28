@@ -12,6 +12,7 @@ import { env } from "@agenci/env/server";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { organization } from "better-auth/plugins/organization";
+import { sendInvitationViaResend } from "./invitation-email";
 import { ac, admin, member, owner } from "./permissions";
 
 /**
@@ -90,18 +91,31 @@ export function createAuth() {
           allowRemovingAllTeams: false,
         },
         /**
-         * Task 1.4 — invitation email.
-         * No mail provider in local yet: log the accept URL so the Solid UI / console can share it.
+         * Team invitation e-mail. Sent through Resend when RESEND_API_KEY is
+         * set; otherwise (local dev) the accept link is logged so it can be
+         * shared by hand. The dashboard also shows the link after inviting.
          */
         async sendInvitationEmail(data) {
           const base =
             env.DASHBOARD_ORIGIN ?? env.CORS_ORIGIN ?? "http://localhost:3004";
           const inviteLink = `${base.replace(/\/$/, "")}/accept-invitation/${data.id}`;
-          console.info("[better-auth] invitation email (dev stub)", {
-            email: data.email,
+          if (!env.RESEND_API_KEY) {
+            console.info("[better-auth] invitation (no RESEND_API_KEY, not e-mailed)", {
+              email: data.email,
+              organization: data.organization.name,
+              role: data.role,
+              inviteLink,
+            });
+            return;
+          }
+          await sendInvitationViaResend({
+            apiKey: env.RESEND_API_KEY,
+            from: env.RESEND_FROM_EMAIL,
+            to: data.email,
             organization: data.organization.name,
+            inviter: data.inviter.user.name || data.inviter.user.email,
             role: data.role,
-            inviteLink,
+            link: inviteLink,
           });
         },
       }),
