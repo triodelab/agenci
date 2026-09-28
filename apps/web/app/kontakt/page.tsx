@@ -1,60 +1,88 @@
 import type { Metadata } from "next";
-import { MarketingPageLayout } from "@/modules/landing/ui/components/marketing-page-layout";
-import { LandingContactForm } from "@/modules/landing/ui/components/landing-contact-form";
-import { MarketingSubpageCta } from "@/modules/landing/ui/components/marketing-subpage-cta";
+import Image from "next/image";
+import { ContactFormCard } from "@/modules/landing/ui/components/contact-form-card";
+import { LandingFooter } from "@/modules/landing/ui/components/landing-footer";
+import { LandingNav } from "@/modules/landing/ui/components/landing-nav";
+import s from "@/modules/landing/ui/views/kontakt.module.css";
 
 export const metadata: Metadata = {
   title: "Kontakt oss",
   description:
-    "Book en demo, spør om pris eller send oss en melding. Vi svarer innen én arbeidsdag.",
+    "Book en demo, spør om pris eller få hjelp med oppsettet. Vi svarer innen én arbeidsdag.",
   alternates: { canonical: "/kontakt" },
 };
 
 export default function KontaktPage() {
   return (
-    <MarketingPageLayout>
-      {/* Hero */}
-      <section className="bg-[#1C1C1C]">
-        <div className="mx-auto max-w-[1200px] px-6 py-20 md:py-24 xl:px-8">
-          <div className="grid gap-14 lg:grid-cols-[1fr_1.5fr] lg:gap-20 xl:gap-24">
+    <>
+      <LandingNav variant="auto" />
+      <main
+        className={`${s.page} landing-warp overflow-x-clip antialiased`}
+        data-agenci-product-sections
+        data-landing-nav-surface="light"
+      >
+        <section className={s.left} aria-labelledby="kontakt-heading">
+          <div className={s.inner}>
+            <span className={s.eyebrow}>
+              <i aria-hidden="true" />
+              Vi svarer innen én arbeidsdag
+            </span>
+            <h1 id="kontakt-heading" className={s.title}>
+              La oss ta en prat.
+              <br />
+              <span>Uten forpliktelser.</span>
+            </h1>
+            <p className={s.lead}>
+              Lurer du på om Agenci passer for dere, hva det koster med ditt
+              volum, eller vil du ha hjelp med oppsettet? Skriv noen linjer, så
+              tar vi det derfra.
+            </p>
+            <ul className={s.direct}>
+              <li>
+                <a href="mailto:post@triodelab.no">post@triodelab.no</a>
+              </li>
+              <li>Demo på video, ca. 20 minutter</li>
+            </ul>
 
-            {/* Left — intro */}
-            <div className="flex flex-col justify-center">
-              <p className="text-[13px] font-medium uppercase tracking-[0.4px] text-[#6b7280]">
-                Kontakt
-              </p>
-              <h1 className="mt-5 text-[40px] font-semibold leading-[1.15] tracking-[-1px] text-[#f2f3f5] sm:text-[44px]">
-                Snakk med oss
-              </h1>
-              <p className="mt-5 text-[16px] leading-[1.5] tracking-[-0.05px] text-[#9ca3af]">
-                Demo, pristilbud eller spørsmål om oppsett — vi svarer vanligvis innen én arbeidsdag.
-              </p>
-
-              <div className="mt-10 space-y-6">
-                <div>
-                  <p className="text-[12px] font-medium uppercase tracking-[0.4px] text-[#4b5563]">
-                    E-post
-                  </p>
-                  <p className="mt-1.5 text-[14px] text-[#9ca3af]">hei@agenci.no</p>
-                </div>
-                <div>
-                  <p className="text-[12px] font-medium uppercase tracking-[0.4px] text-[#4b5563]">
-                    Responstid
-                  </p>
-                  <p className="mt-1.5 text-[14px] text-[#9ca3af]">Innen én arbeidsdag</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Right — form */}
-            <div className="rounded-[12px] border border-[#2a2a2a] bg-[#161616] p-8 md:p-10">
-              <LandingContactForm variant="dark" />
-            </div>
+            <ContactFormCard />
           </div>
-        </div>
-      </section>
+        </section>
 
-      <MarketingSubpageCta omitContactButton />
-    </MarketingPageLayout>
+        <figure className={s.media}>
+          <Image
+            src="/images/agenci-kontakt-bygg.webp"
+            alt="Moderne betongbygg med geometrisk fasade mot blå himmel."
+            fill
+            priority
+            sizes="(max-width: 980px) 100vw, 50vw"
+            className={s.photo}
+          />
+          <span className={s.shade} aria-hidden="true" />
+          <div className={s.note}>
+            <span className={s.noteMark} aria-hidden="true">
+              {/* biome-ignore lint/performance/noImgElement: tiny static brand mark */}
+              <img src="/AgenciMark.png" alt="" />
+            </span>
+            <span>
+              <strong>Et menneske leser meldingen din</strong>
+              <small>Ingen automatisk kø. Du får svar fra oss direkte.</small>
+            </span>
+          </div>
+          <figcaption className={s.credit}>
+            Foto:{" "}
+            <a
+              href="https://www.pexels.com/@sukrit-lamthong-34482161/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Sukrit Lamthong / Pexels
+            </a>
+          </figcaption>
+        </figure>
+      </main>
+      <div className="bg-[#FAFAFA]">
+        <LandingFooter />
+      </div>
+    </>
   );
 }

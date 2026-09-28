@@ -228,7 +228,7 @@ export function LandingMascotPromiseSection() {
             id="mascot-promise-heading"
             className="agenci-cinematic-title max-w-[11ch] text-[clamp(2.85rem,4.45vw,4.5rem)] leading-[0.9]"
           >
-            Gjør mindre manuelt.
+            Samme spørsmål, hver dag.
           </h2>
         </motion.div>
 
@@ -254,7 +254,7 @@ export function LandingMascotPromiseSection() {
           style={reduceMotion ? undefined : { transform: rightText }}
         >
           <p className="agenci-cinematic-title max-w-[11ch] text-[clamp(2.85rem,4.45vw,4.5rem)] leading-[0.9] lg:ml-auto">
-            Automatiser mer.
+            Agenci tar dem.
           </p>
         </motion.div>
       </div>

@@ -158,9 +158,9 @@ export function LandingHeroSection() {
         <div className="agenci-cinematic-intro">
           <h1
             id="landing-hero-heading"
-            className="agenci-cinematic-title max-w-[11.5ch] text-[clamp(3rem,5.4vw,5.25rem)] leading-[1] text-white"
+            className="agenci-cinematic-title max-w-[13ch] text-[clamp(3rem,5.4vw,5.25rem)] leading-[1] text-white"
           >
-            Svar som føles menneskelige.
+            Gode svar til kundene dine.
           </h1>
 
           <p
@@ -176,7 +176,7 @@ export function LandingHeroSection() {
               loggedInHref={LANDING_AUTH_PATHS.marketingLoggedInCta}
               className="agenci-cinematic-primary group inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-6 text-[0.94rem] font-medium"
             >
-              Kom i gang gratis
+              Prøv gratis
               <ArrowUpRight
                 aria-hidden="true"
                 className="size-4 transition-transform duration-200 ease-out group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
@@ -186,7 +186,7 @@ export function LandingHeroSection() {
               href={landingSectionHref("contact")}
               className="agenci-cinematic-secondary group inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-6 text-[0.94rem] font-medium"
             >
-              Snakk med oss
+              Book en prat
               <ArrowUpRight
                 aria-hidden="true"
                 className="size-4 transition-transform duration-200 ease-out group-hover:-translate-y-0.5 group-hover:translate-x-0.5"

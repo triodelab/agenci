@@ -42,7 +42,7 @@ const PLANS: Plan[] = [
 		monthlyPrice: 0,
 		yearlyPrice: 0,
 		conversations: "50 samtaler / mnd",
-		blurb: "Se hva Agenci gjør for deg — uten å legge inn kortinfo.",
+		blurb: "Prøv den på din egen nettside. Du trenger ikke legge inn kort.",
 		featured: false,
 		cta: "Start gratis",
 		bullets: [
@@ -61,7 +61,7 @@ const PLANS: Plan[] = [
 		monthlyPrice: 499,
 		yearlyPrice: 399,
 		conversations: "500 samtaler / mnd",
-		blurb: "For deg som er klar til å automatisere de vanligste spørsmålene.",
+		blurb: "For små bedrifter som er lei av å svare på de samme spørsmålene.",
 		featured: false,
 		cta: "Kom i gang",
 		bullets: [
@@ -80,7 +80,7 @@ const PLANS: Plan[] = [
 		monthlyPrice: 1499,
 		yearlyPrice: 1199,
 		conversations: "2 000 samtaler / mnd",
-		blurb: "For team som vokser og trenger full kontroll over kundeservice.",
+		blurb: "For bedrifter med mye trafikk og et team som deler på kundeservicen.",
 		featured: true,
 		cta: "Kom i gang",
 		bullets: [
@@ -99,7 +99,7 @@ const PLANS: Plan[] = [
 		monthlyPrice: 3999,
 		yearlyPrice: 3199,
 		conversations: "10 000 samtaler / mnd",
-		blurb: "Når én agent ikke er nok og dere trenger alt på plass.",
+		blurb: "Flere nettsider, flere agenter, og alt samlet på ett sted.",
 		featured: false,
 		cta: "Kom i gang",
 		bullets: [
@@ -247,7 +247,7 @@ export function PriserView() {
 							<div className={story.startBar}>
 								<div>
 									<h3 id="pricing-cta-heading">
-										Prøv Agenci gratis — ingen kort, ingen binding.
+										Prøv Agenci gratis. Ingen kort, ingen binding.
 									</h3>
 									<p>
 										Kom i gang på under fem minutter, eller snakk med oss om et

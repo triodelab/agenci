@@ -81,7 +81,7 @@ export function LandingFooter() {
           <br />
           Litt enklere hverdag.
         </p>
-        <a href="mailto:hei@agenci.no" className="agenci-text-link">
+        <a href="mailto:post@triodelab.no" className="agenci-text-link">
           Si hei <ArrowUpRight size={18} />
         </a>
       </div>
@@ -107,7 +107,7 @@ export function LandingFooter() {
               </li>
             ))}
             <li>
-              <a href="mailto:hei@agenci.no">hei@agenci.no</a>
+              <a href="mailto:post@triodelab.no">post@triodelab.no</a>
             </li>
           </ul>
         </div>
@@ -168,7 +168,12 @@ export function LandingFooter() {
         href="/?from=marketing"
         aria-label="Agenci — tilbake til forsiden"
       >
-        Agenci
+        {/* Same wordmark as the dashboard: the big A mark, then "genci". */}
+        <span className="agenci-footer-wordmark-inner" aria-hidden="true">
+          {/* biome-ignore lint/performance/noImgElement: sized in em with the wordmark */}
+          <img src="/AgenciMark.png" alt="" />
+          <span>genci</span>
+        </span>
       </Link>
       <div className="agenci-footer-bottom">
         <div>

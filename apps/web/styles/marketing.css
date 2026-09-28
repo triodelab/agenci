@@ -708,13 +708,34 @@
 }
 .agenci-footer-wordmark {
   display: block;
-  font-size: clamp(120px, 24.5vw, 370px);
-  line-height: 0.95;
-  color: #0d9488;
-  letter-spacing: -0.085em !important;
+  font-size: clamp(56px, 12.5vw, 190px);
+  line-height: 1;
+  color: #111;
+  letter-spacing: -0.03em !important;
   text-align: center;
-  padding: 18px 0 36px;
+  padding: 0.1em 0 0.38em;
   overflow: hidden;
+}
+/*
+ * Same wordmark as the dashboard: the A mark (tightly cropped, AgenciMark.png)
+ * then "genci". Baseline alignment puts the foot of the A exactly on the text
+ * baseline, and the cropped mark makes the whole word optically centred.
+ */
+.agenci-footer-wordmark-inner {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.07em;
+  white-space: nowrap;
+}
+.agenci-footer-wordmark-inner img {
+  display: block;
+  height: 1.13em;
+  width: auto;
+  flex-shrink: 0;
+}
+.agenci-footer-wordmark-inner span {
+  line-height: 1;
+  color: #111;
 }
 .agenci-footer-bottom {
   border-top: 1px solid #cddfd3;
@@ -1287,7 +1308,7 @@
     width: 100%;
   }
   .agenci-footer-wordmark {
-    font-size: 25vw;
+    font-size: 19vw;
     padding: 12px 0 28px;
   }
   .agenci-footer-bottom {

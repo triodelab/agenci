@@ -22,6 +22,21 @@ const nextConfig = {
    * Proxy Better Auth / oRPC / WS ticket to Fastify so cookies stay first-party
    * on the Next origin (localhost:3000 → server :3003).
    */
+  /** Removed marketing pages keep working for old links and search results. */
+  async redirects() {
+    return [
+      {
+        source: "/hvordan-det-virker",
+        destination: "/produktet",
+        permanent: true,
+      },
+      {
+        source: "/integrasjoner",
+        destination: "/produktet",
+        permanent: true,
+      },
+    ];
+  },
   async rewrites() {
     const server =
       process.env.NEXT_PUBLIC_SERVER_URL?.replace(/\/$/, "") ||

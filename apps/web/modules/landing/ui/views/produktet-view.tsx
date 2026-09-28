@@ -20,7 +20,7 @@ import {
 	LANDING_AUTH_PATHS,
 	LANDING_CONTACT_PAGE_PATH,
 } from "@/modules/landing/constants";
-import TRACKS from "@/modules/landing/hvordan-video-tracks.json";
+import TRACKS from "@/modules/landing/produktet-video-tracks.json";
 import {
 	CinematicMacbook,
 	type VideoTrack,
@@ -28,10 +28,17 @@ import {
 import { LandingFooter } from "@/modules/landing/ui/components/landing-footer";
 import { LandingNav } from "@/modules/landing/ui/components/landing-nav";
 import story from "@/modules/landing/ui/components/product-story.module.css";
-import local from "./hvordan-det-virker.module.css";
+import local from "./produktet.module.css";
 
-/** Screenshots are captured from the real dashboard (public/images/hvordan). */
-const SHOT = (name: string) => `/images/hvordan/${name}-v2.webp`;
+/** Screenshots are captured from the real dashboard (public/images/produktet). */
+const SHOT = (name: string) => `/images/produktet/${name}-v2.webp?v=${ASSET_VERSION}`;
+/**
+ * Bump when the recordings are re-shot: a new URL makes browsers and the CDN
+ * fetch the new files instead of an old cached copy.
+ */
+const ASSET_VERSION = "3";
+const clip = (id: string, ext: "mp4" | "jpg") =>
+	`/images/produktet/${id}.${ext}?v=${ASSET_VERSION}`;
 
 /** Each part gets its own stage: photos, a paper surface or a deep-green one. */
 type Backdrop = "forest" | "sky" | "touch" | "paper" | "ink";
@@ -67,7 +74,7 @@ const FEATURES: Feature[] = [
 				På ett blikk.
 			</>
 		),
-		lead: "Samtaler, løste saker og når kundene chatter — samlet for hver agent, så dere vet hvor det går bra og hva som trenger en hånd.",
+		lead: "Hvor mange som skriver, hvor mange agenten løser selv, og når på døgnet kundene er innom. Du ser fort hva som går bra, og hva som trenger deg.",
 		details: [
 			{ icon: Gauge, text: "Andel løst uten et menneske" },
 			{ icon: MessageCircle, text: "Samtaler over tid" },
@@ -88,7 +95,7 @@ const FEATURES: Feature[] = [
 				Med hele historikken.
 			</>
 		),
-		lead: "Følg med mens agenten svarer, se hvem kunden er og hvor de kom fra, og ta over når noen trenger et menneske.",
+		lead: "Les med mens agenten svarer, se hvem kunden er og hvor de kom fra, og hopp inn selv når det trengs.",
 		details: [
 			{ icon: Inbox, text: "Innboks med status per samtale" },
 			{ icon: UserRound, text: "Kontaktinfo og kontekst" },
@@ -110,7 +117,7 @@ const FEATURES: Feature[] = [
 				Synlig og under kontroll.
 			</>
 		),
-		lead: "Nettsider, dokumenter og filer blir til kunnskap agenten svarer fra. Se hva som er lært, spør kunnskapsbasen direkte, og legg til mer når dere vil.",
+		lead: "Nettsider, PDF-er og dokumenter blir til det agenten svarer ut fra. Du ser nøyaktig hva den har lært, kan spørre den direkte, og legge til mer når du vil.",
 		details: [
 			{ icon: Network, text: "Kunnskapen som et levende kart" },
 			{ icon: BookOpen, text: "Kildebibliotek med status" },
@@ -131,7 +138,7 @@ const FEATURES: Feature[] = [
 				Deres måte å svare på.
 			</>
 		),
-		lead: "Velg AI-modell, gi agenten en personlighet og tydelige regler, og bestem når et menneske skal ta over. Farger og tekst i chatten tilpasser dere på samme sted.",
+		lead: "Bestem hvordan agenten skal snakke, hva den ikke skal svare på, og når den skal sende saken videre til deg. Farger og tekster i chatten endrer du samme sted.",
 		details: [
 			{ icon: SlidersHorizontal, text: "AI-modell og personlighet" },
 			{ icon: ShieldCheck, text: "Regler og emner å unngå" },
@@ -146,22 +153,22 @@ const FEATURES: Feature[] = [
 const FLOW = [
 	{
 		title: "Kunden spør.",
-		text: "Chatten ligger på nettsiden deres og er klar døgnet rundt.",
+		text: "Chatten ligger på nettsiden og svarer døgnet rundt, også i helgene.",
 	},
 	{
 		title: "Agenci svarer.",
-		text: "Ut fra deres egen kunnskap — og sier ifra når et menneske trengs.",
+		text: "Ut fra det dere selv har skrevet, og sier fra når et menneske trengs.",
 	},
 	{
 		title: "Dere har oversikten.",
-		text: "Samtaler, kunnskap og innstillinger samlet i dashboardet.",
+		text: "Samtaler, kunnskap og innstillinger på ett sted i dashbordet.",
 	},
 ];
 
 const START = [
 	{
 		title: "Opprett en agent.",
-		text: "Gi den et navn og fortell hva den skal hjelpe kundene med.",
+		text: "Gi den et navn og skriv kort hva den skal hjelpe kundene med.",
 	},
 	{
 		title: "Pek den mot nettsiden.",
@@ -169,7 +176,7 @@ const START = [
 	},
 	{
 		title: "Lim inn én kodelinje.",
-		text: "Chatten dukker opp på nettsiden — og samtalene i dashboardet.",
+		text: "Chatten dukker opp på nettsiden, og samtalene i dashbordet.",
 	},
 ];
 
@@ -234,7 +241,7 @@ function Stage({
 	);
 }
 
-export function HvordanDetVirkerView() {
+export function ProduktetView() {
 	return (
 		<>
 			<LandingNav variant="auto" />
@@ -248,15 +255,15 @@ export function HvordanDetVirkerView() {
 					>
 						<div className={story.container}>
 							<header className={story.centerHeading}>
-								<span className={story.eyebrow}>Slik fungerer det</span>
+								<span className={story.eyebrow}>Produktet</span>
 								<h1 id="how-heading" className={local.title}>
-									Fra spørsmål på nettsiden.
+									Kunden spør på nettsiden.
 									<br />
-									<span>Til oversikt i dashboardet.</span>
+									<span>Du ser alt i dashbordet.</span>
 								</h1>
 								<p>
-									Kunden spør. Agenci svarer ut fra det dere vet. Dere følger
-									alt fra ett sted.
+									Agenci svarer ut fra det dere har lagt inn, og du følger med
+									på alt fra ett sted. Her er hvordan det henger sammen.
 								</p>
 								<nav className={local.anchors} aria-label="Hopp til del">
 									{FEATURES.map((f) => (
@@ -286,16 +293,16 @@ export function HvordanDetVirkerView() {
 						<div className={story.container}>
 							<header className={story.workflowHeading}>
 								<div>
-									<span className={story.eyebrow}>Én sammenhengende flyt</span>
+									<span className={story.eyebrow}>Fra spørsmål til svar</span>
 									<h2 id="flow-heading">
-										Tre ledd.
+										Kunden i chatten.
 										<br />
-										<span>Ingen løse tråder.</span>
+										<span>Du i dashbordet.</span>
 									</h2>
 								</div>
 								<p>
-									Det kunden ser på nettsiden og det dere ser i dashboardet er
-									den samme samtalen — med den samme kunnskapen bak.
+									Det kunden ser i chatten, ser du i dashbordet. Samme samtale,
+									med den samme kunnskapen bak.
 								</p>
 							</header>
 							<ol className={story.steps}>
@@ -319,12 +326,12 @@ export function HvordanDetVirkerView() {
 						<div className={story.container}>
 							<header className={story.brandHeading}>
 								<span className={story.pill}>
-									<span /> Dashboardet
+									<span /> Dashbordet
 								</span>
 								<h2 id="dashboard-heading">
-									Alt dere trenger.
+									Dashbordet,
 									<br />
-									<span>Ingenting dere ikke trenger.</span>
+									<span>del for del.</span>
 								</h2>
 							</header>
 							<div className={story.featureRows}>
@@ -355,14 +362,14 @@ export function HvordanDetVirkerView() {
 										<Stage backdrop={f.backdrop} className={story.featureMedia}>
 											{f.flat ? (
 												<BrowserFrame
-													video={`/images/hvordan/${f.id}.mp4`}
-													poster={`/images/hvordan/${f.id}.jpg`}
+													video={clip(f.id, "mp4")}
+													poster={clip(f.id, "jpg")}
 													alt={f.alt}
 												/>
 											) : (
 												<CinematicMacbook
-													video={`/images/hvordan/${f.id}.mp4`}
-													poster={`/images/hvordan/${f.id}.jpg`}
+													video={clip(f.id, "mp4")}
+													poster={clip(f.id, "jpg")}
 													track={(TRACKS as Record<string, VideoTrack>)[f.id]}
 													alt={f.alt}
 												/>
@@ -385,14 +392,14 @@ export function HvordanDetVirkerView() {
 								<div>
 									<span className={story.eyebrow}>Kom i gang</span>
 									<h2 id="start-heading">
-										I gang på minutter.
+										Kom i gang
 										<br />
-										<span>Ikke uker.</span>
+										<span>på én ettermiddag.</span>
 									</h2>
 								</div>
 								<p>
-									Ingen integrasjonsprosjekt. Agenci lærer fra det dere allerede
-									har, og dere justerer i eget tempo.
+									Du trenger ingen utvikler. Agenci lærer av det som allerede
+									ligger på nettsiden din, og du justerer når du har tid.
 								</p>
 							</header>
 							<ol className={story.steps}>

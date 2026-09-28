@@ -49,25 +49,22 @@ export function landingSectionHref(key: keyof typeof LANDING_SECTION_IDS): strin
 /** Hovedmeny (sentrert i header) — matcher ny landing-struktur */
 export const LANDING_NAV_PRIMARY_LINKS = [
   { name: "Hjem", href: LANDING_HOME_MARKETING_HREF },
-  { name: "Produktet", href: hash(LANDING_SECTION_IDS.workflow) },
+  { name: "Produktet", href: "/produktet" },
   { name: "Priser", href: LANDING_PRICING_PAGE_PATH },
-  { name: "Slik det fungerer", href: "/hvordan-det-virker" },
   { name: "Blogg", href: "/blogg" },
   { name: "Kontakt", href: LANDING_CONTACT_PAGE_PATH },
 ] as const;
 
 /** Egne markedsføringssider */
 export const LANDING_MARKETING_PAGE_LINKS = [
-  { name: "Integrasjoner", href: "/integrasjoner" },
-  { name: "Slik fungerer det", href: "/hvordan-det-virker" },
+  { name: "Produktet", href: "/produktet" },
   { name: "Kontakt", href: LANDING_CONTACT_PAGE_PATH },
 ] as const;
 
 /** Footer / «Utforsk» */
 export const LANDING_FORSIDE_SECTION_LINKS = [
   { name: "Priser", href: LANDING_PRICING_PAGE_PATH },
-  { name: "Integrasjoner", href: hash(LANDING_SECTION_IDS.integrations) },
-  { name: "Slik det fungerer", href: "/hvordan-det-virker" },
+  { name: "Produktet", href: "/produktet" },
   { name: "Kontakt", href: LANDING_CONTACT_PAGE_PATH },
 ] as const;
 
@@ -90,8 +87,7 @@ export const LANDING_FOOTER_PRODUCT_LINKS = [
 ] as const;
 
 export const LANDING_FOOTER_EXPLORE_LINKS = [
-  { href: "/integrasjoner", label: "Integrasjoner" },
-  { href: "/hvordan-det-virker", label: "Slik fungerer det" },
+  { href: "/produktet", label: "Produktet" },
   { href: "/blogg", label: "Blogg" },
 ] as const;
 

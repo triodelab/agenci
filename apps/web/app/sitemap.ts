@@ -15,16 +15,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
 			priority: 1.0,
 		},
 		{
-			url: `${base}/hvordan-det-virker`,
+			url: `${base}/produktet`,
 			lastModified: now,
 			changeFrequency: "monthly",
 			priority: 0.8,
-		},
-		{
-			url: `${base}/integrasjoner`,
-			lastModified: now,
-			changeFrequency: "monthly",
-			priority: 0.7,
 		},
 		{
 			url: `${base}/kontakt`,

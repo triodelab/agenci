@@ -86,7 +86,7 @@ const jsonLdOrganization = {
   logo: "https://agenci.no/AgenciLogo.png",
   description:
     "AI-chatassistent for norske nettsteder — svarer kunder automatisk 24/7.",
-  email: "hei@agenci.no",
+  email: "post@triodelab.no",
   address: {
     "@type": "PostalAddress",
     streetAddress: "Gildevangen 16 B",
@@ -96,7 +96,7 @@ const jsonLdOrganization = {
   },
   contactPoint: {
     "@type": "ContactPoint",
-    email: "hei@agenci.no",
+    email: "post@triodelab.no",
     contactType: "customer support",
     availableLanguage: "Norwegian",
   },

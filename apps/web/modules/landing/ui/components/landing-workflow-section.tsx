@@ -42,7 +42,7 @@ export function LandingWorkflowSection() {
           transition={{ duration: 0.6, ease }}
         >
           <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-[#6b7280]">
-            Slik fungerer det
+            Produktet
           </p>
           <h2
             id="workflow-heading"
