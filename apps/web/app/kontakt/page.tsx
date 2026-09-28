@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { ContactFormCard } from "@/modules/landing/ui/components/contact-form-card";
-import { LandingFooter } from "@/modules/landing/ui/components/landing-footer";
 import { LandingNav } from "@/modules/landing/ui/components/landing-nav";
 import s from "@/modules/landing/ui/views/kontakt.module.css";
 
@@ -49,40 +48,29 @@ export default function KontaktPage() {
         </section>
 
         <figure className={s.media}>
-          <Image
-            src="/images/agenci-kontakt-bygg.webp"
-            alt="Moderne betongbygg med geometrisk fasade mot blå himmel."
-            fill
-            priority
-            sizes="(max-width: 980px) 100vw, 50vw"
-            className={s.photo}
-          />
-          <span className={s.shade} aria-hidden="true" />
-          <div className={s.note}>
-            <span className={s.noteMark} aria-hidden="true">
-              {/* biome-ignore lint/performance/noImgElement: tiny static brand mark */}
-              <img src="/AgenciMark.png" alt="" />
-            </span>
-            <span>
-              <strong>Et menneske leser meldingen din</strong>
-              <small>Ingen automatisk kø. Du får svar fra oss direkte.</small>
-            </span>
+          <div className={s.frame}>
+            <Image
+              src="/images/agenci-kontakt-glass.webp"
+              alt="Glassfasade på et moderne bygg som speiler skyene mot blå himmel."
+              fill
+              priority
+              sizes="(max-width: 980px) 100vw, 50vw"
+              className={s.photo}
+            />
           </div>
+          <span className={s.shade} aria-hidden="true" />
           <figcaption className={s.credit}>
             Foto:{" "}
             <a
-              href="https://www.pexels.com/@sukrit-lamthong-34482161/"
+              href="https://www.pexels.com/@imjimmyqian/"
               target="_blank"
               rel="noopener noreferrer"
             >
-              Sukrit Lamthong / Pexels
+              Longxiang Qian / Pexels
             </a>
           </figcaption>
         </figure>
       </main>
-      <div className="bg-[#FAFAFA]">
-        <LandingFooter />
-      </div>
     </>
   );
 }
