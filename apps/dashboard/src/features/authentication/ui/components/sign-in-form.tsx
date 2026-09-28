@@ -4,6 +4,7 @@ import { z } from "zod";
 
 import { AuthShell } from "@/components/auth-shell";
 import { authClient } from "@/lib/auth-client";
+import { takePendingInvite } from "@/lib/pending-invite";
 import { btnPrimaryCls, errCls, inputCls, labelCls } from "@/lib/ui";
 
 const signInSchema = z.object({
@@ -34,7 +35,16 @@ export default function SignInForm({
     setError(undefined);
     try {
       await authClient.signIn.email(result.data, {
-        onSuccess: () => navigate({ to: "/" }),
+        onSuccess: () => {
+          // Came from an invitation link: go back and accept it.
+          const invite = takePendingInvite();
+          return invite
+            ? navigate({
+                to: "/accept-invitation/$invitationId",
+                params: { invitationId: invite },
+              })
+            : navigate({ to: "/" });
+        },
         onError: ({ error: signInError }) => {
           setError(signInError.message);
         },

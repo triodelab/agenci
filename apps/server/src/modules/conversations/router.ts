@@ -9,6 +9,7 @@ import { ORPCError } from "@orpc/server";
 import { memoryStore } from "@/mastra/store";
 import { privateProcedure } from "@/routers/procedures";
 import {
+  ConversationUsageResponseSchema,
   GetConversationResponseSchema,
   GetConversationSchema,
   ListConversationsResponseSchema,
@@ -127,6 +128,39 @@ async function assertAgent(organizationId: string, agentId: string) {
 }
 
 export const conversationsRouter = {
+  /** Read-only usage for the billing page: conversations this month, per day. */
+  usage: privateProcedure
+    .output(ConversationUsageResponseSchema)
+    .handler(async ({ context }) => {
+      const now = new Date();
+      const start = new Date(now.getFullYear(), now.getMonth(), 1);
+      const prevStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+      const [rows, previousTotal] = await Promise.all([
+        prisma.conversation.findMany({
+          where: {
+            organizationId: context.organizationId,
+            messageCount: { gt: 0 },
+            createdAt: { gte: start },
+          },
+          select: { createdAt: true },
+        }),
+        prisma.conversation.count({
+          where: {
+            organizationId: context.organizationId,
+            messageCount: { gt: 0 },
+            createdAt: { gte: prevStart, lt: start },
+          },
+        }),
+      ]);
+      const days = Array.from({ length: now.getDate() }, () => 0);
+      for (const r of rows) {
+        const i = r.createdAt.getDate() - 1;
+        if (i >= 0 && i < days.length) days[i] = (days[i] ?? 0) + 1;
+      }
+      const month = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+      return { month, days, total: rows.length, previousTotal };
+    }),
+
   list: privateProcedure
     .input(ListConversationsSchema)
     .output(ListConversationsResponseSchema)

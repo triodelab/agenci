@@ -54,6 +54,13 @@ export const env = createEnv({
      * Optional at boot so non-AI routes work; required when generating replies.
      */
     OPENAI_API_KEY: z.string().min(1).optional(),
+    /**
+     * Resend (https://resend.com) for transactional e-mail such as team
+     * invitations. Without a key, invitation links are only logged.
+     * The from-address must be on a domain verified in Resend.
+     */
+    RESEND_API_KEY: z.string().min(1).optional(),
+    RESEND_FROM_EMAIL: z.string().min(3).default("Agenci <post@triodelab.no>"),
   },
   runtimeEnv: process.env,
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,

@@ -12,22 +12,30 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthedRouteImport } from './routes/_authed'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthedIndexRouteImport } from './routes/_authed/index'
+import { Route as AcceptInvitationInvitationIdRouteImport } from './routes/accept-invitation.$invitationId'
 import { Route as AuthedOrgOrgSlugRouteRouteImport } from './routes/_authed/org/$orgSlug/route'
 import { Route as AuthedOrgCreateRouteImport } from './routes/_authed/org/create'
 import { Route as AuthedOrgOrganizationRouteImport } from './routes/_authed/org/organization'
 import { Route as AuthedOrgOrgSlugIndexRouteImport } from './routes/_authed/org/$orgSlug/index'
 import { Route as AuthedOrgOrgSlugAgentsRouteImport } from './routes/_authed/org/$orgSlug/agents'
+import { Route as AuthedOrgOrgSlugBillingRouteImport } from './routes/_authed/org/$orgSlug/billing'
+import { Route as AuthedOrgOrgSlugMembersRouteImport } from './routes/_authed/org/$orgSlug/members'
 import { Route as AuthedOrgOrgSlugAgentsIndexRouteImport } from './routes/_authed/org/$orgSlug/agents/index'
 import { Route as AuthedOrgOrgSlugAgentsAgentIdRouteRouteImport } from './routes/_authed/org/$orgSlug/agents/$agentId/route'
 import { Route as AuthedOrgOrgSlugAgentsCreateRouteImport } from './routes/_authed/org/$orgSlug/agents/create'
+import { Route as AuthedOrgOrgSlugSettingsIndexRouteImport } from './routes/_authed/org/$orgSlug/settings/index'
+import { Route as AuthedOrgOrgSlugSettingsSectionRouteImport } from './routes/_authed/org/$orgSlug/settings/$section'
 import { Route as AuthedOrgOrgSlugAgentsAgentIdIndexRouteImport } from './routes/_authed/org/$orgSlug/agents/$agentId/index'
 import { Route as AuthedOrgOrgSlugAgentsAgentIdSplatRouteImport } from './routes/_authed/org/$orgSlug/agents/$agentId/$'
+import { Route as AuthedOrgOrgSlugAgentsAgentIdBillingRouteImport } from './routes/_authed/org/$orgSlug/agents/$agentId/billing'
 import { Route as AuthedOrgOrgSlugAgentsAgentIdConversationsRouteImport } from './routes/_authed/org/$orgSlug/agents/$agentId/conversations'
 import { Route as AuthedOrgOrgSlugAgentsAgentIdCustomizationRouteImport } from './routes/_authed/org/$orgSlug/agents/$agentId/customization'
 import { Route as AuthedOrgOrgSlugAgentsAgentIdFilesRouteImport } from './routes/_authed/org/$orgSlug/agents/$agentId/files'
 import { Route as AuthedOrgOrgSlugAgentsAgentIdIntegrationsRouteImport } from './routes/_authed/org/$orgSlug/agents/$agentId/integrations'
 import { Route as AuthedOrgOrgSlugAgentsAgentIdConversationsIndexRouteImport } from './routes/_authed/org/$orgSlug/agents/$agentId/conversations/index'
 import { Route as AuthedOrgOrgSlugAgentsAgentIdConversationsConversationIdRouteImport } from './routes/_authed/org/$orgSlug/agents/$agentId/conversations/$conversationId'
+import { Route as AuthedOrgOrgSlugAgentsAgentIdSettingsIndexRouteImport } from './routes/_authed/org/$orgSlug/agents/$agentId/settings/index'
+import { Route as AuthedOrgOrgSlugAgentsAgentIdSettingsSectionRouteImport } from './routes/_authed/org/$orgSlug/agents/$agentId/settings/$section'
 
 const AuthedRoute = AuthedRouteImport.update({
   id: '/_authed',
@@ -43,6 +51,12 @@ const AuthedIndexRoute = AuthedIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthedRoute,
 } as any)
+const AcceptInvitationInvitationIdRoute =
+  AcceptInvitationInvitationIdRouteImport.update({
+    id: '/accept-invitation/$invitationId',
+    path: '/accept-invitation/$invitationId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthedOrgOrgSlugRouteRoute = AuthedOrgOrgSlugRouteRouteImport.update({
   id: '/org/$orgSlug',
   path: '/org/$orgSlug',
@@ -68,6 +82,16 @@ const AuthedOrgOrgSlugAgentsRoute = AuthedOrgOrgSlugAgentsRouteImport.update({
   path: '/agents',
   getParentRoute: () => AuthedOrgOrgSlugRouteRoute,
 } as any)
+const AuthedOrgOrgSlugBillingRoute = AuthedOrgOrgSlugBillingRouteImport.update({
+  id: '/billing',
+  path: '/billing',
+  getParentRoute: () => AuthedOrgOrgSlugRouteRoute,
+} as any)
+const AuthedOrgOrgSlugMembersRoute = AuthedOrgOrgSlugMembersRouteImport.update({
+  id: '/members',
+  path: '/members',
+  getParentRoute: () => AuthedOrgOrgSlugRouteRoute,
+} as any)
 const AuthedOrgOrgSlugAgentsIndexRoute =
   AuthedOrgOrgSlugAgentsIndexRouteImport.update({
     id: '/',
@@ -86,6 +110,18 @@ const AuthedOrgOrgSlugAgentsCreateRoute =
     path: '/create',
     getParentRoute: () => AuthedOrgOrgSlugAgentsRoute,
   } as any)
+const AuthedOrgOrgSlugSettingsIndexRoute =
+  AuthedOrgOrgSlugSettingsIndexRouteImport.update({
+    id: '/settings/',
+    path: '/settings/',
+    getParentRoute: () => AuthedOrgOrgSlugRouteRoute,
+  } as any)
+const AuthedOrgOrgSlugSettingsSectionRoute =
+  AuthedOrgOrgSlugSettingsSectionRouteImport.update({
+    id: '/settings/$section',
+    path: '/settings/$section',
+    getParentRoute: () => AuthedOrgOrgSlugRouteRoute,
+  } as any)
 const AuthedOrgOrgSlugAgentsAgentIdIndexRoute =
   AuthedOrgOrgSlugAgentsAgentIdIndexRouteImport.update({
     id: '/',
@@ -96,6 +132,12 @@ const AuthedOrgOrgSlugAgentsAgentIdSplatRoute =
   AuthedOrgOrgSlugAgentsAgentIdSplatRouteImport.update({
     id: '/$',
     path: '/$',
+    getParentRoute: () => AuthedOrgOrgSlugAgentsAgentIdRouteRoute,
+  } as any)
+const AuthedOrgOrgSlugAgentsAgentIdBillingRoute =
+  AuthedOrgOrgSlugAgentsAgentIdBillingRouteImport.update({
+    id: '/billing',
+    path: '/billing',
     getParentRoute: () => AuthedOrgOrgSlugAgentsAgentIdRouteRoute,
   } as any)
 const AuthedOrgOrgSlugAgentsAgentIdConversationsRoute =
@@ -134,128 +176,189 @@ const AuthedOrgOrgSlugAgentsAgentIdConversationsConversationIdRoute =
     path: '/$conversationId',
     getParentRoute: () => AuthedOrgOrgSlugAgentsAgentIdConversationsRoute,
   } as any)
+const AuthedOrgOrgSlugAgentsAgentIdSettingsIndexRoute =
+  AuthedOrgOrgSlugAgentsAgentIdSettingsIndexRouteImport.update({
+    id: '/settings/',
+    path: '/settings/',
+    getParentRoute: () => AuthedOrgOrgSlugAgentsAgentIdRouteRoute,
+  } as any)
+const AuthedOrgOrgSlugAgentsAgentIdSettingsSectionRoute =
+  AuthedOrgOrgSlugAgentsAgentIdSettingsSectionRouteImport.update({
+    id: '/settings/$section',
+    path: '/settings/$section',
+    getParentRoute: () => AuthedOrgOrgSlugAgentsAgentIdRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthedIndexRoute
   '/login': typeof LoginRoute
+  '/accept-invitation/$invitationId': typeof AcceptInvitationInvitationIdRoute
   '/org/$orgSlug': typeof AuthedOrgOrgSlugRouteRouteWithChildren
   '/org/create': typeof AuthedOrgCreateRoute
   '/org/organization': typeof AuthedOrgOrganizationRoute
   '/org/$orgSlug/agents': typeof AuthedOrgOrgSlugAgentsRouteWithChildren
+  '/org/$orgSlug/billing': typeof AuthedOrgOrgSlugBillingRoute
+  '/org/$orgSlug/members': typeof AuthedOrgOrgSlugMembersRoute
   '/org/$orgSlug/': typeof AuthedOrgOrgSlugIndexRoute
   '/org/$orgSlug/agents/$agentId': typeof AuthedOrgOrgSlugAgentsAgentIdRouteRouteWithChildren
   '/org/$orgSlug/agents/create': typeof AuthedOrgOrgSlugAgentsCreateRoute
+  '/org/$orgSlug/settings/$section': typeof AuthedOrgOrgSlugSettingsSectionRoute
   '/org/$orgSlug/agents/': typeof AuthedOrgOrgSlugAgentsIndexRoute
+  '/org/$orgSlug/settings/': typeof AuthedOrgOrgSlugSettingsIndexRoute
   '/org/$orgSlug/agents/$agentId/$': typeof AuthedOrgOrgSlugAgentsAgentIdSplatRoute
+  '/org/$orgSlug/agents/$agentId/billing': typeof AuthedOrgOrgSlugAgentsAgentIdBillingRoute
   '/org/$orgSlug/agents/$agentId/conversations': typeof AuthedOrgOrgSlugAgentsAgentIdConversationsRouteWithChildren
   '/org/$orgSlug/agents/$agentId/customization': typeof AuthedOrgOrgSlugAgentsAgentIdCustomizationRoute
   '/org/$orgSlug/agents/$agentId/files': typeof AuthedOrgOrgSlugAgentsAgentIdFilesRoute
   '/org/$orgSlug/agents/$agentId/integrations': typeof AuthedOrgOrgSlugAgentsAgentIdIntegrationsRoute
   '/org/$orgSlug/agents/$agentId/': typeof AuthedOrgOrgSlugAgentsAgentIdIndexRoute
   '/org/$orgSlug/agents/$agentId/conversations/$conversationId': typeof AuthedOrgOrgSlugAgentsAgentIdConversationsConversationIdRoute
+  '/org/$orgSlug/agents/$agentId/settings/$section': typeof AuthedOrgOrgSlugAgentsAgentIdSettingsSectionRoute
   '/org/$orgSlug/agents/$agentId/conversations/': typeof AuthedOrgOrgSlugAgentsAgentIdConversationsIndexRoute
+  '/org/$orgSlug/agents/$agentId/settings/': typeof AuthedOrgOrgSlugAgentsAgentIdSettingsIndexRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
+  '/accept-invitation/$invitationId': typeof AcceptInvitationInvitationIdRoute
   '/': typeof AuthedIndexRoute
   '/org/create': typeof AuthedOrgCreateRoute
   '/org/organization': typeof AuthedOrgOrganizationRoute
+  '/org/$orgSlug/billing': typeof AuthedOrgOrgSlugBillingRoute
+  '/org/$orgSlug/members': typeof AuthedOrgOrgSlugMembersRoute
   '/org/$orgSlug': typeof AuthedOrgOrgSlugIndexRoute
   '/org/$orgSlug/agents/create': typeof AuthedOrgOrgSlugAgentsCreateRoute
+  '/org/$orgSlug/settings/$section': typeof AuthedOrgOrgSlugSettingsSectionRoute
   '/org/$orgSlug/agents': typeof AuthedOrgOrgSlugAgentsIndexRoute
+  '/org/$orgSlug/settings': typeof AuthedOrgOrgSlugSettingsIndexRoute
   '/org/$orgSlug/agents/$agentId/$': typeof AuthedOrgOrgSlugAgentsAgentIdSplatRoute
+  '/org/$orgSlug/agents/$agentId/billing': typeof AuthedOrgOrgSlugAgentsAgentIdBillingRoute
   '/org/$orgSlug/agents/$agentId/customization': typeof AuthedOrgOrgSlugAgentsAgentIdCustomizationRoute
   '/org/$orgSlug/agents/$agentId/files': typeof AuthedOrgOrgSlugAgentsAgentIdFilesRoute
   '/org/$orgSlug/agents/$agentId/integrations': typeof AuthedOrgOrgSlugAgentsAgentIdIntegrationsRoute
   '/org/$orgSlug/agents/$agentId': typeof AuthedOrgOrgSlugAgentsAgentIdIndexRoute
   '/org/$orgSlug/agents/$agentId/conversations/$conversationId': typeof AuthedOrgOrgSlugAgentsAgentIdConversationsConversationIdRoute
+  '/org/$orgSlug/agents/$agentId/settings/$section': typeof AuthedOrgOrgSlugAgentsAgentIdSettingsSectionRoute
   '/org/$orgSlug/agents/$agentId/conversations': typeof AuthedOrgOrgSlugAgentsAgentIdConversationsIndexRoute
+  '/org/$orgSlug/agents/$agentId/settings': typeof AuthedOrgOrgSlugAgentsAgentIdSettingsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authed': typeof AuthedRouteWithChildren
   '/login': typeof LoginRoute
+  '/accept-invitation/$invitationId': typeof AcceptInvitationInvitationIdRoute
   '/_authed/': typeof AuthedIndexRoute
   '/_authed/org/$orgSlug': typeof AuthedOrgOrgSlugRouteRouteWithChildren
   '/_authed/org/create': typeof AuthedOrgCreateRoute
   '/_authed/org/organization': typeof AuthedOrgOrganizationRoute
   '/_authed/org/$orgSlug/agents': typeof AuthedOrgOrgSlugAgentsRouteWithChildren
+  '/_authed/org/$orgSlug/billing': typeof AuthedOrgOrgSlugBillingRoute
+  '/_authed/org/$orgSlug/members': typeof AuthedOrgOrgSlugMembersRoute
   '/_authed/org/$orgSlug/': typeof AuthedOrgOrgSlugIndexRoute
   '/_authed/org/$orgSlug/agents/$agentId': typeof AuthedOrgOrgSlugAgentsAgentIdRouteRouteWithChildren
   '/_authed/org/$orgSlug/agents/create': typeof AuthedOrgOrgSlugAgentsCreateRoute
+  '/_authed/org/$orgSlug/settings/$section': typeof AuthedOrgOrgSlugSettingsSectionRoute
   '/_authed/org/$orgSlug/agents/': typeof AuthedOrgOrgSlugAgentsIndexRoute
+  '/_authed/org/$orgSlug/settings/': typeof AuthedOrgOrgSlugSettingsIndexRoute
   '/_authed/org/$orgSlug/agents/$agentId/$': typeof AuthedOrgOrgSlugAgentsAgentIdSplatRoute
+  '/_authed/org/$orgSlug/agents/$agentId/billing': typeof AuthedOrgOrgSlugAgentsAgentIdBillingRoute
   '/_authed/org/$orgSlug/agents/$agentId/conversations': typeof AuthedOrgOrgSlugAgentsAgentIdConversationsRouteWithChildren
   '/_authed/org/$orgSlug/agents/$agentId/customization': typeof AuthedOrgOrgSlugAgentsAgentIdCustomizationRoute
   '/_authed/org/$orgSlug/agents/$agentId/files': typeof AuthedOrgOrgSlugAgentsAgentIdFilesRoute
   '/_authed/org/$orgSlug/agents/$agentId/integrations': typeof AuthedOrgOrgSlugAgentsAgentIdIntegrationsRoute
   '/_authed/org/$orgSlug/agents/$agentId/': typeof AuthedOrgOrgSlugAgentsAgentIdIndexRoute
   '/_authed/org/$orgSlug/agents/$agentId/conversations/$conversationId': typeof AuthedOrgOrgSlugAgentsAgentIdConversationsConversationIdRoute
+  '/_authed/org/$orgSlug/agents/$agentId/settings/$section': typeof AuthedOrgOrgSlugAgentsAgentIdSettingsSectionRoute
   '/_authed/org/$orgSlug/agents/$agentId/conversations/': typeof AuthedOrgOrgSlugAgentsAgentIdConversationsIndexRoute
+  '/_authed/org/$orgSlug/agents/$agentId/settings/': typeof AuthedOrgOrgSlugAgentsAgentIdSettingsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/login'
+    | '/accept-invitation/$invitationId'
     | '/org/$orgSlug'
     | '/org/create'
     | '/org/organization'
     | '/org/$orgSlug/agents'
+    | '/org/$orgSlug/billing'
+    | '/org/$orgSlug/members'
     | '/org/$orgSlug/'
     | '/org/$orgSlug/agents/$agentId'
     | '/org/$orgSlug/agents/create'
+    | '/org/$orgSlug/settings/$section'
     | '/org/$orgSlug/agents/'
+    | '/org/$orgSlug/settings/'
     | '/org/$orgSlug/agents/$agentId/$'
+    | '/org/$orgSlug/agents/$agentId/billing'
     | '/org/$orgSlug/agents/$agentId/conversations'
     | '/org/$orgSlug/agents/$agentId/customization'
     | '/org/$orgSlug/agents/$agentId/files'
     | '/org/$orgSlug/agents/$agentId/integrations'
     | '/org/$orgSlug/agents/$agentId/'
     | '/org/$orgSlug/agents/$agentId/conversations/$conversationId'
+    | '/org/$orgSlug/agents/$agentId/settings/$section'
     | '/org/$orgSlug/agents/$agentId/conversations/'
+    | '/org/$orgSlug/agents/$agentId/settings/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
+    | '/accept-invitation/$invitationId'
     | '/'
     | '/org/create'
     | '/org/organization'
+    | '/org/$orgSlug/billing'
+    | '/org/$orgSlug/members'
     | '/org/$orgSlug'
     | '/org/$orgSlug/agents/create'
+    | '/org/$orgSlug/settings/$section'
     | '/org/$orgSlug/agents'
+    | '/org/$orgSlug/settings'
     | '/org/$orgSlug/agents/$agentId/$'
+    | '/org/$orgSlug/agents/$agentId/billing'
     | '/org/$orgSlug/agents/$agentId/customization'
     | '/org/$orgSlug/agents/$agentId/files'
     | '/org/$orgSlug/agents/$agentId/integrations'
     | '/org/$orgSlug/agents/$agentId'
     | '/org/$orgSlug/agents/$agentId/conversations/$conversationId'
+    | '/org/$orgSlug/agents/$agentId/settings/$section'
     | '/org/$orgSlug/agents/$agentId/conversations'
+    | '/org/$orgSlug/agents/$agentId/settings'
   id:
     | '__root__'
     | '/_authed'
     | '/login'
+    | '/accept-invitation/$invitationId'
     | '/_authed/'
     | '/_authed/org/$orgSlug'
     | '/_authed/org/create'
     | '/_authed/org/organization'
     | '/_authed/org/$orgSlug/agents'
+    | '/_authed/org/$orgSlug/billing'
+    | '/_authed/org/$orgSlug/members'
     | '/_authed/org/$orgSlug/'
     | '/_authed/org/$orgSlug/agents/$agentId'
     | '/_authed/org/$orgSlug/agents/create'
+    | '/_authed/org/$orgSlug/settings/$section'
     | '/_authed/org/$orgSlug/agents/'
+    | '/_authed/org/$orgSlug/settings/'
     | '/_authed/org/$orgSlug/agents/$agentId/$'
+    | '/_authed/org/$orgSlug/agents/$agentId/billing'
     | '/_authed/org/$orgSlug/agents/$agentId/conversations'
     | '/_authed/org/$orgSlug/agents/$agentId/customization'
     | '/_authed/org/$orgSlug/agents/$agentId/files'
     | '/_authed/org/$orgSlug/agents/$agentId/integrations'
     | '/_authed/org/$orgSlug/agents/$agentId/'
     | '/_authed/org/$orgSlug/agents/$agentId/conversations/$conversationId'
+    | '/_authed/org/$orgSlug/agents/$agentId/settings/$section'
     | '/_authed/org/$orgSlug/agents/$agentId/conversations/'
+    | '/_authed/org/$orgSlug/agents/$agentId/settings/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   AuthedRoute: typeof AuthedRouteWithChildren
   LoginRoute: typeof LoginRoute
+  AcceptInvitationInvitationIdRoute: typeof AcceptInvitationInvitationIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -280,6 +383,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof AuthedIndexRouteImport
       parentRoute: typeof AuthedRoute
+    }
+    '/accept-invitation/$invitationId': {
+      id: '/accept-invitation/$invitationId'
+      path: '/accept-invitation/$invitationId'
+      fullPath: '/accept-invitation/$invitationId'
+      preLoaderRoute: typeof AcceptInvitationInvitationIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authed/org/$orgSlug': {
       id: '/_authed/org/$orgSlug'
@@ -316,6 +426,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedOrgOrgSlugAgentsRouteImport
       parentRoute: typeof AuthedOrgOrgSlugRouteRoute
     }
+    '/_authed/org/$orgSlug/billing': {
+      id: '/_authed/org/$orgSlug/billing'
+      path: '/billing'
+      fullPath: '/org/$orgSlug/billing'
+      preLoaderRoute: typeof AuthedOrgOrgSlugBillingRouteImport
+      parentRoute: typeof AuthedOrgOrgSlugRouteRoute
+    }
+    '/_authed/org/$orgSlug/members': {
+      id: '/_authed/org/$orgSlug/members'
+      path: '/members'
+      fullPath: '/org/$orgSlug/members'
+      preLoaderRoute: typeof AuthedOrgOrgSlugMembersRouteImport
+      parentRoute: typeof AuthedOrgOrgSlugRouteRoute
+    }
     '/_authed/org/$orgSlug/agents/': {
       id: '/_authed/org/$orgSlug/agents/'
       path: '/'
@@ -337,6 +461,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedOrgOrgSlugAgentsCreateRouteImport
       parentRoute: typeof AuthedOrgOrgSlugAgentsRoute
     }
+    '/_authed/org/$orgSlug/settings/': {
+      id: '/_authed/org/$orgSlug/settings/'
+      path: '/settings'
+      fullPath: '/org/$orgSlug/settings/'
+      preLoaderRoute: typeof AuthedOrgOrgSlugSettingsIndexRouteImport
+      parentRoute: typeof AuthedOrgOrgSlugRouteRoute
+    }
+    '/_authed/org/$orgSlug/settings/$section': {
+      id: '/_authed/org/$orgSlug/settings/$section'
+      path: '/settings/$section'
+      fullPath: '/org/$orgSlug/settings/$section'
+      preLoaderRoute: typeof AuthedOrgOrgSlugSettingsSectionRouteImport
+      parentRoute: typeof AuthedOrgOrgSlugRouteRoute
+    }
     '/_authed/org/$orgSlug/agents/$agentId/': {
       id: '/_authed/org/$orgSlug/agents/$agentId/'
       path: '/'
@@ -349,6 +487,13 @@ declare module '@tanstack/react-router' {
       path: '/$'
       fullPath: '/org/$orgSlug/agents/$agentId/$'
       preLoaderRoute: typeof AuthedOrgOrgSlugAgentsAgentIdSplatRouteImport
+      parentRoute: typeof AuthedOrgOrgSlugAgentsAgentIdRouteRoute
+    }
+    '/_authed/org/$orgSlug/agents/$agentId/billing': {
+      id: '/_authed/org/$orgSlug/agents/$agentId/billing'
+      path: '/billing'
+      fullPath: '/org/$orgSlug/agents/$agentId/billing'
+      preLoaderRoute: typeof AuthedOrgOrgSlugAgentsAgentIdBillingRouteImport
       parentRoute: typeof AuthedOrgOrgSlugAgentsAgentIdRouteRoute
     }
     '/_authed/org/$orgSlug/agents/$agentId/conversations': {
@@ -393,6 +538,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedOrgOrgSlugAgentsAgentIdConversationsConversationIdRouteImport
       parentRoute: typeof AuthedOrgOrgSlugAgentsAgentIdConversationsRoute
     }
+    '/_authed/org/$orgSlug/agents/$agentId/settings/': {
+      id: '/_authed/org/$orgSlug/agents/$agentId/settings/'
+      path: '/settings'
+      fullPath: '/org/$orgSlug/agents/$agentId/settings/'
+      preLoaderRoute: typeof AuthedOrgOrgSlugAgentsAgentIdSettingsIndexRouteImport
+      parentRoute: typeof AuthedOrgOrgSlugAgentsAgentIdRouteRoute
+    }
+    '/_authed/org/$orgSlug/agents/$agentId/settings/$section': {
+      id: '/_authed/org/$orgSlug/agents/$agentId/settings/$section'
+      path: '/settings/$section'
+      fullPath: '/org/$orgSlug/agents/$agentId/settings/$section'
+      preLoaderRoute: typeof AuthedOrgOrgSlugAgentsAgentIdSettingsSectionRouteImport
+      parentRoute: typeof AuthedOrgOrgSlugAgentsAgentIdRouteRoute
+    }
   }
 }
 
@@ -416,17 +575,22 @@ const AuthedOrgOrgSlugAgentsAgentIdConversationsRouteWithChildren =
 
 interface AuthedOrgOrgSlugAgentsAgentIdRouteRouteChildren {
   AuthedOrgOrgSlugAgentsAgentIdSplatRoute: typeof AuthedOrgOrgSlugAgentsAgentIdSplatRoute
+  AuthedOrgOrgSlugAgentsAgentIdBillingRoute: typeof AuthedOrgOrgSlugAgentsAgentIdBillingRoute
   AuthedOrgOrgSlugAgentsAgentIdConversationsRoute: typeof AuthedOrgOrgSlugAgentsAgentIdConversationsRouteWithChildren
   AuthedOrgOrgSlugAgentsAgentIdCustomizationRoute: typeof AuthedOrgOrgSlugAgentsAgentIdCustomizationRoute
   AuthedOrgOrgSlugAgentsAgentIdFilesRoute: typeof AuthedOrgOrgSlugAgentsAgentIdFilesRoute
   AuthedOrgOrgSlugAgentsAgentIdIntegrationsRoute: typeof AuthedOrgOrgSlugAgentsAgentIdIntegrationsRoute
   AuthedOrgOrgSlugAgentsAgentIdIndexRoute: typeof AuthedOrgOrgSlugAgentsAgentIdIndexRoute
+  AuthedOrgOrgSlugAgentsAgentIdSettingsSectionRoute: typeof AuthedOrgOrgSlugAgentsAgentIdSettingsSectionRoute
+  AuthedOrgOrgSlugAgentsAgentIdSettingsIndexRoute: typeof AuthedOrgOrgSlugAgentsAgentIdSettingsIndexRoute
 }
 
 const AuthedOrgOrgSlugAgentsAgentIdRouteRouteChildren: AuthedOrgOrgSlugAgentsAgentIdRouteRouteChildren =
   {
     AuthedOrgOrgSlugAgentsAgentIdSplatRoute:
       AuthedOrgOrgSlugAgentsAgentIdSplatRoute,
+    AuthedOrgOrgSlugAgentsAgentIdBillingRoute:
+      AuthedOrgOrgSlugAgentsAgentIdBillingRoute,
     AuthedOrgOrgSlugAgentsAgentIdConversationsRoute:
       AuthedOrgOrgSlugAgentsAgentIdConversationsRouteWithChildren,
     AuthedOrgOrgSlugAgentsAgentIdCustomizationRoute:
@@ -437,6 +601,10 @@ const AuthedOrgOrgSlugAgentsAgentIdRouteRouteChildren: AuthedOrgOrgSlugAgentsAge
       AuthedOrgOrgSlugAgentsAgentIdIntegrationsRoute,
     AuthedOrgOrgSlugAgentsAgentIdIndexRoute:
       AuthedOrgOrgSlugAgentsAgentIdIndexRoute,
+    AuthedOrgOrgSlugAgentsAgentIdSettingsSectionRoute:
+      AuthedOrgOrgSlugAgentsAgentIdSettingsSectionRoute,
+    AuthedOrgOrgSlugAgentsAgentIdSettingsIndexRoute:
+      AuthedOrgOrgSlugAgentsAgentIdSettingsIndexRoute,
   }
 
 const AuthedOrgOrgSlugAgentsAgentIdRouteRouteWithChildren =
@@ -465,12 +633,20 @@ const AuthedOrgOrgSlugAgentsRouteWithChildren =
 
 interface AuthedOrgOrgSlugRouteRouteChildren {
   AuthedOrgOrgSlugAgentsRoute: typeof AuthedOrgOrgSlugAgentsRouteWithChildren
+  AuthedOrgOrgSlugBillingRoute: typeof AuthedOrgOrgSlugBillingRoute
+  AuthedOrgOrgSlugMembersRoute: typeof AuthedOrgOrgSlugMembersRoute
   AuthedOrgOrgSlugIndexRoute: typeof AuthedOrgOrgSlugIndexRoute
+  AuthedOrgOrgSlugSettingsSectionRoute: typeof AuthedOrgOrgSlugSettingsSectionRoute
+  AuthedOrgOrgSlugSettingsIndexRoute: typeof AuthedOrgOrgSlugSettingsIndexRoute
 }
 
 const AuthedOrgOrgSlugRouteRouteChildren: AuthedOrgOrgSlugRouteRouteChildren = {
   AuthedOrgOrgSlugAgentsRoute: AuthedOrgOrgSlugAgentsRouteWithChildren,
+  AuthedOrgOrgSlugBillingRoute: AuthedOrgOrgSlugBillingRoute,
+  AuthedOrgOrgSlugMembersRoute: AuthedOrgOrgSlugMembersRoute,
   AuthedOrgOrgSlugIndexRoute: AuthedOrgOrgSlugIndexRoute,
+  AuthedOrgOrgSlugSettingsSectionRoute: AuthedOrgOrgSlugSettingsSectionRoute,
+  AuthedOrgOrgSlugSettingsIndexRoute: AuthedOrgOrgSlugSettingsIndexRoute,
 }
 
 const AuthedOrgOrgSlugRouteRouteWithChildren =
@@ -498,6 +674,7 @@ const AuthedRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   AuthedRoute: AuthedRouteWithChildren,
   LoginRoute: LoginRoute,
+  AcceptInvitationInvitationIdRoute: AcceptInvitationInvitationIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

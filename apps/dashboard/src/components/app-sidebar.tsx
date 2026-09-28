@@ -19,6 +19,14 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@workspace/ui/components/tooltip";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@workspace/ui/components/dropdown-menu";
 import { cn } from "@workspace/ui/lib/utils";
 import {
   ArrowLeftIcon,
@@ -27,9 +35,14 @@ import {
   CalendarIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
-  ChevronsUpDownIcon,
   CreditCardIcon,
   HomeIcon,
+  Building2Icon,
+  ChevronDownIcon,
+  LogOutIcon,
+  ShieldIcon,
+  SlidersHorizontalIcon,
+  UserRoundIcon,
   InboxIcon,
   LibraryBigIcon,
   Mic,
@@ -42,6 +55,7 @@ import {
 } from "lucide-react";
 import { useAgentQuery } from "@/features/agents/queries/agents-queries";
 import { authClient } from "@/lib/auth-client";
+import { getSidebarStart } from "@/lib/preferences";
 
 const WEB_APP_URL =
   import.meta.env.VITE_WEB_URL?.replace(/\/$/, "") ?? "http://localhost:3000";
@@ -130,14 +144,19 @@ function globalNavItems(orgSlug: string) {
       exact: true,
       action: { url: `${base}/agents/create`, label: "Ny agent" },
     },
-    // "Innstillinger" comes back when there is an org settings page
-    // (`/settings` has no route yet and led to a 404).
     {
       title: "Medlemmer",
-      url: "/org/organization",
+      url: `${base}/members`,
       icon: UsersIcon,
       badge: false,
       exact: true,
+    },
+    {
+      title: "Innstillinger",
+      url: `${base}/settings`,
+      icon: SlidersHorizontalIcon,
+      badge: false,
+      exact: false,
     },
   ] as const;
 }
@@ -329,13 +348,18 @@ function SidebarBrand({
 function PlanCard({
   collapsed,
   orgSlug,
+  agentId,
 }: {
   collapsed: boolean;
   orgSlug: string;
+  /** Inside an agent the billing link stays in the agent (keeps its sidebar). */
+  agentId?: string;
 }) {
   if (collapsed) return null;
 
-  const billingUrl = `${orgBase(orgSlug)}/billing`;
+  const billingUrl = agentId
+    ? `${agentBase(orgSlug, agentId)}/billing`
+    : `${orgBase(orgSlug)}/billing`;
 
   return (
     <div className="mx-1 mb-2 rounded-[14px] border border-white/60 bg-white/30 p-3.5 shadow-[inset_0_1px_0_rgb(255_255_255/0.8),0_1px_2px_rgb(16_24_20/0.04)] backdrop-blur-md dark:border-white/[0.06] dark:bg-white/[0.03]">
@@ -370,41 +394,114 @@ function initialsOf(name: string | undefined, email: string | undefined) {
   return letters.toUpperCase() || "?";
 }
 
-function SidebarUser() {
+const ROLE_LABEL: Record<string, string> = { owner: "Eier", admin: "Admin", member: "Medlem" };
+
+/**
+ * The signed-in person, top right: name on the left, photo on the right, and
+ * a menu for account, organization and logging out. Inside an agent the
+ * account pages open in the agent so its sidebar stays.
+ */
+function UserMenu({ orgSlug, agentId }: { orgSlug: string; agentId?: string }) {
+  const navigate = useNavigate();
   const { data } = authClient.useSession();
+  const { data: org } = authClient.useActiveOrganization();
   const user = data?.user;
   if (!user) return null;
 
-  return (
-    <div className="mt-2 flex items-center gap-3 border-t border-black/[0.06] px-2 pt-4 pb-1 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 dark:border-white/[0.06]">
-      {user.image ? (
-        <img
-          src={user.image}
-          alt=""
-          className="size-9 shrink-0 rounded-full object-cover"
-        />
-      ) : (
-        <span
-          aria-hidden
-          className="flex size-9 shrink-0 items-center justify-center rounded-full bg-(--agenci-accent-soft) text-[13px] font-medium text-(--agenci-accent)"
-        >
-          {initialsOf(user.name, user.email)}
-        </span>
-      )}
-      <div className="min-w-0 flex-1 group-data-[collapsible=icon]:hidden">
-        <p className="truncate text-[15px] leading-tight tracking-[-0.012em] text-(--agenci-ink)">
-          {user.name || user.email}
-        </p>
-        <p className="mt-0.5 truncate text-[13px] leading-tight text-(--agenci-ink-2)">
-          {user.email}
-        </p>
-      </div>
-      <ChevronsUpDownIcon
+  const scope = agentId ? agentBase(orgSlug, agentId) : orgBase(orgSlug);
+  const go = (to: string) => void navigate({ to });
+  const role = org?.members.find((m) => m.userId === user.id)?.role;
+  const roleLabel = role ? (ROLE_LABEL[role] ?? role) : null;
+  const itemClass = "gap-2.5 rounded-[10px] px-2.5 py-2 text-[13.5px] text-(--agenci-ink)";
+  const iconClass = "size-4 text-(--agenci-ink-2)";
+
+  const avatar = (size: string, text: string) =>
+    user.image ? (
+      <img src={user.image} alt="" className={cn(size, "shrink-0 rounded-full object-cover")} />
+    ) : (
+      <span
         aria-hidden
-        className="size-4 shrink-0 text-(--agenci-ink-3) group-data-[collapsible=icon]:hidden"
-        strokeWidth={1.5}
-      />
-    </div>
+        className={cn(size, text, "flex shrink-0 items-center justify-center rounded-full bg-(--agenci-accent-soft) font-medium text-(--agenci-accent)")}
+      >
+        {initialsOf(user.name, user.email)}
+      </span>
+    );
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger className="group flex items-center gap-2.5 rounded-full py-1 pr-1 pl-3 outline-none transition-colors hover:bg-black/[0.04] focus-visible:ring-2 focus-visible:ring-(--agenci-ink)/20 data-[state=open]:bg-black/[0.04] dark:hover:bg-white/5">
+        <span className="hidden min-w-0 text-right sm:block">
+          <span className="block max-w-[180px] truncate text-[13.5px] leading-tight font-medium text-(--agenci-ink)">
+            {user.name || user.email}
+          </span>
+          {roleLabel && org ? (
+            <span className="block max-w-[180px] truncate text-[12px] leading-tight text-(--agenci-ink-3)">
+              {roleLabel} · {org.name}
+            </span>
+          ) : null}
+        </span>
+        {avatar("size-8", "text-[12px]")}
+        <ChevronDownIcon
+          aria-hidden
+          className="size-3.5 text-(--agenci-ink-3) transition-transform group-data-[state=open]:rotate-180"
+          strokeWidth={1.8}
+        />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent
+        align="end"
+        sideOffset={8}
+        className="w-72 rounded-[16px] border border-(--agenci-line) bg-white p-1.5 shadow-[0_1px_2px_rgb(5_6_7/0.05),0_16px_36px_-18px_rgb(5_6_7/0.22)] backdrop-blur-none dark:bg-(--card)"
+      >
+        <div className="flex items-center gap-3 border-b border-(--agenci-line) px-2.5 pt-2 pb-3">
+          {avatar("size-10", "text-[13px]")}
+          <span className="min-w-0">
+            <span className="block truncate text-[14px] font-medium text-(--agenci-ink)">{user.name || user.email}</span>
+            <span className="block truncate text-[12.5px] text-(--agenci-ink-3)">{user.email}</span>
+          </span>
+        </div>
+        <DropdownMenuLabel className="px-2.5 pt-3 pb-1 text-[11.5px] font-medium tracking-[0.06em] text-(--agenci-ink-3) uppercase">
+          Konto
+        </DropdownMenuLabel>
+        <DropdownMenuItem className={itemClass} onSelect={() => go(`${scope}/settings/profil`)}>
+          <UserRoundIcon className={iconClass} strokeWidth={1.6} />
+          Profil
+        </DropdownMenuItem>
+        <DropdownMenuItem className={itemClass} onSelect={() => go(`${scope}/settings/sikkerhet`)}>
+          <ShieldIcon className={iconClass} strokeWidth={1.6} />
+          Sikkerhet
+        </DropdownMenuItem>
+        <DropdownMenuItem className={itemClass} onSelect={() => go(`${scope}/settings/preferanser`)}>
+          <SlidersHorizontalIcon className={iconClass} strokeWidth={1.6} />
+          Preferanser
+        </DropdownMenuItem>
+        <DropdownMenuLabel className="px-2.5 pt-3 pb-1 text-[11.5px] font-medium tracking-[0.06em] text-(--agenci-ink-3) uppercase">
+          {org?.name ?? "Organisasjon"}
+        </DropdownMenuLabel>
+        <DropdownMenuItem className={itemClass} onSelect={() => go(`${scope}/settings/organisasjon`)}>
+          <Building2Icon className={iconClass} strokeWidth={1.6} />
+          Innstillinger for organisasjonen
+        </DropdownMenuItem>
+        <DropdownMenuItem className={itemClass} onSelect={() => go(`${orgBase(orgSlug)}/members`)}>
+          <UsersIcon className={iconClass} strokeWidth={1.6} />
+          Medlemmer
+        </DropdownMenuItem>
+        <DropdownMenuItem className={itemClass} onSelect={() => go(`${scope}/billing`)}>
+          <CreditCardIcon className={iconClass} strokeWidth={1.6} />
+          Plan og faktura
+        </DropdownMenuItem>
+        <DropdownMenuSeparator className="my-1.5" />
+        <DropdownMenuItem
+          className={itemClass}
+          onSelect={async () => {
+            await authClient.signOut();
+            window.location.href = "/login";
+          }}
+        >
+          <LogOutIcon className={iconClass} strokeWidth={1.6} />
+          Logg ut
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 
@@ -519,7 +616,11 @@ function SidebarNav({
       </SidebarContent>
 
       <SidebarFooter className="gap-0 px-2 pt-0 pb-3">
-        <PlanCard collapsed={collapsed} orgSlug={orgSlug} />
+        <PlanCard
+          collapsed={collapsed}
+          orgSlug={orgSlug}
+          agentId={agentIdFromPath(pathname, orgSlug)}
+        />
         <SidebarMenu>
           <SidebarMenuItem>
             {collapsed ? (
@@ -555,7 +656,6 @@ function SidebarNav({
             )}
           </SidebarMenuItem>
         </SidebarMenu>
-        <SidebarUser />
       </SidebarFooter>
     </>
   );
@@ -601,6 +701,8 @@ function useCrumbs(pathname: string, orgSlug: string | undefined): Crumb[] {
   if (pathname.startsWith(`${base}/settings`)) {
     return [{ label: "Innstillinger" }];
   }
+  if (pathname.startsWith(`${base}/members`)) return [{ label: "Medlemmer" }];
+  if (pathname === `${base}/billing`) return [{ label: "Plan og faktura" }];
   if (!pathname.startsWith(agentsUrl)) return [];
   if (pathname === agentsUrl) return [{ label: "Agenter" }];
   if (pathname === `${agentsUrl}/create`) {
@@ -616,6 +718,10 @@ function useCrumbs(pathname: string, orgSlug: string | undefined): Crumb[] {
     .filter((item) => item.url !== agentUrl && pathname.startsWith(item.url))
     .sort((a, b) => b.url.length - a.url.length)[0];
 
+  if (pathname.startsWith(`${agentUrl}/settings`)) {
+    crumbs.push({ label: agentLabel, to: agentUrl }, { label: "Innstillinger" });
+    return crumbs;
+  }
   if (!section) {
     crumbs.push({ label: agentLabel });
     return crumbs;
@@ -636,12 +742,12 @@ function DashboardBreadcrumbs() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { orgSlug } = useParams({ strict: false }) as { orgSlug?: string };
   const crumbs = useCrumbs(pathname, orgSlug);
-  if (crumbs.length === 0) return null;
 
   return (
+    <header className="flex h-14 shrink-0 items-center gap-4 border-b border-(--agenci-line) pr-3 pl-5 md:pr-5 md:pl-8">
     <nav
       aria-label="Brødsmuler"
-      className="flex h-14 shrink-0 items-center gap-2 border-b border-(--agenci-line) px-5 text-[15px] tracking-[-0.012em] md:px-8"
+      className="flex min-w-0 flex-1 items-center gap-2 text-[15px] tracking-[-0.012em]"
     >
       {crumbs.map((crumb, i) => {
         const last = i === crumbs.length - 1;
@@ -679,6 +785,10 @@ function DashboardBreadcrumbs() {
         );
       })}
     </nav>
+    {orgSlug ? (
+      <UserMenu orgSlug={orgSlug} agentId={agentIdFromPath(pathname, orgSlug)} />
+    ) : null}
+    </header>
   );
 }
 
@@ -691,6 +801,7 @@ export default function AppSidebar({
 }) {
   return (
     <SidebarProvider
+      defaultOpen={getSidebarStart() === "open"}
       className="dashboard-app-shell dash-shell-root flex h-svh min-h-0 max-h-svh w-full"
       style={
         {
