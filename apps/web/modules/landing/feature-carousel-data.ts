@@ -54,7 +54,7 @@ export const featureCards = [
   {
     id: "knowledge",
     feature: "Kunnskapsbase",
-    caption: "Når gjesten spør om hotellet.\nSvar fra deres egen kunnskap.",
+    caption: "Gjesten spør når frokosten er.\nAgenci vet svaret.",
     image:
       "/images/carusel/active/pexels-clement-proust-363898785-29649747.jpg",
     sourceSize: {
@@ -89,7 +89,7 @@ export const featureCards = [
   {
     id: "tone",
     feature: "Tone og instrukser",
-    caption: "Samme omtanke bak disken.\nSamme tone i svarene.",
+    caption: "Hyggelig bak disken.\nLike hyggelig i chatten.",
     image:
       "https://images.pexels.com/photos/13736416/pexels-photo-13736416.jpeg",
     sourceSize: {
@@ -125,7 +125,7 @@ export const featureCards = [
   {
     id: "website",
     feature: "Nettside og integrasjoner",
-    caption: "Hjelp på nettsiden.\nOgså hjemme fra sofaen.",
+    caption: "Et lite vindu på nettsiden.\nI deres farger.",
     image: "/images/carusel/active/pexels-pavel-danilyuk-6443347.jpg",
     sourceSize: {
       width: 4323,
@@ -142,7 +142,7 @@ export const featureCards = [
   {
     id: "insights",
     feature: "Samtaleinnsikt",
-    caption: "Se hva kundene spør om.\nFinn forbedringene sammen.",
+    caption: "Se hva kundene spør om.\nSkriv svaret én gang.",
     image: "/images/carusel/active/brooke-cagle-g1Kr4Ozfoac-unsplash.jpg",
     sourceSize: {
       width: 5231,

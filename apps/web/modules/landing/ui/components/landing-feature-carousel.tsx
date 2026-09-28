@@ -231,8 +231,8 @@ export function LandingFeatureCarousel() {
       }}
     >
       <header className={styles.header}>
-        <h2 id="features-heading">Agencis funksjoner</h2>
-        <p>Hjelp, der hverdagen skjer.</p>
+        <h2 id="features-heading">Der kundene er.</h2>
+        <p>I sofaen, på bussen eller i kassakøen. Svaret kommer med én gang.</p>
       </header>
       <div
         ref={stageRef}

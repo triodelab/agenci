@@ -14,30 +14,30 @@ const cards = [
 
 const stages = [
   {
-    label: "Koble til",
+    label: "Kom i gang",
     cards: [
-      { title: "Samle kunnskapen.", text: "Legg til nettsiden, dokumentene og svarene dere allerede har.", note: "Ett felles utgangspunkt for gode svar." },
-      { title: "Finn deres stemme.", text: "Velg tonen og gi tydelige instrukser for hvordan Agenci skal hjelpe.", note: "Deres språk. Deres måte å møte kunder på." },
-      { title: "Prøv en samtale.", text: "Test spørsmålene kundene faktisk stiller, og juster svarene før dere starter.", note: "Bli trygg på hjelpen kundene møter." },
-      { title: "Ønsk kundene velkommen.", text: "Legg Agenci på nettsiden, og gi kunden en enkel vei til hjelp.", note: "Tilpasset nettsiden og bedriften deres." },
+      { title: "Gi den nettsiden din.", text: "Lim inn adressen. Agenci leser sidene og lærer produktene, prisene og reglene deres.", note: "PDF-er og dokumenter kan du legge til etterpå." },
+      { title: "Bestem hvordan den snakker.", text: "Du eller De, kort eller grundig. Skriv inn det den aldri skal si.", note: "Den skal høres ut som dere." },
+      { title: "Test før kundene gjør det.", text: "Still spørsmålene du vet kommer, og se svarene før chatten går live.", note: "Ingen overraskelser første dag." },
+      { title: "Lim inn én kodelinje.", text: "Chatten dukker opp nederst på nettsiden. Virker med WordPress, Shopify, Wix og resten.", note: "Tar et par minutter." },
     ],
   },
   {
-    label: "Se Agenci i arbeid",
+    label: "I bruk",
     cards: [
-      { title: "Kunnskapsbase", text: "Svar fra kunnskapen dere allerede har.", note: "" },
-      { title: "Automatiske svar", text: "La Agenci ta de vanlige spørsmålene.", note: "" },
-      { title: "Samtaler med kontekst", text: "Svar som følger samtalen videre.", note: "" },
-      { title: "Bedre for hver samtale", text: "Gjør kundenes spørsmål til nyttig innsikt.", note: "" },
+      { title: "Kunnskapsbase", text: "Svarer ut fra det dere selv har skrevet.", note: "" },
+      { title: "Svar med én gang", text: "Døgnet rundt, også i helgene.", note: "" },
+      { title: "Husker samtalen", text: "Kunden slipper å gjenta seg selv.", note: "" },
+      { title: "Viser hva som mangler", text: "Du ser hvilke spørsmål den ikke kunne svare på.", note: "" },
     ],
   },
   {
-    label: "Forbedre",
+    label: "Bli bedre",
     cards: [
-      { title: "Lytt til spørsmålene.", text: "Se hva kundene lurer på, og hvor samtalene trenger et tydeligere svar.", note: "Innsikt fra samtalene, samlet på ett sted." },
-      { title: "Fyll inn det som mangler.", text: "Oppdater nettsider, dokumenter og vanlige spørsmål med kunnskapen kunden trenger.", note: "Bedre kilder gir et bedre grunnlag for svar." },
-      { title: "Finjuster hjelpen.", text: "Juster tonen og instruksjonene. Prøv samtalen på nytt og se hva som fungerer.", note: "Små forbedringer, i deres eget tempo." },
-      { title: "Ha teamet i ryggen.", text: "Følg opp samtalene som trenger et menneske, og ta læringen med videre.", note: "Teknologi og mennesker, med samme oversikt." },
+      { title: "Se hva folk spør om.", text: "Oversikten viser de vanligste spørsmålene og når kundene skriver.", note: "Ofte ting du ikke visste at de lurte på." },
+      { title: "Fyll hullene.", text: "Vet ikke agenten svaret, skriver du det inn én gang. Neste kunde får svar.", note: "Kunnskapsbasen blir bedre uke for uke." },
+      { title: "Juster tonen.", text: "Er svarene for lange eller for stive? Endre det og test på nytt.", note: "Tar et minutt." },
+      { title: "Ta over når det trengs.", text: "Saker agenten ikke skal løse, sendes til deg med hele samtalen.", note: "Kunden merker ingen pause." },
     ],
   },
 ] as const;
@@ -70,8 +70,8 @@ export function LandingOutcomeDemosSection() {
         <header className={styles.outcomeHeader}>
           <span className={styles.outcomeEyebrow}>Gode samtaler betyr noe</span>
           <h2 id="outcome-heading">
-            Fra gode samtaler<br />
-            til <span>en enklere hverdag for alle.</span>
+            Fra første oppsett<br />
+            <span>til daglig bruk.</span>
           </h2>
           <div className={styles.outcomeTabs} role="tablist" aria-label="Tre steg med Agenci" aria-orientation="horizontal">
             {stages.map((stage, index) => (

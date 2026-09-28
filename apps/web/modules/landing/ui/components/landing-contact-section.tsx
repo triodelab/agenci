@@ -21,8 +21,8 @@ export function LandingContactSection() {
             Fortell litt om bedriften din, eller spør om det du lurer på. Vi
             hjelper deg å finne en god start.
           </p>
-          <a href="mailto:hei@agenci.no" className="agenci-text-link">
-            hei@agenci.no <ArrowUpRight size={18} />
+          <a href="mailto:post@triodelab.no" className="agenci-text-link">
+            post@triodelab.no <ArrowUpRight size={18} />
           </a>
         </div>
         <div className="agenci-contact-panel">

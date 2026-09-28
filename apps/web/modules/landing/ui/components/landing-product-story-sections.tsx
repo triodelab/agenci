@@ -50,21 +50,21 @@ export function LandingMeetSection() {
     >
       <div className={styles.container}>
         <header className={styles.centerHeading}>
-          <span className={styles.eyebrow}>En enklere hverdag starter her</span>
+          <span className={styles.eyebrow}>Dashbordet ditt</span>
           <h2 id="meet-heading">Møt Agenci.</h2>
-          <p>God hjelp for kundene. God oversikt for deg.</p>
+          <p>Alt kundene spør om, og hvordan det gikk. På én side.</p>
         </header>
         <div id="dashboard-scroll" className={styles.dashboardStage}>
           <InteractiveProductDemo />
         </div>
         <div className={styles.meetCaption}>
           <p>
-            Kunnskap, samtaler og mennesker.
+            Se hva kundene lurer på, hva agenten har løst
             <br />
-            Samlet på ett sted.
+            og hvilke samtaler som venter på deg.
           </p>
-          <Link className={styles.textLink} href="/hvordan-det-virker">
-            Bli kjent med Agenci <ArrowUpRight size={18} />
+          <Link className={styles.textLink} href="/produktet">
+            Se produktet <ArrowUpRight size={18} />
           </Link>
         </div>
       </div>
@@ -83,12 +83,12 @@ export function LandingBrandSection() {
       <div className={styles.container}>
         <header className={styles.brandHeading}>
           <span className={styles.pill}>
-            <span /> Laget for din bedrift
+            <span /> Deres stemme
           </span>
           <h2 id="brand-heading">
-            Hver samtale betyr noe.
+            Den snakker
             <br />
-            <span>La hjelpen føles som dere.</span>
+            <span>slik dere gjør.</span>
           </h2>
         </header>
         <div className={styles.featureRows}>
@@ -98,32 +98,32 @@ export function LandingBrandSection() {
           >
             <div className={styles.featureCopy}>
               <h3 id="brand-tone-heading">
-                Deres kunnskap.
+                Du bestemmer
                 <br />
-                Deres måte å si det på.
+                hvordan den snakker.
               </h3>
               <p>
-                Tilpass tonen, gi tydelige instrukser og prøv svarene før
-                kundene møter dem.
+                Varm eller saklig, du eller De, kort eller grundig. Skriv inn
+                det den aldri skal si, og prøv svarene før kundene ser dem.
               </p>
               <ul className={styles.featureDetails}>
                 <li>
                   <span>
                     <Settings2 size={20} aria-hidden="true" />
                   </span>
-                  Tilpass tonen
+                  Tone og tiltale
                 </li>
                 <li>
                   <span>
                     <FileText size={20} aria-hidden="true" />
                   </span>
-                  Gi tydelige instrukser
+                  Regler og ting å unngå
                 </li>
                 <li>
                   <span>
                     <MessageCircle size={20} aria-hidden="true" />
                   </span>
-                  Prøv svarene
+                  Test før du publiserer
                 </li>
               </ul>
             </div>
@@ -141,16 +141,14 @@ export function LandingBrandSection() {
           >
             <div className={styles.featureCopy}>
               <h3 id="brand-presence-heading">
-                En del av
+                Ser ut som resten
                 <br />
-                nettsiden din.
+                av nettsiden.
               </h3>
-              <p>Samme uttrykk. En ny måte å hjelpe på.</p>
-              <div className={styles.featureLink}>
-                <Link href="/integrasjoner" className={styles.textLink}>
-                  Se integrasjoner <ArrowUpRight size={20} aria-hidden="true" />
-                </Link>
-              </div>
+              <p>
+                Agenci henter logoen og fargene fra nettsiden deres, så chatten
+                passer inn fra første dag.
+              </p>
             </div>
             <NatureDemo
               scene="presence"
@@ -167,13 +165,13 @@ export function LandingBrandSection() {
           >
             <div className={styles.bentoCopy}>
               <h3>
-                Teknologi.
+                Når det trengs
                 <br />
-                Med folk i ryggen.
+                et menneske.
               </h3>
               <p>
-                Noen spørsmål trenger et menneske. La teamet ta over, uten en ny
-                start.
+                Noen saker vil du ta selv. Agenci sender dem til deg med hele
+                samtalen, så kunden slipper å forklare alt på nytt.
               </p>
             </div>
             <NatureDemo
@@ -190,8 +188,8 @@ export function LandingBrandSection() {
                 til «det passer fint».
               </h3>
               <p>
-                Gjør veien videre enkel. Hjelp kunden å finne en tid, få et svar
-                og komme videre med dagen.
+                Kunden finner en ledig time rett i chatten og får bekreftelsen
+                med én gang. Du slipper å ta telefonen.
               </p>
             </div>
             <NatureDemo
@@ -209,20 +207,20 @@ export function LandingBrandSection() {
 
 const steps = [
   {
-    title: "Gi Agenci kunnskap.",
-    text: "Legg til nettsiden, dokumentene og svarene dere allerede har.",
+    title: "Lim inn nettsiden.",
+    text: "Agenci leser innholdet og lærer hva dere selger og hvordan dere jobber.",
   },
   {
-    title: "Finn deres stemme.",
-    text: "Sett tonen og rammene. Prøv spørsmålene kundene faktisk stiller.",
+    title: "Bestem tonen.",
+    text: "Velg hvordan den skal snakke, og hva den ikke skal svare på.",
   },
   {
-    title: "Ønsk kundene velkommen.",
-    text: "Legg chatten på nettsiden, og følg samtalene fra oversikten.",
+    title: "Legg chatten på siden.",
+    text: "Én kodelinje. Står du fast, hjelper vi deg.",
   },
   {
-    title: "Lær. Juster. Gjenta.",
-    text: "Se hvor svarene kan bli bedre. Oppdater innholdet i deres tempo.",
+    title: "Følg med og fyll på.",
+    text: "Se samtalene i dashbordet, og skriv inn svarene som mangler.",
   },
 ];
 
@@ -238,17 +236,18 @@ export function LandingWorkflowSection() {
         <header className={styles.workflowHeading}>
           <div>
             <span className={styles.eyebrow}>
-              Fra første spørsmål til nyttig hjelp
+              Slik kommer du i gang
             </span>
             <h2 id="workflow-heading">
-              Enkelt å starte.
+              Enkelt å
               <br />
-              <span>Rom for å bli bedre.</span>
+              <span>komme i gang.</span>
             </h2>
           </div>
           <p>
-            Du kjenner bedriften din best. Agenci hjelper deg å gjøre den
-            kunnskapen tilgjengelig – én god samtale av gangen.
+            Du trenger ikke skrive en eneste FAQ fra bunnen av. Agenci
+            starter med det som allerede står på nettsiden din, og så fyller
+            du på etter hvert.
           </p>
         </header>
         <ol className={styles.steps}>
@@ -262,15 +261,15 @@ export function LandingWorkflowSection() {
         </ol>
         <div id="final-cta" className={styles.startBar}>
           <div>
-            <h3>Klar for den første samtalen?</h3>
-            <p>Start gratis, eller finn riktig oppsett sammen med oss.</p>
+            <h3>Prøv den på din egen nettside.</h3>
+            <p>Gratis opp til 50 samtaler i måneden. Ingen kort, ingen binding.</p>
           </div>
           <div id="contact" className={styles.actions}>
             <Link className={styles.primaryLink} href="/sign-up">
-              Kom i gang gratis <ArrowRight size={18} />
+              Prøv gratis <ArrowRight size={18} />
             </Link>
             <Link className={styles.secondaryLink} href="/kontakt">
-              Snakk med oss <ArrowUpRight size={18} />
+              Book en prat <ArrowUpRight size={18} />
             </Link>
           </div>
         </div>
@@ -281,24 +280,25 @@ export function LandingWorkflowSection() {
             </summary>
             <div className={styles.quickAnswers}>
               <div>
-                <h3>Hva bruker Agenci til å svare?</h3>
+                <h3>Hvor får Agenci svarene fra?</h3>
                 <p>
-                  Innholdet dere legger til i kunnskapsbasen og instruksjonene
-                  dere gir agenten. Start med de spørsmålene dere får oftest, og
-                  test svarene før publisering.
+                  Fra nettsiden din og dokumentene du laster opp. Den holder
+                  seg til det dere har lagt inn, og sier fra når den ikke vet
+                  svaret i stedet for å gjette.
                 </p>
               </div>
               <div>
-                <h3>Kan et menneske overta?</h3>
+                <h3>Kan jeg ta over en samtale?</h3>
                 <p>
-                  Ja. Teamet kan følge samtalene og overta når kunden trenger
-                  personlig hjelp. Historikken blir med videre.
+                  Ja. Du ser samtalene mens de pågår og kan svare selv når
+                  som helst. Kunden ser hele tråden, og merker ingen pause.
                 </p>
               </div>
               <div>
-                <h3>Trenger vi hjelp med oppsettet?</h3>
+                <h3>Trenger jeg hjelp med oppsettet?</h3>
                 <p>
-                  Vi hjelper dere å komme i gang.{" "}
+                  De fleste klarer det selv på en kvarters tid. Står du fast,
+                  hjelper vi deg.{" "}
                   <Link href="/kontakt">
                     Ta kontakt med oss <ArrowUpRight size={14} />
                   </Link>
