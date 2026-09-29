@@ -3,7 +3,7 @@
 import Link from "next/link";
 import type { ComponentProps } from "react";
 import { useAuth } from "@/lib/auth-hooks";
-import { LANDING_AUTH_PATHS } from "@/modules/landing/constants";
+import { DASHBOARD_ENABLED, LANDING_AUTH_PATHS } from "@/modules/landing/constants";
 
 /**
  * Points to the dashboard when signed in (Better Auth), otherwise to the
@@ -21,7 +21,14 @@ export function AuthAwareLink({
   const { isSignedIn } = useAuth();
   const target = isSignedIn ? loggedInHref : href;
   return (
-    <Link href={target} {...props}>
+    <Link
+      href={target}
+      {...props}
+      onClick={(event) => {
+        if (!DASHBOARD_ENABLED) event.preventDefault();
+        props.onClick?.(event);
+      }}
+    >
       {children}
     </Link>
   );
