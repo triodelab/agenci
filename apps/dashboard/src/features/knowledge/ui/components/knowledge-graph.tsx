@@ -23,14 +23,36 @@ import type {
   KnowledgeSource,
 } from "../../queries/knowledge-queries";
 import { isSourceBusy } from "../../queries/knowledge-queries";
+import { useTheme } from "@/lib/theme";
 
+const INK = "#243236";
+
+/**
+ * `color` is for the SVG graph (see useGraphInk); `swatch` is the same colour
+ * for HTML dots and chips, following the theme.
+ */
 export const TYPE_META = {
-  WEBPAGE: { label: "Nettside", plural: "Nettsider", color: "#243236" },
-  DOCUMENT: { label: "Dokument", plural: "Dokumenter", color: "#D2A23C" },
-  MEDIA: { label: "Lyd og video", plural: "Lyd og video", color: "#9C9A3E" },
+  WEBPAGE: { label: "Nettside", plural: "Nettsider", color: INK, swatch: "var(--agenci-ink)" },
+  DOCUMENT: { label: "Dokument", plural: "Dokumenter", color: "#D2A23C", swatch: "#D2A23C" },
+  MEDIA: { label: "Lyd og video", plural: "Lyd og video", color: "#9C9A3E", swatch: "#9C9A3E" },
 } as const;
 
 const SIZE = 1000;
+
+/**
+ * The graph is drawn in ink on white. In dark mode ink becomes a light
+ * blue-grey and "paper" (selection rings, failed nodes) the card colour, so
+ * web pages and the agent stay clearly visible.
+ */
+function useGraphInk() {
+  const dark = useTheme().resolved === "dark";
+  const ink = dark ? "#c3ced2" : INK;
+  return {
+    ink,
+    paper: dark ? "#1a1c21" : "#fff",
+    tone: (c: string) => (c === INK ? ink : c),
+  };
+}
 const C = SIZE / 2;
 const TAU = Math.PI * 2;
 const CAMERA = 900;
@@ -171,10 +193,10 @@ const fmt = (n: number) => n.toLocaleString("nb-NO");
 
 function statusLabel(s: KnowledgeSource) {
   if (s.status === "FAILED")
-    return { text: "Feilet", cls: "bg-[#F9E2DF] text-[#B2463A]" };
+    return { text: "Feilet", cls: "bg-(--dash-bad-bg) text-(--dash-bad)" };
   if (isSourceBusy(s))
-    return { text: "Indekseres", cls: "bg-[#FBEBDD] text-[#B06A34]" };
-  return { text: "Klar", cls: "bg-[#E2F2E5] text-[#2F7D46]" };
+    return { text: "Indekseres", cls: "bg-(--dash-warn-bg) text-(--dash-warn)" };
+  return { text: "Klar", cls: "bg-(--dash-good-bg) text-(--dash-good)" };
 }
 
 function HoverCard({
@@ -185,6 +207,7 @@ function HoverCard({
   box: React.RefObject<HTMLDivElement | null>;
 }) {
   const pt = usePointerIn(box, target !== null);
+  const g = useGraphInk();
   if (!target) return null;
   const { source } = target;
   const meta = TYPE_META[source.type];
@@ -195,7 +218,7 @@ function HoverCard({
   return (
     <div
       key={hoverKey(target)}
-      className="kb-card-in pointer-events-none absolute z-30 w-[264px] rounded-[12px] border border-white/80 bg-white/97 p-3 shadow-[0_1px_2px_rgb(5_6_7/0.06),0_16px_36px_-12px_rgb(5_6_7/0.28)] backdrop-blur dark:bg-(--card)"
+      className="kb-card-in pointer-events-none absolute z-30 w-[264px] rounded-[12px] border border-(--dash-edge)/80 bg-(--dash-surface)/97 p-3 shadow-[0_1px_2px_rgb(5_6_7/0.06),0_16px_36px_-12px_rgb(5_6_7/0.28)] backdrop-blur dark:bg-(--card)"
       style={{
         left: flipX ? pt.x - 18 - W : pt.x + 18,
         top: pt.y + (flipY ? -18 : 18),
@@ -206,7 +229,7 @@ function HoverCard({
         <span
           aria-hidden
           className="size-2 shrink-0 rounded-full"
-          style={{ background: meta.color }}
+          style={{ background: g.tone(meta.color) }}
         />
         <span className="text-[12px] font-medium tracking-[0.06em] text-(--agenci-ink-3) uppercase [font-family:var(--font-agenci-data)]">
           {target.kind === "chunk" ? "Kunnskapsbit" : meta.label}
@@ -645,9 +668,9 @@ const selectionKey = (s: GraphSelection) =>
 
 function ZoomControls({ zoom }: { zoom: ReturnType<typeof useZoom> }) {
   const btn =
-    "flex size-8 items-center justify-center text-(--agenci-ink-2) transition-colors hover:bg-[#f1f3f2] hover:text-(--agenci-ink) disabled:opacity-35 disabled:hover:bg-transparent dark:hover:bg-white/5";
+    "flex size-8 items-center justify-center text-(--agenci-ink-2) transition-colors hover:bg-(--dash-subtle) hover:text-(--agenci-ink) disabled:opacity-35 disabled:hover:bg-transparent dark:hover:bg-white/5";
   return (
-    <div className="absolute top-2 right-2 z-10 flex flex-col overflow-hidden rounded-[12px] border border-(--agenci-line) bg-white/90 shadow-[0_4px_14px_-8px_rgb(5_6_7/0.25)] backdrop-blur dark:bg-(--card)/90">
+    <div className="absolute top-2 right-2 z-10 flex flex-col overflow-hidden rounded-[12px] border border-(--agenci-line) bg-(--dash-surface)/90 shadow-[0_4px_14px_-8px_rgb(5_6_7/0.25)] backdrop-blur dark:bg-(--card)/90">
       <button
         type="button"
         onClick={zoom.zoomIn}
@@ -789,6 +812,7 @@ export function KnowledgeGraph({
   /** Source to highlight from outside (e.g. hovering its library card). */
   highlight?: string | null;
 }) {
+  const g = useGraphInk();
   const [inside, setInside] = useState(false);
   const [settled, setSettled] = useState(false);
   const hover = useHoverIntent();
@@ -926,7 +950,7 @@ export function KnowledgeGraph({
               cy={C}
               r={170 * sourceScale}
               fill="none"
-              stroke="#243236"
+              stroke={g.ink}
               strokeOpacity={0.05}
             />
             <circle
@@ -934,7 +958,7 @@ export function KnowledgeGraph({
               cy={C}
               r={360 * chunkScale}
               fill="none"
-              stroke="#243236"
+              stroke={g.ink}
               strokeOpacity={0.04 * spread}
               strokeDasharray="2 6"
             />
@@ -958,7 +982,7 @@ export function KnowledgeGraph({
                 y1={center.y}
                 x2={sp.x}
                 y2={sp.y}
-                stroke="#243236"
+                stroke={g.ink}
                 strokeOpacity={0.3}
                 strokeWidth={1.2}
               />
@@ -975,7 +999,7 @@ export function KnowledgeGraph({
                     y1={sp.y}
                     x2={cp.x}
                     y2={cp.y}
-                    stroke="#243236"
+                    stroke={g.ink}
                     strokeOpacity={
                       (q && !chunkMatches(c.chunk, q) ? 0.04 : 0.14) *
                       lerp(0.6, 1, spread) *
@@ -990,7 +1014,7 @@ export function KnowledgeGraph({
 
         {/* Nodes: a visual dot + a larger invisible hit area on top */}
         {nodes.map((s) => {
-          const color = TYPE_META[s.source.type].color;
+          const color = g.tone(TYPE_META[s.source.type].color);
           const sp = project(s.angle, s.dist * sourceScale);
           const hasMatch = s.chunks.some((c) => chunkMatches(c.chunk, q));
           const push =
@@ -1034,7 +1058,7 @@ export function KnowledgeGraph({
                       fill={color}
                       fillOpacity={q && !match ? 0.15 : 0.9}
                       stroke={
-                        selected || isHover || (q && match) ? "#fff" : "none"
+                        selected || isHover || (q && match) ? g.paper : "none"
                       }
                       strokeWidth={selected ? 3 : 2}
                       className="pointer-events-none transition-[r] duration-150"
@@ -1073,12 +1097,12 @@ export function KnowledgeGraph({
                     ? sr * 1.15
                     : sr
                 }
-                fill={failed ? "#fff" : color}
+                fill={failed ? g.paper : color}
                 stroke={
                   failed
                     ? "#B2463A"
                     : selectedSource === s.source.id || sourceHovered
-                      ? "#fff"
+                      ? g.paper
                       : "none"
                 }
                 strokeWidth={3}
@@ -1125,7 +1149,7 @@ export function KnowledgeGraph({
           cx={center.x}
           cy={center.y}
           r={30 * lerp(0.7, 1, intro)}
-          fill="#243236"
+          fill={g.ink}
           className="pointer-events-none"
         />
         <circle
@@ -1133,7 +1157,7 @@ export function KnowledgeGraph({
           cy={center.y}
           r={42}
           fill="none"
-          stroke="#243236"
+          stroke={g.ink}
           strokeOpacity={0.12 * intro}
           strokeWidth={8}
           className="kb-breathe pointer-events-none"
@@ -1143,7 +1167,7 @@ export function KnowledgeGraph({
       {/* Labels */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <span
-          className="absolute rounded-full bg-white/90 px-2.5 py-0.5 text-[12px] font-medium whitespace-nowrap text-(--agenci-ink) shadow-[0_1px_2px_rgb(5_6_7/0.06)] backdrop-blur"
+          className="absolute rounded-full bg-(--dash-surface)/90 px-2.5 py-0.5 text-[12px] font-medium whitespace-nowrap text-(--agenci-ink) shadow-[0_1px_2px_rgb(5_6_7/0.06)] backdrop-blur"
           style={{
             ...zoom.pct(center.x, center.y),
             transform: "translate(-50%, 46px)",
@@ -1161,7 +1185,7 @@ export function KnowledgeGraph({
           return (
             <span
               key={s.source.id}
-              className="absolute max-w-[170px] truncate rounded-full bg-white/90 px-2 py-0.5 text-[12px] text-(--agenci-ink-2) shadow-[0_1px_2px_rgb(5_6_7/0.06)] backdrop-blur"
+              className="absolute max-w-[170px] truncate rounded-full bg-(--dash-surface)/90 px-2 py-0.5 text-[12px] text-(--agenci-ink-2) shadow-[0_1px_2px_rgb(5_6_7/0.06)] backdrop-blur"
               style={{
                 ...zoom.pct(p.x, p.y),
                 transform: `translate(${dx < -40 ? "-100%" : dx > 40 ? "0" : "-50%"}, -50%)`,
@@ -1276,7 +1300,7 @@ function agentNode(agentName: string): Node3D {
     label: agentName,
     pos: { x: 0, y: 0, z: 0 },
     r: 16,
-    color: "#243236",
+    color: INK,
   };
 }
 
@@ -1391,6 +1415,7 @@ export function KnowledgeGraph3D({
   /** Source to highlight from outside (e.g. hovering its library card). */
   highlight?: string | null;
 }) {
+  const g = useGraphInk();
   const graph = useMemo(
     () =>
       type === "WEBPAGE"
@@ -1500,7 +1525,7 @@ export function KnowledgeGraph3D({
               y1={a.y}
               x2={b.x}
               y2={b.y}
-              stroke="#243236"
+              stroke={g.ink}
               strokeOpacity={o}
               strokeWidth={e.strength > 0.3 ? 1.3 : 0.8}
               className="pointer-events-none"
@@ -1516,12 +1541,12 @@ export function KnowledgeGraph3D({
                   cy={y}
                   r={n.r * s * 1.6}
                   fill="none"
-                  stroke="#243236"
+                  stroke={g.ink}
                   strokeOpacity={0.12}
                   strokeWidth={8}
                   className="kb-breathe"
                 />
-                <circle cx={x} cy={y} r={n.r * s} fill="#243236" />
+                <circle cx={x} cy={y} r={n.r * s} fill={g.ink} />
               </g>
             );
           }
@@ -1565,15 +1590,15 @@ export function KnowledgeGraph3D({
                 cx={x}
                 cy={y}
                 r={isHover || selected ? r * 1.35 : r}
-                fill={failed ? "#fff" : n.color}
+                fill={failed ? g.paper : g.tone(n.color)}
                 fillOpacity={n.kind === "chunk" ? 0.85 : 1}
                 stroke={
                   failed
                     ? "#B2463A"
                     : selected || isHover
-                      ? "#fff"
+                      ? g.paper
                       : n.kind === "host"
-                        ? n.color
+                        ? g.tone(n.color)
                         : "none"
                 }
                 strokeWidth={selected ? 3 : 2}
@@ -1620,7 +1645,7 @@ export function KnowledgeGraph3D({
           .map(({ n, x, y, z }) => (
             <span
               key={n.id}
-              className="absolute max-w-[180px] truncate rounded-full bg-white/90 px-2 py-0.5 text-[12px] text-(--agenci-ink-2) shadow-[0_1px_2px_rgb(5_6_7/0.06)] backdrop-blur"
+              className="absolute max-w-[180px] truncate rounded-full bg-(--dash-surface)/90 px-2 py-0.5 text-[12px] text-(--agenci-ink-2) shadow-[0_1px_2px_rgb(5_6_7/0.06)] backdrop-blur"
               style={{
                 ...zoom.pct(x, y),
                 transform: "translate(12px, -50%)",

@@ -59,14 +59,14 @@ function splitHost(s: KnowledgeSource) {
 function Status({ source }: { source: KnowledgeSource }) {
   if (source.status === "FAILED")
     return (
-      <span className="flex items-center gap-1.5 text-[12.5px] text-[#B2463A]">
+      <span className="flex items-center gap-1.5 text-[12.5px] text-(--dash-bad)">
         <span className="size-1.5 rounded-full bg-[#B2463A]" />
         Feilet
       </span>
     );
   if (isSourceBusy(source))
     return (
-      <span className="flex items-center gap-1.5 text-[12.5px] text-[#B06A34]">
+      <span className="flex items-center gap-1.5 text-[12.5px] text-(--dash-warn)">
         <LoaderIcon
           className="size-3 animate-spin"
           strokeWidth={1.5}
@@ -115,7 +115,7 @@ function SourceRow({
 }) {
   const [confirm, setConfirm] = useState(false);
   const Icon = TYPE_ICON[source.type];
-  const color = TYPE_META[source.type].color;
+  const color = TYPE_META[source.type].swatch;
   const failed = source.status === "FAILED";
 
   return (
@@ -124,8 +124,8 @@ function SourceRow({
       className={cn(
         "group relative rounded-[10px] transition-colors duration-150",
         selected
-          ? "bg-[#f1f3f2] dark:bg-white/[0.06]"
-          : "hover:bg-[#f7f8f7] dark:hover:bg-white/[0.03]",
+          ? "bg-(--dash-subtle) dark:bg-white/[0.06]"
+          : "hover:bg-(--dash-subtle-2) dark:hover:bg-white/[0.03]",
         indent && "ml-[26px]",
       )}
       onMouseEnter={() => onHover(source.id)}
@@ -159,7 +159,7 @@ function SourceRow({
             <span
               className="flex size-7 shrink-0 items-center justify-center rounded-[8px]"
               style={{
-                background: `color-mix(in srgb, ${color} 10%, white)`,
+                background: `color-mix(in srgb, ${color} 10%, var(--dash-surface))`,
                 color,
               }}
             >
@@ -173,7 +173,7 @@ function SourceRow({
           <span
             className={cn(
               "truncate text-[13.5px]",
-              failed ? "text-[#B2463A]" : "text-(--agenci-ink)",
+              failed ? "text-(--dash-bad)" : "text-(--agenci-ink)",
               indent ? "font-normal" : "font-medium",
             )}
           >
@@ -181,7 +181,7 @@ function SourceRow({
           </span>
         </span>
         <span className="hidden items-center md:flex">
-          <span className="h-1 w-full overflow-hidden rounded-full bg-[#eef0ef] dark:bg-white/10">
+          <span className="h-1 w-full overflow-hidden rounded-full bg-(--dash-subtle) dark:bg-white/10">
             <span
               className="block h-full rounded-full transition-[width] duration-500 ease-[cubic-bezier(.16,1,.3,1)]"
               style={{
@@ -237,7 +237,7 @@ function SourceRow({
             rel="noopener noreferrer"
             aria-label="Åpne kilde"
             title="Åpne kilde"
-            className="flex size-7 items-center justify-center rounded-full bg-white text-(--agenci-ink-2) shadow-[0_1px_2px_rgb(5_6_7/0.08)] hover:text-(--agenci-ink) dark:bg-white/10"
+            className="flex size-7 items-center justify-center rounded-full bg-(--dash-surface) text-(--agenci-ink-2) shadow-[0_1px_2px_rgb(5_6_7/0.08)] hover:text-(--agenci-ink) dark:bg-white/10"
           >
             <ExternalLinkIcon
               className="size-3.5"
@@ -256,7 +256,7 @@ function SourceRow({
             "flex h-7 items-center justify-center gap-1 rounded-full text-[12px] font-medium shadow-[0_1px_2px_rgb(5_6_7/0.08)] disabled:opacity-50",
             confirm
               ? "bg-[#B2463A] px-2.5 text-white"
-              : "w-7 bg-white text-(--agenci-ink-2) hover:text-[#B2463A] dark:bg-white/10",
+              : "w-7 bg-(--dash-surface) text-(--agenci-ink-2) hover:text-(--dash-bad) dark:bg-white/10",
           )}
         >
           <Trash2Icon
@@ -276,14 +276,14 @@ function PendingRow({ upload }: { upload: PendingUpload }) {
   return (
     <div className={cn(ROW_GRID, "kb-card-in rounded-[10px] px-3 py-2.5")}>
       <span className="flex min-w-0 items-center gap-3">
-        <span className="flex size-7 shrink-0 items-center justify-center rounded-[8px] bg-[#f3f5f4] text-(--agenci-ink-2) dark:bg-white/5">
+        <span className="flex size-7 shrink-0 items-center justify-center rounded-[8px] bg-(--dash-subtle) text-(--agenci-ink-2) dark:bg-white/5">
           <Icon className="size-3.5" strokeWidth={1.5} absoluteStrokeWidth />
         </span>
         <span className="truncate text-[13.5px] font-medium text-(--agenci-ink)">
           {upload.name}
         </span>
       </span>
-      <span className="kb-shimmer hidden h-1 rounded-full bg-[linear-gradient(90deg,#eef0ef_0%,#d7dcd9_40%,#eef0ef_80%)] bg-[length:200%_100%] md:block" />
+      <span className="kb-shimmer hidden h-1 rounded-full bg-[linear-gradient(90deg,#eef0ef_0%,#d7dcd9_40%,#eef0ef_80%)] bg-[length:200%_100%] dark:bg-[linear-gradient(90deg,#23262c_0%,#33383f_40%,#23262c_80%)] md:block" />
       <span className="hidden md:block" />
       <span className="hidden items-center gap-1.5 text-[12.5px] text-(--agenci-ink-2) md:flex">
         <LoaderIcon
@@ -352,12 +352,12 @@ function SiteGroup({
         type="button"
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
-        className="flex w-full items-center gap-3 rounded-[10px] px-3 py-2.5 text-left transition-colors hover:bg-[#f7f8f7] dark:hover:bg-white/[0.03]"
+        className="flex w-full items-center gap-3 rounded-[10px] px-3 py-2.5 text-left transition-colors hover:bg-(--dash-subtle-2) dark:hover:bg-white/[0.03]"
       >
         <span
           className="flex size-7 shrink-0 items-center justify-center rounded-[8px]"
           style={{
-            background: `color-mix(in srgb, ${color} 10%, white)`,
+            background: `color-mix(in srgb, ${color} 10%, var(--dash-surface))`,
             color,
           }}
         >
@@ -512,7 +512,7 @@ export function KnowledgeLibrary({
   const empty = !filtered.length && !pending.length;
 
   return (
-    <section className="mt-6 rounded-[24px] border border-(--agenci-line) bg-white p-2 shadow-[0_1px_3px_rgb(5_6_7/0.07),0_14px_34px_-14px_rgb(5_6_7/0.22)] dark:bg-(--card)">
+    <section className="mt-6 rounded-[24px] border border-(--agenci-line) bg-(--dash-surface) p-2 shadow-[0_1px_3px_rgb(5_6_7/0.07),0_14px_34px_-14px_rgb(5_6_7/0.22)] dark:bg-(--card)">
       {/* Header */}
       <div className="flex flex-wrap items-center gap-3 px-3 pt-3 pb-2">
         <div className="min-w-0">
@@ -536,7 +536,7 @@ export function KnowledgeLibrary({
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Finn kilde"
               aria-label="Finn kilde"
-              className="h-8 w-[170px] rounded-full border border-(--agenci-line) bg-white pr-3 pl-8 text-[13px] text-(--agenci-ink) outline-none transition-[width,border-color] duration-200 placeholder:text-(--agenci-ink-3) focus:w-[220px] focus:border-(--agenci-ink-3) dark:bg-transparent"
+              className="h-8 w-[170px] rounded-full border border-(--agenci-line) bg-(--dash-surface) pr-3 pl-8 text-[13px] text-(--agenci-ink) outline-none transition-[width,border-color] duration-200 placeholder:text-(--agenci-ink-3) focus:w-[220px] focus:border-(--agenci-ink-3) dark:bg-transparent"
             />
           </div>
           <Segment
@@ -558,7 +558,7 @@ export function KnowledgeLibrary({
                 className="h-full rounded-full transition-[flex-grow] duration-500"
                 style={{
                   flexGrow: Math.max(c.chunks, 1),
-                  background: TYPE_META[c.t].color,
+                  background: TYPE_META[c.t].swatch,
                   opacity: 0.85,
                 }}
               />
@@ -573,7 +573,7 @@ export function KnowledgeLibrary({
                 <span
                   aria-hidden
                   className="size-1.5 rounded-full"
-                  style={{ background: TYPE_META[c.t].color }}
+                  style={{ background: TYPE_META[c.t].swatch }}
                 />
                 {TYPE_META[c.t].plural}
                 <span className={cn(data, "text-(--agenci-ink-3)")}>

@@ -68,10 +68,17 @@ export const LANDING_FORSIDE_SECTION_LINKS = [
   { name: "Kontakt", href: LANDING_CONTACT_PAGE_PATH },
 ] as const;
 
+/** The dashboard (apps/dashboard) — all login and sign-up happens there. */
+export const DASHBOARD_URL = (
+  process.env.NEXT_PUBLIC_DASHBOARD_URL ?? "http://localhost:3004"
+).replace(/\/$/, "");
+
+const DASHBOARD_SIGN_IN = `${DASHBOARD_URL}/login?mode=signin`;
+
 export const LANDING_APP_NAV_LINKS = [
-  { name: "Agenter", href: "/sign-in", loggedInHref: "/agents" },
-  { name: "Widget", href: "/sign-in", loggedInHref: "/customization" },
-  { name: "Systemer", href: "/sign-in", loggedInHref: "/integrations" },
+  { name: "Agenter", href: DASHBOARD_SIGN_IN, loggedInHref: `${DASHBOARD_URL}/` },
+  { name: "Widget", href: DASHBOARD_SIGN_IN, loggedInHref: `${DASHBOARD_URL}/` },
+  { name: "Systemer", href: DASHBOARD_SIGN_IN, loggedInHref: `${DASHBOARD_URL}/` },
 ] as const;
 
 export const LANDING_DESKTOP_NAV_LINKS = [
@@ -103,16 +110,16 @@ export const LANDING_FOOTER_NAV_GROUPS = [
 ] as const;
 
 export const LANDING_AUTH_PATHS = {
-  signIn: "/sign-in",
-  signUp: "/sign-up",
-  appHome: "/agents",
+  signIn: DASHBOARD_SIGN_IN,
+  signUp: `${DASHBOARD_URL}/login`,
+  appHome: `${DASHBOARD_URL}/`,
   /** App-oversikt når innlogget bruker forventes å gå videre inn i produktet (ikke markedsføring). */
-  appOverview: "/dashboard",
+  appOverview: `${DASHBOARD_URL}/`,
   /**
    * Innlogget bruker som klikker «Opprett konto» / «Kom i gang» på landing — ikke send til innboks;
    * behold kontekst på markedsføringssider (AuthAwareLink `loggedInHref`).
    */
-  marketingLoggedInCta: "/agents",
+  marketingLoggedInCta: `${DASHBOARD_URL}/`,
 } as const;
 
 /** Primær CTA — hvit på mørk bakgrunn */

@@ -12,6 +12,7 @@ import { ProductDemo } from "./product-demo";
 import { InteractiveProductDemo } from "./interactive-demo";
 import type { ProductDemoScene } from "../../product-demo-config";
 import styles from "./product-story.module.css";
+import { LANDING_AUTH_PATHS } from "../../constants";
 export { LandingOutcomeDemosSection } from "./landing-outcome-section";
 
 /** Photography gives the glass a real backdrop; copy stays on a solid white surface. */
@@ -265,7 +266,7 @@ export function LandingWorkflowSection() {
             <p>Gratis opp til 50 samtaler i måneden. Ingen kort, ingen binding.</p>
           </div>
           <div id="contact" className={styles.actions}>
-            <Link className={styles.primaryLink} href="/sign-up">
+            <Link className={styles.primaryLink} href={LANDING_AUTH_PATHS.signUp}>
               Prøv gratis <ArrowRight size={18} />
             </Link>
             <Link className={styles.secondaryLink} href="/kontakt">

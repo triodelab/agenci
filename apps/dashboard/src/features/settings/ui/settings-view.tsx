@@ -85,7 +85,7 @@ export default function SettingsView({
                       className={cn(
                         "flex h-9 shrink-0 items-center gap-2.5 rounded-[10px] px-3 text-[13.5px] transition-colors",
                         active
-                          ? "bg-white font-medium text-(--agenci-ink) shadow-[0_1px_2px_rgb(5_6_7/0.06),0_0_0_1px_var(--agenci-line)] dark:bg-white/10"
+                          ? "bg-(--dash-surface) font-medium text-(--agenci-ink) shadow-[0_1px_2px_rgb(5_6_7/0.06),0_0_0_1px_var(--agenci-line)] dark:bg-white/10"
                           : "text-(--agenci-ink-2) hover:bg-black/[0.04] hover:text-(--agenci-ink) dark:hover:bg-white/5",
                       )}
                     >

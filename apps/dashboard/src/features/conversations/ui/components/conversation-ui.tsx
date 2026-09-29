@@ -10,15 +10,15 @@ export const STATUS_META: Record<
 > = {
   unresolved: {
     label: "Uavklart",
-    className: "bg-[#FBEBDD] text-[#B06A34] dark:bg-[#B06A34]/15",
+    className: "bg-(--dash-warn-bg) text-(--dash-warn) dark:bg-[#B06A34]/15",
   },
   escalated: {
     label: "Eskalert",
-    className: "bg-[#F9E2DF] text-[#B2463A] dark:bg-[#B2463A]/15",
+    className: "bg-(--dash-bad-bg) text-(--dash-bad) dark:bg-[#B2463A]/15",
   },
   resolved: {
     label: "Løst",
-    className: "bg-[#E2F2E5] text-[#2F7D46] dark:bg-[#2F7D46]/15",
+    className: "bg-(--dash-good-bg) text-(--dash-good) dark:bg-[#2F7D46]/15",
   },
 };
 
@@ -185,17 +185,17 @@ export function pageLabel(url: string | null) {
 // ─── Card chrome (DESIGN.md: surface, 16px radius, --shadow-1) ──────────────
 
 export const cardClass =
-  "rounded-[16px] border border-white/80 bg-white shadow-[0_1px_3px_rgb(5_6_7/0.07),0_14px_34px_-14px_rgb(5_6_7/0.22)] dark:border-white/5 dark:bg-(--card)";
+  "rounded-[16px] border border-(--dash-edge)/80 bg-(--dash-surface) shadow-[0_1px_3px_rgb(5_6_7/0.07),0_14px_34px_-14px_rgb(5_6_7/0.22)] dark:border-white/5 dark:bg-(--card)";
 
 /** Inset surface inside cards (DESIGN.md --surface-2, 10px radius). */
-export const insetClass = "rounded-[10px] bg-[#f3f5f4] dark:bg-white/[0.04]";
+export const insetClass = "rounded-[10px] bg-(--dash-subtle) dark:bg-white/[0.04]";
 
 /** Caption / time / number text (DESIGN.md: Space Grotesk, tabular). */
 export const dataTextClass =
   "[font-family:var(--font-agenci-data)] tabular-nums";
 
 export const iconButtonClass =
-  "inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-(--agenci-line) bg-white text-(--agenci-ink-2) transition-[color,background-color,transform] duration-150 hover:bg-[#f3f5f4] hover:text-(--agenci-ink) active:scale-95 disabled:pointer-events-none disabled:opacity-40 dark:border-white/10 dark:bg-transparent";
+  "inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-(--agenci-line) bg-(--dash-surface) text-(--agenci-ink-2) transition-[color,background-color,transform] duration-150 hover:bg-(--dash-subtle) hover:text-(--agenci-ink) active:scale-95 disabled:pointer-events-none disabled:opacity-40 dark:border-white/10 dark:bg-transparent";
 
 /** Round arrow chip in card corners (reference: ↗ on every card). */
 export const arrowChipClass =

@@ -269,8 +269,8 @@ export function KnowledgeView({ agentId }: { agentId: string }) {
       >
         {/* Drop overlay */}
         {dragDepth > 0 ? (
-          <div className="kb-card-in pointer-events-none fixed inset-0 z-50 flex items-center justify-center bg-white/55 backdrop-blur-sm dark:bg-black/40">
-            <div className="flex flex-col items-center gap-3 rounded-[24px] border-2 border-dashed border-(--agenci-ink)/40 bg-white/90 px-12 py-10 text-center shadow-[0_24px_60px_-24px_rgb(5_6_7/0.35)] dark:bg-(--card)">
+          <div className="kb-card-in pointer-events-none fixed inset-0 z-50 flex items-center justify-center bg-(--dash-surface)/55 backdrop-blur-sm dark:bg-black/40">
+            <div className="flex flex-col items-center gap-3 rounded-[24px] border-2 border-dashed border-(--agenci-ink)/40 bg-(--dash-surface)/90 px-12 py-10 text-center shadow-[0_24px_60px_-24px_rgb(5_6_7/0.35)] dark:bg-(--card)">
               <span className="kb-breathe flex size-14 items-center justify-center rounded-full bg-(--agenci-ink) text-white dark:text-[#0b0c0e]">
                 <UploadIcon
                   className="size-6"
@@ -326,7 +326,7 @@ export function KnowledgeView({ agentId }: { agentId: string }) {
               onClick={() => setAskOpen(true)}
               className={cn(
                 pillButton,
-                "border border-(--agenci-line) bg-white text-(--agenci-ink) hover:bg-[#f6f7f6] dark:bg-transparent",
+                "border border-(--agenci-line) bg-(--dash-surface) text-(--agenci-ink) hover:bg-(--dash-subtle) dark:bg-transparent",
               )}
             >
               <SparklesIcon
@@ -341,7 +341,7 @@ export function KnowledgeView({ agentId }: { agentId: string }) {
               onClick={() => setAdding((a) => !a)}
               className={cn(
                 pillButton,
-                "border border-(--agenci-line) bg-white text-(--agenci-ink) hover:bg-[#f6f7f6] dark:bg-transparent",
+                "border border-(--agenci-line) bg-(--dash-surface) text-(--agenci-ink) hover:bg-(--dash-subtle) dark:bg-transparent",
               )}
             >
               <GlobeIcon
@@ -453,7 +453,7 @@ export function KnowledgeView({ agentId }: { agentId: string }) {
                   }}
                   placeholder="Hva vet agenten om… (f.eks. retur)"
                   aria-label="Søk i kunnskapen"
-                  className="h-9 w-full rounded-full border border-(--agenci-line) bg-white pr-9 pl-9 text-[13.5px] text-(--agenci-ink) outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-(--agenci-ink-3) focus:border-(--agenci-ink-3) focus:shadow-[0_0_0_3px_rgb(36_50_54/0.08)] dark:border-white/10 dark:bg-white/5"
+                  className="h-9 w-full rounded-full border border-(--agenci-line) bg-(--dash-surface) pr-9 pl-9 text-[13.5px] text-(--agenci-ink) outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-(--agenci-ink-3) focus:border-(--agenci-ink-3) focus:shadow-[0_0_0_3px_rgb(36_50_54/0.08)] dark:border-white/10 dark:bg-white/5"
                 />
                 {query ? (
                   <button
@@ -502,7 +502,7 @@ export function KnowledgeView({ agentId }: { agentId: string }) {
               }}
             >
               {isPending ? (
-                <div className="aspect-square w-full max-w-[520px] animate-pulse rounded-full bg-[#f3f5f4]" />
+                <div className="aspect-square w-full max-w-[520px] animate-pulse rounded-full bg-(--dash-subtle)" />
               ) : data && sources.length === 0 ? (
                 <button
                   type="button"
@@ -581,7 +581,7 @@ export function KnowledgeView({ agentId }: { agentId: string }) {
                 {[60, 90, 75, 85].map((w) => (
                   <div
                     key={w}
-                    className="h-3.5 animate-pulse rounded bg-[#f1f3f2]"
+                    className="h-3.5 animate-pulse rounded bg-(--dash-subtle)"
                     style={{ width: `${w}%` }}
                   />
                 ))}

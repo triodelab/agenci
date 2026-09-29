@@ -24,9 +24,9 @@ export function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-[20px] border border-(--agenci-line) bg-white p-5 shadow-[0_1px_2px_rgb(5_6_7/0.04)] dark:bg-(--card)">
+    <section className="rounded-[20px] border border-(--agenci-line) bg-(--dash-surface) p-5 shadow-[0_1px_2px_rgb(5_6_7/0.04)] dark:bg-(--card)">
       <header className="mb-4 flex items-center gap-3">
-        <span className="flex size-8 shrink-0 items-center justify-center rounded-[10px] bg-[#f3f5f4] text-(--agenci-ink) dark:bg-white/5">
+        <span className="flex size-8 shrink-0 items-center justify-center rounded-[10px] bg-(--dash-subtle) text-(--agenci-ink) dark:bg-white/5">
           <Icon className="size-4" strokeWidth={1.5} absoluteStrokeWidth />
         </span>
         <h2 className="min-w-0 flex-1 text-[15px] font-semibold tracking-[-0.01em] text-(--agenci-ink)">
@@ -67,7 +67,7 @@ export function Field({
 }
 
 const inputClass =
-  "w-full rounded-[10px] border border-[#d7dce2] bg-white px-3 text-[14px] text-(--agenci-ink) outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-(--agenci-ink-3) focus:border-(--agenci-ink-3) focus:shadow-[0_0_0_3px_rgb(36_50_54/0.08)] dark:border-white/10 dark:bg-transparent";
+  "w-full rounded-[10px] border border-(--dash-field) bg-(--dash-surface) px-3 text-[14px] text-(--agenci-ink) outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-(--agenci-ink-3) focus:border-(--agenci-ink-3) focus:shadow-[0_0_0_3px_rgb(36_50_54/0.08)] dark:border-white/10 dark:bg-transparent";
 
 export function TextInput({
   value,
@@ -168,7 +168,7 @@ export function ColorField({
     <div className="flex items-center gap-3">
       <label
         htmlFor={id}
-        className="relative size-10 shrink-0 cursor-pointer overflow-hidden rounded-[10px] border border-black/10 shadow-[inset_0_0_0_1px_rgb(255_255_255/0.4)] transition-transform duration-150 hover:scale-105"
+        className="relative size-10 shrink-0 cursor-pointer overflow-hidden rounded-[10px] border border-black/10 shadow-[inset_0_0_0_1px_rgb(255_255_255/0.4)] dark:border-white/15 transition-transform duration-150 hover:scale-105"
         style={{ background: value }}
         title={`Velg ${label.toLowerCase()}`}
       >
@@ -205,7 +205,7 @@ export function ColorField({
         disabled={!isCustom}
         aria-label={`Tilbakestill ${label.toLowerCase()}`}
         title="Tilbake til nettsidens farge"
-        className="flex size-8 items-center justify-center rounded-full text-(--agenci-ink-3) transition-colors hover:bg-[#f3f5f4] hover:text-(--agenci-ink) disabled:opacity-0"
+        className="flex size-8 items-center justify-center rounded-full text-(--agenci-ink-3) transition-colors hover:bg-(--dash-subtle) hover:text-(--agenci-ink) disabled:opacity-0"
       >
         <RotateCcwIcon
           className="size-3.5"
@@ -296,7 +296,7 @@ export function Switch({
       >
         <span
           className={cn(
-            "absolute top-0.5 size-4 rounded-full bg-white shadow-sm transition-[left] duration-200 dark:bg-[#0b0c0e]",
+            "absolute top-0.5 size-4 rounded-full bg-(--dash-surface) shadow-sm transition-[left] duration-200 dark:bg-[#0b0c0e]",
             checked ? "left-[18px]" : "left-0.5",
           )}
         />

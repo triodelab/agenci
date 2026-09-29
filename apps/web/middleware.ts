@@ -10,8 +10,6 @@ import { getSessionCookie } from "better-auth/cookies";
 
 const PUBLIC_PATHS = [
   "/",
-  "/sign-in",
-  "/sign-up",
   "/priser",
   "/produktet",
   "/personvern",
@@ -31,8 +29,6 @@ const PUBLIC_PATHS = [
 
 /** Innloggede uten org kan fortsatt besøke disse */
 const ORG_FREE_PREFIXES = [
-  "/sign-in",
-  "/sign-up",
   "/onboarding",
   "/produktet",
   "/personvern",
@@ -80,6 +76,14 @@ export default async function middleware(req: NextRequest) {
     return NextResponse.redirect(`${DASHBOARD_URL}/`);
   }
 
+  // Login and sign-up live in the dashboard; old links and bookmarks go there.
+  if (matchesPrefix(pathname, ["/sign-in"])) {
+    return NextResponse.redirect(`${DASHBOARD_URL}/login?mode=signin`);
+  }
+  if (matchesPrefix(pathname, ["/sign-up"])) {
+    return NextResponse.redirect(`${DASHBOARD_URL}/login`);
+  }
+
   const isPublic = matchesPrefix(pathname, PUBLIC_PATHS);
   const sessionCookie = getSessionCookie(req);
 
@@ -91,16 +95,12 @@ export default async function middleware(req: NextRequest) {
 
   // Protected routes
   if (!sessionCookie) {
-    const signIn = new URL("/sign-in", req.url);
-    signIn.searchParams.set("redirect_url", pathname);
-    return NextResponse.redirect(signIn);
+    return NextResponse.redirect(`${DASHBOARD_URL}/login?mode=signin`);
   }
 
   const session = await fetchSession(req);
   if (!session?.user) {
-    const signIn = new URL("/sign-in", req.url);
-    signIn.searchParams.set("redirect_url", pathname);
-    return NextResponse.redirect(signIn);
+    return NextResponse.redirect(`${DASHBOARD_URL}/login?mode=signin`);
   }
 
   const orgId = session.session?.activeOrganizationId ?? null;

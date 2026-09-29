@@ -3,13 +3,15 @@
 import Link from "next/link";
 import type { ComponentProps } from "react";
 import { useAuth } from "@/lib/auth-hooks";
+import { LANDING_AUTH_PATHS } from "@/modules/landing/constants";
 
 /**
- * Task 1.2 — Points to the app when signed in (Better Auth), otherwise sign-in.
+ * Points to the dashboard when signed in (Better Auth), otherwise to the
+ * dashboard login.
  */
 export function AuthAwareLink({
-  href = "/sign-in",
-  loggedInHref = "/agents",
+  href = LANDING_AUTH_PATHS.signIn,
+  loggedInHref = LANDING_AUTH_PATHS.appHome,
   children,
   ...props
 }: Omit<ComponentProps<typeof Link>, "href"> & {

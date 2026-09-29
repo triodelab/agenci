@@ -67,7 +67,7 @@ function ConversationCard({
           aria-hidden
           className={cn(
             arrowChipClass,
-            "group-hover:bg-[#f3f5f4]",
+            "group-hover:bg-(--dash-subtle)",
             selected &&
               "border-transparent bg-(--agenci-ink) text-white group-hover:bg-(--agenci-ink) dark:bg-white dark:text-[#0b0c0e]",
           )}
@@ -128,7 +128,7 @@ export function ConversationsPanel({
           {[0, 1, 2].map((i) => (
             <div
               key={i}
-              className={cn(cardClass, "h-[150px] animate-pulse bg-white/70")}
+              className={cn(cardClass, "h-[150px] animate-pulse bg-(--dash-surface)/70")}
             />
           ))}
         </div>
@@ -149,7 +149,7 @@ export function ConversationsPanel({
             "flex flex-col items-center gap-3 px-5 py-10 text-center",
           )}
         >
-          <div className="flex size-12 items-center justify-center rounded-2xl bg-[#f3f5f4] text-(--agenci-ink) dark:bg-white/5">
+          <div className="flex size-12 items-center justify-center rounded-2xl bg-(--dash-subtle) text-(--agenci-ink) dark:bg-white/5">
             <MessageSquareIcon className="size-5" strokeWidth={1.5} />
           </div>
           <div>
@@ -190,7 +190,7 @@ export function ConversationsPanel({
           {searchQuery.trim() ? (
             <button
               onClick={onClearSearch}
-              className="mt-1 inline-flex h-9 items-center rounded-full border border-(--agenci-line) bg-white px-4 text-[13px] font-medium text-(--agenci-ink) transition-colors hover:bg-[#f3f5f4] dark:border-white/10 dark:bg-transparent"
+              className="mt-1 inline-flex h-9 items-center rounded-full border border-(--agenci-line) bg-(--dash-surface) px-4 text-[13px] font-medium text-(--agenci-ink) transition-colors hover:bg-(--dash-subtle) dark:border-white/10 dark:bg-transparent"
               type="button"
             >
               Tøm søk

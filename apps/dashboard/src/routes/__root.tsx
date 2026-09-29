@@ -4,6 +4,7 @@ import { Toaster } from "@workspace/ui/components/sonner";
 import "../index.css";
 import { authClient, type Session } from "@/lib/auth-client";
 import type { orpc } from "@/lib/api";
+import { useTheme } from "@/lib/theme";
 
 export interface RouterAppContext {
   orpc: typeof orpc;
@@ -24,10 +25,11 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 });
 
 function RootComponent() {
+  const { resolved } = useTheme();
   return (
     <>
       <Outlet />
-      <Toaster richColors />
+      <Toaster richColors theme={resolved} />
     </>
   );
 }

@@ -55,7 +55,7 @@ function csvCell(value: string) {
 }
 
 const roundIconButton =
-  "inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-white text-(--agenci-ink-2) shadow-[0_1px_2px_rgb(5_6_7/0.04),0_6px_18px_-10px_rgb(5_6_7/0.12)] transition-[color,transform] duration-150 hover:text-(--agenci-ink) active:scale-95 dark:bg-white/5";
+  "inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-(--dash-surface) text-(--agenci-ink-2) shadow-[0_1px_2px_rgb(5_6_7/0.04),0_6px_18px_-10px_rgb(5_6_7/0.12)] transition-[color,transform] duration-150 hover:text-(--agenci-ink) active:scale-95 dark:bg-white/5";
 
 export function ConversationsLayout({
   children,
@@ -130,7 +130,7 @@ export function ConversationsLayout({
           />
           <input
             aria-label="Søk i samtaler"
-            className="h-10 w-full rounded-full bg-white pr-11 pl-10 text-[13.5px] text-(--agenci-ink) shadow-[0_1px_2px_rgb(5_6_7/0.04),0_6px_18px_-10px_rgb(5_6_7/0.12)] outline-none transition-shadow duration-150 placeholder:text-(--agenci-ink-3) focus:shadow-[0_0_0_3px_rgb(36_50_54/0.08)] dark:bg-white/5"
+            className="h-10 w-full rounded-full bg-(--dash-surface) pr-11 pl-10 text-[13.5px] text-(--agenci-ink) shadow-[0_1px_2px_rgb(5_6_7/0.04),0_6px_18px_-10px_rgb(5_6_7/0.12)] outline-none transition-shadow duration-150 placeholder:text-(--agenci-ink-3) focus:shadow-[0_0_0_3px_rgb(36_50_54/0.08)] dark:bg-white/5"
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={`Søk i ${activeFilter?.label.toLowerCase() ?? "samtaler"}…`}
             type="search"
@@ -139,7 +139,7 @@ export function ConversationsLayout({
           <DropdownMenu>
             <DropdownMenuTrigger
               aria-label="Filtrer samtaler"
-              className="absolute right-1.5 flex size-7 items-center justify-center rounded-full text-(--agenci-ink-2) outline-none transition-colors hover:bg-[#f3f5f4] hover:text-(--agenci-ink) data-[state=open]:bg-[#f3f5f4]"
+              className="absolute right-1.5 flex size-7 items-center justify-center rounded-full text-(--agenci-ink-2) outline-none transition-colors hover:bg-(--dash-subtle) hover:text-(--agenci-ink) data-[state=open]:bg-(--dash-subtle)"
             >
               <SlidersHorizontalIcon
                 className="size-4"

@@ -3,6 +3,92 @@
  * cool neutrals (ink #243236, line #E4E8E5) + the landing page's moss-green
  * accent (#365C3D) for primary buttons, focus and the active nav item.
  */
+
+/*
+ * Surface + status tokens, light and dark. Components use these instead of
+ * hard-coded hex values so the whole dashboard follows the theme (lib/theme.ts
+ * puts `.dark` on <html>). Defined on the root so portals (dialogs, menus,
+ * toasts) and the auth / onboarding pages get them too.
+ */
+:root {
+  --agenci-ink: #243236;
+  --agenci-ink-2: #5a606a;
+  --agenci-ink-3: #8a9096;
+  --agenci-line: #e4e8e5;
+  --agenci-accent-hover: #1b272a;
+
+  --dash-surface: #ffffff; /* cards, panels, inputs */
+  --dash-subtle: #f3f5f4; /* quiet fills, chips, hover */
+  --dash-subtle-2: #f8f9f8; /* card footers, very light rows */
+  --dash-field: #d7dce2; /* input borders */
+  --dash-edge: #ffffff; /* hairline highlight on glass cards */
+  --dash-on-ink: #ffffff; /* text on ink (primary) buttons */
+  --dash-page: #f2f3f1;
+  --dash-placeholder: #b3b9be;
+  --dash-swatch-edge: rgb(0 0 0 / 0.1);
+
+  --dash-good: #2f7d46;
+  --dash-good-bg: #e2f2e5;
+  --dash-bad: #b2463a;
+  --dash-bad-bg: #f9e2df;
+  --dash-bad-line: #f2d3ce;
+  --dash-warn: #b06a34;
+  --dash-warn-bg: #fbebdd;
+
+  /* charts */
+  --chart-ring-a: #1f2224;
+  --chart-ring-b: #5a5e5c;
+  --chart-track: #f0f1f0;
+  --chart-grid: #eef0ef;
+  --chart-axis: #a9aeb3;
+  --chart-muted: #d9dcda;
+  --chart-muted-dot: #c9cdcb;
+  --chart-heat-empty: #f1f3f2;
+  --chart-heat-rgb: 36 50 54;
+  --chart-bar: #d7dce2;
+}
+
+.dark {
+  --agenci-ink: #e6eaea;
+  --agenci-ink-2: #a8afb6;
+  --agenci-ink-3: #6f767e;
+  --agenci-line: #262a30;
+  --agenci-accent-hover: #ffffff;
+
+  --dash-surface: #1a1c21;
+  --dash-subtle: #23262c;
+  --dash-subtle-2: #1e2025;
+  --dash-field: #33383f;
+  --dash-edge: rgb(255 255 255 / 0.06);
+  --dash-on-ink: #0b0c0e;
+  --dash-page: #0b0c0e;
+  --dash-placeholder: #5d636b;
+  --dash-swatch-edge: rgb(255 255 255 / 0.18);
+
+  --dash-good: #74c98c;
+  --dash-good-bg: rgb(116 201 140 / 0.14);
+  --dash-bad: #f08a7e;
+  --dash-bad-bg: rgb(240 138 126 / 0.14);
+  --dash-bad-line: rgb(240 138 126 / 0.28);
+  --dash-warn: #f2b48a;
+  --dash-warn-bg: rgb(242 180 138 / 0.14);
+
+  --chart-ring-a: #f2f3f5;
+  --chart-ring-b: #9aa1a8;
+  --chart-track: #25282e;
+  --chart-grid: #25282e;
+  --chart-axis: #5d636b;
+  --chart-muted: #3a3e45;
+  --chart-muted-dot: #4a4f57;
+  --chart-heat-empty: #202328;
+  --chart-heat-rgb: 230 234 234;
+  --chart-bar: #3a3e45;
+}
+
+.dark body {
+  background-color: var(--dash-page);
+  color: var(--agenci-ink);
+}
 .dashboard-app-shell [data-slot="sidebar"] {
   flex-shrink: 0 !important;
   height: 100% !important;

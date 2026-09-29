@@ -23,6 +23,9 @@ const ContactSchema = z.object({
 const MessageSchema = z.object({
   id: z.string(),
   role: z.enum(["user", "assistant"]),
+  /** visitor, the AI agent, or a person from the team */
+  author: z.enum(["visitor", "agent", "team"]),
+  authorName: z.string().nullable(),
   text: z.string(),
   createdAt: z.string(),
 });
@@ -77,4 +80,14 @@ export const ConversationUsageResponseSchema = z.object({
   days: z.array(z.number().int().nonnegative()),
   total: z.number().int().nonnegative(),
   previousTotal: z.number().int().nonnegative(),
+});
+
+export const ReplyToConversationSchema = z.object({
+  agentId: z.string().min(1),
+  threadId: z.string().min(1),
+  text: z.string().trim().min(1, "Skriv et svar").max(4000),
+});
+
+export const ReplyToConversationResponseSchema = z.object({
+  ok: z.literal(true),
 });

@@ -50,22 +50,22 @@ const STATUS: Record<Status, { label: string; dot: string; pill: string }> = {
   COMPLETED: {
     label: "Aktiv",
     dot: "bg-(--agenci-ink)",
-    pill: "bg-[#f1f3f2] text-(--agenci-ink) dark:bg-white/5",
+    pill: "bg-(--dash-subtle) text-(--agenci-ink) dark:bg-white/5",
   },
   PROCESSING: {
     label: "Lærer",
     dot: "bg-[#E49A62] animate-pulse",
-    pill: "bg-[#fbf1e9] text-[#9a5a2a]",
+    pill: "bg-(--dash-warn-bg) text-(--dash-warn)",
   },
   PENDING: {
     label: "Venter",
     dot: "bg-(--agenci-ink-3)",
-    pill: "bg-[#f1f3f2] text-(--agenci-ink-2) dark:bg-white/5",
+    pill: "bg-(--dash-subtle) text-(--agenci-ink-2) dark:bg-white/5",
   },
   FAILED: {
     label: "Feilet",
     dot: "bg-[#C4453A]",
-    pill: "bg-[#fbeceb] text-[#a3372d]",
+    pill: "bg-(--dash-bad-bg) text-(--dash-bad)",
   },
 };
 
@@ -244,7 +244,7 @@ function AgentCard({
   const recent = agent.activity.reduce((n, v) => n + v, 0);
   return (
     <article
-      className="kb-card-in group relative flex flex-col overflow-hidden rounded-[20px] border border-(--agenci-line) bg-white shadow-[0_1px_2px_rgb(5_6_7/0.04),0_10px_28px_-20px_rgb(5_6_7/0.2)] transition-[transform,box-shadow,border-color] duration-300 ease-[cubic-bezier(.23,1,.32,1)] hover:-translate-y-0.5 hover:border-[#d5dad7] hover:shadow-[0_1px_2px_rgb(5_6_7/0.05),0_20px_40px_-22px_rgb(5_6_7/0.3)] dark:bg-(--card)"
+      className="kb-card-in group relative flex flex-col overflow-hidden rounded-[20px] border border-(--agenci-line) bg-(--dash-surface) shadow-[0_1px_2px_rgb(5_6_7/0.04),0_10px_28px_-20px_rgb(5_6_7/0.2)] transition-[transform,box-shadow,border-color] duration-300 ease-[cubic-bezier(.23,1,.32,1)] hover:-translate-y-0.5 hover:border-(--dash-field) hover:shadow-[0_1px_2px_rgb(5_6_7/0.05),0_20px_40px_-22px_rgb(5_6_7/0.3)] dark:bg-(--card)"
       style={{ animationDelay: `${index * 50}ms` }}
     >
       {/* Soft wash in the agent's brand colour */}
@@ -298,7 +298,7 @@ function AgentCard({
               <button
                 type="button"
                 aria-label={`Handlinger for ${agent.name}`}
-                className="relative z-10 -mr-1.5 flex size-8 shrink-0 items-center justify-center self-start rounded-full text-(--agenci-ink-3) opacity-60 transition-[background-color,color,opacity] group-hover:opacity-100 hover:bg-[#f1f3f2] hover:text-(--agenci-ink) data-[state=open]:bg-[#f1f3f2] data-[state=open]:text-(--agenci-ink) data-[state=open]:opacity-100 dark:hover:bg-white/5"
+                className="relative z-10 -mr-1.5 flex size-8 shrink-0 items-center justify-center self-start rounded-full text-(--agenci-ink-3) opacity-60 transition-[background-color,color,opacity] group-hover:opacity-100 hover:bg-(--dash-subtle) hover:text-(--agenci-ink) data-[state=open]:bg-(--dash-subtle) data-[state=open]:text-(--agenci-ink) data-[state=open]:opacity-100 dark:hover:bg-white/5"
               >
                 <MoreHorizontalIcon className="size-4" {...icon} />
               </button>
@@ -340,7 +340,7 @@ function AgentCard({
                 onSelect={onDelete}
                 className={cn(
                   menuItem,
-                  "text-[#a3372d] focus:bg-[#fbeceb] focus:text-[#a3372d] [&_svg]:text-[#a3372d]",
+                  "text-(--dash-bad) focus:bg-(--dash-bad-bg) focus:text-(--dash-bad) [&_svg]:text-(--dash-bad)",
                 )}
               >
                 <Trash2Icon className="size-4" {...icon} />
@@ -382,7 +382,7 @@ function AgentCard({
           {status.label}
         </span>
         {agent.failedSourceCount > 0 ? (
-          <span className="inline-flex h-6 items-center rounded-full bg-[#fbeceb] px-2.5 text-[12px] font-medium text-[#a3372d]">
+          <span className="inline-flex h-6 items-center rounded-full bg-(--dash-bad-bg) px-2.5 text-[12px] font-medium text-(--dash-bad)">
             {plural(agent.failedSourceCount, "kilde feilet", "kilder feilet")}
           </span>
         ) : null}
@@ -403,7 +403,7 @@ function NewAgentCard({ orgSlug, index }: { orgSlug: string; index: number }) {
     <Link
       to="/org/$orgSlug/agents/create"
       params={{ orgSlug }}
-      className="kb-card-in group flex min-h-[260px] flex-col items-center justify-center gap-3 rounded-[20px] border border-dashed border-[#cfd5d2] text-center transition-[border-color,background-color] duration-300 hover:border-(--agenci-ink-3) hover:bg-white/60 dark:border-white/15 dark:hover:bg-white/[0.03]"
+      className="kb-card-in group flex min-h-[260px] flex-col items-center justify-center gap-3 rounded-[20px] border border-dashed border-[#cfd5d2] text-center transition-[border-color,background-color] duration-300 hover:border-(--agenci-ink-3) hover:bg-(--dash-surface)/60 dark:border-white/15 dark:hover:bg-white/[0.03]"
       style={{ animationDelay: `${index * 50}ms` }}
     >
       <span className="flex size-11 items-center justify-center rounded-full bg-(--agenci-ink) text-white shadow-[0_8px_20px_-10px_rgb(5_6_7/0.6)] transition-transform duration-300 ease-[cubic-bezier(.23,1,.32,1)] group-hover:scale-105 group-active:scale-[0.97] dark:text-[#0b0c0e]">
@@ -423,16 +423,16 @@ function NewAgentCard({ orgSlug, index }: { orgSlug: string; index: number }) {
 
 function CardSkeleton() {
   return (
-    <div className="flex h-[260px] flex-col gap-4 rounded-[20px] border border-(--agenci-line) bg-white p-5 dark:bg-(--card)">
+    <div className="flex h-[260px] flex-col gap-4 rounded-[20px] border border-(--agenci-line) bg-(--dash-surface) p-5 dark:bg-(--card)">
       <div className="flex gap-3.5">
-        <div className="size-12 animate-pulse rounded-[14px] bg-[#f1f3f2]" />
+        <div className="size-12 animate-pulse rounded-[14px] bg-(--dash-subtle)" />
         <div className="flex-1 space-y-2 pt-1">
-          <div className="h-4 w-32 animate-pulse rounded-full bg-[#f1f3f2]" />
-          <div className="h-3 w-20 animate-pulse rounded-full bg-[#f1f3f2]" />
+          <div className="h-4 w-32 animate-pulse rounded-full bg-(--dash-subtle)" />
+          <div className="h-3 w-20 animate-pulse rounded-full bg-(--dash-subtle)" />
         </div>
       </div>
-      <div className="h-9 animate-pulse rounded-[10px] bg-[#f6f7f6]" />
-      <div className="h-16 animate-pulse rounded-[14px] bg-[#f6f7f6]" />
+      <div className="h-9 animate-pulse rounded-[10px] bg-(--dash-subtle)" />
+      <div className="h-16 animate-pulse rounded-[14px] bg-(--dash-subtle)" />
     </div>
   );
 }
@@ -446,7 +446,7 @@ const STEPS = [
 
 function EmptyState({ orgSlug }: { orgSlug: string }) {
   return (
-    <div className="kb-card-in mx-auto w-full max-w-2xl overflow-hidden rounded-[24px] border border-(--agenci-line) bg-white shadow-[0_1px_2px_rgb(5_6_7/0.04),0_24px_48px_-28px_rgb(5_6_7/0.25)] dark:bg-(--card)">
+    <div className="kb-card-in mx-auto w-full max-w-2xl overflow-hidden rounded-[24px] border border-(--agenci-line) bg-(--dash-surface) shadow-[0_1px_2px_rgb(5_6_7/0.04),0_24px_48px_-28px_rgb(5_6_7/0.25)] dark:bg-(--card)">
       <div className="px-8 pt-10 pb-8 text-center">
         <h2
           className={cn(
@@ -516,7 +516,7 @@ function EditDialog({
     );
   };
   const input =
-    "w-full rounded-[10px] border border-[#d7dce2] bg-white px-3 text-[14px] text-(--agenci-ink) outline-none transition-[border-color,box-shadow] focus:border-(--agenci-ink-3) focus:shadow-[0_0_0_3px_rgb(36_50_54/0.08)] dark:border-white/10 dark:bg-transparent";
+    "w-full rounded-[10px] border border-(--dash-field) bg-(--dash-surface) px-3 text-[14px] text-(--agenci-ink) outline-none transition-[border-color,box-shadow] focus:border-(--agenci-ink-3) focus:shadow-[0_0_0_3px_rgb(36_50_54/0.08)] dark:border-white/10 dark:bg-transparent";
 
   return (
     <Dialog
@@ -567,7 +567,7 @@ function EditDialog({
             <button
               type="button"
               onClick={onClose}
-              className="h-9 rounded-full px-4 text-[13px] font-medium text-(--agenci-ink-2) transition-colors hover:bg-[#f1f3f2] hover:text-(--agenci-ink) dark:hover:bg-white/5"
+              className="h-9 rounded-full px-4 text-[13px] font-medium text-(--agenci-ink-2) transition-colors hover:bg-(--dash-subtle) hover:text-(--agenci-ink) dark:hover:bg-white/5"
             >
               Avbryt
             </button>
@@ -646,7 +646,7 @@ function DeleteDialog({
               </DialogDescription>
             </div>
 
-            <div className="mt-5 grid grid-cols-3 divide-x divide-(--agenci-line) rounded-[14px] bg-[#f6f7f6] py-3.5 dark:bg-white/5">
+            <div className="mt-5 grid grid-cols-3 divide-x divide-(--agenci-line) rounded-[14px] bg-(--dash-subtle) py-3.5 dark:bg-white/5">
               {[
                 [
                   String(target.sourceCount),
@@ -689,7 +689,7 @@ function DeleteDialog({
                   placeholder={target.name}
                   autoComplete="off"
                   spellCheck={false}
-                  className="h-10 w-full rounded-[10px] border border-[#d7dce2] bg-white pr-9 pl-3 text-[14px] text-(--agenci-ink) outline-none transition-[border-color,box-shadow] placeholder:text-[#c3c8cc] focus:border-(--agenci-ink-3) focus:shadow-[0_0_0_3px_rgb(36_50_54/0.08)] dark:border-white/10 dark:bg-transparent"
+                  className="h-10 w-full rounded-[10px] border border-(--dash-field) bg-(--dash-surface) pr-9 pl-3 text-[14px] text-(--agenci-ink) outline-none transition-[border-color,box-shadow] placeholder:text-(--dash-placeholder) focus:border-(--agenci-ink-3) focus:shadow-[0_0_0_3px_rgb(36_50_54/0.08)] dark:border-white/10 dark:bg-transparent"
                 />
                 <CheckIcon
                   aria-hidden
@@ -706,7 +706,7 @@ function DeleteDialog({
               <button
                 type="button"
                 onClick={close}
-                className="h-10 rounded-full border border-(--agenci-line) text-[13px] font-medium text-(--agenci-ink) transition-[background-color,transform] hover:bg-[#f6f7f6] active:scale-[0.97] dark:hover:bg-white/5"
+                className="h-10 rounded-full border border-(--agenci-line) text-[13px] font-medium text-(--agenci-ink) transition-[background-color,transform] hover:bg-(--dash-subtle) active:scale-[0.97] dark:hover:bg-white/5"
               >
                 Avbryt
               </button>
@@ -717,7 +717,7 @@ function DeleteDialog({
                   "inline-flex h-10 items-center justify-center gap-1.5 rounded-full text-[13px] font-medium transition-[background-color,color,transform] duration-200 active:scale-[0.97]",
                   matches
                     ? "bg-[#B8392E] text-white hover:bg-[#a3322a]"
-                    : "cursor-not-allowed bg-[#f1f3f2] text-(--agenci-ink-3) dark:bg-white/5",
+                    : "cursor-not-allowed bg-(--dash-subtle) text-(--agenci-ink-3) dark:bg-white/5",
                 )}
               >
                 {remove.isPending ? (
@@ -780,7 +780,7 @@ export default function AgentsListView() {
           ))}
         </div>
       ) : isError ? (
-        <p className="text-[13px] text-[#a3372d]">
+        <p className="text-[13px] text-(--dash-bad)">
           Kunne ikke hente agentene. Prøv å laste siden på nytt.
         </p>
       ) : agents.length === 0 ? (

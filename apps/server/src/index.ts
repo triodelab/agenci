@@ -128,16 +128,24 @@ const previewGlobal = globalThis as {
 previewGlobal.__sitePreviewFetch = sitePreviewApp.fetch;
 if (!previewGlobal.__sitePreviewListening) {
   previewGlobal.__sitePreviewListening = true;
-  serve(
-    {
-      fetch: (req, ...rest) =>
-        (previewGlobal.__sitePreviewFetch ?? sitePreviewApp.fetch)(req, ...rest),
-      port: SITE_PREVIEW_PORT,
-      hostname: "127.0.0.1",
-      overrideGlobalObjects: false,
-    },
-    (info) => {
-      console.log(`Site preview proxy on http://*.localhost:${info.port}`);
-    },
-  );
+  // Browsers may resolve `*.localhost` to ::1 or 127.0.0.1, so listen on both
+  // loopbacks; a missing IPv6 stack just skips the second listener.
+  for (const hostname of ["127.0.0.1", "::1"]) {
+    try {
+      serve(
+        {
+          fetch: (req, ...rest) =>
+            (previewGlobal.__sitePreviewFetch ?? sitePreviewApp.fetch)(req, ...rest),
+          port: SITE_PREVIEW_PORT,
+          hostname,
+          overrideGlobalObjects: false,
+        },
+        (info) => {
+          console.log(`Site preview proxy on http://*.localhost:${info.port} (${hostname})`);
+        },
+      );
+    } catch (err) {
+      console.warn(`Site preview proxy: could not listen on ${hostname}`, err);
+    }
+  }
 }

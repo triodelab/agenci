@@ -173,8 +173,8 @@ function AssistantTurn({
           className={cn(
             "rounded-[14px] rounded-tl-[5px] border px-3.5 py-2.5 text-[13.5px] leading-relaxed text-(--agenci-ink) [font-family:var(--font-agenci-voice)]",
             turn.error
-              ? "border-[#F0CFCB] bg-[#FFF9F8] text-[#B2463A]"
-              : "border-(--agenci-line) bg-white dark:bg-transparent",
+              ? "border-[#F0CFCB] bg-[#FFF9F8] text-(--dash-bad)"
+              : "border-(--agenci-line) bg-(--dash-surface) dark:bg-transparent",
           )}
         >
           <RichText text={text} citations={turn.citations} onCite={onCite} />
@@ -193,7 +193,7 @@ function AssistantTurn({
                   key={`${c.documentId}:${c.chunkIndex}`}
                   type="button"
                   onClick={() => onCite(c)}
-                  className="group rounded-[12px] border border-(--agenci-line) bg-white px-3 py-2.5 text-left transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-[0_12px_24px_-14px_rgb(5_6_7/0.3)] dark:bg-transparent"
+                  className="group rounded-[12px] border border-(--agenci-line) bg-(--dash-surface) px-3 py-2.5 text-left transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-[0_12px_24px_-14px_rgb(5_6_7/0.3)] dark:bg-transparent"
                 >
                   <span className="flex items-center gap-2 text-[12px] text-(--agenci-ink-3)">
                     <span className="flex size-[18px] items-center justify-center rounded-full bg-(--agenci-ink) text-[12px] leading-none font-medium text-white dark:text-[#0b0c0e]">
@@ -202,7 +202,7 @@ function AssistantTurn({
                     <span
                       aria-hidden
                       className="size-1.5 rounded-full"
-                      style={{ background: TYPE_META[c.sourceType].color }}
+                      style={{ background: TYPE_META[c.sourceType].swatch }}
                     />
                     <span className="truncate">{c.sourceName}</span>
                   </span>
@@ -249,7 +249,7 @@ function Thinking() {
           absoluteStrokeWidth
         />
       </span>
-      <div className="flex items-center gap-2 rounded-full border border-(--agenci-line) bg-white px-3.5 py-2 text-[13px] text-(--agenci-ink-2) dark:bg-transparent">
+      <div className="flex items-center gap-2 rounded-full border border-(--agenci-line) bg-(--dash-surface) px-3.5 py-2 text-[13px] text-(--agenci-ink-2) dark:bg-transparent">
         <span className="flex gap-1">
           {[0, 1, 2].map((i) => (
             <span
@@ -437,7 +437,7 @@ export function KnowledgeAssistant({
           absoluteStrokeWidth
         />
         {focusSource ? (
-          <span className="absolute top-0 right-0 size-3 rounded-full border-2 border-white bg-[#E49A62]" />
+          <span className="absolute top-0 right-0 size-3 rounded-full border-2 border-(--dash-edge) bg-[#E49A62]" />
         ) : null}
       </button>
 
@@ -447,7 +447,7 @@ export function KnowledgeAssistant({
         aria-hidden={!open}
         inert={!open}
         className={cn(
-          "absolute right-3 bottom-3 z-40 flex h-[min(540px,calc(100%-1.5rem))] w-[min(380px,calc(100vw-2rem))] origin-bottom-right flex-col overflow-hidden rounded-[20px] border border-(--agenci-line) bg-white shadow-[0_24px_60px_-24px_rgb(5_6_7/0.4)] transition-[transform,opacity] duration-300 ease-[cubic-bezier(.23,1,.32,1)] dark:bg-(--card)",
+          "absolute right-3 bottom-3 z-40 flex h-[min(540px,calc(100%-1.5rem))] w-[min(380px,calc(100vw-2rem))] origin-bottom-right flex-col overflow-hidden rounded-[20px] border border-(--agenci-line) bg-(--dash-surface) shadow-[0_24px_60px_-24px_rgb(5_6_7/0.4)] transition-[transform,opacity] duration-300 ease-[cubic-bezier(.23,1,.32,1)] dark:bg-(--card)",
           open
             ? "scale-100 opacity-100"
             : "pointer-events-none translate-y-2 scale-95 opacity-0",
@@ -471,7 +471,7 @@ export function KnowledgeAssistant({
               onClick={() => setTurns([])}
               aria-label="Ny samtale"
               title="Ny samtale"
-              className="flex size-8 items-center justify-center rounded-full text-(--agenci-ink-3) transition-colors hover:bg-[#f1f3f2] hover:text-(--agenci-ink) dark:hover:bg-white/5"
+              className="flex size-8 items-center justify-center rounded-full text-(--agenci-ink-3) transition-colors hover:bg-(--dash-subtle) hover:text-(--agenci-ink) dark:hover:bg-white/5"
             >
               <RotateCcwIcon
                 className="size-4"
@@ -485,7 +485,7 @@ export function KnowledgeAssistant({
             onClick={() => onOpenChange(false)}
             aria-label="Lukk"
             title="Lukk (Esc)"
-            className="flex size-8 items-center justify-center rounded-full text-(--agenci-ink-3) transition-colors hover:bg-[#f1f3f2] hover:text-(--agenci-ink) dark:hover:bg-white/5"
+            className="flex size-8 items-center justify-center rounded-full text-(--agenci-ink-3) transition-colors hover:bg-(--dash-subtle) hover:text-(--agenci-ink) dark:hover:bg-white/5"
           >
             <XIcon className="size-4" strokeWidth={1.5} absoluteStrokeWidth />
           </button>
@@ -514,7 +514,7 @@ export function KnowledgeAssistant({
                     key={s}
                     type="button"
                     onClick={() => void send(s)}
-                    className="group flex w-full items-center gap-3 rounded-[12px] border border-(--agenci-line) bg-white px-3 py-2.5 text-left text-[13px] text-(--agenci-ink) transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-px hover:border-[#d5dad7] hover:shadow-[0_10px_24px_-16px_rgb(5_6_7/0.35)] active:scale-[0.99] dark:bg-transparent"
+                    className="group flex w-full items-center gap-3 rounded-[12px] border border-(--agenci-line) bg-(--dash-surface) px-3 py-2.5 text-left text-[13px] text-(--agenci-ink) transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-px hover:border-(--dash-field) hover:shadow-[0_10px_24px_-16px_rgb(5_6_7/0.35)] active:scale-[0.99] dark:bg-transparent"
                   >
                     <span className="min-w-0 flex-1">{s}</span>
                     <ArrowUpRightIcon
@@ -562,11 +562,11 @@ export function KnowledgeAssistant({
         >
           {focusSource ? (
             <div className="mb-2 flex">
-              <span className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-[#f1f3f2] py-1 pr-1 pl-2.5 text-[12px] text-(--agenci-ink-2) dark:bg-white/5">
+              <span className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-(--dash-subtle) py-1 pr-1 pl-2.5 text-[12px] text-(--agenci-ink-2) dark:bg-white/5">
                 <span
                   aria-hidden
                   className="size-1.5 rounded-full"
-                  style={{ background: TYPE_META[focusSource.type].color }}
+                  style={{ background: TYPE_META[focusSource.type].swatch }}
                 />
                 Fokus:{" "}
                 <span className="truncate font-medium text-(--agenci-ink)">
@@ -576,7 +576,7 @@ export function KnowledgeAssistant({
                   type="button"
                   aria-label="Fjern fokus"
                   onClick={onClearFocus}
-                  className="flex size-5 items-center justify-center rounded-full text-(--agenci-ink-3) hover:bg-white hover:text-(--agenci-ink) dark:hover:bg-white/10"
+                  className="flex size-5 items-center justify-center rounded-full text-(--agenci-ink-3) hover:bg-(--dash-surface) hover:text-(--agenci-ink) dark:hover:bg-white/10"
                 >
                   <XIcon
                     className="size-3"
@@ -587,7 +587,7 @@ export function KnowledgeAssistant({
               </span>
             </div>
           ) : null}
-          <div className="flex items-end gap-2 rounded-[14px] border border-(--agenci-line) bg-[#fafbfa] p-1 pl-3 transition-[box-shadow,border-color,background-color] focus-within:border-(--agenci-ink-3) focus-within:bg-white focus-within:shadow-[0_0_0_4px_rgb(36_50_54/0.07)] dark:bg-transparent">
+          <div className="flex items-end gap-2 rounded-[14px] border border-(--agenci-line) bg-(--dash-subtle-2) p-1 pl-3 transition-[box-shadow,border-color,background-color] focus-within:border-(--agenci-ink-3) focus-within:bg-(--dash-surface) focus-within:shadow-[0_0_0_4px_rgb(36_50_54/0.07)] dark:bg-transparent">
             <textarea
               ref={inputRef}
               value={draft}

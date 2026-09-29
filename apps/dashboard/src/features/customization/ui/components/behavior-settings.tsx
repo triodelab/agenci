@@ -58,7 +58,7 @@ const ICON = { strokeWidth: 1.5, absoluteStrokeWidth: true } as const;
 const caption =
   "text-[12px] font-medium tracking-[0.06em] uppercase text-(--agenci-ink-3) [font-family:var(--font-agenci-data)]";
 const input =
-  "h-11 w-full rounded-[10px] border border-[#d7dce2] bg-white px-3.5 text-[14px] text-(--agenci-ink) outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-(--agenci-ink-3) focus:border-(--agenci-ink-3) focus:shadow-[0_0_0_3px_rgb(36_50_54/0.08)] dark:border-white/10 dark:bg-transparent";
+  "h-11 w-full rounded-[10px] border border-(--dash-field) bg-(--dash-surface) px-3.5 text-[14px] text-(--agenci-ink) outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-(--agenci-ink-3) focus:border-(--agenci-ink-3) focus:shadow-[0_0_0_3px_rgb(36_50_54/0.08)] dark:border-white/10 dark:bg-transparent";
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
@@ -221,10 +221,10 @@ function SettingsCard({
   return (
     <section
       id={id}
-      className="kb-enter overflow-hidden rounded-[20px] border border-(--agenci-line) bg-white shadow-[0_1px_2px_rgb(5_6_7/0.04),0_8px_24px_-16px_rgb(5_6_7/0.12)] dark:bg-(--card)"
+      className="kb-enter overflow-hidden rounded-[20px] border border-(--agenci-line) bg-(--dash-surface) shadow-[0_1px_2px_rgb(5_6_7/0.04),0_8px_24px_-16px_rgb(5_6_7/0.12)] dark:bg-(--card)"
     >
       <header className="flex items-center gap-4 px-6 pt-6">
-        <span className="flex size-10 shrink-0 items-center justify-center rounded-[12px] bg-[#f3f5f4] text-(--agenci-ink) dark:bg-white/5">
+        <span className="flex size-10 shrink-0 items-center justify-center rounded-[12px] bg-(--dash-subtle) text-(--agenci-ink) dark:bg-white/5">
           <IconCmp className="size-5" {...ICON} />
         </span>
         <h2 className="min-w-0 flex-1 [font-family:var(--font-agenci-title)] text-[21px] leading-[1.25] font-medium tracking-[-0.04em] text-(--agenci-ink)">
@@ -260,7 +260,7 @@ function Toggle({
     >
       <span
         className={cn(
-          "absolute top-1 size-4 rounded-full bg-white shadow-[0_1px_2px_rgb(5_6_7/0.2)] transition-[left] duration-200 ease-[cubic-bezier(.23,1,.32,1)] dark:bg-[#0b0c0e]",
+          "absolute top-1 size-4 rounded-full bg-(--dash-surface) shadow-[0_1px_2px_rgb(5_6_7/0.2)] transition-[left] duration-200 ease-[cubic-bezier(.23,1,.32,1)] dark:bg-[#0b0c0e]",
           checked ? "left-5" : "left-1",
         )}
       />
@@ -280,7 +280,7 @@ function Row({
 }) {
   return (
     <div className="flex items-center gap-4 py-3.5">
-      <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#f3f5f4] text-(--agenci-ink-2) dark:bg-white/5">
+      <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-(--dash-subtle) text-(--agenci-ink-2) dark:bg-white/5">
         <IconCmp className="size-4" {...ICON} />
       </span>
       <p className="min-w-0 flex-1 text-[14px] font-medium text-(--agenci-ink)">
@@ -387,8 +387,8 @@ export function BehaviorSettings({
                   className={cn(
                     "group flex shrink-0 items-center gap-2.5 rounded-[10px] px-3 py-2 text-left text-[14px] whitespace-nowrap transition-[background-color,color,transform] duration-150 active:scale-[0.98]",
                     on
-                      ? "bg-white text-(--agenci-ink) shadow-[0_1px_2px_rgb(5_6_7/0.06)] dark:bg-white/10"
-                      : "text-(--agenci-ink-2) hover:bg-white/60 hover:text-(--agenci-ink) dark:hover:bg-white/5",
+                      ? "bg-(--dash-surface) text-(--agenci-ink) shadow-[0_1px_2px_rgb(5_6_7/0.06)] dark:bg-white/10"
+                      : "text-(--agenci-ink-2) hover:bg-(--dash-surface)/60 hover:text-(--agenci-ink) dark:hover:bg-white/5",
                   )}
                 >
                   <SIcon
@@ -429,8 +429,8 @@ export function BehaviorSettings({
                       "flex w-full items-center gap-4 px-4 py-3.5 text-left transition-colors duration-150",
                       i > 0 && "border-t border-(--agenci-line)",
                       on
-                        ? "bg-[#f6f7f6] dark:bg-white/[0.05]"
-                        : "hover:bg-[#fafbfa] dark:hover:bg-white/[0.02]",
+                        ? "bg-(--dash-subtle) dark:bg-white/[0.05]"
+                        : "hover:bg-(--dash-subtle-2) dark:hover:bg-white/[0.02]",
                     )}
                   >
                     <span
@@ -438,7 +438,7 @@ export function BehaviorSettings({
                         "flex size-10 shrink-0 items-center justify-center rounded-[12px] transition-colors",
                         on
                           ? "bg-(--agenci-ink) text-white dark:text-[#0b0c0e]"
-                          : "bg-[#f3f5f4] text-(--agenci-ink-2) dark:bg-white/5",
+                          : "bg-(--dash-subtle) text-(--agenci-ink-2) dark:bg-white/5",
                       )}
                     >
                       <MIcon className="size-5" {...ICON} />
@@ -508,7 +508,7 @@ export function BehaviorSettings({
                           className={cn(
                             "flex items-center gap-3 rounded-[16px] border p-3 text-left transition-[border-color,box-shadow,background-color] duration-150 active:scale-[0.99]",
                             on
-                              ? "border-(--agenci-ink) bg-[#f6f7f6] shadow-[0_0_0_1px_var(--agenci-ink)] dark:bg-white/[0.05]"
+                              ? "border-(--agenci-ink) bg-(--dash-subtle) shadow-[0_0_0_1px_var(--agenci-ink)] dark:bg-white/[0.05]"
                               : "border-(--agenci-line) hover:border-(--agenci-ink-3)",
                           )}
                         >
@@ -585,7 +585,7 @@ export function BehaviorSettings({
               </div>
 
               {/* Style sample (DESIGN.md conversation) */}
-              <aside className="flex flex-col rounded-[16px] bg-[#f6f7f6] p-4 dark:bg-white/[0.04]">
+              <aside className="flex flex-col rounded-[16px] bg-(--dash-subtle) p-4 dark:bg-white/[0.04]">
                 <p className={cn(caption, "mb-3")}>Stilprøve</p>
                 <div className="flex flex-1 flex-col justify-center gap-2.5">
                   <p className="ml-auto max-w-[85%] rounded-[18px] rounded-br-[6px] bg-(--agenci-ink) px-3.5 py-2.5 text-[14px] text-white dark:text-[#0b0c0e]">
@@ -593,7 +593,7 @@ export function BehaviorSettings({
                   </p>
                   <p
                     key={sampleAnswer(b)}
-                    className="kb-card-in max-w-[92%] rounded-[18px] rounded-bl-[6px] border border-(--agenci-line) bg-white px-3.5 py-2.5 text-[15px] leading-[1.6] text-(--agenci-ink) [font-family:var(--font-agenci-voice)] dark:bg-transparent"
+                    className="kb-card-in max-w-[92%] rounded-[18px] rounded-bl-[6px] border border-(--agenci-line) bg-(--dash-surface) px-3.5 py-2.5 text-[15px] leading-[1.6] text-(--agenci-ink) [font-family:var(--font-agenci-voice)] dark:bg-transparent"
                   >
                     {sampleAnswer(b)}
                   </p>
@@ -608,7 +608,7 @@ export function BehaviorSettings({
             icon={ListChecksIcon}
             title="Regler"
             aside={
-              <span className="rounded-full bg-[#f3f5f4] px-2.5 py-1 text-[12px] tabular-nums text-(--agenci-ink-2) [font-family:var(--font-agenci-data)] dark:bg-white/5">
+              <span className="rounded-full bg-(--dash-subtle) px-2.5 py-1 text-[12px] tabular-nums text-(--agenci-ink-2) [font-family:var(--font-agenci-data)] dark:bg-white/5">
                 {rules.length}/20
               </span>
             }
@@ -621,10 +621,10 @@ export function BehaviorSettings({
                     className={cn(
                       "kb-card-in group flex items-center gap-3 px-4 py-3",
                       i > 0 && "border-t border-(--agenci-line)",
-                      !r.enabled && "bg-[#fafbfa] dark:bg-white/[0.02]",
+                      !r.enabled && "bg-(--dash-subtle-2) dark:bg-white/[0.02]",
                     )}
                   >
-                    <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-[#f3f5f4] text-[12px] tabular-nums text-(--agenci-ink-2) [font-family:var(--font-agenci-data)] dark:bg-white/5">
+                    <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-(--dash-subtle) text-[12px] tabular-nums text-(--agenci-ink-2) [font-family:var(--font-agenci-data)] dark:bg-white/5">
                       {i + 1}
                     </span>
                     <input
@@ -726,7 +726,7 @@ export function BehaviorSettings({
                             <button
                               type="button"
                               onClick={() => addRule(t)}
-                              className="group flex w-full items-start gap-2 rounded-[10px] px-2 py-1.5 text-left text-[13px] leading-snug text-(--agenci-ink-2) transition-colors hover:bg-[#f6f7f6] hover:text-(--agenci-ink) dark:hover:bg-white/5"
+                              className="group flex w-full items-start gap-2 rounded-[10px] px-2 py-1.5 text-left text-[13px] leading-snug text-(--agenci-ink-2) transition-colors hover:bg-(--dash-subtle) hover:text-(--agenci-ink) dark:hover:bg-white/5"
                             >
                               <PlusIcon
                                 className="mt-0.5 size-3.5 shrink-0 text-(--agenci-ink-3) group-hover:text-(--agenci-ink)"
@@ -751,11 +751,11 @@ export function BehaviorSettings({
 
           {/* ── Topics ────────────────────────────────────────────────── */}
           <SettingsCard id="bh-topics" icon={ShieldXIcon} title="Emner å unngå">
-            <div className="flex min-h-11 flex-wrap items-center gap-1.5 rounded-[10px] border border-[#d7dce2] bg-white p-1.5 transition-[border-color,box-shadow] focus-within:border-(--agenci-ink-3) focus-within:shadow-[0_0_0_3px_rgb(36_50_54/0.08)] dark:border-white/10 dark:bg-transparent">
+            <div className="flex min-h-11 flex-wrap items-center gap-1.5 rounded-[10px] border border-(--dash-field) bg-(--dash-surface) p-1.5 transition-[border-color,box-shadow] focus-within:border-(--agenci-ink-3) focus-within:shadow-[0_0_0_3px_rgb(36_50_54/0.08)] dark:border-white/10 dark:bg-transparent">
               {topics.map((t) => (
                 <span
                   key={t}
-                  className="kb-card-in inline-flex items-center gap-1.5 rounded-full bg-[#f3f5f4] py-1 pr-1 pl-3 text-[13px] text-(--agenci-ink) dark:bg-white/10"
+                  className="kb-card-in inline-flex items-center gap-1.5 rounded-full bg-(--dash-subtle) py-1 pr-1 pl-3 text-[13px] text-(--agenci-ink) dark:bg-white/10"
                 >
                   <ShieldXIcon
                     className="size-3.5 text-(--agenci-ink-3)"
@@ -768,7 +768,7 @@ export function BehaviorSettings({
                     onClick={() =>
                       set({ avoidTopics: topics.filter((x) => x !== t) })
                     }
-                    className="flex size-6 items-center justify-center rounded-full text-(--agenci-ink-3) transition-colors hover:bg-white hover:text-(--agenci-ink) dark:hover:bg-white/10"
+                    className="flex size-6 items-center justify-center rounded-full text-(--agenci-ink-3) transition-colors hover:bg-(--dash-surface) hover:text-(--agenci-ink) dark:hover:bg-white/10"
                   >
                     <XIcon className="size-3.5" {...ICON} />
                   </button>
@@ -878,7 +878,7 @@ export function BehaviorSettings({
             icon={FileCode2Icon}
             title="Slik instrueres agenten"
           >
-            <div className="overflow-hidden rounded-[16px] border border-(--agenci-line) bg-[#fafbfa] dark:bg-white/[0.02]">
+            <div className="overflow-hidden rounded-[16px] border border-(--agenci-line) bg-(--dash-subtle-2) dark:bg-white/[0.02]">
               <div className="flex items-center gap-2 border-b border-(--agenci-line) px-4 py-2.5">
                 <span className={caption}>Instruksjoner</span>
                 <span className="text-[12px] text-(--agenci-ink-3)">
@@ -893,7 +893,7 @@ export function BehaviorSettings({
                       setCopied(true);
                       window.setTimeout(() => setCopied(false), 1500);
                     }}
-                    className="ml-auto inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-[13px] text-(--agenci-ink-2) transition-colors hover:bg-white hover:text-(--agenci-ink) dark:hover:bg-white/10"
+                    className="ml-auto inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-[13px] text-(--agenci-ink-2) transition-colors hover:bg-(--dash-surface) hover:text-(--agenci-ink) dark:hover:bg-white/10"
                   >
                     {copied ? (
                       <CheckIcon className="size-3.5" {...ICON} />

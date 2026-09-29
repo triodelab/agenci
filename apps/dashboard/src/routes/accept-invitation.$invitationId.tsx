@@ -27,7 +27,7 @@ type Invitation = {
 const inkBtn =
   "inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-full bg-(--agenci-ink) px-5 text-[14px] font-medium text-white transition-colors hover:bg-(--agenci-accent-hover) disabled:opacity-50 dark:text-[#0b0c0e]";
 const ghostBtn =
-  "inline-flex h-11 flex-1 items-center justify-center rounded-full border border-(--agenci-line) bg-white px-5 text-[14px] text-(--agenci-ink) transition-colors hover:bg-[#f6f7f6] disabled:opacity-50 dark:bg-transparent";
+  "inline-flex h-11 flex-1 items-center justify-center rounded-full border border-(--agenci-line) bg-(--dash-surface) px-5 text-[14px] text-(--agenci-ink) transition-colors hover:bg-(--dash-subtle) disabled:opacity-50 dark:bg-transparent";
 
 function Shell({ children }: { children: React.ReactNode }) {
   return (
@@ -39,7 +39,7 @@ function Shell({ children }: { children: React.ReactNode }) {
             genci
           </span>
         </div>
-        <section className="rounded-[22px] border border-white/80 bg-white p-7 shadow-[0_1px_3px_rgb(5_6_7/0.06),0_24px_50px_-24px_rgb(5_6_7/0.25)] dark:border-white/5 dark:bg-(--card)">
+        <section className="rounded-[22px] border border-(--dash-edge)/80 bg-(--dash-surface) p-7 shadow-[0_1px_3px_rgb(5_6_7/0.06),0_24px_50px_-24px_rgb(5_6_7/0.25)] dark:border-white/5 dark:bg-(--card)">
           {children}
         </section>
       </div>
@@ -126,7 +126,7 @@ function AcceptInvitationPage() {
   if (!session) {
     return (
       <Shell>
-        <span className="flex size-11 items-center justify-center rounded-full bg-[#f3f4f3] text-(--agenci-ink)">
+        <span className="flex size-11 items-center justify-center rounded-full bg-(--dash-subtle) text-(--agenci-ink)">
           <MailIcon className="size-5" strokeWidth={1.6} />
         </span>
         <h1 className="mt-4 text-[20px] font-semibold tracking-[-0.02em] text-(--agenci-ink)">
@@ -209,7 +209,7 @@ function AcceptInvitationPage() {
 
   return (
     <Shell>
-      <span className="flex size-11 items-center justify-center rounded-full bg-[#f3f4f3] text-(--agenci-ink)">
+      <span className="flex size-11 items-center justify-center rounded-full bg-(--dash-subtle) text-(--agenci-ink)">
         <UsersIcon className="size-5" strokeWidth={1.6} />
       </span>
       <h1 className="mt-4 text-[20px] font-semibold tracking-[-0.02em] text-(--agenci-ink)">
@@ -220,7 +220,7 @@ function AcceptInvitationPage() {
         <span className="font-medium text-(--agenci-ink)">{role}</span>. Du får
         tilgang til agentene og samtalene til teamet.
       </p>
-      <dl className="mt-5 space-y-2 rounded-[14px] bg-[#f5f6f5] px-4 py-3 text-[13px] dark:bg-white/5">
+      <dl className="mt-5 space-y-2 rounded-[14px] bg-(--dash-subtle) px-4 py-3 text-[13px] dark:bg-white/5">
         <div className="flex justify-between gap-3">
           <dt className="text-(--agenci-ink-3)">Invitasjon til</dt>
           <dd className="truncate text-(--agenci-ink)">{invitation.email}</dd>
@@ -236,7 +236,7 @@ function AcceptInvitationPage() {
         </div>
       </dl>
       {expired || invitation.status !== "pending" ? (
-        <p className="mt-5 rounded-[12px] bg-[#F9E2DF] px-4 py-3 text-[13.5px] text-[#B2463A]">
+        <p className="mt-5 rounded-[12px] bg-(--dash-bad-bg) px-4 py-3 text-[13.5px] text-(--dash-bad)">
           Invitasjonen er ikke lenger gyldig. Be om en ny.
         </p>
       ) : (

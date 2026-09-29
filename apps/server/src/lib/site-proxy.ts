@@ -138,6 +138,14 @@ sitePreviewApp.all("*", async (c) => {
   if (!session || session.exp < Date.now()) {
     return c.text("Forhåndsvisningen har utløpt. Last inn siden på nytt.", 410);
   }
+  // Sliding expiry: a preview that is being used never runs out mid-session.
+  session.exp = Date.now() + SESSION_TTL_MS;
+
+  // Never let a previewed site install a service worker on the preview
+  // origin: it would keep serving stale or broken responses on later visits.
+  if (c.req.header("service-worker") === "script") {
+    return c.text("", 404);
+  }
 
   const incoming = new URL(c.req.url);
   const upstreamUrl = `${session.upstream}${incoming.pathname}${incoming.search}`;
@@ -152,6 +160,10 @@ sitePreviewApp.all("*", async (c) => {
   }
 
   let res: Response;
+  // Time limit on getting a response, not on streaming it: a slow or hung
+  // upstream fails fast, while large files (video, fonts) still stream fully.
+  const abort = new AbortController();
+  const timer = setTimeout(() => abort.abort(), 15_000);
   try {
     const method = c.req.method;
     res = await fetch(upstreamUrl, {
@@ -159,10 +171,13 @@ sitePreviewApp.all("*", async (c) => {
       headers,
       body: method === "GET" || method === "HEAD" ? undefined : await c.req.arrayBuffer(),
       redirect: "manual",
-      signal: AbortSignal.timeout(20_000),
+      signal: abort.signal,
     });
+    clearTimeout(timer);
   } catch {
-    return c.text("Kunne ikke hente nettsiden", 502);
+    clearTimeout(timer);
+    // Timed out or unreachable: fail fast so the page can still finish loading.
+    return c.text("Kunne ikke hente denne delen av nettsiden", 504);
   }
 
   const out = new Headers(res.headers);

@@ -11,6 +11,15 @@
       rel="stylesheet"
     />
     <title>Agenci</title>
+    <script>
+      // Apply the saved theme before first paint (see src/lib/theme.ts).
+      try {
+        var t = localStorage.getItem("agenci:pref:theme");
+        var d = t === "dark" || (t !== "light" && matchMedia("(prefers-color-scheme: dark)").matches);
+        if (d) document.documentElement.classList.add("dark");
+        document.documentElement.style.colorScheme = d ? "dark" : "light";
+      } catch (e) {}
+    </script>
   </head>
   <body class="font-sans antialiased">
     <div id="app"></div>

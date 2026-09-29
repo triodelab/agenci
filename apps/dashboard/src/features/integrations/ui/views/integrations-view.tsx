@@ -23,7 +23,7 @@ const pillButton =
   "inline-flex h-9 items-center gap-1.5 rounded-full px-3.5 text-[13px] font-medium transition-[background-color,color,transform] duration-150 active:scale-[0.985] disabled:pointer-events-none disabled:opacity-40";
 
 const cardClass =
-  "rounded-[20px] border border-white/80 bg-white shadow-[0_1px_3px_rgb(5_6_7/0.06),0_14px_34px_-16px_rgb(5_6_7/0.2)] dark:border-white/5 dark:bg-(--card)";
+  "rounded-[20px] border border-(--dash-edge)/80 bg-(--dash-surface) shadow-[0_1px_3px_rgb(5_6_7/0.06),0_14px_34px_-16px_rgb(5_6_7/0.2)] dark:border-white/5 dark:bg-(--card)";
 
 const DAY = 86_400_000;
 
@@ -48,7 +48,7 @@ function BrandLogo({
   return (
     <span
       aria-hidden
-      className="block shrink-0 dark:!bg-white"
+      className="block shrink-0"
       style={{
         width: size,
         height: size,
@@ -72,7 +72,7 @@ function LogoTile({
 }) {
   return (
     <span
-      className="flex shrink-0 items-center justify-center rounded-[11px] border border-[#E9EBEA] bg-white shadow-[0_1px_2px_rgb(5_6_7/0.05)] dark:border-white/10 dark:bg-white/5"
+      className="flex shrink-0 items-center justify-center rounded-[11px] border border-[#E9EBEA] bg-white shadow-[0_1px_2px_rgb(5_6_7/0.05)] dark:border-transparent"
       style={{ width: size, height: size }}
     >
       <BrandLogo logo={logo} color={color} size={Math.round(size * 0.52)} />
@@ -228,7 +228,7 @@ export function IntegrationsView({ agentId }: { agentId: string }) {
               onClick={() =>
                 row.value && void flash(row.value, row.label, row.key)
               }
-              className="group inline-flex h-8 items-center gap-2 rounded-full bg-[#f5f6f5] pr-2.5 pl-3 text-[12px] text-(--agenci-ink-3) transition-colors hover:bg-[#eef0ef] dark:bg-white/5"
+              className="group inline-flex h-8 items-center gap-2 rounded-full bg-(--dash-subtle) pr-2.5 pl-3 text-[12px] text-(--agenci-ink-3) transition-colors hover:bg-(--dash-subtle) dark:bg-white/5"
             >
               {row.label}
               <span
@@ -241,7 +241,7 @@ export function IntegrationsView({ agentId }: { agentId: string }) {
               </span>
               {copied === row.key ? (
                 <CheckIcon
-                  className="size-3.5 text-[#2F7D46]"
+                  className="size-3.5 text-(--dash-good)"
                   strokeWidth={2.2}
                 />
               ) : (
@@ -257,7 +257,7 @@ export function IntegrationsView({ agentId }: { agentId: string }) {
               href={agent?.websiteUrl ?? "#"}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex h-8 items-center gap-1.5 rounded-full border border-(--agenci-line) px-3 text-[12px] text-(--agenci-ink) transition-colors hover:bg-[#f6f7f6]"
+              className="inline-flex h-8 items-center gap-1.5 rounded-full border border-(--agenci-line) px-3 text-[12px] text-(--agenci-ink) transition-colors hover:bg-(--dash-subtle)"
             >
               Test på {website}
               <ArrowUpRightIcon className="size-3.5" strokeWidth={1.6} />
@@ -273,7 +273,7 @@ export function IntegrationsView({ agentId }: { agentId: string }) {
           "grid shrink-0 overflow-hidden lg:grid-cols-[280px_minmax(0,1fr)]",
         )}
       >
-        <div className="border-b border-[#EEF0EF] p-3 lg:border-r lg:border-b-0 dark:border-white/5">
+        <div className="border-b border-(--agenci-line) p-3 lg:border-r lg:border-b-0 dark:border-white/5">
           <p className="px-2.5 pt-2 pb-2 text-[12px] font-medium tracking-[0.06em] text-(--agenci-ink-3) uppercase">
             Hvor ligger nettsiden?
           </p>
@@ -294,8 +294,8 @@ export function IntegrationsView({ agentId }: { agentId: string }) {
                   className={cn(
                     "flex items-center gap-3 rounded-[14px] px-2.5 py-2 text-left transition-[background-color,box-shadow] duration-150",
                     active
-                      ? "bg-[#f3f4f3] shadow-[inset_0_0_0_1px_rgb(36_50_54/0.12)] dark:bg-white/10"
-                      : "hover:bg-[#f7f8f7] dark:hover:bg-white/5",
+                      ? "bg-(--dash-subtle) shadow-[inset_0_0_0_1px_rgb(36_50_54/0.12)] dark:bg-white/10"
+                      : "hover:bg-(--dash-subtle-2) dark:hover:bg-white/5",
                   )}
                 >
                   <LogoTile logo={p.logo} color={p.color} size={36} />
@@ -334,7 +334,7 @@ export function IntegrationsView({ agentId }: { agentId: string }) {
               href={mailto}
               className={cn(
                 pillButton,
-                "ml-auto border border-(--agenci-line) bg-white text-(--agenci-ink) hover:bg-[#f6f7f6] dark:bg-transparent",
+                "ml-auto border border-(--agenci-line) bg-(--dash-surface) text-(--agenci-ink) hover:bg-(--dash-subtle) dark:bg-transparent",
                 !snippet && "pointer-events-none opacity-40",
               )}
             >
@@ -364,11 +364,11 @@ export function IntegrationsView({ agentId }: { agentId: string }) {
                   </p>
                   {i === 1 ? (
                     <div className="mt-3 overflow-hidden rounded-[14px] bg-[#16181A] text-[#E7E9E8] shadow-[0_18px_40px_-22px_rgb(5_6_7/0.55)]">
-                      <div className="flex items-center gap-2 border-b border-white/[0.07] px-4 py-2.5">
+                      <div className="flex items-center gap-2 border-b border-(--dash-edge)/[0.07] px-4 py-2.5">
                         <span className="flex gap-1.5" aria-hidden>
-                          <span className="size-2.5 rounded-full bg-white/15" />
-                          <span className="size-2.5 rounded-full bg-white/15" />
-                          <span className="size-2.5 rounded-full bg-white/15" />
+                          <span className="size-2.5 rounded-full bg-(--dash-surface)/15" />
+                          <span className="size-2.5 rounded-full bg-(--dash-surface)/15" />
+                          <span className="size-2.5 rounded-full bg-(--dash-surface)/15" />
                         </span>
                         <span
                           className={cn(
@@ -387,8 +387,8 @@ export function IntegrationsView({ agentId }: { agentId: string }) {
                           className={cn(
                             "ml-auto inline-flex h-7 shrink-0 items-center gap-1.5 rounded-full px-3 text-[12px] font-medium transition-colors",
                             copied === "snippet"
-                              ? "bg-[#E2F2E5] text-[#2F7D46]"
-                              : "bg-white text-[#16181A] hover:bg-white/85",
+                              ? "bg-(--dash-good-bg) text-(--dash-good)"
+                              : "bg-(--dash-surface) text-(--agenci-ink) hover:bg-(--dash-surface)/85",
                           )}
                         >
                           {copied === "snippet" ? (
@@ -413,7 +413,7 @@ export function IntegrationsView({ agentId }: { agentId: string }) {
             ))}
           </ol>
 
-          <p className="mt-6 flex items-center gap-2 border-t border-[#EEF0EF] pt-4 text-[12.5px] text-(--agenci-ink-3) dark:border-white/5">
+          <p className="mt-6 flex items-center gap-2 border-t border-(--agenci-line) pt-4 text-[12.5px] text-(--agenci-ink-3) dark:border-white/5">
             <ZapIcon className="size-3.5" strokeWidth={1.6} />
             Koden lastes i bakgrunnen og gjør ikke nettsiden tregere.
           </p>
@@ -426,7 +426,7 @@ export function IntegrationsView({ agentId }: { agentId: string }) {
           <h2 className="text-[16px] font-semibold tracking-[-0.01em] text-(--agenci-ink)">
             Flere integrasjoner på vei
           </h2>
-          <span className="rounded-full bg-[#f1f2f1] px-2.5 py-0.5 text-[11.5px] text-(--agenci-ink-2) dark:bg-white/10">
+          <span className="rounded-full bg-(--dash-subtle) px-2.5 py-0.5 text-[11.5px] text-(--agenci-ink-2) dark:bg-white/10">
             Kommer snart
           </span>
           <p className="w-full text-[13px] text-(--agenci-ink-3)">
@@ -444,7 +444,7 @@ export function IntegrationsView({ agentId }: { agentId: string }) {
             >
               <div className="flex items-start justify-between">
                 <LogoTile logo={i.logo} color={i.color} size={46} />
-                <span className="rounded-full bg-[#f3f4f3] px-2.5 py-0.5 text-[11.5px] text-(--agenci-ink-2) dark:bg-white/10">
+                <span className="rounded-full bg-(--dash-subtle) px-2.5 py-0.5 text-[11.5px] text-(--agenci-ink-2) dark:bg-white/10">
                   {i.category}
                 </span>
               </div>
@@ -456,7 +456,7 @@ export function IntegrationsView({ agentId }: { agentId: string }) {
               </p>
               <a
                 href={`mailto:post@triodelab.no?subject=${encodeURIComponent(`Varsle meg om ${i.name}-integrasjonen`)}`}
-                className="mt-4 inline-flex h-8 w-fit items-center gap-1.5 rounded-full border border-(--agenci-line) px-3 text-[12.5px] text-(--agenci-ink) transition-colors hover:bg-[#f6f7f6] dark:hover:bg-white/5"
+                className="mt-4 inline-flex h-8 w-fit items-center gap-1.5 rounded-full border border-(--agenci-line) px-3 text-[12.5px] text-(--agenci-ink) transition-colors hover:bg-(--dash-subtle) dark:hover:bg-white/5"
               >
                 <BellIcon className="size-3.5" strokeWidth={1.6} />
                 Varsle meg

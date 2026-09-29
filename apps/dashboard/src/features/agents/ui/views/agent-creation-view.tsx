@@ -21,6 +21,12 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { AgenciLoader } from "@/components/agenci-loader";
 import {
+  OnboardingShell,
+  onboardingLinkCls,
+  Stepper,
+} from "@/components/onboarding-shell";
+import { skipOnboarding } from "@/lib/onboarding";
+import {
   useAddWebpageMutation,
   useAgentDocumentsQuery,
   useAgentsListQuery,
@@ -52,6 +58,8 @@ const TEMPLATES = [
 ] as const;
 
 const STEPS = ["Agent", "Kunnskap", "Opprett"] as const;
+/** Past the last onboarding step: everything ticked off. */
+const ONBOARDING_DONE = 4;
 type Step = 0 | 1 | 2;
 
 /** Accepts "triodelab.no" as well as full URLs. */
@@ -82,7 +90,7 @@ function initials(name: string) {
 }
 
 const inputBase =
-  "w-full rounded-[12px] border border-[#d7dce2] bg-white text-(--agenci-ink) outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-[#b3b9be] focus:border-(--agenci-ink-3) focus:shadow-[0_0_0_4px_rgb(36_50_54/0.07)] dark:border-white/10 dark:bg-transparent";
+  "w-full rounded-[12px] border border-(--dash-field) bg-(--dash-surface) text-(--agenci-ink) outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-(--dash-placeholder) focus:border-(--agenci-ink-3) focus:shadow-[0_0_0_4px_rgb(36_50_54/0.07)] dark:border-white/10 dark:bg-transparent";
 
 function PrimaryButton({
   children,
@@ -112,60 +120,11 @@ function BackButton({ onClick }: { onClick: () => void }) {
     <button
       type="button"
       onClick={onClick}
-      className="inline-flex h-12 items-center gap-1.5 rounded-full px-5 text-[15px] font-medium text-(--agenci-ink-2) transition-colors hover:bg-[#f1f3f2] hover:text-(--agenci-ink) dark:hover:bg-white/5"
+      className="inline-flex h-12 items-center gap-1.5 rounded-full px-5 text-[15px] font-medium text-(--agenci-ink-2) transition-colors hover:bg-(--dash-subtle) hover:text-(--agenci-ink) dark:hover:bg-white/5"
     >
       <ArrowLeftIcon className="size-4" {...icon} />
       Tilbake
     </button>
-  );
-}
-
-function Stepper({ step }: { step: Step }) {
-  return (
-    <ol className="flex items-center gap-2" aria-label="Fremdrift">
-      {STEPS.map((label, i) => (
-        <li key={label} className="flex items-center gap-2">
-          <span
-            className={cn(
-              "flex items-center gap-2.5 text-[13.5px] transition-colors duration-300",
-              i === step
-                ? "font-medium text-(--agenci-ink)"
-                : i < step
-                  ? "text-(--agenci-ink-2)"
-                  : "text-(--agenci-ink-3)",
-            )}
-            aria-current={i === step ? "step" : undefined}
-          >
-            <span
-              className={cn(
-                dataText,
-                "flex size-6 items-center justify-center rounded-full text-[12px] transition-[background-color,color,box-shadow] duration-300",
-                i < step && "bg-(--agenci-ink) text-white dark:text-[#0b0c0e]",
-                i === step &&
-                  "text-(--agenci-ink) shadow-[inset_0_0_0_1.5px_var(--agenci-ink)]",
-                i > step &&
-                  "text-(--agenci-ink-3) shadow-[inset_0_0_0_1px_var(--agenci-line)]",
-              )}
-            >
-              {i < step ? (
-                <CheckIcon className="size-3" strokeWidth={2.5} />
-              ) : (
-                i + 1
-              )}
-            </span>
-            <span className="hidden sm:inline">{label}</span>
-          </span>
-          {i < STEPS.length - 1 ? (
-            <span className="relative h-px w-8 overflow-hidden bg-(--agenci-line) sm:w-14">
-              <span
-                className="absolute inset-y-0 left-0 bg-(--agenci-ink) transition-[width] duration-500 ease-[cubic-bezier(.23,1,.32,1)]"
-                style={{ width: i < step ? "100%" : "0%" }}
-              />
-            </span>
-          ) : null}
-        </li>
-      ))}
-    </ol>
   );
 }
 
@@ -178,22 +137,22 @@ const CARD_STATUS: Record<
   draft: {
     label: "Utkast",
     dot: "bg-(--agenci-ink-3)",
-    pill: "bg-[#f1f3f2] text-(--agenci-ink-2) dark:bg-white/5",
+    pill: "bg-(--dash-subtle) text-(--agenci-ink-2) dark:bg-white/5",
   },
   learning: {
     label: "Lærer",
     dot: "bg-[#E49A62] animate-pulse",
-    pill: "bg-[#fbf1e9] text-[#9a5a2a]",
+    pill: "bg-(--dash-warn-bg) text-(--dash-warn)",
   },
   ready: {
     label: "Aktiv",
     dot: "bg-(--agenci-ink)",
-    pill: "bg-[#f1f3f2] text-(--agenci-ink) dark:bg-white/5",
+    pill: "bg-(--dash-subtle) text-(--agenci-ink) dark:bg-white/5",
   },
   failed: {
     label: "Feilet",
     dot: "bg-[#C4453A]",
-    pill: "bg-[#fbeceb] text-[#a3372d]",
+    pill: "bg-(--dash-bad-bg) text-(--dash-bad)",
   },
 };
 
@@ -227,7 +186,7 @@ function PreviewCard({
     ["Språk", "Norsk"],
   ];
   return (
-    <div className="relative overflow-hidden rounded-[24px] border border-(--agenci-line) bg-white shadow-[0_1px_2px_rgb(5_6_7/0.04),0_32px_64px_-32px_rgb(5_6_7/0.32)] dark:bg-(--card)">
+    <div className="relative overflow-hidden rounded-[24px] border border-(--agenci-line) bg-(--dash-surface) shadow-[0_1px_2px_rgb(5_6_7/0.04),0_32px_64px_-32px_rgb(5_6_7/0.32)] dark:bg-(--card)">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-0 top-0 h-44 transition-[background] duration-700"
@@ -308,7 +267,7 @@ function PreviewCard({
           ))}
         </div>
       </div>
-      <div className="relative flex items-center gap-2 border-t border-(--agenci-line) bg-[#fafbfa] px-7 py-4 dark:bg-white/[0.02]">
+      <div className="relative flex items-center gap-2 border-t border-(--agenci-line) bg-(--dash-subtle-2) px-7 py-4 dark:bg-white/[0.02]">
         <span
           className={cn(
             "inline-flex h-7 items-center gap-1.5 rounded-full px-3 text-[12.5px] font-medium",
@@ -394,7 +353,7 @@ function StepAgent({
                   "h-9 rounded-full px-4 text-[13.5px] font-medium transition-[background-color,color,box-shadow] duration-150 active:scale-[0.97]",
                   active
                     ? "bg-(--agenci-ink) text-white dark:text-[#0b0c0e]"
-                    : "bg-[#f1f3f2] text-(--agenci-ink-2) hover:text-(--agenci-ink) dark:bg-white/5",
+                    : "bg-(--dash-subtle) text-(--agenci-ink-2) hover:text-(--agenci-ink) dark:bg-white/5",
                 )}
               >
                 {t.label}
@@ -509,7 +468,7 @@ function StepKnowledge({
         <span
           className={cn(
             "mt-2.5 block text-[13px]",
-            invalid ? "text-[#a3372d]" : "text-(--agenci-ink-3)",
+            invalid ? "text-(--dash-bad)" : "text-(--agenci-ink-3)",
           )}
         >
           {invalid
@@ -565,7 +524,7 @@ function StepReview({
         Klar til å lære
       </h1>
 
-      <dl className="mt-8 divide-y divide-(--agenci-line) rounded-[16px] border border-(--agenci-line) bg-white dark:bg-transparent">
+      <dl className="mt-8 divide-y divide-(--agenci-line) rounded-[16px] border border-(--agenci-line) bg-(--dash-surface) dark:bg-transparent">
         {rows.map((r) => (
           <div key={r.label} className="flex items-start gap-4 px-5 py-4">
             <dt className="w-32 shrink-0 pt-px text-[13.5px] text-(--agenci-ink-3)">
@@ -691,7 +650,7 @@ function Learning({
               : "Dette tar vanligvis under ett minutt. Du kan gå videre imens."}
         </p>
 
-        <ol className="mt-10 overflow-hidden rounded-[20px] border border-(--agenci-line) bg-white dark:bg-transparent">
+        <ol className="mt-10 overflow-hidden rounded-[20px] border border-(--agenci-line) bg-(--dash-surface) dark:bg-transparent">
           {PHASES.map((p, i) => {
             const state =
               failed && i === phase
@@ -707,7 +666,7 @@ function Learning({
                 className={cn(
                   "relative flex items-center gap-4 px-5 py-4 transition-colors duration-300",
                   i > 0 && "border-t border-(--agenci-line)",
-                  state === "active" && "bg-[#fafbfa] dark:bg-white/[0.03]",
+                  state === "active" && "bg-(--dash-subtle-2) dark:bg-white/[0.03]",
                 )}
               >
                 <span
@@ -716,10 +675,10 @@ function Learning({
                     state === "done" &&
                       "bg-(--agenci-ink) text-white dark:text-[#0b0c0e]",
                     state === "active" &&
-                      "bg-white shadow-[inset_0_0_0_1.5px_var(--agenci-ink)] dark:bg-transparent",
+                      "bg-(--dash-surface) shadow-[inset_0_0_0_1.5px_var(--agenci-ink)] dark:bg-transparent",
                     state === "todo" &&
                       "text-(--agenci-ink-3) shadow-[inset_0_0_0_1px_var(--agenci-line)]",
-                    state === "failed" && "bg-[#fbeceb] text-[#a3372d]",
+                    state === "failed" && "bg-(--dash-bad-bg) text-(--dash-bad)",
                   )}
                 >
                   {state === "done" ? (
@@ -752,7 +711,7 @@ function Learning({
                     dataText,
                     "shrink-0 text-[12.5px]",
                     state === "failed"
-                      ? "text-[#a3372d]"
+                      ? "text-(--dash-bad)"
                       : "text-(--agenci-ink-3)",
                   )}
                 >
@@ -796,7 +755,7 @@ function Learning({
                 : "/org/$orgSlug/agents/$agentId"
             }
             params={params}
-            className="inline-flex h-12 items-center gap-2 rounded-full px-5 text-[15px] font-medium text-(--agenci-ink-2) transition-colors hover:bg-[#f1f3f2] hover:text-(--agenci-ink) dark:hover:bg-white/5"
+            className="inline-flex h-12 items-center gap-2 rounded-full px-5 text-[15px] font-medium text-(--agenci-ink-2) transition-colors hover:bg-(--dash-subtle) hover:text-(--agenci-ink) dark:hover:bg-white/5"
           >
             {done ? (
               <>
@@ -814,7 +773,7 @@ function Learning({
             <Link
               to="/org/$orgSlug/agents/$agentId/conversations"
               params={params}
-              className="inline-flex h-12 items-center gap-2 rounded-full px-5 text-[15px] font-medium text-(--agenci-ink-2) transition-colors hover:bg-[#f1f3f2] hover:text-(--agenci-ink) dark:hover:bg-white/5"
+              className="inline-flex h-12 items-center gap-2 rounded-full px-5 text-[15px] font-medium text-(--agenci-ink-2) transition-colors hover:bg-(--dash-subtle) hover:text-(--agenci-ink) dark:hover:bg-white/5"
             >
               <MessagesSquareIcon className="size-4" {...icon} />
               Samtaler
@@ -841,7 +800,15 @@ function Learning({
 
 /* ---------- Page ---------- */
 
-export default function AgentCreationView() {
+/**
+ * `onboarding`: the second half of the first-time flow (after naming the
+ * company) — full screen, no sidebar, one stepper for the whole flow.
+ */
+export default function AgentCreationView({
+  onboarding = false,
+}: {
+  onboarding?: boolean;
+}) {
   const { orgSlug } = useParams({ from: "/_authed/org/$orgSlug" });
   const draft = useAgentDraftStore((s) => s.draft);
   const setDraft = useAgentDraftStore((s) => s.setDraft);
@@ -864,7 +831,7 @@ export default function AgentCreationView() {
   }, [name, description, url, created, setDraft]);
 
   if (created) {
-    return (
+    const learning = (
       <div className="flex w-full flex-col py-4 lg:py-10">
         <Learning
           agentId={created.id}
@@ -873,6 +840,21 @@ export default function AgentCreationView() {
           url={created.url}
         />
       </div>
+    );
+    return onboarding ? (
+      <OnboardingShell
+        step={ONBOARDING_DONE}
+        action={
+          <Link to="/org/$orgSlug/agents" params={{ orgSlug }} className={onboardingLinkCls}>
+            Til dashbordet
+            <ArrowRightIcon className="size-4" {...icon} />
+          </Link>
+        }
+      >
+        {learning}
+      </OnboardingShell>
+    ) : (
+      learning
     );
   }
 
@@ -891,22 +873,27 @@ export default function AgentCreationView() {
     });
   };
 
-  return (
+  const form = (
     <div className="flex w-full flex-col">
+      {onboarding ? null : (
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4">
         <Link
           to="/org/$orgSlug/agents"
           params={{ orgSlug }}
-          className="inline-flex h-9 items-center gap-1.5 rounded-full pr-3 pl-2 text-[13px] font-medium text-(--agenci-ink-2) transition-colors hover:bg-[#f1f3f2] hover:text-(--agenci-ink) dark:hover:bg-white/5"
+          className="inline-flex h-9 items-center gap-1.5 rounded-full pr-3 pl-2 text-[13px] font-medium text-(--agenci-ink-2) transition-colors hover:bg-(--dash-subtle) hover:text-(--agenci-ink) dark:hover:bg-white/5"
         >
           <XIcon className="size-4" {...icon} />
           Avbryt
         </Link>
-        <Stepper step={step} />
+        <Stepper step={step} labels={STEPS} />
         <span className="w-[76px]" aria-hidden />
       </div>
+      )}
 
-      <div className="mx-auto mt-10 grid w-full max-w-6xl items-start gap-10 lg:mt-16 lg:grid-cols-[minmax(0,1fr)_460px] lg:gap-20">
+      <div className={cn(
+          "mx-auto grid w-full max-w-6xl items-start gap-10 lg:grid-cols-[minmax(0,1fr)_460px] lg:gap-20",
+          !onboarding && "mt-10 lg:mt-16",
+        )}>
         <div key={step} className="max-w-[600px]">
           {step === 0 ? (
             <StepAgent
@@ -945,5 +932,24 @@ export default function AgentCreationView() {
         </aside>
       </div>
     </div>
+  );
+
+  if (!onboarding) return form;
+  return (
+    <OnboardingShell
+      step={step + 1}
+      action={
+        <Link
+          to="/org/$orgSlug/agents"
+          params={{ orgSlug }}
+          onClick={() => skipOnboarding(orgSlug)}
+          className={onboardingLinkCls}
+        >
+          Hopp over
+        </Link>
+      }
+    >
+      {form}
+    </OnboardingShell>
   );
 }

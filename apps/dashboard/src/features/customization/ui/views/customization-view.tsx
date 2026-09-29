@@ -23,6 +23,7 @@ import { getWidgetPreviewUrl } from "@/lib/widget-preview-url";
 import {
   useSaveWidgetCustomizationMutation,
   useWidgetCustomizationQuery,
+  reloadWidgetSite,
   useWidgetSiteQuery,
   type WidgetAppearanceDraft,
   type WidgetCustomization,
@@ -196,12 +197,12 @@ export function CustomizationView({ agentId }: { agentId: string }) {
           {[180, 260, 200].map((h) => (
             <div
               key={h}
-              className="animate-pulse rounded-[20px] bg-[#f3f5f4]"
+              className="animate-pulse rounded-[20px] bg-(--dash-subtle)"
               style={{ height: h }}
             />
           ))}
         </div>
-        <div className="hidden animate-pulse rounded-[20px] bg-[#f3f5f4] xl:block" />
+        <div className="hidden animate-pulse rounded-[20px] bg-(--dash-subtle) xl:block" />
       </div>
     );
   }
@@ -243,7 +244,7 @@ export function CustomizationView({ agentId }: { agentId: string }) {
           <span
             className={cn(
               "flex items-center gap-1.5 text-[12.5px] transition-opacity duration-200",
-              dirty ? "text-[#B06A34] opacity-100" : "text-(--agenci-ink-3)",
+              dirty ? "text-(--dash-warn) opacity-100" : "text-(--agenci-ink-3)",
             )}
           >
             <span
@@ -262,7 +263,7 @@ export function CustomizationView({ agentId }: { agentId: string }) {
             type="button"
             disabled={!dirty || save.isPending}
             onClick={() => saved && setDraft(saved)}
-            className="h-9 rounded-full border border-(--agenci-line) bg-white px-3.5 text-[13px] font-medium text-(--agenci-ink) transition-[background-color,opacity] hover:bg-[#f6f7f6] disabled:opacity-40 dark:bg-transparent"
+            className="h-9 rounded-full border border-(--agenci-line) bg-(--dash-surface) px-3.5 text-[13px] font-medium text-(--agenci-ink) transition-[background-color,opacity] hover:bg-(--dash-subtle) disabled:opacity-40 dark:bg-transparent"
           >
             Angre
           </button>
@@ -283,7 +284,7 @@ export function CustomizationView({ agentId }: { agentId: string }) {
             <kbd
               className={cn(
                 dataText,
-                "hidden rounded-[6px] bg-white/15 px-1.5 text-[12px] sm:inline",
+                "hidden rounded-[6px] bg-(--dash-surface)/15 px-1.5 text-[12px] sm:inline",
               )}
             >
               ⌘S
@@ -484,7 +485,7 @@ export function CustomizationView({ agentId }: { agentId: string }) {
         {/* Live preview */}
         {/* Hidden (not unmounted) on the behaviour tab so the widget keeps its state. */}
         <div className={cn("min-w-0", tab === "behavior" && "hidden")}>
-          <div className="sticky top-0 flex h-[min(820px,calc(100dvh-180px))] min-h-[560px] flex-col rounded-[24px] border border-(--agenci-line) bg-[linear-gradient(180deg,#f7f8f7,#eef0ef)] p-4 dark:bg-white/[0.03]">
+          <div className="sticky top-0 flex h-[min(820px,calc(100dvh-180px))] min-h-[560px] flex-col rounded-[24px] border border-(--agenci-line) bg-[linear-gradient(180deg,#f7f8f7,#eef0ef)] p-4 dark:bg-none dark:bg-white/[0.03]">
             <div className="mb-3 flex items-center gap-2">
               <span className="flex items-center gap-2 text-[13px] font-medium text-(--agenci-ink)">
                 <span className="relative flex size-2">
@@ -511,7 +512,7 @@ export function CustomizationView({ agentId }: { agentId: string }) {
                   onClick={() => setPreviewKey((k) => k + 1)}
                   aria-label="Start forhåndsvisningen på nytt"
                   title="Start samtalen på nytt"
-                  className="flex size-8 items-center justify-center rounded-full bg-white text-(--agenci-ink-2) shadow-[0_1px_2px_rgb(5_6_7/0.08)] hover:text-(--agenci-ink) dark:bg-white/10"
+                  className="flex size-8 items-center justify-center rounded-full bg-(--dash-surface) text-(--agenci-ink-2) shadow-[0_1px_2px_rgb(5_6_7/0.08)] hover:text-(--agenci-ink) dark:bg-white/10"
                 >
                   <RefreshCwIcon
                     className="size-3.5"
@@ -531,6 +532,7 @@ export function CustomizationView({ agentId }: { agentId: string }) {
                 siteUrl={data.brand?.sourceUrl ?? null}
                 site={site ?? null}
                 siteLoading={siteLoading}
+                onReloadSite={() => reloadWidgetSite(agentId, device)}
                 device={device}
                 open={open}
                 onToggleOpen={() => setOpen((o) => !o)}

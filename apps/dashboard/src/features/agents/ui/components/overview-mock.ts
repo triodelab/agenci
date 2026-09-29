@@ -127,6 +127,8 @@ export function demoConversations(now = new Date()): ConversationSummary[] {
         lastMessage: {
           id: `${DEMO_PREFIX}m${out.length}`,
           role: "assistant",
+          author: "agent",
+          authorName: null,
           text: ANSWERS[Math.floor(r() * ANSWERS.length)] ?? "",
           createdAt: updated.toISOString(),
         },
@@ -238,6 +240,8 @@ export function setDemoConversationStatus(
 type DemoMessage = {
   id: string;
   role: "user" | "assistant";
+  author: "visitor" | "agent" | "team";
+  authorName: string | null;
   text: string;
   createdAt: string;
 };
@@ -273,6 +277,8 @@ export function demoConversationDetail(
     messages.push({
       id: `${threadId}-m${i}`,
       role,
+      author: role === "user" ? "visitor" : "agent",
+      authorName: null,
       text,
       createdAt: new Date(start + i * step).toISOString(),
     });

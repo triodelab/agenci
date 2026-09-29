@@ -9,7 +9,7 @@ export function ConversationsView() {
         <div className="flex w-full max-w-lg flex-col items-center text-center">
           <div
             aria-hidden
-            className="mb-6 flex size-16 items-center justify-center rounded-2xl bg-[#f3f5f4] text-(--agenci-ink) dark:bg-white/5"
+            className="mb-6 flex size-16 items-center justify-center rounded-2xl bg-(--dash-subtle) text-(--agenci-ink) dark:bg-white/5"
           >
             <InboxIcon className="size-7" strokeWidth={1.5} />
           </div>

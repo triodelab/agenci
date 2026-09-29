@@ -6,61 +6,23 @@
  */
 import prisma from "@agenci/db";
 import { ORPCError } from "@orpc/server";
-import { memoryStore } from "@/mastra/store";
 import { privateProcedure } from "@/routers/procedures";
+import {
+  appendThreadMessage,
+  listThreadMessages,
+  recordTeamReply,
+} from "./service";
 import {
   ConversationUsageResponseSchema,
   GetConversationResponseSchema,
   GetConversationSchema,
   ListConversationsResponseSchema,
   ListConversationsSchema,
+  ReplyToConversationResponseSchema,
+  ReplyToConversationSchema,
   SetConversationStatusResponseSchema,
   SetConversationStatusSchema,
 } from "./schema";
-
-async function memoryStorage() {
-  const storage = await memoryStore.getStore("memory");
-  if (!storage) {
-    throw new ORPCError("INTERNAL_SERVER_ERROR", {
-      message: "Samtalelageret er ikke tilgjengelig",
-    });
-  }
-  return storage;
-}
-
-type MemoryStorage = Awaited<ReturnType<typeof memoryStorage>>;
-type DbMessage = Awaited<
-  ReturnType<MemoryStorage["listMessages"]>
->["messages"][number];
-
-function textOf(message: DbMessage): string {
-  const content = message.content as unknown as {
-    parts?: { type?: string; text?: string }[];
-    content?: string;
-  };
-  const fromParts = (content?.parts ?? [])
-    .filter((p) => p.type === "text" && typeof p.text === "string")
-    .map((p) => p.text as string)
-    .join("\n")
-    .trim();
-  return (
-    fromParts ||
-    (typeof content?.content === "string" ? content.content.trim() : "")
-  );
-}
-
-function toMessages(raw: DbMessage[]) {
-  return raw
-    .filter((m) => m.role === "user" || m.role === "assistant")
-    .map((m) => ({
-      id: m.id,
-      role: m.role as "user" | "assistant",
-      text: textOf(m),
-      createdAt: new Date(m.createdAt).toISOString(),
-    }))
-    .filter((m) => m.text.length > 0)
-    .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
-}
 
 function metaString(meta: unknown, key: string): string | null {
   if (!meta || typeof meta !== "object") return null;
@@ -107,6 +69,10 @@ function toSummary(row: ConversationRow) {
           role: (row.lastMessageRole === "user" ? "user" : "assistant") as
             | "user"
             | "assistant",
+          author: (row.lastMessageRole === "user" ? "visitor" : "agent") as
+            | "visitor"
+            | "agent",
+          authorName: null,
           text: row.lastMessage,
           createdAt: row.lastMessageAt.toISOString(),
         }
@@ -192,18 +158,53 @@ export const conversationsRouter = {
       });
       if (!row) return { conversation: null };
 
-      const storage = await memoryStorage();
-      const { messages } = await storage.listMessages({
-        threadId: row.id,
-        perPage: false,
-      });
       return {
         conversation: {
           ...toSummary(row),
           agentName: row.agent.name,
-          messages: toMessages(messages),
+          messages: await listThreadMessages(row.id),
         },
       };
+    }),
+
+  /**
+   * A person from the team answers the visitor. The message goes into the
+   * same thread the agent uses, and the conversation becomes "escalated"
+   * (the team has it): the agent stops replying until someone sets it back
+   * to "unresolved". The widget picks the reply up via `chat.history`.
+   */
+  reply: privateProcedure
+    .input(ReplyToConversationSchema)
+    .output(ReplyToConversationResponseSchema)
+    .handler(async ({ input, context }) => {
+      const row = await prisma.conversation.findFirst({
+        where: {
+          id: input.threadId,
+          organizationId: context.organizationId,
+          agentId: input.agentId,
+        },
+        select: { id: true, contactSessionId: true },
+      });
+      if (!row) {
+        throw new ORPCError("NOT_FOUND", { message: "Samtalen ble ikke funnet" });
+      }
+      const user = await prisma.user.findUnique({
+        where: { id: context.userId },
+        select: { name: true },
+      });
+      await appendThreadMessage({
+        threadId: row.id,
+        resourceId: `${context.organizationId}:contact:${row.contactSessionId}`,
+        role: "assistant",
+        text: input.text,
+        metadata: {
+          author: "team",
+          authorName: user?.name?.trim() || null,
+          userId: context.userId,
+        },
+      });
+      await recordTeamReply(row.id, input.text);
+      return { ok: true as const };
     }),
 
   setStatus: privateProcedure

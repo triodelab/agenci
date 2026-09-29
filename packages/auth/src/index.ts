@@ -10,6 +10,7 @@
 import { createPrismaClient } from "@agenci/db";
 import { env } from "@agenci/env/server";
 import { betterAuth } from "better-auth";
+import { APIError } from "better-auth/api";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { organization } from "better-auth/plugins/organization";
 import { sendInvitationViaResend } from "./invitation-email";
@@ -49,6 +50,34 @@ export function createAuth() {
 
     emailAndPassword: {
       enabled: true,
+    },
+
+    /**
+     * Self-serve account deletion (Innstillinger → Sikkerhet). The client
+     * sends the password, which Better Auth verifies. Refused while the user
+     * is the only owner of an organization, so no team is left without an
+     * owner — they delete the organization or hand it over first.
+     */
+    user: {
+      deleteUser: {
+        enabled: true,
+        async beforeDelete(user) {
+          const owned = await prisma.member.findMany({
+            where: { userId: user.id, role: "owner" },
+            select: { organizationId: true, organization: { select: { name: true } } },
+          });
+          for (const m of owned) {
+            const owners = await prisma.member.count({
+              where: { organizationId: m.organizationId, role: "owner" },
+            });
+            if (owners <= 1) {
+              throw new APIError("BAD_REQUEST", {
+                message: `Du er eneste eier av ${m.organization.name}. Slett organisasjonen eller gjør noen andre til eier først.`,
+              });
+            }
+          }
+        },
+      },
     },
     secret: env.BETTER_AUTH_SECRET,
     // Public URL of the auth API (Hono). For local Next rewrites, keep this as the server origin.

@@ -11,7 +11,7 @@ export function DemoSwitch() {
       aria-checked={on}
       onClick={toggle}
       title={on ? "Viser eksempeltall" : "Viser ekte data"}
-      className="flex h-9 items-center gap-2 rounded-full border border-(--agenci-line) bg-white pr-3 pl-2 text-[12.5px] text-(--agenci-ink-2) transition-[color,transform] duration-150 hover:text-(--agenci-ink) active:scale-[0.97] dark:border-white/10 dark:bg-transparent"
+      className="flex h-9 items-center gap-2 rounded-full border border-(--agenci-line) bg-(--dash-surface) pr-3 pl-2 text-[12.5px] text-(--agenci-ink-2) transition-[color,transform] duration-150 hover:text-(--agenci-ink) active:scale-[0.97] dark:border-white/10 dark:bg-transparent"
     >
       <span
         aria-hidden
@@ -24,7 +24,7 @@ export function DemoSwitch() {
       >
         <span
           className={cn(
-            "absolute top-0.5 size-3 rounded-full bg-white shadow-sm transition-[left] duration-200 dark:bg-[#0b0c0e]",
+            "absolute top-0.5 size-3 rounded-full bg-(--dash-surface) shadow-sm transition-[left] duration-200 dark:bg-[#0b0c0e]",
             on ? "left-[14px]" : "left-0.5",
           )}
         />

@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { createFileRoute, Outlet, redirect, useMatch } from "@tanstack/react-router";
 import AppSidebar from "@/components/app-sidebar";
 import { authClient } from "@/lib/auth-client";
 
@@ -24,6 +24,12 @@ export const Route = createFileRoute("/_authed/org/$orgSlug")({
 });
 
 function RouteComponent() {
+  // Onboarding is full screen: no sidebar until the first agent exists.
+  const onboarding = useMatch({
+    from: "/_authed/org/$orgSlug/onboarding",
+    shouldThrow: false,
+  });
+  if (onboarding) return <Outlet />;
   return (
     <AppSidebar>
       <Outlet />

@@ -29,9 +29,9 @@ const WEB_URL =
 const PRICING_URL = `${WEB_URL}/priser`;
 
 const cardClass =
-  "rounded-[18px] border border-white/80 bg-white shadow-[0_1px_3px_rgb(5_6_7/0.06),0_14px_34px_-16px_rgb(5_6_7/0.18)] dark:border-white/5 dark:bg-(--card)";
+  "rounded-[18px] border border-(--dash-edge)/80 bg-(--dash-surface) shadow-[0_1px_3px_rgb(5_6_7/0.06),0_14px_34px_-16px_rgb(5_6_7/0.18)] dark:border-white/5 dark:bg-(--card)";
 const outlineBtn =
-  "inline-flex h-9 items-center gap-1.5 rounded-full border border-(--agenci-line) bg-white px-3.5 text-[13px] font-medium text-(--agenci-ink) transition-colors hover:bg-[#f6f7f6] dark:bg-transparent";
+  "inline-flex h-9 items-center gap-1.5 rounded-full border border-(--agenci-line) bg-(--dash-surface) px-3.5 text-[13px] font-medium text-(--agenci-ink) transition-colors hover:bg-(--dash-subtle) dark:bg-transparent";
 const inkBtn =
   "inline-flex h-9 items-center gap-1.5 rounded-full bg-(--agenci-ink) px-4 text-[13px] font-medium text-white transition-colors hover:bg-(--agenci-accent-hover) dark:text-[#0b0c0e]";
 
@@ -41,13 +41,13 @@ function Ring({ value }: { value: number }) {
   const pct = Math.min(1, Math.max(0, value));
   return (
     <svg viewBox="0 0 36 36" className="size-11 shrink-0 -rotate-90" aria-hidden="true">
-      <circle cx="18" cy="18" r="14.5" fill="none" stroke="#EEF0EF" strokeWidth="4.5" />
+      <circle cx="18" cy="18" r="14.5" fill="none" style={{ stroke: "var(--chart-track)" }} strokeWidth="4.5" />
       <circle
         cx="18"
         cy="18"
         r="14.5"
         fill="none"
-        stroke={pct >= 0.9 ? "#D9743A" : "var(--agenci-ink)"}
+        style={{ stroke: pct >= 0.9 ? "#D9743A" : "var(--agenci-ink)" }}
         strokeWidth="4.5"
         strokeLinecap="round"
         pathLength={100}
@@ -65,7 +65,7 @@ function Avatars({ names }: { names: string[] }) {
         <span
           key={`${n}-${i}`}
           title={n}
-          className="-ml-1.5 flex size-7 items-center justify-center rounded-full border-2 border-white bg-gradient-to-b from-[#f1f2f4] to-[#e3e6ea] text-[10.5px] font-medium text-(--agenci-ink) first:ml-0 dark:border-(--card)"
+          className="-ml-1.5 flex size-7 items-center justify-center rounded-full border-2 border-(--dash-edge) bg-gradient-to-b from-(--dash-subtle) to-(--chart-muted) text-[10.5px] font-medium text-(--agenci-ink) first:ml-0 dark:border-(--card)"
         >
           {n
             .split(/\s+/)
@@ -76,7 +76,7 @@ function Avatars({ names }: { names: string[] }) {
         </span>
       ))}
       {names.length > shown.length ? (
-        <span className="-ml-1.5 flex size-7 items-center justify-center rounded-full border-2 border-white bg-[#f3f4f3] text-[10.5px] text-(--agenci-ink-2)">
+        <span className="-ml-1.5 flex size-7 items-center justify-center rounded-full border-2 border-(--dash-edge) bg-(--dash-subtle) text-[10.5px] text-(--agenci-ink-2)">
           +{names.length - shown.length}
         </span>
       ) : null}
@@ -117,7 +117,7 @@ function UsageChart({ days, limit }: { days: number[]; limit: number }) {
       <div className="relative h-[190px]" onMouseLeave={() => setHover(null)}>
         <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 size-full overflow-visible" aria-hidden="true">
           {[25, 50, 75].map((g) => (
-            <line key={g} x1="0" x2="100" y1={g} y2={g} stroke="#EEF0EF" strokeWidth="1" vectorEffect="non-scaling-stroke" />
+            <line key={g} x1="0" x2="100" y1={g} y2={g} style={{ stroke: "var(--chart-grid)" }} strokeWidth="1" vectorEffect="non-scaling-stroke" />
           ))}
           {/* daily volume */}
           {days.map((d, i) => (
@@ -128,7 +128,7 @@ function UsageChart({ days, limit }: { days: number[]; limit: number }) {
               y={100 - (d / maxDaily) * 28}
               height={(d / maxDaily) * 28}
               rx="0.6"
-              fill={active === i ? "#C9CECB" : "#EDEFEE"}
+              style={{ fill: active === i ? "var(--chart-muted-dot)" : "var(--chart-track)" }}
             />
           ))}
           {/* plan limit */}
@@ -138,7 +138,7 @@ function UsageChart({ days, limit }: { days: number[]; limit: number }) {
             </>
           ) : null}
           {projection ? (
-            <path d={projection} fill="none" stroke="#A9AEB3" strokeWidth="1.5" strokeDasharray="3 4" vectorEffect="non-scaling-stroke" />
+            <path d={projection} fill="none" style={{ stroke: "var(--chart-axis)" }} strokeWidth="1.5" strokeDasharray="3 4" vectorEffect="non-scaling-stroke" />
           ) : null}
           {line ? (
             <path d={line} fill="none" stroke="var(--agenci-ink)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
@@ -147,7 +147,7 @@ function UsageChart({ days, limit }: { days: number[]; limit: number }) {
 
         {limit <= top ? (
           <span
-            className="absolute right-0 -translate-y-full rounded-md bg-[#FCEFE4] px-1.5 py-0.5 text-[11px] font-medium text-[#B06A34]"
+            className="absolute right-0 -translate-y-full rounded-md bg-(--dash-warn-bg) px-1.5 py-0.5 text-[11px] font-medium text-(--dash-warn)"
             style={{ top: `${y(limit)}%` }}
           >
             Grense {limit}
@@ -158,7 +158,7 @@ function UsageChart({ days, limit }: { days: number[]; limit: number }) {
           <>
             <span className="pointer-events-none absolute inset-y-0 w-px bg-(--agenci-ink)/15" style={{ left: `${x(active)}%` }} />
             <span
-              className="pointer-events-none absolute size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-(--agenci-ink) shadow"
+              className="pointer-events-none absolute size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-(--dash-edge) bg-(--agenci-ink) shadow"
               style={{ left: `${x(active)}%`, top: `${y(cumulative[active] ?? 0)}%` }}
             />
             <div
@@ -270,7 +270,7 @@ export default function BillingView() {
             <div className="min-w-0 flex-1">
               <p className="flex items-center gap-2 text-[15px] font-semibold text-(--agenci-ink)">
                 {CURRENT.name}
-                <span className="inline-flex items-center gap-1 rounded-full border border-(--agenci-line) px-2 py-px text-[11.5px] font-medium text-[#2F7D46]">
+                <span className="inline-flex items-center gap-1 rounded-full border border-(--agenci-line) px-2 py-px text-[11.5px] font-medium text-(--dash-good)">
                   <span className="size-1.5 rounded-full bg-[#5FA06F]" />
                   Aktiv
                 </span>
@@ -281,7 +281,7 @@ export default function BillingView() {
               Bytt plan
             </a>
           </div>
-          <div className="mt-auto flex flex-wrap items-center gap-3 border-t border-[#EEF0EF] px-5 py-4 dark:border-white/5">
+          <div className="mt-auto flex flex-wrap items-center gap-3 border-t border-(--agenci-line) px-5 py-4 dark:border-white/5">
             <p className="text-(--agenci-ink)">
               <span className="[font-family:var(--font-agenci-title)] text-[30px] leading-none font-medium tracking-[-0.03em]">
                 {kr(CURRENT.price)} kr
@@ -305,8 +305,8 @@ export default function BillingView() {
               Legg til kort
             </a>
           </div>
-          <div className="mt-auto flex items-center gap-3 border-t border-[#EEF0EF] px-5 py-4 dark:border-white/5">
-            <span className="flex size-10 items-center justify-center rounded-[10px] border border-dashed border-[#C9CECB] text-(--agenci-ink-3)">
+          <div className="mt-auto flex items-center gap-3 border-t border-(--agenci-line) px-5 py-4 dark:border-white/5">
+            <span className="flex size-10 items-center justify-center rounded-[10px] border border-dashed border-(--chart-muted-dot) text-(--agenci-ink-3)">
               <CreditCardIcon className="size-4.5" strokeWidth={1.6} />
             </span>
             <div className="min-w-0">
@@ -329,7 +329,7 @@ export default function BillingView() {
                 <span
                   className={cn(
                     "rounded-full border px-2 py-px text-[11.5px] font-medium",
-                    trend >= 0 ? "border-[#5FA06F]/40 text-[#2F7D46]" : "border-(--agenci-line) text-(--agenci-ink-2)",
+                    trend >= 0 ? "border-[#5FA06F]/40 text-(--dash-good)" : "border-(--agenci-line) text-(--agenci-ink-2)",
                   )}
                 >
                   {trend >= 0 ? "↑" : "↓"} {Math.abs(trend)} %
@@ -345,7 +345,7 @@ export default function BillingView() {
               <span className="h-0.5 w-3 rounded-full bg-(--agenci-ink)" /> Så langt
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="w-3 border-t border-dashed border-[#A9AEB3]" /> Med samme tempo
+              <span className="w-3 border-t border-dashed border-(--chart-axis)" /> Med samme tempo
             </span>
           </span>
         </div>
@@ -356,7 +356,7 @@ export default function BillingView() {
           <span className="ml-1.5 text-[13px] text-(--agenci-ink-3)">av {CURRENT.limit}</span>
         </p>
         <div className="mt-4">
-          {usage ? <UsageChart days={usage.days} limit={CURRENT.limit} /> : <div className="h-[206px] animate-pulse rounded-[12px] bg-[#f5f6f5]" />}
+          {usage ? <UsageChart days={usage.days} limit={CURRENT.limit} /> : <div className="h-[206px] animate-pulse rounded-[12px] bg-(--dash-subtle)" />}
         </div>
       </section>
 
@@ -364,7 +364,7 @@ export default function BillingView() {
       <section className={cn(cardClass, "overflow-hidden")}>
         <div className="flex flex-wrap items-center gap-3 px-5 pt-5 pb-4">
           <p className="flex-1 text-[15px] font-semibold text-(--agenci-ink)">Fakturaer</p>
-          <label className="flex h-9 w-60 items-center gap-2 rounded-[10px] border border-(--agenci-line) bg-white px-3 dark:bg-transparent">
+          <label className="flex h-9 w-60 items-center gap-2 rounded-[10px] border border-(--agenci-line) bg-(--dash-surface) px-3 dark:bg-transparent">
             <SearchIcon className="size-4 text-(--agenci-ink-3)" strokeWidth={1.6} />
             <input
               value={query}
@@ -376,7 +376,7 @@ export default function BillingView() {
         </div>
         <div className="overflow-x-auto">
           <table className="w-full min-w-[640px] border-collapse">
-            <thead className="bg-[#f7f8f7] dark:bg-white/5">
+            <thead className="bg-(--dash-subtle-2) dark:bg-white/5">
               <tr className="text-left text-[12.5px] text-(--agenci-ink-2)">
                 <th className="h-10 px-5 font-medium">Faktura</th>
                 <th className="h-10 px-3 font-medium">Dato</th>
@@ -390,7 +390,7 @@ export default function BillingView() {
             <tbody>
               <tr>
                 <td colSpan={5} className="px-5 py-14 text-center">
-                  <span className="mx-auto mb-3 flex size-10 items-center justify-center rounded-full bg-[#f3f4f3] text-(--agenci-ink-2) dark:bg-white/10">
+                  <span className="mx-auto mb-3 flex size-10 items-center justify-center rounded-full bg-(--dash-subtle) text-(--agenci-ink-2) dark:bg-white/10">
                     <FileTextIcon className="size-4.5" strokeWidth={1.6} />
                   </span>
                   <p className="text-[14px] font-medium text-(--agenci-ink)">Ingen fakturaer ennå</p>
@@ -418,7 +418,7 @@ export default function BillingView() {
                 key={p.id}
                 className={cn(
                   "flex flex-col rounded-[14px] border p-4",
-                  current ? "border-(--agenci-ink) bg-[#fafbfa] dark:bg-white/5" : "border-(--agenci-line)",
+                  current ? "border-(--agenci-ink) bg-(--dash-subtle-2) dark:bg-white/5" : "border-(--agenci-line)",
                 )}
               >
                 <p className="flex items-center justify-between text-[14px] font-semibold text-(--agenci-ink)">

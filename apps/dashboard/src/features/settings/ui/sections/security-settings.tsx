@@ -29,7 +29,7 @@ function strength(pw: string) {
   };
 }
 
-function PasswordInput({ value, onChange, autoComplete }: { value: string; onChange: (v: string) => void; autoComplete: string }) {
+export function PasswordInput({ value, onChange, autoComplete }: { value: string; onChange: (v: string) => void; autoComplete: string }) {
   const [show, setShow] = useState(false);
   return (
     <span className="relative block">
@@ -44,7 +44,7 @@ function PasswordInput({ value, onChange, autoComplete }: { value: string; onCha
         type="button"
         onClick={() => setShow((v) => !v)}
         aria-label={show ? "Skjul passord" : "Vis passord"}
-        className="absolute top-1/2 right-2 flex size-8 -translate-y-1/2 items-center justify-center rounded-full text-(--agenci-ink-3) hover:bg-[#f3f5f4] hover:text-(--agenci-ink)"
+        className="absolute top-1/2 right-2 flex size-8 -translate-y-1/2 items-center justify-center rounded-full text-(--agenci-ink-3) hover:bg-(--dash-subtle) hover:text-(--agenci-ink)"
       >
         {show ? <EyeOffIcon className="size-4" strokeWidth={1.6} /> : <EyeIcon className="size-4" strokeWidth={1.6} />}
       </button>
@@ -154,13 +154,13 @@ export function SecuritySettings() {
             <div>
               <div className="flex gap-1.5">
                 {[1, 2, 3, 4].map((i) => (
-                  <span key={i} className={cn("h-1.5 flex-1 rounded-full bg-[#EEF0EF]", i <= pw.level && pw.color)} />
+                  <span key={i} className={cn("h-1.5 flex-1 rounded-full bg-(--dash-subtle)", i <= pw.level && pw.color)} />
                 ))}
               </div>
               <p className="mt-1.5 text-[12.5px] text-(--agenci-ink-2)">{error ?? pw.label}</p>
             </div>
           ) : null}
-          <label className="flex cursor-pointer items-start gap-3 rounded-[12px] bg-[#f7f8f7] px-3.5 py-3 dark:bg-white/5">
+          <label className="flex cursor-pointer items-start gap-3 rounded-[12px] bg-(--dash-subtle-2) px-3.5 py-3 dark:bg-white/5">
             <input type="checkbox" checked={others} onChange={(e) => setOthers(e.currentTarget.checked)} className="mt-0.5 size-4 accent-(--agenci-ink)" />
             <span>
               <span className="block text-[13.5px] text-(--agenci-ink)">Logg ut av alle andre enheter</span>
@@ -205,14 +205,14 @@ export function SecuritySettings() {
               const Icon = d.mobile ? SmartphoneIcon : d.known ? LaptopIcon : MonitorSmartphoneIcon;
               return (
                 <li key={s.id} className="flex items-center gap-3.5 px-4 py-3.5">
-                  <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-[#f3f4f3] text-(--agenci-ink) dark:bg-white/10">
+                  <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-(--dash-subtle) text-(--agenci-ink) dark:bg-white/10">
                     <Icon className="size-4.5" strokeWidth={1.6} />
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="flex flex-wrap items-center gap-2 text-[13.5px] font-medium text-(--agenci-ink)">
                       {d.label}
                       {isCurrent ? (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-[#E2F2E5] px-2 py-px text-[11.5px] font-medium text-[#2F7D46]">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-(--dash-good-bg) px-2 py-px text-[11.5px] font-medium text-(--dash-good)">
                           <CheckIcon className="size-3" strokeWidth={2.4} /> Denne enheten
                         </span>
                       ) : null}
@@ -233,7 +233,7 @@ export function SecuritySettings() {
                         toast.success("Enheten er logget ut");
                         void load();
                       }}
-                      className="inline-flex h-8 items-center rounded-full px-3 text-[12.5px] text-(--agenci-ink-2) hover:bg-[#f3f5f4] hover:text-(--agenci-ink) disabled:opacity-40"
+                      className="inline-flex h-8 items-center rounded-full px-3 text-[12.5px] text-(--agenci-ink-2) hover:bg-(--dash-subtle) hover:text-(--agenci-ink) disabled:opacity-40"
                     >
                       Logg ut
                     </button>

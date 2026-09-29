@@ -26,7 +26,7 @@ export function Segment<T extends string>({
     <fieldset
       aria-label={label}
       className={cn(
-        "relative grid min-w-0 rounded-full bg-[#f3f5f4] p-0.5 dark:bg-white/5",
+        "relative grid min-w-0 rounded-full bg-(--dash-subtle) p-0.5 dark:bg-white/5",
         className,
       )}
       style={{
@@ -35,7 +35,7 @@ export function Segment<T extends string>({
     >
       <span
         aria-hidden
-        className="absolute top-0.5 bottom-0.5 left-0.5 rounded-full bg-white shadow-[0_1px_2px_rgb(5_6_7/0.08)] transition-transform duration-[320ms] ease-[cubic-bezier(.16,1,.3,1)] dark:bg-white/15"
+        className="absolute top-0.5 bottom-0.5 left-0.5 rounded-full bg-(--dash-surface) shadow-[0_1px_2px_rgb(5_6_7/0.08)] transition-transform duration-[320ms] ease-[cubic-bezier(.16,1,.3,1)] dark:bg-white/15"
         style={{
           width: `calc((100% - 4px) / ${options.length})`,
           transform: `translateX(${index * 100}%)`,
