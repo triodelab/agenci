@@ -1,5 +1,9 @@
 import { Agent } from "@mastra/core/agent";
 import { SUPPORT_AGENT_PROMPT } from "../constants";
+import {
+  createEscalateConversationTool,
+  createResolveConversationTool,
+} from "../tools/conversation-tools";
 import { createKnowledgeSearchTool } from "../tools/knowledge-search-tool";
 import { CUSTOMER_AGENT_MODEL, customerAgentMemory } from "../store";
 import {
@@ -45,8 +49,10 @@ export function createCustomerServiceAgent({
       buildInstructions(name, description) + buildBehaviorInstructions(behavior),
     model: behavior?.model || CUSTOMER_AGENT_MODEL,
     tools: {
-      // Key must stay `searchTool` — the system prompt refers to it by name.
+      // Keys must match the names the system prompt uses.
       searchTool: createKnowledgeSearchTool(id),
+      escalateConversationTool: createEscalateConversationTool(id),
+      resolveConversationTool: createResolveConversationTool(id),
     },
     memory: customerAgentMemory,
   });

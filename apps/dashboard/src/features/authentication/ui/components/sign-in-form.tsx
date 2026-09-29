@@ -2,10 +2,10 @@ import { type FormEvent, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
 
-import { AuthShell } from "@/components/auth-shell";
+import { AuthShell, authButtonCls, authInputCls, authLabelCls, PasswordInput } from "@/components/auth-shell";
 import { authClient } from "@/lib/auth-client";
 import { takePendingInvite } from "@/lib/pending-invite";
-import { btnPrimaryCls, errCls, inputCls, labelCls } from "@/lib/ui";
+import { errCls } from "@/lib/ui";
 
 const signInSchema = z.object({
   email: z.email("Ugyldig e-postadresse"),
@@ -56,51 +56,31 @@ export default function SignInForm({
 
   return (
     <AuthShell
-      title="Logg inn"
-      subtitle="Kom i gang med Agenci"
-      footer={
+      title="Velkommen tilbake"
+      subtitle={
         <>
           Har du ikke konto?{" "}
-          <button
-            type="button"
-            onClick={onSwitchToSignUp}
-            className="font-semibold text-neutral-900 hover:underline"
-          >
+          <button type="button" onClick={onSwitchToSignUp} className="font-medium text-(--agenci-ink) underline underline-offset-4 hover:no-underline">
             Opprett konto
           </button>
         </>
       }
     >
-      <form onSubmit={(e) => void submit(e)} className="space-y-3.5">
+      <form onSubmit={(e) => void submit(e)} className="space-y-4">
         <div className="space-y-1.5">
-          <label htmlFor="email" className={labelCls}>
+          <label htmlFor="email" className={authLabelCls}>
             E-post
           </label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            autoComplete="email"
-            required
-            className={inputCls}
-          />
+          <input id="email" name="email" type="email" autoComplete="email" required className={authInputCls} placeholder="navn@bedrift.no" />
         </div>
         <div className="space-y-1.5">
-          <label htmlFor="password" className={labelCls}>
+          <label htmlFor="password" className={authLabelCls}>
             Passord
           </label>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            autoComplete="current-password"
-            minLength={8}
-            required
-            className={inputCls}
-          />
+          <PasswordInput id="password" name="password" autoComplete="current-password" minLength={8} required />
         </div>
         {error ? <p className={errCls}>{error}</p> : null}
-        <button type="submit" className={btnPrimaryCls} disabled={isSubmitting}>
+        <button type="submit" className={authButtonCls} disabled={isSubmitting}>
           {isSubmitting ? "Logger inn…" : "Logg inn"}
         </button>
       </form>

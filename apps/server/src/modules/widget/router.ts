@@ -7,7 +7,9 @@ import { z } from "zod";
 import { createPrismaClient } from "@agenci/db";
 import { base, contactProcedure } from "@/routers/procedures";
 import {
+  appendThreadMessage,
   deleteConversationThreads,
+  listThreadMessages,
   recordAgentReply,
   recordVisitorMessage,
 } from "@/modules/conversations/service";
@@ -23,6 +25,8 @@ import {
   ContactSessionIdResponseSchema,
   CreateContactSessionSchema,
   GetWidgetSettingsSchema,
+  PublicChatHistoryResponseSchema,
+  PublicChatHistorySchema,
   SendPublicChatMessageResponseSchema,
   SendPublicChatMessageSchema,
   UpdateContactSessionIdentitySchema,
@@ -185,6 +189,20 @@ const widgetSettingsRouter = {
     }),
 };
 
+/**
+ * Visitor ↔ agent ↔ team. Every message goes into the `conversations` index
+ * (inbox) and the Mastra thread with the same id (full history):
+ *
+ *   widget chat.send ─► recordVisitorMessage ─┬─ status "escalated" ─► saved
+ *                                             │   to the thread, no AI reply
+ *                                             │   (team answers from the inbox)
+ *                                             └─ otherwise ─► Mastra agent
+ *                                                 (searchTool → pgvector) ─►
+ *                                                 reply ─► recordAgentReply
+ *
+ * The widget polls `chat.history` while the team has the chat, so replies
+ * from `conversations.reply` (dashboard) show up without a reload.
+ */
 const publicChatRouter = {
   send: contactProcedure
     .input(SendPublicChatMessageSchema)
@@ -192,24 +210,65 @@ const publicChatRouter = {
     .handler(async ({ input, context }) => {
       const { organizationId, id: contactSessionId } = context.contactSession;
       const threadId = input.threadId ?? crypto.randomUUID();
+      const memoryResourceId = `${organizationId}:contact:${contactSessionId}`;
       // Index row first: also stops a visitor from writing into someone
       // else's thread, and reopens a resolved conversation.
-      await recordVisitorMessage({
+      const status = await recordVisitorMessage({
         threadId,
         organizationId,
         agentId: input.agentId,
         contactSessionId,
         text: input.message,
       });
+
+      if (status === "escalated") {
+        await appendThreadMessage({
+          threadId,
+          resourceId: memoryResourceId,
+          role: "user",
+          text: input.message,
+        });
+        return { threadId, message: null, status };
+      }
+
       const result = await sendChatMessage({
         organizationId,
         agentId: input.agentId,
         message: input.message,
         threadId,
-        memoryResourceId: `${organizationId}:contact:${contactSessionId}`,
+        memoryResourceId,
       });
       await recordAgentReply(threadId, result.message);
-      return result;
+      // The agent may have escalated or resolved during this turn.
+      const after = await prisma.conversation.findUnique({
+        where: { id: threadId },
+        select: { status: true },
+      });
+      return {
+        threadId,
+        message: result.message,
+        status: after?.status ?? "unresolved",
+      };
+    }),
+
+  /** The visitor's own conversation: restores the chat after a reload and
+   * delivers replies from the team. */
+  history: contactProcedure
+    .input(PublicChatHistorySchema)
+    .output(PublicChatHistoryResponseSchema)
+    .handler(async ({ input, context }) => {
+      const row = await prisma.conversation.findFirst({
+        where: {
+          id: input.threadId,
+          contactSessionId: context.contactSession.id,
+        },
+        select: { status: true },
+      });
+      if (!row) return { status: null, messages: [] };
+      return {
+        status: row.status,
+        messages: await listThreadMessages(input.threadId),
+      };
     }),
 };
 

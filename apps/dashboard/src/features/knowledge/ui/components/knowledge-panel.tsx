@@ -40,14 +40,14 @@ export function TypeDot({ type }: { type: KnowledgeSource["type"] }) {
     <span
       aria-hidden
       className="size-2 shrink-0 rounded-full"
-      style={{ background: TYPE_META[type].color }}
+      style={{ background: TYPE_META[type].swatch }}
     />
   );
 }
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-[10px] bg-[#f6f7f6] px-3 py-2.5 dark:bg-white/[0.04]">
+    <div className="rounded-[10px] bg-(--dash-subtle) px-3 py-2.5 dark:bg-white/[0.04]">
       <p className={captionClass}>{label}</p>
       <p className="mt-1 [font-family:var(--font-agenci-title)] text-[20px] leading-none font-medium tracking-[-0.03em] tabular-nums text-(--agenci-ink)">
         {value}
@@ -173,7 +173,7 @@ function AgentPanel({ data }: { data: KnowledgeOverview }) {
                 {colors.map((c) => (
                   <div key={c.label} className="min-w-0">
                     <span
-                      className="block h-9 rounded-[10px] border border-black/5"
+                      className="block h-9 rounded-[10px] border border-black/5 dark:border-white/15"
                       style={{ background: c.value }}
                     />
                     <p className="mt-1 truncate text-[12px] text-(--agenci-ink-3)">
@@ -210,7 +210,7 @@ function AgentPanel({ data }: { data: KnowledgeOverview }) {
         )}
       </section>
 
-      <p className="rounded-[10px] bg-[#f6f7f6] px-3 py-2.5 text-[12.5px] leading-snug text-(--agenci-ink-2) dark:bg-white/[0.04]">
+      <p className="rounded-[10px] bg-(--dash-subtle) px-3 py-2.5 text-[12.5px] leading-snug text-(--agenci-ink-2) dark:bg-white/[0.04]">
         Klikk på en kilde eller en prikk i grafen for å se nøyaktig hva agenten
         vet — eller søk i kunnskapen.
       </p>
@@ -257,7 +257,7 @@ function SearchPanel({
               onClick={() =>
                 onSelect({ kind: "chunk", sourceId: s.id, index: c.index })
               }
-              className="w-full rounded-[10px] px-2.5 py-2 text-left transition-colors hover:bg-[#f6f7f6] dark:hover:bg-white/5"
+              className="w-full rounded-[10px] px-2.5 py-2 text-left transition-colors hover:bg-(--dash-subtle) dark:hover:bg-white/5"
             >
               <span className="flex items-center gap-2 text-[13px] font-medium text-(--agenci-ink)">
                 <TypeDot type={s.type} />
@@ -326,11 +326,11 @@ function SourcePanel({
         />
       </div>
       {source.status === "FAILED" ? (
-        <p className="mt-3 rounded-[10px] bg-[#F9E2DF] px-3 py-2 text-[12.5px] text-[#B2463A]">
+        <p className="mt-3 rounded-[10px] bg-(--dash-bad-bg) px-3 py-2 text-[12.5px] text-(--dash-bad)">
           Kilden kunne ikke leses. Fjern den og prøv å legge den til på nytt.
         </p>
       ) : isSourceBusy(source) ? (
-        <p className="mt-3 rounded-[10px] bg-[#FBEBDD] px-3 py-2 text-[12.5px] text-[#B06A34]">
+        <p className="mt-3 rounded-[10px] bg-(--dash-warn-bg) px-3 py-2 text-[12.5px] text-(--dash-warn)">
           Leses og indekseres nå — agenten kan bruke den om et øyeblikk.
         </p>
       ) : null}
@@ -340,7 +340,7 @@ function SourcePanel({
             href={source.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex h-9 items-center gap-1.5 rounded-full border border-(--agenci-line) bg-white px-3.5 text-[13px] text-(--agenci-ink) transition-colors hover:bg-[#f6f7f6] dark:bg-transparent"
+            className="inline-flex h-9 items-center gap-1.5 rounded-full border border-(--agenci-line) bg-(--dash-surface) px-3.5 text-[13px] text-(--agenci-ink) transition-colors hover:bg-(--dash-subtle) dark:bg-transparent"
           >
             <ExternalLinkIcon
               className="size-3.5"
@@ -362,7 +362,7 @@ function SourcePanel({
             "inline-flex h-9 items-center gap-1.5 rounded-full px-3.5 text-[13px] transition-colors disabled:opacity-40",
             confirm
               ? "bg-[#B2463A] text-white"
-              : "border border-(--agenci-line) bg-white text-(--agenci-ink-2) hover:text-[#B2463A] dark:bg-transparent",
+              : "border border-(--agenci-line) bg-(--dash-surface) text-(--agenci-ink-2) hover:text-(--dash-bad) dark:bg-transparent",
           )}
         >
           <Trash2Icon
@@ -383,7 +383,7 @@ function SourcePanel({
               onClick={() =>
                 onSelect({ kind: "chunk", sourceId: source.id, index: c.index })
               }
-              className="flex w-full items-baseline gap-3 rounded-[10px] px-2 py-1.5 text-left transition-colors hover:bg-[#f6f7f6] dark:hover:bg-white/5"
+              className="flex w-full items-baseline gap-3 rounded-[10px] px-2 py-1.5 text-left transition-colors hover:bg-(--dash-subtle) dark:hover:bg-white/5"
             >
               <span
                 className={cn(
@@ -486,13 +486,13 @@ function ChunkPanel({
       <h3 className="mt-2 text-[16px] leading-snug font-semibold text-(--agenci-ink)">
         {summary?.title ?? "Kunnskapsbit"}
       </h3>
-      <div className="mt-3 rounded-[12px] border border-(--agenci-line) bg-white p-3.5 dark:bg-transparent">
+      <div className="mt-3 rounded-[12px] border border-(--agenci-line) bg-(--dash-surface) p-3.5 dark:bg-transparent">
         {isPending && !full ? (
           <div className="space-y-2">
             {[90, 100, 80, 95].map((w) => (
               <div
                 key={w}
-                className="h-3 animate-pulse rounded bg-[#f1f3f2]"
+                className="h-3 animate-pulse rounded bg-(--dash-subtle)"
                 style={{ width: `${w}%` }}
               />
             ))}

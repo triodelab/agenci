@@ -13,17 +13,21 @@ import {
   InboxIcon,
   MailIcon,
   MessageSquareIcon,
+  BotIcon,
+  LoaderIcon,
   RotateCcwIcon,
   UserRoundIcon,
 } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import {
   type ConversationDetail,
   type ConversationStatus,
   useConversationQuery,
+  useReplyMutation,
   useSetConversationStatusMutation,
 } from "../../queries/conversations-queries";
+import { isDemoId } from "@/features/agents/ui/components/overview-mock";
 import {
   arrowChipClass,
   ContactAvatar,
@@ -125,7 +129,7 @@ function StatusToggles({
             disabled={disabled}
             onClick={() => !active && onChange(status)}
             type="button"
-            className="flex items-center gap-3 rounded-[10px] px-1 py-2 text-left transition-colors hover:bg-[#f3f5f4] disabled:opacity-60 dark:hover:bg-white/5"
+            className="flex items-center gap-3 rounded-[10px] px-1 py-2 text-left transition-colors hover:bg-(--dash-subtle) disabled:opacity-60 dark:hover:bg-white/5"
           >
             <span
               aria-hidden
@@ -138,7 +142,7 @@ function StatusToggles({
             >
               <span
                 className={cn(
-                  "absolute top-0.5 size-3 rounded-full bg-white shadow-sm transition-[left] duration-200 dark:bg-[#0b0c0e]",
+                  "absolute top-0.5 size-3 rounded-full bg-(--dash-surface) shadow-sm transition-[left] duration-200 dark:bg-[#0b0c0e]",
                   active ? "left-[14px]" : "left-0.5",
                 )}
               />
@@ -193,7 +197,7 @@ function ConversationSidebar({
             <a
               href={`mailto:${c.contact.email}`}
               aria-label="Send e-post"
-              className={cn(arrowChipClass, "hover:bg-[#f3f5f4]")}
+              className={cn(arrowChipClass, "hover:bg-(--dash-subtle)")}
             >
               <ArrowUpRightIcon className="size-3.5" strokeWidth={1.5} />
             </a>
@@ -256,6 +260,7 @@ function Thread({ conversation: c }: { conversation: ConversationDetail }) {
     <div className="flex flex-col gap-3">
       {c.messages.map((m) => {
         const fromVisitor = m.role === "user";
+        const fromTeam = m.author === "team";
         return (
           <div
             key={m.id}
@@ -269,13 +274,20 @@ function Thread({ conversation: c }: { conversation: ConversationDetail }) {
                 "rounded-[16px] px-3.5 py-2.5 text-[14px] leading-relaxed whitespace-pre-wrap",
                 fromVisitor
                   ? "rounded-br-[6px] bg-(--agenci-ink) text-white dark:bg-white dark:text-[#0b0c0e]"
-                  : "rounded-bl-[6px] border border-(--agenci-line) bg-white text-(--agenci-ink) [font-family:var(--font-agenci-voice)] dark:bg-transparent",
+                  : fromTeam
+                    ? "rounded-bl-[6px] border border-(--dash-warn)/30 bg-(--dash-warn-bg) text-(--agenci-ink)"
+                    : "rounded-bl-[6px] border border-(--agenci-line) bg-(--dash-surface) text-(--agenci-ink) [font-family:var(--font-agenci-voice)] dark:bg-transparent",
               )}
             >
               {m.text}
             </div>
             <span className="px-1 text-[12px] tabular-nums [font-family:var(--font-agenci-data)] text-(--agenci-ink-3)">
-              {fromVisitor ? contactName(c.contact) : c.agentName} ·{" "}
+              {fromVisitor
+                ? contactName(c.contact)
+                : fromTeam
+                  ? `${m.authorName ?? "Teamet"} (team)`
+                  : c.agentName}{" "}
+              ·{" "}
               {formatTime(m.createdAt)}
             </span>
           </div>
@@ -297,6 +309,13 @@ export function ConversationIdView() {
     conversationId,
   );
   const setStatus = useSetConversationStatusMutation(agentId, conversationId);
+  const reply = useReplyMutation(agentId, conversationId);
+  const [draft, setDraft] = useState("");
+  const sendReply = () => {
+    const text = draft.trim();
+    if (!text || reply.isPending) return;
+    reply.mutate(text, { onSuccess: () => setDraft("") });
+  };
 
   const backLink = (
     <Link
@@ -313,14 +332,14 @@ export function ConversationIdView() {
     return (
       <div className="flex min-h-0 flex-1 gap-3">
         <div
-          className={cn(cardClass, "min-h-0 flex-1 animate-pulse bg-white/70")}
+          className={cn(cardClass, "min-h-0 flex-1 animate-pulse bg-(--dash-surface)/70")}
         />
         <div className="hidden w-[320px] shrink-0 flex-col gap-3 xl:flex">
           {[150, 260, 170].map((h) => (
             <div
               key={h}
               style={{ height: h }}
-              className={cn(cardClass, "animate-pulse bg-white/70")}
+              className={cn(cardClass, "animate-pulse bg-(--dash-surface)/70")}
             />
           ))}
         </div>
@@ -333,7 +352,7 @@ export function ConversationIdView() {
       <div className={cn(cardClass, "flex min-h-0 flex-1 flex-col p-5")}>
         {backLink}
         <div className="flex flex-1 flex-col items-center justify-center py-12 text-center">
-          <div className="mb-5 flex size-14 items-center justify-center rounded-2xl bg-[#f3f5f4] text-(--agenci-ink) dark:bg-white/5">
+          <div className="mb-5 flex size-14 items-center justify-center rounded-2xl bg-(--dash-subtle) text-(--agenci-ink) dark:bg-white/5">
             <InboxIcon className="size-6" strokeWidth={1.5} />
           </div>
           <h2 className="text-[20px] font-medium leading-[1.25] tracking-[-0.025em] [font-family:var(--font-agenci-title)] text-(--agenci-ink)">
@@ -373,7 +392,7 @@ export function ConversationIdView() {
             onClick={() => setStatus.mutate("escalated")}
             className={cn(
               "inline-flex items-center gap-1.5 rounded-full px-1.5 py-1 text-[12.5px] text-(--agenci-ink-2) transition-colors hover:text-(--agenci-ink) disabled:pointer-events-none",
-              escalated && "text-[#B2463A]",
+              escalated && "text-(--dash-bad)",
             )}
           >
             <FlagIcon className="size-3.5" strokeWidth={1.5} />
@@ -404,7 +423,7 @@ export function ConversationIdView() {
             <ContactAvatar contact={c.contact} size={64} />
             <span
               aria-hidden
-              className="absolute -right-1 -bottom-1 flex size-6 items-center justify-center rounded-full border-[2.5px] border-white bg-(--agenci-ink) text-white dark:border-(--card) dark:bg-white dark:text-[#0b0c0e]"
+              className="absolute -right-1 -bottom-1 flex size-6 items-center justify-center rounded-full border-[2.5px] border-(--dash-edge) bg-(--agenci-ink) text-white dark:border-(--card) dark:bg-white dark:text-[#0b0c0e]"
             >
               <MessageSquareIcon className="size-2.5" strokeWidth={1.5} />
             </span>
@@ -424,7 +443,7 @@ export function ConversationIdView() {
               onClick={() =>
                 setStatus.mutate(resolved ? "unresolved" : "resolved")
               }
-              className="inline-flex h-9 items-center gap-1.5 rounded-full border border-(--agenci-line) bg-white px-4 text-[13px] font-medium active:scale-[0.985] text-(--agenci-ink) transition-colors hover:bg-[#f3f5f4] disabled:opacity-50 dark:border-white/10 dark:bg-transparent"
+              className="inline-flex h-9 items-center gap-1.5 rounded-full border border-(--agenci-line) bg-(--dash-surface) px-4 text-[13px] font-medium active:scale-[0.985] text-(--agenci-ink) transition-colors hover:bg-(--dash-subtle) disabled:opacity-50 dark:border-white/10 dark:bg-transparent"
             >
               {resolved ? (
                 <RotateCcwIcon className="size-3.5" strokeWidth={1.5} />
@@ -496,27 +515,72 @@ export function ConversationIdView() {
           <Thread conversation={c} />
         </div>
 
-        {/* Composer (reference: grey reply box, black send) */}
+        {/* Composer: the team answers the visitor (the agent pauses) */}
         <div className="shrink-0 px-4 pb-4">
-          <div className={cn(insetClass, "rounded-[16px] p-3")}>
-            <textarea
-              disabled
-              rows={2}
-              aria-label="Svar"
-              placeholder="Svar fra teamet kommer snart — i mellomtiden svarer agenten kunden automatisk."
-              className="w-full resize-none bg-transparent px-1 text-[13.5px] text-(--agenci-ink) outline-none placeholder:text-(--agenci-ink-3) disabled:cursor-not-allowed"
-            />
-            <div className="mt-1 flex items-center justify-end">
+          {escalated ? (
+            <div className="mb-2 flex items-center gap-2 rounded-[12px] bg-(--dash-warn-bg) px-3.5 py-2 text-[12.5px] text-(--dash-warn)">
+              <UserRoundIcon className="size-3.5 shrink-0" strokeWidth={1.8} />
+              <span className="min-w-0 flex-1">
+                Teamet har samtalen. Agenten svarer ikke før du gir den tilbake.
+              </span>
               <button
                 type="button"
-                disabled
+                disabled={setStatus.isPending}
+                onClick={() => setStatus.mutate("unresolved")}
+                className="inline-flex shrink-0 items-center gap-1 font-medium underline-offset-4 hover:underline disabled:opacity-50"
+              >
+                <BotIcon className="size-3.5" strokeWidth={1.8} />
+                Gi tilbake til agenten
+              </button>
+            </div>
+          ) : null}
+          <form
+            className={cn(insetClass, "rounded-[16px] p-3")}
+            onSubmit={(e) => {
+              e.preventDefault();
+              sendReply();
+            }}
+          >
+            <textarea
+              rows={2}
+              value={draft}
+              maxLength={4000}
+              disabled={reply.isPending || isDemoId(c.threadId)}
+              onChange={(e) => setDraft(e.currentTarget.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  sendReply();
+                }
+              }}
+              aria-label="Svar kunden"
+              placeholder={
+                isDemoId(c.threadId)
+                  ? "Du kan ikke svare i en demosamtale."
+                  : escalated
+                    ? "Skriv et svar til kunden …"
+                    : "Svar kunden selv. Da tar teamet over, og agenten tar pause."
+              }
+              className="w-full resize-none bg-transparent px-1 text-[13.5px] text-(--agenci-ink) outline-none placeholder:text-(--agenci-ink-3) disabled:cursor-not-allowed"
+            />
+            <div className="mt-1 flex items-center justify-between gap-3">
+              <span className="px-1 text-[12px] text-(--agenci-ink-3)">
+                Enter sender · Shift + Enter gir ny linje
+              </span>
+              <button
+                type="submit"
+                disabled={!draft.trim() || reply.isPending}
                 aria-label="Send"
                 className="flex size-8 items-center justify-center rounded-full bg-(--agenci-ink) text-white disabled:opacity-40 dark:bg-white dark:text-[#0b0c0e]"
               >
-                <ArrowUpIcon className="size-4" strokeWidth={2} />
+                {reply.isPending ? (
+                  <LoaderIcon className="size-4 animate-spin" />
+                ) : (
+                  <ArrowUpIcon className="size-4" strokeWidth={2} />
+                )}
               </button>
             </div>
-          </div>
+          </form>
         </div>
       </article>
 

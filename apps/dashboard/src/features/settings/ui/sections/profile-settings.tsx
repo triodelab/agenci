@@ -1,9 +1,11 @@
 import { cn } from "@workspace/ui/lib/utils";
-import { CameraIcon, LoaderIcon, LockIcon } from "lucide-react";
+import { CameraIcon, LoaderIcon, LockIcon, TrashIcon } from "lucide-react";
 import { type ChangeEvent, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
+import { PasswordInput } from "./security-settings";
 import {
+  dangerBtn,
   Field,
   ghostBtn,
   inkBtn,
@@ -72,7 +74,7 @@ export function ProfileSettings() {
           {image ? (
             <img src={image} alt="" className="size-16 rounded-full object-cover" />
           ) : (
-            <span className="flex size-16 items-center justify-center rounded-full bg-[#eef0ef] text-[19px] font-medium text-(--agenci-ink) dark:bg-white/10">
+            <span className="flex size-16 items-center justify-center rounded-full bg-(--dash-subtle) text-[19px] font-medium text-(--agenci-ink) dark:bg-white/10">
               {initials(display)}
             </span>
           )}
@@ -138,7 +140,7 @@ export function ProfileSettings() {
               <LockIcon className="absolute top-1/2 right-3.5 size-4 -translate-y-1/2 text-(--agenci-ink-3)" strokeWidth={1.6} />
             </span>
           </Field>
-          <dl className="grid gap-3 rounded-[12px] bg-[#f7f8f7] px-4 py-3 text-[13px] sm:grid-cols-2 dark:bg-white/5">
+          <dl className="grid gap-3 rounded-[12px] bg-(--dash-subtle-2) px-4 py-3 text-[13px] sm:grid-cols-2 dark:bg-white/5">
             <div>
               <dt className="text-(--agenci-ink-3)">Rolle</dt>
               <dd className="mt-0.5 text-(--agenci-ink)">
@@ -154,6 +156,69 @@ export function ProfileSettings() {
           </dl>
         </div>
       </Section>
+
+      <DeleteAccount />
     </div>
+  );
+}
+
+/**
+ * Delete your own account. Better Auth checks the password, and refuses
+ * while you are the only owner of an organization (the message says which).
+ */
+function DeleteAccount() {
+  const [password, setPassword] = useState("");
+  const [understood, setUnderstood] = useState(false);
+  const [busy, setBusy] = useState(false);
+
+  const remove = async () => {
+    setBusy(true);
+    const { error } = await authClient.deleteUser({ password });
+    setBusy(false);
+    if (error) {
+      return toast.error(
+        /invalid password|incorrect/i.test(error.message ?? "")
+          ? "Passordet er feil."
+          : (error.message ?? "Kunne ikke slette kontoen."),
+      );
+    }
+    toast.success("Kontoen er slettet");
+    window.location.href = "/login";
+  };
+
+  return (
+    <Section
+      tone="danger"
+      title="Slett kontoen"
+      description="Profilen, innloggingene og medlemskapene dine slettes for godt. Er du eneste eier av en organisasjon, må du slette den eller gjøre noen andre til eier først."
+      footer={
+        <button
+          type="button"
+          className={dangerBtn}
+          disabled={!password || !understood || busy}
+          onClick={remove}
+        >
+          {busy ? <LoaderIcon className="size-4 animate-spin" /> : <TrashIcon className="size-4" strokeWidth={1.6} />}
+          Slett kontoen for godt
+        </button>
+      }
+    >
+      <div className="grid gap-4">
+        <Field label="Bekreft med passordet ditt">
+          <PasswordInput value={password} onChange={setPassword} autoComplete="current-password" />
+        </Field>
+        <label className="flex cursor-pointer items-start gap-3 rounded-[12px] bg-(--dash-subtle-2) px-3.5 py-3 dark:bg-white/5">
+          <input
+            type="checkbox"
+            checked={understood}
+            onChange={(e) => setUnderstood(e.currentTarget.checked)}
+            className="mt-0.5 size-4 accent-(--agenci-ink)"
+          />
+          <span className="text-[13.5px] text-(--agenci-ink)">
+            Jeg forstår at dette ikke kan angres.
+          </span>
+        </label>
+      </div>
+    </Section>
   );
 }

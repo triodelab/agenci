@@ -43,17 +43,17 @@ const ROLE: Record<Role, { label: string; dot: string; chip: string }> = {
   owner: {
     label: "Eier",
     dot: "bg-[#243236]",
-    chip: "border-[#243236]/30 text-[#243236]",
+    chip: "border-[#243236]/30 text-(--agenci-ink)",
   },
   admin: {
     label: "Admin",
     dot: "bg-[#D9493E]",
-    chip: "border-[#D9493E]/40 text-[#B2463A]",
+    chip: "border-[#D9493E]/40 text-(--dash-bad)",
   },
   member: {
     label: "Medlem",
     dot: "bg-[#5FA06F]",
-    chip: "border-[#5FA06F]/45 text-[#2F7D46]",
+    chip: "border-[#5FA06F]/45 text-(--dash-good)",
   },
 };
 
@@ -132,7 +132,7 @@ function RoleChip({ role }: { role: Role }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-[6px] border bg-white px-2 py-px text-[12px] font-medium dark:bg-transparent",
+        "inline-flex items-center rounded-[6px] border bg-(--dash-surface) px-2 py-px text-[12px] font-medium dark:bg-transparent",
         ROLE[role].chip,
       )}
     >
@@ -148,12 +148,12 @@ function AccessChips({ role }: { role: Role }) {
   return (
     <span className="flex items-center gap-1.5">
       {shown.map((a) => (
-        <span key={a} className="rounded-full border border-(--agenci-line) bg-white px-2.5 py-0.5 text-[12px] text-(--agenci-ink) dark:bg-transparent">
+        <span key={a} className="rounded-full border border-(--agenci-line) bg-(--dash-surface) px-2.5 py-0.5 text-[12px] text-(--agenci-ink) dark:bg-transparent">
           {a}
         </span>
       ))}
       {rest > 0 ? (
-        <span title={all.slice(2).join(", ")} className="rounded-full border border-(--agenci-line) bg-white px-2 py-0.5 text-[12px] text-(--agenci-ink-2) dark:bg-transparent">
+        <span title={all.slice(2).join(", ")} className="rounded-full border border-(--agenci-line) bg-(--dash-surface) px-2 py-0.5 text-[12px] text-(--agenci-ink-2) dark:bg-transparent">
           +{rest}
         </span>
       ) : null}
@@ -172,9 +172,9 @@ function CopyButton({ value, label }: { value: string; label: string }) {
         setDone(true);
         window.setTimeout(() => setDone(false), 1500);
       }}
-      className="flex size-6 shrink-0 items-center justify-center rounded-md text-(--agenci-ink-3) transition-colors hover:bg-[#f3f5f4] hover:text-(--agenci-ink)"
+      className="flex size-6 shrink-0 items-center justify-center rounded-md text-(--agenci-ink-3) transition-colors hover:bg-(--dash-subtle) hover:text-(--agenci-ink)"
     >
-      {done ? <CheckIcon className="size-3.5 text-[#2F7D46]" strokeWidth={2.2} /> : <CopyIcon className="size-3.5" strokeWidth={1.7} />}
+      {done ? <CheckIcon className="size-3.5 text-(--dash-good)" strokeWidth={2.2} /> : <CopyIcon className="size-3.5" strokeWidth={1.7} />}
     </button>
   );
 }
@@ -198,7 +198,7 @@ function RoleOptions({
           onClick={() => onChange(r)}
           className={cn(
             "flex items-center gap-3 rounded-[12px] border px-3.5 py-2.5 text-left transition-[border-color,background-color] duration-150",
-            value === r ? "border-(--agenci-ink) bg-[#fafbfa] dark:bg-white/5" : "border-(--agenci-line) hover:border-[#cfd4d1]",
+            value === r ? "border-(--agenci-ink) bg-(--dash-subtle-2) dark:bg-white/5" : "border-(--agenci-line) hover:border-(--dash-field)",
           )}
         >
           <span className={cn("size-2 rounded-full", ROLE[r].dot)} />
@@ -214,7 +214,7 @@ function RoleOptions({
 }
 
 const ghostBtn =
-  "inline-flex h-10 items-center justify-center rounded-full border border-(--agenci-line) px-4 text-[13.5px] text-(--agenci-ink) transition-colors hover:bg-[#f6f7f6] disabled:opacity-40";
+  "inline-flex h-10 items-center justify-center rounded-full border border-(--agenci-line) px-4 text-[13.5px] text-(--agenci-ink) transition-colors hover:bg-(--dash-subtle) disabled:opacity-40";
 const inkBtn =
   "inline-flex h-10 items-center justify-center rounded-full bg-(--agenci-ink) px-5 text-[13.5px] font-medium text-white transition-[background-color,opacity] hover:bg-(--agenci-accent-hover) disabled:opacity-40 dark:text-[#0b0c0e]";
 
@@ -280,7 +280,7 @@ function InviteDialog({
         </DialogHeader>
         {link ? (
           <div className="min-w-0 space-y-4 px-6 pt-5 pb-6">
-            <p className="flex items-center gap-2.5 rounded-[12px] bg-[#E2F2E5] px-4 py-3 text-[13.5px] text-[#2F7D46]">
+            <p className="flex items-center gap-2.5 rounded-[12px] bg-(--dash-good-bg) px-4 py-3 text-[13.5px] text-(--dash-good)">
               <CheckIcon className="size-4 shrink-0" strokeWidth={2.2} />
               Invitasjonen er sendt til {sentTo}.
             </p>
@@ -288,7 +288,7 @@ function InviteDialog({
               <p className="text-[12.5px] text-(--agenci-ink-2)">
                 Kom den ikke fram? Send lenken selv, den gjør det samme.
               </p>
-              <div className="mt-2 flex min-w-0 items-center gap-2 rounded-[12px] border border-(--agenci-line) bg-[#fafbfa] py-1.5 pr-1.5 pl-3 dark:bg-white/5">
+              <div className="mt-2 flex min-w-0 items-center gap-2 rounded-[12px] border border-(--agenci-line) bg-(--dash-subtle-2) py-1.5 pr-1.5 pl-3 dark:bg-white/5">
                 <span className="min-w-0 flex-1 truncate font-mono text-[12px] text-(--agenci-ink)">{link}</span>
                 <CopyButton value={link} label="Kopier invitasjonslenken" />
               </div>
@@ -310,7 +310,7 @@ function InviteDialog({
           <form className="space-y-5 px-6 pt-5 pb-6" onSubmit={submit}>
             <label className="block">
               <span className="text-[13px] font-medium text-(--agenci-ink)">E-post</span>
-              <span className="mt-1.5 flex items-center gap-2 rounded-[12px] border border-(--agenci-line) bg-white px-3 focus-within:border-(--agenci-ink) focus-within:shadow-[0_0_0_4px_rgb(36_50_54/0.08)] dark:bg-transparent">
+              <span className="mt-1.5 flex items-center gap-2 rounded-[12px] border border-(--agenci-line) bg-(--dash-surface) px-3 focus-within:border-(--agenci-ink) focus-within:shadow-[0_0_0_4px_rgb(36_50_54/0.08)] dark:bg-transparent">
                 <MailIcon className="size-4 shrink-0 text-(--agenci-ink-3)" strokeWidth={1.6} />
                 <input
                   type="email"
@@ -328,7 +328,7 @@ function InviteDialog({
               <legend className="mb-1.5 text-[13px] font-medium text-(--agenci-ink)">Rolle</legend>
               <RoleOptions value={role} onChange={setRole} roles={roles} />
             </fieldset>
-            {error ? <p className="rounded-[12px] bg-[#F9E2DF] px-3 py-2 text-[13px] text-[#B2463A]">{error}</p> : null}
+            {error ? <p className="rounded-[12px] bg-(--dash-bad-bg) px-3 py-2 text-[13px] text-(--dash-bad)">{error}</p> : null}
             <div className="flex justify-end gap-2">
               <button type="button" className={ghostBtn} onClick={() => onOpenChange(false)}>
                 Avbryt
@@ -417,7 +417,7 @@ function MemberDialog({
                         void act(() => authClient.organization.removeMember({ memberIdOrEmail: row.id }), `${row.name} er fjernet`);
                       }
                     }}
-                    className="text-[13.5px] text-[#B2463A] hover:underline disabled:opacity-40"
+                    className="text-[13.5px] text-(--dash-bad) hover:underline disabled:opacity-40"
                   >
                     Fjern fra teamet
                   </button>
@@ -551,9 +551,9 @@ export default function OrganizationInviteView() {
 
   const stats = [
     { label: "Totalt", value: counts.total, hint: "Medlemmer og invitasjoner", icon: UsersIcon, tint: "bg-[#EEF1FB] text-[#4D68A8]" },
-    { label: "Aktive", value: counts.active, hint: counts.total ? `${Math.round((counts.active / counts.total) * 100)} % av teamet` : "Ingen ennå", icon: UserCheckIcon, tint: "bg-[#E7F3EA] text-[#2F7D46]" },
-    { label: "Eiere og admin", value: counts.admins, hint: "Kan endre oppsett og team", icon: ShieldCheckIcon, tint: "bg-[#FBECEA] text-[#B2463A]" },
-    { label: "Invitert", value: counts.invited, hint: counts.invited ? "Invitasjon sendt" : "Ingen ventende", icon: MailPlusIcon, tint: "bg-[#FCEFE4] text-[#B06A34]" },
+    { label: "Aktive", value: counts.active, hint: counts.total ? `${Math.round((counts.active / counts.total) * 100)} % av teamet` : "Ingen ennå", icon: UserCheckIcon, tint: "bg-[#E7F3EA] text-(--dash-good)" },
+    { label: "Eiere og admin", value: counts.admins, hint: "Kan endre oppsett og team", icon: ShieldCheckIcon, tint: "bg-[#FBECEA] text-(--dash-bad)" },
+    { label: "Invitert", value: counts.invited, hint: counts.invited ? "Invitasjon sendt" : "Ingen ventende", icon: MailPlusIcon, tint: "bg-(--dash-warn-bg) text-(--dash-warn)" },
   ];
 
   const filters: { id: Filter; label: string; dot?: string }[] = [
@@ -567,7 +567,7 @@ export default function OrganizationInviteView() {
   const th = "h-10 px-3 text-left text-[12.5px] font-medium text-(--agenci-ink-2)";
   const td = "h-[52px] px-3 align-middle text-[13.5px]";
   const check =
-    "size-4 cursor-pointer appearance-none rounded-[5px] border border-[#cfd4d1] bg-white transition-colors checked:border-(--agenci-ink) checked:bg-(--agenci-ink) checked:bg-[url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22 fill=%22none%22 stroke=%22white%22 stroke-width=%222.4%22><path d=%22M4 8.5l2.5 2.5L12 5.5%22/></svg>')] disabled:cursor-default disabled:opacity-40";
+    "size-4 cursor-pointer appearance-none rounded-[5px] border border-(--dash-field) bg-(--dash-surface) transition-colors checked:border-(--agenci-ink) checked:bg-(--agenci-ink) checked:bg-[url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22 fill=%22none%22 stroke=%22white%22 stroke-width=%222.4%22><path d=%22M4 8.5l2.5 2.5L12 5.5%22/></svg>')] disabled:cursor-default disabled:opacity-40";
 
   return (
     <div className="flex w-full min-w-0 flex-col gap-5">
@@ -598,7 +598,7 @@ export default function OrganizationInviteView() {
       </header>
 
       {/* Stats */}
-      <section className="grid grid-cols-2 overflow-hidden rounded-[14px] border border-(--agenci-line) bg-white lg:grid-cols-4 dark:bg-(--card)">
+      <section className="grid grid-cols-2 overflow-hidden rounded-[14px] border border-(--agenci-line) bg-(--dash-surface) lg:grid-cols-4 dark:bg-(--card)">
         {stats.map((s, i) => (
           <div
             key={s.label}
@@ -634,8 +634,8 @@ export default function OrganizationInviteView() {
             className={cn(
               "inline-flex h-8 items-center gap-1.5 rounded-full border px-3 text-[13px] transition-colors",
               filter === f.id
-                ? "border-(--agenci-ink) bg-white font-medium text-(--agenci-ink) shadow-[0_0_0_1px_var(--agenci-ink)] dark:bg-white/10"
-                : "border-(--agenci-line) bg-white text-(--agenci-ink-2) hover:text-(--agenci-ink) dark:bg-transparent",
+                ? "border-(--agenci-ink) bg-(--dash-surface) font-medium text-(--agenci-ink) shadow-[0_0_0_1px_var(--agenci-ink)] dark:bg-white/10"
+                : "border-(--agenci-line) bg-(--dash-surface) text-(--agenci-ink-2) hover:text-(--agenci-ink) dark:bg-transparent",
             )}
           >
             <span className={cn("size-1.5 rounded-full", f.dot)} />
@@ -644,7 +644,7 @@ export default function OrganizationInviteView() {
         ))}
         <span className="ml-auto flex items-center gap-2">
           <DropdownMenu>
-            <DropdownMenuTrigger className="inline-flex h-9 items-center gap-1.5 rounded-[10px] border border-(--agenci-line) bg-white px-3 text-[13px] text-(--agenci-ink) outline-none hover:bg-[#f6f7f6] dark:bg-transparent">
+            <DropdownMenuTrigger className="inline-flex h-9 items-center gap-1.5 rounded-[10px] border border-(--agenci-line) bg-(--dash-surface) px-3 text-[13px] text-(--agenci-ink) outline-none hover:bg-(--dash-subtle) dark:bg-transparent">
               <SlidersHorizontalIcon className="size-3.5" strokeWidth={1.7} />
               Sorter
             </DropdownMenuTrigger>
@@ -657,7 +657,7 @@ export default function OrganizationInviteView() {
               </DropdownMenuRadioGroup>
             </DropdownMenuContent>
           </DropdownMenu>
-          <label className="flex h-9 w-56 items-center gap-2 rounded-[10px] border border-(--agenci-line) bg-white px-3 dark:bg-transparent">
+          <label className="flex h-9 w-56 items-center gap-2 rounded-[10px] border border-(--agenci-line) bg-(--dash-surface) px-3 dark:bg-transparent">
             <SearchIcon className="size-4 text-(--agenci-ink-3)" strokeWidth={1.6} />
             <input
               value={query}
@@ -670,10 +670,10 @@ export default function OrganizationInviteView() {
       </div>
 
       {/* Table */}
-      <section className="overflow-hidden rounded-[14px] border border-(--agenci-line) bg-white dark:bg-(--card)">
+      <section className="overflow-hidden rounded-[14px] border border-(--agenci-line) bg-(--dash-surface) dark:bg-(--card)">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[880px] border-collapse">
-            <thead className="bg-[#f7f8f7] dark:bg-white/5">
+            <thead className="bg-(--dash-subtle-2) dark:bg-white/5">
               <tr>
                 <th className={cn(th, "w-10 pl-4")}>
                   <input
@@ -704,7 +704,7 @@ export default function OrganizationInviteView() {
               {invites.length ? <GroupRow label="Invitert" /> : null}
               {invites.map((r) =>
                 r.kind === "invite" ? (
-                  <tr key={r.id} className="border-t border-[#EEF0EF] dark:border-white/5">
+                  <tr key={r.id} className="border-t border-(--agenci-line) dark:border-white/5">
                     <td className={cn(td, "pl-4")}>
                       <input type="checkbox" disabled className={check} aria-label="Kan ikke velges" />
                     </td>
@@ -723,7 +723,7 @@ export default function OrganizationInviteView() {
                     </td>
                     <td className={td}><AccessChips role={r.role} /></td>
                     <td className={td}>
-                      <span className="rounded-[6px] bg-[#f1f2f1] px-2 py-0.5 text-[12px] text-(--agenci-ink-3) dark:bg-white/10">
+                      <span className="whitespace-nowrap rounded-[6px] bg-(--dash-subtle) px-2 py-0.5 text-[12px] text-(--agenci-ink-2)">
                         {daysLeft(r.expiresAt)}
                       </span>
                     </td>
@@ -735,7 +735,7 @@ export default function OrganizationInviteView() {
                             type="button"
                             disabled={busy === r.id}
                             onClick={() => void cancelInvite(r.id)}
-                            className="inline-flex items-center gap-1.5 rounded-md px-1.5 py-1 text-[13px] font-medium text-(--agenci-ink) hover:bg-[#f3f5f4] disabled:opacity-40"
+                            className="inline-flex items-center gap-1.5 rounded-md px-1.5 py-1 text-[13px] font-medium text-(--agenci-ink) hover:bg-(--dash-subtle) disabled:opacity-40"
                           >
                             <XCircleIcon className="size-4" strokeWidth={1.7} />
                             Trekk tilbake
@@ -750,7 +750,7 @@ export default function OrganizationInviteView() {
               {members.length ? <GroupRow label="Medlemmer" /> : null}
               {members.map((r) =>
                 r.kind === "member" ? (
-                  <tr key={r.id} className="border-t border-[#EEF0EF] dark:border-white/5">
+                  <tr key={r.id} className="border-t border-(--agenci-line) dark:border-white/5">
                     <td className={cn(td, "pl-4")}>
                       <input
                         type="checkbox"
@@ -779,13 +779,13 @@ export default function OrganizationInviteView() {
                     </td>
                     <td className={td}><AccessChips role={r.role} /></td>
                     <td className={td}>
-                      <span className="rounded-[6px] bg-[#E2F2E5] px-2 py-0.5 text-[12px] text-[#2F7D46]">Aktiv</span>
+                      <span className="rounded-[6px] bg-(--dash-good-bg) px-2 py-0.5 text-[12px] text-(--dash-good)">Aktiv</span>
                     </td>
                     <td className={cn(td, "pr-4 text-center")}>
                       <button
                         type="button"
                         onClick={() => setViewing(r)}
-                        className="inline-flex h-8 items-center gap-1 rounded-[8px] bg-[#f1f2f1] pr-2 pl-3.5 text-[13px] font-medium text-(--agenci-ink) transition-colors hover:bg-[#e8eae8] dark:bg-white/10"
+                        className="inline-flex h-8 items-center gap-1 rounded-[8px] bg-(--dash-subtle) pr-2 pl-3.5 text-[13px] font-medium text-(--agenci-ink) transition-colors hover:bg-[#e8eae8] dark:bg-white/10"
                       >
                         Vis
                         <ChevronRightIcon className="size-4" strokeWidth={1.7} />
@@ -825,7 +825,7 @@ export default function OrganizationInviteView() {
         <span className="mx-auto flex items-center gap-4 text-[13px] text-(--agenci-ink-2)">
           <span className="flex items-center gap-2">
             Side
-            <span className="inline-flex h-8 items-center gap-1 rounded-[8px] border border-(--agenci-line) bg-white px-2.5 text-(--agenci-ink) tabular-nums dark:bg-transparent">
+            <span className="inline-flex h-8 items-center gap-1 rounded-[8px] border border-(--agenci-line) bg-(--dash-surface) px-2.5 text-(--agenci-ink) tabular-nums dark:bg-transparent">
               {String(current).padStart(2, "0")}
               <ChevronDownIcon className="size-3.5 text-(--agenci-ink-3)" />
             </span>
@@ -837,7 +837,7 @@ export default function OrganizationInviteView() {
               aria-label="Forrige side"
               disabled={current === 1}
               onClick={() => setPage(current - 1)}
-              className="flex size-8 items-center justify-center rounded-[8px] border border-(--agenci-line) bg-white text-(--agenci-ink) disabled:opacity-40 dark:bg-transparent"
+              className="flex size-8 items-center justify-center rounded-[8px] border border-(--agenci-line) bg-(--dash-surface) text-(--agenci-ink) disabled:opacity-40 dark:bg-transparent"
             >
               <ChevronLeftIcon className="size-4" />
             </button>
@@ -849,7 +849,7 @@ export default function OrganizationInviteView() {
                 onClick={() => setPage(p)}
                 className={cn(
                   "flex size-8 items-center justify-center rounded-[8px] text-[13px] tabular-nums",
-                  p === current ? "border border-(--agenci-line) bg-white font-medium text-(--agenci-ink) dark:bg-white/10" : "text-(--agenci-ink-2) hover:bg-[#f3f5f4]",
+                  p === current ? "border border-(--agenci-line) bg-(--dash-surface) font-medium text-(--agenci-ink) dark:bg-white/10" : "text-(--agenci-ink-2) hover:bg-(--dash-subtle)",
                 )}
               >
                 {p}
@@ -860,7 +860,7 @@ export default function OrganizationInviteView() {
               aria-label="Neste side"
               disabled={current === pages}
               onClick={() => setPage(current + 1)}
-              className="flex size-8 items-center justify-center rounded-[8px] border border-(--agenci-line) bg-white text-(--agenci-ink) disabled:opacity-40 dark:bg-transparent"
+              className="flex size-8 items-center justify-center rounded-[8px] border border-(--agenci-line) bg-(--dash-surface) text-(--agenci-ink) disabled:opacity-40 dark:bg-transparent"
             >
               <ChevronRightIcon className="size-4" />
             </button>
@@ -873,8 +873,8 @@ export default function OrganizationInviteView() {
 
 function GroupRow({ label }: { label: string }) {
   return (
-    <tr className="border-t border-[#EEF0EF] dark:border-white/5">
-      <td colSpan={7} className="h-9 bg-[#fafbfa] px-4 text-[12.5px] font-medium text-(--agenci-ink-2) dark:bg-white/[0.03]">
+    <tr className="border-t border-(--agenci-line) dark:border-white/5">
+      <td colSpan={7} className="h-9 bg-(--dash-subtle-2) px-4 text-[12.5px] font-medium text-(--agenci-ink-2) dark:bg-white/[0.03]">
         {label}
       </td>
     </tr>

@@ -40,7 +40,10 @@ import {
   Building2Icon,
   ChevronDownIcon,
   LogOutIcon,
+  MonitorIcon,
+  MoonIcon,
   ShieldIcon,
+  SunIcon,
   SlidersHorizontalIcon,
   UserRoundIcon,
   InboxIcon,
@@ -56,6 +59,7 @@ import {
 import { useAgentQuery } from "@/features/agents/queries/agents-queries";
 import { authClient } from "@/lib/auth-client";
 import { getSidebarStart } from "@/lib/preferences";
+import { useTheme } from "@/lib/theme";
 
 const WEB_APP_URL =
   import.meta.env.VITE_WEB_URL?.replace(/\/$/, "") ?? "http://localhost:3000";
@@ -206,7 +210,7 @@ function DashboardNavLink({
 const rowBase =
   "h-10 w-full gap-3 rounded-[11px] px-3 text-[15px] tracking-[-0.012em] transition-colors duration-150 [&>svg]:size-5 [&_svg]:size-5";
 const rowIdle =
-  "font-normal text-(--agenci-ink) hover:bg-white/55 hover:text-(--agenci-ink) dark:hover:bg-white/[0.05] [&_svg]:text-(--agenci-ink)";
+  "font-normal text-(--agenci-ink) hover:bg-(--dash-surface)/55 hover:text-(--agenci-ink) dark:hover:bg-white/[0.05] [&_svg]:text-(--agenci-ink)";
 const rowActive =
   "dash-nav-active font-normal data-[active=true]:font-normal text-(--agenci-ink) hover:text-(--agenci-ink) [&_svg]:text-(--agenci-ink)";
 
@@ -251,7 +255,7 @@ function NavItem({
             className={cn(
               "group-data-[collapsible=icon]:hidden ml-auto shrink-0 rounded-full px-1.5 py-0.5 text-[11px] font-medium tabular-nums leading-none",
               active
-                ? "bg-white text-(--agenci-accent) dark:bg-white/10"
+                ? "bg-(--dash-surface) text-(--agenci-accent) dark:bg-white/10"
                 : "bg-(--agenci-accent-soft) text-(--agenci-accent)",
             )}
           >
@@ -266,7 +270,7 @@ function NavItem({
     <SidebarMenuAction
       asChild
       showOnHover={!active}
-      className="top-2 right-2 size-6 rounded-[7px] border border-(--agenci-line) bg-white text-(--agenci-ink-2) shadow-[0_1px_2px_rgb(16_24_20/0.06)] hover:bg-white hover:text-(--agenci-accent) dark:bg-white/10"
+      className="top-2 right-2 size-6 rounded-[7px] border border-(--agenci-line) bg-(--dash-surface) text-(--agenci-ink-2) shadow-[0_1px_2px_rgb(16_24_20/0.06)] hover:bg-(--dash-surface) hover:text-(--agenci-accent) dark:bg-white/10"
     >
       <DashboardNavLink to={item.action.url} aria-label={item.action.label}>
         <PlusIcon className="size-3.5" strokeWidth={2} />
@@ -362,7 +366,7 @@ function PlanCard({
     : `${orgBase(orgSlug)}/billing`;
 
   return (
-    <div className="mx-1 mb-2 rounded-[14px] border border-white/60 bg-white/30 p-3.5 shadow-[inset_0_1px_0_rgb(255_255_255/0.8),0_1px_2px_rgb(16_24_20/0.04)] backdrop-blur-md dark:border-white/[0.06] dark:bg-white/[0.03]">
+    <div className="mx-1 mb-2 rounded-[14px] border border-(--dash-edge)/60 bg-(--dash-surface)/30 p-3.5 shadow-[inset_0_1px_0_rgb(255_255_255/0.8),0_1px_2px_rgb(16_24_20/0.04)] backdrop-blur-md dark:border-white/[0.06] dark:bg-white/[0.03]">
       <div className="mb-2.5 flex size-8 items-center justify-center rounded-lg bg-(--agenci-accent-soft) text-(--agenci-accent)">
         <ZapIcon className="size-3.5" strokeWidth={2} />
       </div>
@@ -396,6 +400,12 @@ function initialsOf(name: string | undefined, email: string | undefined) {
 
 const ROLE_LABEL: Record<string, string> = { owner: "Eier", admin: "Admin", member: "Medlem" };
 
+const THEMES = [
+  { value: "light", label: "Lys", icon: SunIcon },
+  { value: "dark", label: "Mørk", icon: MoonIcon },
+  { value: "system", label: "Som systemet", icon: MonitorIcon },
+] as const;
+
 /**
  * The signed-in person, top right: name on the left, photo on the right, and
  * a menu for account, organization and logging out. Inside an agent the
@@ -405,6 +415,7 @@ function UserMenu({ orgSlug, agentId }: { orgSlug: string; agentId?: string }) {
   const navigate = useNavigate();
   const { data } = authClient.useSession();
   const { data: org } = authClient.useActiveOrganization();
+  const { theme, setTheme } = useTheme();
   const user = data?.user;
   if (!user) return null;
 
@@ -450,7 +461,7 @@ function UserMenu({ orgSlug, agentId }: { orgSlug: string; agentId?: string }) {
       <DropdownMenuContent
         align="end"
         sideOffset={8}
-        className="w-72 rounded-[16px] border border-(--agenci-line) bg-white p-1.5 shadow-[0_1px_2px_rgb(5_6_7/0.05),0_16px_36px_-18px_rgb(5_6_7/0.22)] backdrop-blur-none dark:bg-(--card)"
+        className="w-72 rounded-[16px] border border-(--agenci-line) bg-(--dash-surface) p-1.5 shadow-[0_1px_2px_rgb(5_6_7/0.05),0_16px_36px_-18px_rgb(5_6_7/0.22)] backdrop-blur-none dark:bg-(--card)"
       >
         <div className="flex items-center gap-3 border-b border-(--agenci-line) px-2.5 pt-2 pb-3">
           {avatar("size-10", "text-[13px]")}
@@ -489,6 +500,31 @@ function UserMenu({ orgSlug, agentId }: { orgSlug: string; agentId?: string }) {
           <CreditCardIcon className={iconClass} strokeWidth={1.6} />
           Plan og faktura
         </DropdownMenuItem>
+        <DropdownMenuSeparator className="my-1.5" />
+        <div className="flex items-center justify-between gap-3 px-2.5 py-1.5">
+          <span className="text-[13.5px] text-(--agenci-ink)">Utseende</span>
+          <div role="radiogroup" aria-label="Utseende" className="flex rounded-full bg-(--dash-subtle) p-0.5">
+            {THEMES.map((t) => (
+              <button
+                key={t.value}
+                type="button"
+                role="radio"
+                aria-checked={theme === t.value}
+                aria-label={t.label}
+                title={t.label}
+                onClick={() => setTheme(t.value)}
+                className={cn(
+                  "flex size-7 items-center justify-center rounded-full transition-colors",
+                  theme === t.value
+                    ? "bg-(--dash-surface) text-(--agenci-ink) shadow-[0_1px_2px_rgb(5_6_7/0.12)] dark:bg-white/10"
+                    : "text-(--agenci-ink-3) hover:text-(--agenci-ink)",
+                )}
+              >
+                <t.icon className="size-3.5" strokeWidth={1.8} />
+              </button>
+            ))}
+          </div>
+        </div>
         <DropdownMenuSeparator className="my-1.5" />
         <DropdownMenuItem
           className={itemClass}

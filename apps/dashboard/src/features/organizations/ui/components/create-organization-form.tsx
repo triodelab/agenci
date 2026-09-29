@@ -1,88 +1,237 @@
 import { type FormEvent, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { nanoid } from "nanoid";
+import { cn } from "@workspace/ui/lib/utils";
+import { ArrowRightIcon, LogOutIcon, TrashIcon } from "lucide-react";
 
-import { AuthShell } from "@/components/auth-shell";
+import { AgenciLoader } from "@/components/agenci-loader";
+import { authLabelCls, PasswordInput } from "@/components/auth-shell";
+import { OnboardingShell, onboardingLinkCls } from "@/components/onboarding-shell";
 import { authClient } from "@/lib/auth-client";
 import { slugify } from "@/lib/ui";
-import { btnPrimaryCls, errCls, inputCls, labelCls } from "./org-shared-ui";
+import { errCls } from "./org-shared-ui";
 
+const icon = { strokeWidth: 1.5, absoluteStrokeWidth: true } as const;
+
+/** Readable slug from the name; a short suffix only if it is taken. */
+async function freeSlug(name: string) {
+  const base = slugify(name);
+  const { data } = await authClient.organization.checkSlug({ slug: base });
+  if (data?.status) return base;
+  return `${base}-${Math.random().toString(36).slice(2, 6)}`;
+}
+
+/** Step 1 of onboarding: name the company. Step 2 is the first agent. */
 export default function CreateOrganizationForm() {
   const navigate = useNavigate();
+  const { data: session } = authClient.useSession();
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const firstName = session?.user.name?.split(" ")[0];
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (!name.trim()) return;
     setLoading(true);
     setError(null);
     try {
       const { data, error: createError } = await authClient.organization.create({
         name: name.trim(),
-        slug: nanoid(6),
+        slug: await freeSlug(name),
       });
-      if (createError) {
-        setError(createError.message ?? "Kunne ikke opprette organisasjon.");
+      if (createError || !data) {
+        setError(createError?.message ?? "Kunne ikke opprette bedriften.");
         return;
       }
-      if (data?.id) {
-        await authClient.organization.setActive({ organizationId: data.id });
-      }
-      if (data?.slug) {
-        await navigate({
-          to: "/org/$orgSlug",
-          params: { orgSlug: data.slug },
-        });
-        return;
-      }
-      await navigate({ to: "/" });
+      await authClient.organization.setActive({ organizationId: data.id });
+      await navigate({
+        to: "/org/$orgSlug/onboarding",
+        params: { orgSlug: data.slug },
+      });
     } catch (err: unknown) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Kunne ikke opprette organisasjon.",
-      );
+      setError(err instanceof Error ? err.message : "Kunne ikke opprette bedriften.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <AuthShell
-      title="Opprett organisasjon"
-      subtitle="Du trenger en organisasjon før du kan bruke dashbordet."
+    <OnboardingShell
+      step={0}
+      action={
+        <button
+          type="button"
+          className={onboardingLinkCls}
+          onClick={async () => {
+            await authClient.signOut();
+            await navigate({ to: "/login" });
+          }}
+        >
+          <LogOutIcon className="size-4" {...icon} />
+          Logg ut
+        </button>
+      }
     >
-      <form className="space-y-3.5" onSubmit={(e) => void onSubmit(e)}>
-        <div className="space-y-1.5">
-          <label htmlFor="org-name" className={labelCls}>
-            Organisasjonsnavn
-          </label>
+      <form
+        onSubmit={(e) => void onSubmit(e)}
+        className="kb-enter mx-auto w-full max-w-[560px] lg:mt-10"
+      >
+        <p className="text-[15px] text-(--agenci-ink-2)">
+          {firstName ? `Velkommen, ${firstName}.` : "Velkommen."}
+        </p>
+        <h1 className="mt-2 [font-family:var(--font-agenci-title)] text-[40px] leading-[1.05] font-medium tracking-[-0.03em] text-(--agenci-ink)">
+          Hva heter bedriften din?
+        </h1>
+        <p className="mt-4 text-[16px] leading-relaxed text-(--agenci-ink-2)">
+          Agentene, samtalene og teamet ditt samles her. Etterpå setter vi opp
+          den første agenten sammen, det tar et par minutter.
+        </p>
+
+        <label className="mt-10 block">
+          <span className="mb-2.5 block text-[14px] font-medium text-(--agenci-ink)">
+            Bedriftsnavn
+          </span>
           <input
-            id="org-name"
-            type="text"
+            // biome-ignore lint/a11y/noAutofocus: the only field of this step
+            autoFocus
             required
-            className={inputCls}
             value={name}
+            maxLength={80}
             disabled={loading}
             onChange={(e) => setName(e.currentTarget.value)}
             placeholder="F.eks. Nordlys AS"
+            className="h-14 w-full rounded-[12px] border border-(--dash-field) bg-(--dash-surface) px-5 text-[17px] text-(--agenci-ink) outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-(--dash-placeholder) focus:border-(--agenci-ink-3) focus:shadow-[0_0_0_4px_rgb(36_50_54/0.07)] disabled:opacity-60"
           />
-          {name.trim() ? (
-            <p className="text-[12px] text-neutral-400">
-              URL-slug: {slugify(name)}
-            </p>
-          ) : null}
+          <span className="mt-2.5 block text-[13px] text-(--agenci-ink-3)">
+            Du kan endre navnet og invitere kolleger senere.
+          </span>
+        </label>
+
+        {error ? <p className={cn(errCls, "mt-5")}>{error}</p> : null}
+
+        <div className="mt-10 flex justify-end">
+          <button
+            type="submit"
+            disabled={loading || !name.trim()}
+            className="group inline-flex h-12 items-center gap-2 rounded-full bg-(--agenci-ink) pr-5 pl-6 text-[15px] font-medium text-(--dash-on-ink) shadow-[0_8px_20px_-10px_rgb(5_6_7/0.6)] transition-[background-color,opacity,transform] duration-150 hover:bg-(--agenci-accent-hover) active:scale-[0.97] disabled:pointer-events-none disabled:opacity-35"
+          >
+            {loading ? (
+              <>
+                <AgenciLoader size={22} decorative />
+                Oppretter
+              </>
+            ) : (
+              <>
+                Fortsett
+                <ArrowRightIcon
+                  className="size-4 transition-transform duration-200 group-hover:translate-x-0.5"
+                  {...icon}
+                />
+              </>
+            )}
+          </button>
         </div>
-        {error ? <p className={errCls}>{error}</p> : null}
+
+        <p className="mt-12 text-center text-[13px] text-(--agenci-ink-3)">
+          Er du invitert av en kollega? Åpne lenken i invitasjonen, så havner du
+          rett i teamet.
+        </p>
+      </form>
+
+      <DeleteAccount />
+    </OnboardingShell>
+  );
+}
+
+/**
+ * For someone who deleted their organization and wants to leave for good:
+ * delete the account right here (Better Auth checks the password).
+ */
+function DeleteAccount() {
+  const [open, setOpen] = useState(false);
+  const [password, setPassword] = useState("");
+  const [understood, setUnderstood] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  if (!open) {
+    return (
+      <p className="mx-auto mt-4 text-center text-[13px] text-(--agenci-ink-3)">
+        Vil du ikke bruke Agenci likevel?{" "}
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="text-(--agenci-ink-2) underline underline-offset-4 hover:text-(--dash-bad)"
+        >
+          Slett kontoen
+        </button>
+      </p>
+    );
+  }
+
+  const remove = async (e: FormEvent) => {
+    e.preventDefault();
+    setBusy(true);
+    setError(null);
+    const { error: err } = await authClient.deleteUser({ password });
+    setBusy(false);
+    if (err) {
+      setError(
+        /invalid password|incorrect/i.test(err.message ?? "")
+          ? "Passordet er feil."
+          : (err.message ?? "Kunne ikke slette kontoen."),
+      );
+      return;
+    }
+    window.location.href = "/login";
+  };
+
+  return (
+    <form
+      onSubmit={(e) => void remove(e)}
+      className="kb-enter mx-auto mt-6 w-full max-w-[560px] rounded-[16px] border border-[#f0d4d0] bg-[#fdf7f6] p-5"
+    >
+      <p className="text-[15px] font-medium text-(--agenci-ink)">Slett kontoen</p>
+      <p className="mt-1 text-[13.5px] leading-relaxed text-(--agenci-ink-2)">
+        Profilen og innloggingene dine slettes for godt. Dette kan ikke angres.
+      </p>
+      <label className="mt-4 block">
+        <span className={authLabelCls}>Bekreft med passordet ditt</span>
+        <div className="mt-1.5">
+          <PasswordInput
+            value={password}
+            autoComplete="current-password"
+            onChange={(e) => setPassword(e.currentTarget.value)}
+          />
+        </div>
+      </label>
+      <label className="mt-3 flex cursor-pointer items-center gap-2.5 text-[13.5px] text-(--agenci-ink)">
+        <input
+          type="checkbox"
+          checked={understood}
+          onChange={(e) => setUnderstood(e.currentTarget.checked)}
+          className="size-4 accent-(--agenci-ink)"
+        />
+        Jeg forstår at dette ikke kan angres.
+      </label>
+      {error ? <p className={cn(errCls, "mt-3")}>{error}</p> : null}
+      <div className="mt-4 flex justify-end gap-2">
+        <button
+          type="button"
+          onClick={() => setOpen(false)}
+          className="inline-flex h-10 items-center rounded-full px-4 text-[13.5px] font-medium text-(--agenci-ink-2) hover:bg-black/[0.04]"
+        >
+          Avbryt
+        </button>
         <button
           type="submit"
-          className={btnPrimaryCls}
-          disabled={loading || !name.trim()}
+          disabled={!password || !understood || busy}
+          className="inline-flex h-10 items-center gap-2 rounded-full bg-[#b3392f] px-4 text-[13.5px] font-medium text-white transition-colors hover:bg-[#9a2f26] disabled:opacity-40"
         >
-          {loading ? "Oppretter…" : "Fortsett"}
+          {busy ? <AgenciLoader size={18} decorative /> : <TrashIcon className="size-4" {...icon} />}
+          Slett kontoen for godt
         </button>
-      </form>
-    </AuthShell>
+      </div>
+    </form>
   );
 }

@@ -2,10 +2,10 @@ import { type FormEvent, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
 
-import { AuthShell } from "@/components/auth-shell";
+import { AuthShell, authButtonCls, authInputCls, authLabelCls, PasswordInput } from "@/components/auth-shell";
 import { authClient } from "@/lib/auth-client";
 import { takePendingInvite } from "@/lib/pending-invite";
-import { btnPrimaryCls, errCls, inputCls, labelCls } from "@/lib/ui";
+import { errCls } from "@/lib/ui";
 
 const signUpSchema = z.object({
   name: z.string().min(2, "Navn må være minst 2 tegn"),
@@ -19,7 +19,8 @@ export default function SignUpForm({
   onSwitchToSignIn: () => void;
 }) {
   const navigate = useNavigate();
-  const [name, setName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -28,7 +29,7 @@ export default function SignUpForm({
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
     const parsed = signUpSchema.safeParse({
-      name: name.trim(),
+      name: `${firstName.trim()} ${lastName.trim()}`.trim(),
       email: email.trim(),
       password,
     });
@@ -65,73 +66,46 @@ export default function SignUpForm({
   return (
     <AuthShell
       title="Opprett konto"
-      subtitle="Kom i gang med Agenci"
-      footer={
+      terms="Opprett konto"
+      subtitle={
         <>
           Har du allerede konto?{" "}
-          <button
-            type="button"
-            onClick={onSwitchToSignIn}
-            className="font-semibold text-neutral-900 hover:underline"
-          >
+          <button type="button" onClick={onSwitchToSignIn} className="font-medium text-(--agenci-ink) underline underline-offset-4 hover:no-underline">
             Logg inn
           </button>
         </>
       }
     >
-      <form className="space-y-3.5" onSubmit={(e) => void onSubmit(e)}>
-        <div className="space-y-1.5">
-          <label htmlFor="name" className={labelCls}>
-            Navn
-          </label>
-          <input
-            id="name"
-            type="text"
-            autoComplete="name"
-            required
-            className={inputCls}
-            value={name}
-            disabled={loading}
-            onChange={(e) => setName(e.currentTarget.value)}
-            placeholder="Ditt navn"
-          />
+      <form className="space-y-4" onSubmit={(e) => void onSubmit(e)}>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1.5">
+            <label htmlFor="first-name" className={authLabelCls}>
+              Fornavn
+            </label>
+            <input id="first-name" type="text" autoComplete="given-name" required className={authInputCls} value={firstName} disabled={loading} onChange={(e) => setFirstName(e.currentTarget.value)} />
+          </div>
+          <div className="space-y-1.5">
+            <label htmlFor="last-name" className={authLabelCls}>
+              Etternavn
+            </label>
+            <input id="last-name" type="text" autoComplete="family-name" className={authInputCls} value={lastName} disabled={loading} onChange={(e) => setLastName(e.currentTarget.value)} />
+          </div>
         </div>
         <div className="space-y-1.5">
-          <label htmlFor="email" className={labelCls}>
+          <label htmlFor="email" className={authLabelCls}>
             E-post
           </label>
-          <input
-            id="email"
-            type="email"
-            autoComplete="email"
-            required
-            className={inputCls}
-            value={email}
-            disabled={loading}
-            onChange={(e) => setEmail(e.currentTarget.value)}
-            placeholder="din@epost.no"
-          />
+          <input id="email" type="email" autoComplete="email" required className={authInputCls} value={email} disabled={loading} onChange={(e) => setEmail(e.currentTarget.value)} placeholder="navn@bedrift.no" />
         </div>
         <div className="space-y-1.5">
-          <label htmlFor="password" className={labelCls}>
+          <label htmlFor="password" className={authLabelCls}>
             Passord
           </label>
-          <input
-            id="password"
-            type="password"
-            autoComplete="new-password"
-            required
-            minLength={8}
-            className={inputCls}
-            value={password}
-            disabled={loading}
-            onChange={(e) => setPassword(e.currentTarget.value)}
-            placeholder="Minst 8 tegn"
-          />
+          <PasswordInput id="password" autoComplete="new-password" required minLength={8} value={password} disabled={loading} onChange={(e) => setPassword(e.currentTarget.value)} placeholder="Minst 8 tegn" />
         </div>
         {error ? <p className={errCls}>{error}</p> : null}
-        <button type="submit" className={btnPrimaryCls} disabled={loading}>
-          {loading ? "Oppretter…" : "Opprett konto"}
+        <button type="submit" className={authButtonCls} disabled={loading}>
+          {loading ? "Oppretter konto…" : "Opprett konto"}
         </button>
       </form>
     </AuthShell>

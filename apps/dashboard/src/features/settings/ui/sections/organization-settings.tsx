@@ -140,7 +140,7 @@ export function OrganizationSettings() {
             {logo ? (
               <img src={logo} alt="" className="size-16 rounded-[16px] border border-(--agenci-line) object-cover" />
             ) : (
-              <span className="flex size-16 items-center justify-center rounded-[16px] bg-[#eef0ef] text-[19px] font-medium text-(--agenci-ink) dark:bg-white/10">
+              <span className="flex size-16 items-center justify-center rounded-[16px] bg-(--dash-subtle) text-[19px] font-medium text-(--agenci-ink) dark:bg-white/10">
                 {initials(name || org.name)}
               </span>
             )}
@@ -169,8 +169,8 @@ export function OrganizationSettings() {
                   : "Brukes i lenkene til dashbordet. Små bokstaver, tall og bindestrek."
             }
           >
-            <span className="flex items-center overflow-hidden rounded-[12px] border border-(--agenci-line) bg-white focus-within:border-(--agenci-ink) focus-within:shadow-[0_0_0_4px_rgb(36_50_54/0.08)] dark:bg-transparent">
-              <span className="border-r border-(--agenci-line) bg-[#f7f8f7] px-3 py-3 text-[13px] text-(--agenci-ink-3) dark:bg-white/5">
+            <span className="flex items-center overflow-hidden rounded-[12px] border border-(--agenci-line) bg-(--dash-surface) focus-within:border-(--agenci-ink) focus-within:shadow-[0_0_0_4px_rgb(36_50_54/0.08)] dark:bg-transparent">
+              <span className="border-r border-(--agenci-line) bg-(--dash-subtle-2) px-3 py-3 text-[13px] text-(--agenci-ink-3) dark:bg-white/5">
                 …/org/
               </span>
               <input
@@ -182,7 +182,7 @@ export function OrganizationSettings() {
                 {slugState === "checking" ? (
                   <LoaderIcon className="size-4 animate-spin text-(--agenci-ink-3)" />
                 ) : slugState === "free" ? (
-                  <CheckIcon className="size-4 text-[#2F7D46]" strokeWidth={2.2} />
+                  <CheckIcon className="size-4 text-(--dash-good)" strokeWidth={2.2} />
                 ) : null}
               </span>
             </span>
@@ -191,7 +191,7 @@ export function OrganizationSettings() {
       </Section>
 
       <Section title="Organisasjons-ID" description="Brukes i koden til chatten på nettsiden, og når du kontakter oss om kontoen.">
-        <div className="flex items-center gap-2 rounded-[12px] border border-(--agenci-line) bg-[#fafbfa] py-1.5 pr-1.5 pl-3.5 dark:bg-white/5">
+        <div className="flex items-center gap-2 rounded-[12px] border border-(--agenci-line) bg-(--dash-subtle-2) py-1.5 pr-1.5 pl-3.5 dark:bg-white/5">
           <code className="min-w-0 flex-1 truncate font-mono text-[13px] text-(--agenci-ink)">{org.id}</code>
           <button
             type="button"
@@ -202,7 +202,7 @@ export function OrganizationSettings() {
               window.setTimeout(() => setCopied(false), 1500);
             }}
           >
-            {copied ? <CheckIcon className="size-4 text-[#2F7D46]" strokeWidth={2.2} /> : <CopyIcon className="size-4" strokeWidth={1.6} />}
+            {copied ? <CheckIcon className="size-4 text-(--dash-good)" strokeWidth={2.2} /> : <CopyIcon className="size-4" strokeWidth={1.6} />}
             {copied ? "Kopiert" : "Kopier"}
           </button>
         </div>

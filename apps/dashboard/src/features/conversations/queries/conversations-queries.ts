@@ -62,6 +62,28 @@ export function useConversationQuery(agentId: string, threadId: string) {
   });
 }
 
+/** A person from the team answers the visitor (the team takes the chat). */
+export function useReplyMutation(agentId: string, threadId: string) {
+  return useMutation({
+    mutationFn: (text: string) =>
+      client.private.conversations.reply({ agentId, threadId, text }),
+    onSuccess: () => {
+      const queryClient = getQueryClient();
+      void queryClient.invalidateQueries({
+        queryKey: ["conversations", agentId],
+      });
+      void queryClient.invalidateQueries({
+        queryKey: detailKey(agentId, threadId),
+      });
+    },
+    onError: (error) => {
+      toast.error(
+        error instanceof Error ? error.message : "Kunne ikke sende svaret",
+      );
+    },
+  });
+}
+
 export function useSetConversationStatusMutation(
   agentId: string,
   threadId: string,

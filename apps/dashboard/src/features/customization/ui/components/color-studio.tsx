@@ -261,7 +261,7 @@ export function ColorStudio({
           <button
             type="button"
             onClick={() => onChange(clearAll)}
-            className="inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-[12.5px] font-medium text-(--agenci-ink-2) transition-colors hover:bg-[#f3f5f4] hover:text-(--agenci-ink) active:scale-[0.97] dark:hover:bg-white/5"
+            className="inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-[12.5px] font-medium text-(--agenci-ink-2) transition-colors hover:bg-(--dash-subtle) hover:text-(--agenci-ink) active:scale-[0.97] dark:hover:bg-white/5"
           >
             <RotateCcwIcon
               className="size-3.5"
@@ -290,8 +290,8 @@ export function ColorStudio({
                 className={cn(
                   "flex h-10 w-full overflow-hidden rounded-[10px] transition-shadow duration-200",
                   active
-                    ? "shadow-[0_0_0_2px_#fff,0_0_0_3.5px_var(--agenci-ink)]"
-                    : "shadow-[inset_0_0_0_1px_rgb(0_0_0/0.08)] group-hover:shadow-[0_0_0_2px_#fff,0_0_0_3px_var(--agenci-line)]",
+                    ? "shadow-[0_0_0_2px_var(--dash-surface),0_0_0_3.5px_var(--agenci-ink)]"
+                    : "shadow-[inset_0_0_0_1px_var(--dash-swatch-edge)] dark:outline dark:-outline-offset-1 dark:outline-white/15 group-hover:shadow-[0_0_0_2px_var(--dash-surface),0_0_0_3px_var(--agenci-line)]",
                 )}
               >
                 <span
@@ -323,10 +323,10 @@ export function ColorStudio({
       </div>
 
       {/* Main colour */}
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-3 rounded-[12px] bg-[#f6f7f6] px-3.5 py-3 dark:bg-white/5">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-3 rounded-[12px] bg-(--dash-subtle) px-3.5 py-3 dark:bg-white/5">
         <label className="flex cursor-pointer items-center gap-2.5">
           <span
-            className="relative size-8 shrink-0 overflow-hidden rounded-full shadow-[inset_0_0_0_1px_rgb(0_0_0/0.1)]"
+            className="relative size-8 shrink-0 overflow-hidden rounded-full shadow-[inset_0_0_0_1px_var(--dash-swatch-edge)]"
             style={{ background: primary }}
           >
             <input
@@ -437,13 +437,13 @@ function ColorChip({
   onReset: () => void;
 }) {
   return (
-    <span className="group relative inline-flex h-8 items-center rounded-full bg-[#f3f5f4] pr-3 pl-1 transition-colors hover:bg-[#eceeed] dark:bg-white/5 dark:hover:bg-white/10">
+    <span className="group relative inline-flex h-8 items-center rounded-full bg-(--dash-subtle) pr-3 pl-1 transition-colors hover:bg-(--dash-subtle) dark:bg-white/5 dark:hover:bg-white/10">
       <label
         className="flex cursor-pointer items-center gap-2"
         title={`${name} · ${value.toUpperCase()}`}
       >
         <span
-          className="relative size-6 shrink-0 overflow-hidden rounded-full shadow-[inset_0_0_0_1px_rgb(0_0_0/0.12)]"
+          className="relative size-6 shrink-0 overflow-hidden rounded-full shadow-[inset_0_0_0_1px_var(--dash-swatch-edge)]"
           style={{ background: value }}
         >
           <input
@@ -462,7 +462,7 @@ function ColorChip({
           onClick={onReset}
           aria-label={`Tilbakestill ${name.toLowerCase()}`}
           title="Tilbake til nettsidens farge"
-          className="-mr-1.5 ml-1 flex size-5 items-center justify-center rounded-full text-(--agenci-ink-3) transition-colors hover:bg-white hover:text-(--agenci-ink) dark:hover:bg-white/10"
+          className="-mr-1.5 ml-1 flex size-5 items-center justify-center rounded-full text-(--agenci-ink-3) transition-colors hover:bg-(--dash-surface) hover:text-(--agenci-ink) dark:hover:bg-white/10"
         >
           <RotateCcwIcon
             className="size-3"
@@ -498,8 +498,8 @@ function Swatch({
       className={cn(
         "flex size-6 items-center justify-center rounded-full transition-transform duration-150 ease-[cubic-bezier(.23,1,.32,1)] hover:scale-110 active:scale-[0.97]",
         active
-          ? "shadow-[0_0_0_2px_#fff,0_0_0_3.5px_var(--agenci-ink)]"
-          : "shadow-[inset_0_0_0_1px_rgb(0_0_0/0.1)]",
+          ? "shadow-[0_0_0_2px_var(--dash-surface),0_0_0_3.5px_var(--agenci-ink)]"
+          : "shadow-[inset_0_0_0_1px_var(--dash-swatch-edge)]",
       )}
       style={{ background: color }}
     >

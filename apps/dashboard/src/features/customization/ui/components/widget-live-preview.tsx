@@ -6,7 +6,7 @@
 import { cn } from "@workspace/ui/lib/utils";
 import type { WidgetAppearance } from "@workspace/ui/lib/widget-appearance";
 import { getContrastTextColor } from "@workspace/ui/lib/widget-appearance";
-import { MessageCircleIcon, XIcon } from "lucide-react";
+import { MessageCircleIcon, RotateCwIcon, XIcon } from "lucide-react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 export type Device = "desktop" | "mobile";
@@ -25,6 +25,7 @@ export function WidgetLivePreview({
   siteUrl,
   site,
   siteLoading,
+  onReloadSite,
   device,
   open,
   onToggleOpen,
@@ -44,6 +45,8 @@ export function WidgetLivePreview({
     proxyUrl?: string | null;
   } | null;
   siteLoading: boolean;
+  /** Fetch a fresh preview session (used by the reload button). */
+  onReloadSite?: () => Promise<unknown>;
   device: Device;
   open: boolean;
   onToggleOpen: () => void;
@@ -54,6 +57,9 @@ export function WidgetLivePreview({
   const [ready, setReady] = useState(false);
   /** The real site has painted — the placeholder can go. */
   const [siteShown, setSiteShown] = useState(false);
+  /** Bumped to remount the site frame (reload). */
+  const [siteKey, setSiteKey] = useState(0);
+  const [reloading, setReloading] = useState(false);
   const mobile = device === "mobile";
   const scale = mobile
     ? Math.min(box.w / MOBILE.w, box.h / MOBILE.h, 1)
@@ -122,6 +128,29 @@ export function WidgetLivePreview({
       ? site.url
       : (site.proxyUrl ?? null)
     : null;
+  const siteSrc = liveSrc ?? site?.screenshotUrl ?? null;
+
+  // Some sites never fire "load" (analytics beacons, video, long requests)
+  // even though they have painted. Start over when the site changes, and
+  // show the frame after a short wait no matter what, so the preview can
+  // never hang on "Henter …".
+  // biome-ignore lint/correctness/useExhaustiveDependencies: restart per site / reload
+  useEffect(() => {
+    setSiteShown(false);
+    if (!siteSrc) return;
+    const reveal = window.setTimeout(() => setSiteShown(true), 3500);
+    return () => window.clearTimeout(reveal);
+  }, [siteSrc, siteKey]);
+
+  const reloadSite = async () => {
+    setReloading(true);
+    try {
+      await onReloadSite?.();
+    } finally {
+      setSiteKey((k) => k + 1);
+      setReloading(false);
+    }
+  };
 
   return (
     <div
@@ -157,6 +186,18 @@ export function WidgetLivePreview({
               <span className="mx-auto flex h-7 w-[420px] items-center justify-center rounded-full bg-white text-[13px] text-[#8a9096]">
                 {host}
               </span>
+              {siteSrc ? (
+                <button
+                  type="button"
+                  onClick={() => void reloadSite()}
+                  disabled={reloading}
+                  aria-label={`Last ${host} på nytt`}
+                  title="Last nettsiden på nytt"
+                  className="flex size-7 items-center justify-center rounded-full text-[#8a9096] transition-colors hover:bg-white hover:text-[#243236] disabled:opacity-50"
+                >
+                  <RotateCwIcon className={cn("size-3.5", reloading && "animate-spin")} strokeWidth={1.8} />
+                </button>
+              ) : null}
             </div>
           ) : (
             <div className="flex h-9 items-center justify-between px-6 text-[13px] font-semibold text-[#16181b]">
@@ -262,6 +303,7 @@ export function WidgetLivePreview({
             // An iframe is a replaced element: top/bottom alone don't stretch
             // it (it stays 150px tall), so it needs an explicit height.
             <iframe
+              key={`${liveSrc}-${siteKey}`}
               src={liveSrc}
               title={`Nettsiden ${host}`}
               // Both the real site and the proxy run on origins separate from

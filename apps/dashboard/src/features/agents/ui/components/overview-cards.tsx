@@ -28,7 +28,7 @@ const BLUE = "#7F9CE0";
 const DAY = 86_400_000;
 
 export const tileClass =
-  "relative flex min-h-0 flex-col overflow-hidden rounded-[16px] border border-white/80 bg-white p-4 shadow-[0_1px_3px_rgb(5_6_7/0.07),0_14px_34px_-14px_rgb(5_6_7/0.22)] dark:border-white/5 dark:bg-(--card)";
+  "relative flex min-h-0 flex-col overflow-hidden rounded-[16px] border border-(--dash-edge)/80 bg-(--dash-surface) p-4 shadow-[0_1px_3px_rgb(5_6_7/0.07),0_14px_34px_-14px_rgb(5_6_7/0.22)] dark:border-white/5 dark:bg-(--card)";
 
 export const captionClass = cn(
   dataTextClass,
@@ -100,7 +100,7 @@ function ExpandLink({ to, label }: { to: Target; label: string }) {
       to={to}
       aria-label={label}
       title={label}
-      className="absolute right-3 bottom-3 flex size-7 items-center justify-center rounded-full text-(--agenci-ink-3) transition-[color,background-color,transform] duration-150 hover:bg-white hover:text-(--agenci-ink) active:scale-95 dark:hover:bg-white/10"
+      className="absolute right-3 bottom-3 flex size-7 items-center justify-center rounded-full text-(--agenci-ink-3) transition-[color,background-color,transform] duration-150 hover:bg-(--dash-surface) hover:text-(--agenci-ink) active:scale-95 dark:hover:bg-white/10"
     >
       <Maximize2Icon
         className="size-3.5"
@@ -123,7 +123,7 @@ function HeaderPill({
       to={to}
       className={cn(
         captionClass,
-        "rounded-full border border-[#E4E8E5] bg-white px-2.5 py-0.5 text-(--agenci-ink-2) transition-[color,transform] duration-150 hover:text-(--agenci-ink) active:scale-[0.97] dark:border-white/10 dark:bg-transparent",
+        "rounded-full border border-(--agenci-line) bg-(--dash-surface) px-2.5 py-0.5 text-(--agenci-ink-2) transition-[color,transform] duration-150 hover:text-(--agenci-ink) active:scale-[0.97] dark:border-white/10 dark:bg-transparent",
       )}
     >
       {children}
@@ -146,7 +146,7 @@ function DeltaChip({
       <span
         className={cn(
           dataTextClass,
-          "rounded-full bg-white px-2 py-px text-[12px] text-(--agenci-ink-3)",
+          "rounded-full bg-(--dash-surface) px-2 py-px text-[12px] text-(--agenci-ink-3)",
         )}
       >
         Ny
@@ -159,9 +159,9 @@ function DeltaChip({
       className={cn(
         dataTextClass,
         "rounded-full px-2 py-px text-[12px] font-medium",
-        good === null && "bg-white text-(--agenci-ink-2)",
-        good === true && "bg-[#E2F2E5] text-[#2F7D46]",
-        good === false && "bg-[#F9E2DF] text-[#B2463A]",
+        good === null && "bg-(--dash-surface) text-(--agenci-ink-2)",
+        good === true && "bg-(--dash-good-bg) text-(--dash-good)",
+        good === false && "bg-(--dash-bad-bg) text-(--dash-bad)",
       )}
     >
       {value > 0 ? "↑ " : value < 0 ? "↓ " : ""}
@@ -183,10 +183,10 @@ export function TonePill({
       className={cn(
         dataTextClass,
         "inline-flex shrink-0 items-center rounded-full px-2 py-px text-[12px] font-medium",
-        tone === "ok" && "bg-[#E2F2E5] text-[#2F7D46]",
-        tone === "warn" && "bg-[#FBEBDD] text-[#B06A34]",
-        tone === "bad" && "bg-[#F9E2DF] text-[#B2463A]",
-        tone === "neutral" && "bg-white text-(--agenci-ink-2)",
+        tone === "ok" && "bg-(--dash-good-bg) text-(--dash-good)",
+        tone === "warn" && "bg-(--dash-warn-bg) text-(--dash-warn)",
+        tone === "bad" && "bg-(--dash-bad-bg) text-(--dash-bad)",
+        tone === "neutral" && "bg-(--dash-surface) text-(--agenci-ink-2)",
       )}
     >
       {children}
@@ -273,14 +273,14 @@ export function RecentTile({
               <Link
                 to="/org/$orgSlug/agents/$agentId/conversations/$conversationId"
                 params={{ ...params, conversationId: c.threadId }}
-                className="group -mx-2 flex items-center gap-3 rounded-[10px] border-b border-[#EEF0EF] px-2 py-2.5 transition-colors duration-150 last:border-b-0 hover:bg-[#f7f8f7] dark:border-white/5 dark:hover:bg-white/5"
+                className="group -mx-2 flex items-center gap-3 rounded-[10px] border-b border-(--agenci-line) px-2 py-2.5 transition-colors duration-150 last:border-b-0 hover:bg-(--dash-subtle-2) dark:border-white/5 dark:hover:bg-white/5"
               >
                 <span className="relative">
                   <ContactAvatar contact={c.contact} size={32} />
                   <span
                     aria-hidden
                     className={cn(
-                      "absolute -right-0.5 -bottom-0.5 size-2.5 rounded-full border-2 border-white dark:border-(--card)",
+                      "absolute -right-0.5 -bottom-0.5 size-2.5 rounded-full border-2 border-(--dash-edge) dark:border-(--card)",
                       c.status === "resolved"
                         ? "bg-[#5FA06F]"
                         : c.status === "escalated"
@@ -349,9 +349,9 @@ function rateIn(
 const MINUTES_PER_ENQUIRY = 10;
 
 const RING_PARTS = [
-  { key: "resolved", label: "Agent", color: "url(#agenci-ring)", dot: "#1F2224" },
+  { key: "resolved", label: "Agent", color: "url(#agenci-ring)", dot: "var(--chart-ring-a)" },
   { key: "escalated", label: "Team", color: PEACH, dot: PEACH },
-  { key: "unresolved", label: "Venter", color: "#D9DCDA", dot: "#C9CDCB" },
+  { key: "unresolved", label: "Venter", color: "var(--chart-muted)", dot: "var(--chart-muted-dot)" },
 ] as const;
 
 /**
@@ -411,8 +411,8 @@ export function ResolutionTile({
         >
           <defs>
             <linearGradient id="agenci-ring" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0" stopColor="#1F2224" />
-              <stop offset="1" stopColor="#5A5E5C" />
+              <stop offset="0" style={{ stopColor: "var(--chart-ring-a)" }} />
+              <stop offset="1" style={{ stopColor: "var(--chart-ring-b)" }} />
             </linearGradient>
           </defs>
           <circle
@@ -420,7 +420,7 @@ export function ResolutionTile({
             cy="70"
             r="56"
             fill="none"
-            stroke="#F0F1F0"
+            style={{ stroke: "var(--chart-track)" }}
             strokeWidth={13}
             pathLength={100}
           />
@@ -432,7 +432,7 @@ export function ResolutionTile({
                 cy="70"
                 r="56"
                 fill="none"
-                stroke={a.color}
+                style={{ stroke: a.color }}
                 strokeWidth={13}
                 strokeLinecap="round"
                 pathLength={100}
@@ -467,7 +467,7 @@ export function ResolutionTile({
         {RING_PARTS.map((p) => (
           <div
             key={p.key}
-            className="rounded-[12px] bg-[#f5f6f5] px-3 py-2 dark:bg-white/5"
+            className="rounded-[12px] bg-(--dash-subtle) px-3 py-2 dark:bg-white/5"
           >
             <p
               className={cn(
@@ -676,7 +676,7 @@ export function ConversationsChartTile({
               x2="100"
               y1={100 - p * 0.92}
               y2={100 - p * 0.92}
-              stroke="#EEF0EF"
+              style={{ stroke: "var(--chart-grid)" }}
               strokeWidth={1}
               vectorEffect="non-scaling-stroke"
             />
@@ -684,7 +684,7 @@ export function ConversationsChartTile({
           <path
             d={smoothPath(prevPts)}
             fill="none"
-            stroke="#A9AEB3"
+            style={{ stroke: "var(--chart-axis)" }}
             strokeWidth={1.5}
             strokeDasharray="4 4"
             vectorEffect="non-scaling-stroke"
@@ -704,7 +704,7 @@ export function ConversationsChartTile({
         {!active && peak && peak.total > 0 ? (
           <span
             aria-hidden
-            className="pointer-events-none absolute size-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-[2.5px] border-white bg-[#D9743A] shadow-[0_0_0_5px_rgb(217_116_58/0.18),0_4px_10px_rgb(217_116_58/0.35)]"
+            className="pointer-events-none absolute size-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-[2.5px] border-(--dash-edge) bg-[#D9743A] shadow-[0_0_0_5px_rgb(217_116_58/0.18),0_4px_10px_rgb(217_116_58/0.35)]"
             style={{ left: `${x(peakIndex)}%`, top: `${y(peak.total)}%` }}
           >
             <span
@@ -728,12 +728,12 @@ export function ConversationsChartTile({
             />
             <span
               aria-hidden
-              className="pointer-events-none absolute size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-[#E49A62] shadow-[0_0_0_3px_rgb(228_154_98/0.25)]"
+              className="pointer-events-none absolute size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-(--dash-edge) bg-[#E49A62] shadow-[0_0_0_3px_rgb(228_154_98/0.25)]"
               style={{ left: `${activeX}%`, top: `${y(active.total)}%` }}
             />
             <div
               className={cn(
-                "pointer-events-none absolute top-0 z-10 min-w-[128px] rounded-[10px] bg-white px-3 py-2 shadow-[0_1px_2px_rgb(5_6_7/0.06),0_8px_24px_-8px_rgb(5_6_7/0.2)] dark:bg-(--card)",
+                "pointer-events-none absolute top-0 z-10 min-w-[128px] rounded-[10px] bg-(--dash-surface) px-3 py-2 shadow-[0_1px_2px_rgb(5_6_7/0.06),0_8px_24px_-8px_rgb(5_6_7/0.2)] dark:bg-(--card)",
                 activeX > 60
                   ? "-translate-x-[calc(100%+10px)]"
                   : "translate-x-[10px]",
@@ -824,10 +824,10 @@ const OFFICE = { fromHour: 8, toHour: 16, days: 5 };
 const isOfficeHours = (day: number, hour: number) =>
   day < OFFICE.days && hour >= OFFICE.fromHour && hour < OFFICE.toHour;
 
-const HEAT_EMPTY = "#F1F3F2";
+const HEAT_EMPTY = "var(--chart-heat-empty)";
 function heatColor(v: number, max: number) {
   if (v === 0) return HEAT_EMPTY;
-  return `rgb(36 50 54 / ${0.12 + (v / max) * 0.8})`;
+  return `rgb(var(--chart-heat-rgb) / ${0.12 + (v / max) * 0.8})`;
 }
 
 function Insight({
@@ -840,7 +840,7 @@ function Insight({
   sub: string;
 }) {
   return (
-    <div className="rounded-[10px] bg-[#f6f7f6] px-3.5 py-3 dark:bg-white/[0.04]">
+    <div className="rounded-[10px] bg-(--dash-subtle) px-3.5 py-3 dark:bg-white/[0.04]">
       <p className={captionClass}>{label}</p>
       <p className="mt-1 [font-family:var(--font-agenci-title)] text-[20px] leading-tight font-medium tracking-[-0.025em] text-(--agenci-ink)">
         {value}
@@ -954,7 +954,7 @@ export function ActivityTile({
             <span
               className={cn(
                 captionClass,
-                "mt-1.5 flex items-center justify-center gap-1.5 rounded-full bg-[#EEF0EF] text-(--agenci-ink-2) dark:bg-white/5",
+                "mt-1.5 flex items-center justify-center gap-1.5 rounded-full bg-(--dash-subtle) text-(--agenci-ink-2) dark:bg-white/5",
               )}
               style={{
                 gridColumn: `${OFFICE.fromHour + 3} / span ${OFFICE.toHour - OFFICE.fromHour}`,
@@ -999,7 +999,7 @@ export function ActivityTile({
                         isHover &&
                           "z-20 scale-[1.18] shadow-[0_4px_12px_-4px_rgb(5_6_7/0.35)]",
                         isNow &&
-                          "ring-2 ring-white shadow-[0_0_0_3.5px_rgb(36_50_54)]",
+                          "ring-2 ring-(--dash-surface) shadow-[0_0_0_3.5px_var(--agenci-ink)]",
                       )}
                       style={{
                         background: heatColor(v, stats.max),
@@ -1068,7 +1068,7 @@ export function ActivityTile({
                     background:
                       t === 0
                         ? HEAT_EMPTY
-                        : `rgb(36 50 54 / ${0.12 + t * 0.8})`,
+                        : `rgb(var(--chart-heat-rgb) / ${0.12 + t * 0.8})`,
                   }}
                 />
               ))}
@@ -1077,7 +1077,7 @@ export function ActivityTile({
             <span className="flex items-center gap-1.5">
               <span
                 aria-hidden
-                className="size-2.5 rounded-[3px] bg-white shadow-[0_0_0_1.5px_rgb(36_50_54)]"
+                className="size-2.5 rounded-[3px] bg-(--dash-surface) shadow-[0_0_0_1.5px_var(--agenci-ink)]"
               />
               Nå
             </span>
@@ -1232,7 +1232,7 @@ export function KnowledgeTile({ documents }: { documents: AgentDocument[] }) {
           <div
             className={cn(
               dataTextClass,
-              "mt-1 flex justify-between border-t border-[#E4E8E5] pt-1 text-[12px] text-(--agenci-ink-3)",
+              "mt-1 flex justify-between border-t border-(--agenci-line) pt-1 text-[12px] text-(--agenci-ink-3)",
             )}
           >
             <span>0</span>

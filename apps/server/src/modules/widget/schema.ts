@@ -159,7 +159,30 @@ export const SendPublicChatMessageSchema = z.object({
   threadId: z.string().min(1).optional(),
 });
 
+const ConversationStatus = z.enum(["unresolved", "escalated", "resolved"]);
+
 export const SendPublicChatMessageResponseSchema = z.object({
   threadId: z.string(),
-  message: z.string(),
+  /** The agent's reply — null while a person from the team has the chat. */
+  message: z.string().nullable(),
+  /** "escalated": the team has taken over; replies arrive via `chat.history`. */
+  status: ConversationStatus,
+});
+
+export const PublicChatHistorySchema = z.object({
+  threadId: z.string().min(1),
+});
+
+export const PublicChatHistoryResponseSchema = z.object({
+  status: ConversationStatus.nullable(),
+  messages: z.array(
+    z.object({
+      id: z.string(),
+      role: z.enum(["user", "assistant"]),
+      author: z.enum(["visitor", "agent", "team"]),
+      authorName: z.string().nullable(),
+      text: z.string(),
+      createdAt: z.string(),
+    }),
+  ),
 });

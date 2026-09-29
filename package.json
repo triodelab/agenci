@@ -81,6 +81,7 @@
   ],
   "dependencies": {
     "@mastra/pg": "^1.25.0",
-    "ai": "5"
+    "ai": "5",
+    "cluade": "^0.0.1"
   }
 }

@@ -51,6 +51,14 @@ export function useWidgetSiteQuery(
   return useQuery({
     queryKey: ["widget-site", agentId, device],
     queryFn: () => client.private.widgetCustomization.site({ agentId, device }),
-    staleTime: 25 * 60 * 1000,
+    // Shorter than the preview session so a cached link is never a dead one.
+    staleTime: 10 * 60 * 1000,
   });
+}
+
+/** Fetch a brand-new preview (new session, fresh frameability check). */
+export async function reloadWidgetSite(agentId: string, device: "desktop" | "mobile") {
+  const fresh = await client.private.widgetCustomization.site({ agentId, device, refresh: true });
+  getQueryClient().setQueryData(["widget-site", agentId, device], fresh);
+  return fresh;
 }

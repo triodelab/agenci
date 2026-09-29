@@ -7,16 +7,20 @@ import {
 import { fileExists, readFileBytes } from "@/lib/s3-client";
 import { chunkMarkdown, embedAndStoreChunks } from "@/modules/ingest/service";
 import { isInvalidOpenAIKeyError } from "@/modules/ingest/embedding";
+import { syncAgentStatus } from "@/modules/agents/status";
 import { inngest, uploadDocumentEvent } from "@/inngest/client";
 
 async function markFailed(documentId: string | null | undefined) {
   if (!documentId) {
     return;
   }
-  await prisma.document.update({
+  const doc = await prisma.document.update({
     where: { id: documentId },
     data: { status: "FAILED" },
+    select: { agentId: true },
   });
+  // A failed file never takes a working agent offline (see syncAgentStatus).
+  if (doc.agentId) await syncAgentStatus(doc.agentId);
 }
 
 function documentIdFromFailureEvent(event: unknown) {
@@ -155,11 +159,13 @@ export const uploadDocumentTask: InngestFunction.Any = inngest.createFunction(
       }
     });
 
+    // An agent whose website failed becomes usable once a file is indexed.
     await step.run("mark-completed", async () => {
       await prisma.document.update({
         where: { id: documentId },
         data: { status: "COMPLETED" },
       });
+      return { agentStatus: await syncAgentStatus(agentId) };
     });
 
     logger.info("document ingest complete", {

@@ -25,7 +25,7 @@ import { Form, FormField } from "@workspace/ui/components/form";
 import { cn } from "@workspace/ui/lib/utils";
 import { useAtomValue, useSetAtom } from "jotai";
 import { ExternalLinkIcon, MenuIcon } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { api, setWidgetContactSessionId } from "@/lib/api";
@@ -49,7 +49,15 @@ type ChatMessage = {
   id: string;
   role: "user" | "assistant";
   content: string;
+  /** "team": written by a person from the company, not the AI agent. */
+  author?: "visitor" | "agent" | "team";
+  authorName?: string | null;
 };
+
+type ConversationStatus = "unresolved" | "escalated" | "resolved";
+
+/** How often to look for replies from the team while they have the chat. */
+const TEAM_POLL_MS = 4000;
 
 // Same default as the old Convex flow (`public/conversations.ts`).
 const GREETING: ChatMessage = {
@@ -99,7 +107,47 @@ export const WidgetChatScreen = () => {
   });
 
   const [messages, setMessages] = useState<ChatMessage[]>([GREETING]);
+  const [status, setStatus] = useState<ConversationStatus | null>(null);
   const [isAwaitingAssistant, setIsAwaitingAssistant] = useState(false);
+  const teamHasChat = status === "escalated";
+
+  // Restore the conversation after a reload, and — while the team has the
+  // chat — keep fetching so their replies appear without a reload.
+  useEffect(() => {
+    if (!contactSessionId || !conversationId) return;
+    let cancelled = false;
+    const load = async () => {
+      try {
+        const history = await api.public.chat.history({
+          threadId: conversationId,
+        });
+        if (cancelled || !history.status) return;
+        setStatus(history.status);
+        if (history.messages.length > 0) {
+          setMessages([
+            GREETING,
+            ...history.messages.map((m) => ({
+              id: m.id,
+              role: m.role,
+              content: m.text,
+              author: m.author,
+              authorName: m.authorName,
+            })),
+          ]);
+        }
+      } catch {
+        // offline or session gone: keep what is on screen
+      }
+    };
+    void load();
+    const timer = teamHasChat
+      ? setInterval(() => void load(), TEAM_POLL_MS)
+      : undefined;
+    return () => {
+      cancelled = true;
+      if (timer) clearInterval(timer);
+    };
+  }, [contactSessionId, conversationId, teamHasChat]);
   const showTypingIndicator = isAwaitingAssistant;
   const sessionIsAnonymous = useAtomValue(
     sessionIsAnonymousAtomFamily(organizationId || ""),
@@ -145,7 +193,8 @@ export const WidgetChatScreen = () => {
       ...prev,
       { id: crypto.randomUUID(), role: "user", content: values.message },
     ]);
-    setIsAwaitingAssistant(true);
+    // While the team has the chat there is no AI reply to wait for.
+    setIsAwaitingAssistant(!teamHasChat);
     try {
       const reply = await api.public.chat.send({
         agentId,
@@ -155,10 +204,14 @@ export const WidgetChatScreen = () => {
       if (reply.threadId !== conversationId) {
         setConversationId(reply.threadId);
       }
-      setMessages((prev) => [
-        ...prev,
-        { id: crypto.randomUUID(), role: "assistant", content: reply.message },
-      ]);
+      setStatus(reply.status);
+      const text = reply.message;
+      if (text) {
+        setMessages((prev) => [
+          ...prev,
+          { id: crypto.randomUUID(), role: "assistant", content: text },
+        ]);
+      }
     } catch {
       setMessages((prev) => [
         ...prev,
@@ -184,6 +237,8 @@ export const WidgetChatScreen = () => {
       setWidgetContactSessionId(null);
       setContactSessionId(null);
       setConversationId(null);
+      setMessages([GREETING]);
+      setStatus(null);
       setIsDeleting(false);
       setShowPrivacyPanel(false);
       setScreen("auth");
@@ -293,6 +348,11 @@ export const WidgetChatScreen = () => {
                       : "!border-[var(--widget-input-border)]/80 !bg-[var(--widget-bubble-assistant-bg)] !text-[var(--widget-bubble-assistant-text)] dark:!border-[var(--widget-input-border)]/80 dark:!bg-[var(--widget-bubble-assistant-bg)] dark:!text-[var(--widget-bubble-assistant-text)]",
                   )}
                 >
+                  {message.author === "team" ? (
+                    <span className="mb-0.5 block text-[11px] font-semibold opacity-70">
+                      {message.authorName ?? "Teamet"}
+                    </span>
+                  ) : null}
                   <AIResponse>{message.content}</AIResponse>
                 </AIMessageContent>
                 {message.role === "assistant" && (
@@ -359,6 +419,17 @@ export const WidgetChatScreen = () => {
           })}
         </AISuggestions>
       )}
+      {teamHasChat ? (
+        <div
+          className="shrink-0 border-t border-[var(--widget-input-border)] px-3 py-2 text-center text-[12px] leading-snug"
+          style={{
+            backgroundColor: "var(--widget-input-bg, #fff)",
+            color: "var(--widget-input-placeholder, #8a8f98)",
+          }}
+        >
+          Du snakker nå med en person fra teamet. Svaret kommer her.
+        </div>
+      ) : null}
       {showIdentityBanner && (
         <div
           className="shrink-0 border-t border-[var(--widget-input-border)] px-3 py-2.5"

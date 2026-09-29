@@ -9,10 +9,12 @@ import {
   setStartPage,
   type StartPage,
 } from "@/lib/preferences";
+import { useTheme } from "@/lib/theme";
 import { Choice, Section, SettingsHeader, ToggleRow } from "../settings-ui";
 
 export function PreferencesSettings() {
   const demo = useDemoMode();
+  const { theme, setTheme } = useTheme();
   const [start, setStart] = useState<StartPage>(getStartPage);
   const [sidebar, setSidebar] = useState<SidebarStart>(getSidebarStart);
 
@@ -22,6 +24,23 @@ export function PreferencesSettings() {
         title="Preferanser"
         description="Hvordan Agenci åpner og ser ut for deg. Lagres i denne nettleseren."
       />
+
+      <Section
+        title="Utseende"
+        description="Lys eller mørk modus. «Som systemet» følger innstillingen på maskinen din."
+      >
+        <Choice
+          label="Utseende"
+          cols={3}
+          value={theme}
+          onChange={setTheme}
+          options={[
+            { value: "light", label: "Lys" },
+            { value: "dark", label: "Mørk" },
+            { value: "system", label: "Som systemet" },
+          ]}
+        />
+      </Section>
 
       <Section
         title="Startside"

@@ -1,234 +1,98 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code when working with the Agenci codebase.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ---
 
 # Project Overview
 
-Agenci is a Norwegian-language AI customer support platform.
+Agenci is a Norwegian-language (Bokmål) AI customer support platform. Organizations create an AI agent, feed it knowledge (website crawl, file uploads), and embed a chat widget on their site. Visitors chat with the agent; staff follow and take over conversations from a dashboard inbox.
 
-Organizations embed a chat widget on their website. The widget connects to an AI support agent backed by a RAG knowledge base.
-
-The platform includes:
-
-* AI-powered customer support agents
-* Knowledge base management
-* Website crawling and ingestion
-* File uploads
-* Conversation management
-* Billing and subscriptions
-* Multi-tenant organization support
+The repo is mid-migration from Convex (`packages/backend`, legacy) to a Hono server (`apps/server`). New work goes in `apps/server` + `apps/dashboard`, not Convex or the old Next dashboard.
 
 ---
 
-# Tech Stack
+# Commands
 
-Frontend:
+Bun workspaces + Turborepo. Package manager is `bun` (never npm/yarn/pnpm).
 
-* Next.js 15 (`apps/web`, `apps/widget`)
-* React 19 + TanStack Router (`apps/dashboard`)
-* TypeScript
-* Tailwind CSS v4
-* shadcn/ui
-* Better Auth (`@agenci/auth`) — all authentication
+```bash
+bun install
+bun run infra:up              # docker: postgres (host port 5434), inngest (8288), minio (9000/9001)
 
-Backend:
+bun run dev:server            # apps/server  → http://localhost:3003 (bun --hot)
+bun run dev:dashboard         # apps/dashboard → :3004 (Vite)
+bun run dev:widget            # apps/widget  → :3001 (Vite)
+bun run dev:web               # apps/web     → :3000 (Next.js, marketing)
 
-* Hono (`apps/server`) — Better Auth, oRPC, Inngest, Prisma, Mastra
-* **Mastra** (`@agenci/mastra`) — customer-facing support agents (library; not a public HTTP service)
-* Prisma + PostgreSQL (pgvector)
-* OpenAI GPT-4o-mini
-* Legacy: Convex (being migrated away)
+bun run verify                # typecheck web, widget, dashboard, server — run before finishing a change
+bun --filter server check-types      # single app (server uses `tsc -b`)
+bun --filter dashboard check-types   # or: cd apps/<app> && bunx tsc --noEmit -p .
 
-Infrastructure:
+bun --filter dashboard check  # Biome (dashboard, widget); apps/web + packages/ui use ESLint
+bun --filter dashboard generate-routes   # TanStack Router route tree
+bun --filter @agenci/db db:generate      # Prisma client
+```
 
-* Turborepo
-* Bun workspaces (`bun install`, `bun --filter <pkg> <script>`)
-* AWS Secrets Manager
-* Stripe
+There is no test suite. Verification = `bun run verify` plus exercising the flow against the running server (oRPC over HTTP at `/rpc/*`).
 
-Language:
-
-* Norwegian (Bokmål)
+Widget test URL: `http://localhost:3001/?organizationId=<org-id>`. Inngest dev UI: `http://localhost:8288`.
 
 ---
 
-# Monorepo Structure
+# Architecture
 
-apps/dashboard
+## Apps and packages
 
-* Staff dashboard (React + TanStack Router)
+| Path | What |
+|------|------|
+| `apps/server` | Hono API: Better Auth (`/api/auth/*`), oRPC (`/rpc/*`), Inngest (`/api/inngest`), WebSocket (`/ws`), Mastra agents |
+| `apps/dashboard` | Staff dashboard — React 19, Vite, TanStack Router + Query, oRPC client |
+| `apps/widget` | Customer chat widget — React, Vite |
+| `apps/embed` | Script loader that injects the widget on customer sites |
+| `apps/web` | Next.js marketing site; `app/(dashboard)` is the old dashboard still on Convex (being replaced) |
+| `packages/db` | Prisma (`@agenci/db`), multi-file schema in `prisma/schema/*.prisma` |
+| `packages/auth` | Better Auth config (`@agenci/auth`), incl. trusted origins |
+| `packages/env` | Typed env (`@agenci/env/server`) |
+| `packages/ui` | Shared shadcn/ui (`@workspace/ui/components/...`) |
+| `packages/mastra` | `@agenci/mastra` library; the live customer agent is in `apps/server/src/mastra` |
+| `packages/backend` | Legacy Convex — do not extend |
 
-apps/server
+## Server layout (`apps/server/src`)
 
-* Hono API (Better Auth, oRPC, Inngest, documents, Mastra agents)
+- `routers/router.ts` — root oRPC router split into `public` (widget, anonymous contact session via `X-Contact-Session-Id` header) and `private` (`privateProcedure`: Better Auth session + active organization; context has `userId`, `organizationId`, `role`).
+- `modules/<domain>/` — `router.ts` + `schema.ts` (zod) + `service.ts` per domain: agents, documents, knowledge, ingest, widget, chat, conversations.
+- `inngest/functions/` — background jobs (e.g. `process-agent-onboarding.ts`: crawl → chunk → embed a website).
+- `mastra/` — `customer-service-agent.ts`, tools (`knowledge-search-tool.ts`, `conversation-tools.ts`), system prompt in `constants.ts`, pgvector store in `vector.ts`/`store.ts`. Agents are registered per DB agent (`register-customer-agent.ts`) and re-hydrated on boot.
+- `index.ts` — wires Hono, CORS (trusted origins), WS tickets (`/api/ws/ticket`, cookie or contact-session), and the dev site-preview proxy.
 
-apps/web
+## Data flow
 
-* Marketing / legacy Next dashboard (being migrated)
-
-apps/widget
-
-* Customer-facing chat widget
-
-apps/embed
-
-* Embeddable script loader
-
-packages/backend
-
-* Convex backend (legacy)
-
-packages/mastra
-
-* Mastra agents + workflows (e-commerce / healthcare support)
-
-packages/ui
-
-* Shared UI components
-
-packages/math
-
-* Shared utilities
+1. Staff signs up (Better Auth + organization) in the dashboard and creates an agent with a URL and/or files.
+2. Inngest job / document upload task ingests content into pgvector (the `embeddings` table is owned by `@mastra/pg` and is `@@ignore`d in Prisma). Chunks are tagged with `agentId` metadata; search filters by `agentId`.
+3. Agent status becomes ready (`modules/agents/status.ts`) and the Mastra agent is registered.
+4. Widget loads settings via `public` routes, creates a contact session, and sends messages (`public/chat/send`). The server runs the Mastra agent; memory thread = conversation id, resourceId = `${organizationId}:contact:${contactSessionId}`.
+5. The agent answers via `searchTool` (RAG) and can escalate. When a conversation is `escalated` the AI stays silent and the team replies from the dashboard inbox. Messages carry an `author` (visitor / agent / team).
+6. The `conversations` table is the inbox index (status, message count, last message); message bodies live in Mastra threads.
 
 ---
 
-# Development Principles
+# Rules
 
-Always:
+## Database
+- Never run `prisma db push` or `migrate dev` against the shared DB (the old `docs/LOCAL_TESTING.md` still mentions `db:push`; ignore it). Schema changes = hand-written SQL in `packages/db/prisma/manual-migrations/`, then update the `.prisma` files and `db:generate`.
+- Ask before changing database schemas, auth logic, or billing logic.
 
-* Follow existing project architecture
-* Reuse existing patterns before introducing new ones
-* Keep solutions simple
-* Prefer incremental changes
-* Maintain strict TypeScript compatibility
-* Keep UI text in Norwegian unless explicitly requested otherwise
-* Preserve existing coding conventions
+## AI agent
+- System prompts and all agent-facing text are Norwegian.
+- Reuse the existing search/conversation tools; keep the tool key `searchTool` (the prompt refers to it).
+- Preserve escalation behavior: no AI replies while a human has the conversation.
 
-Never:
+## Code
+- UI text in Norwegian (Bokmål) unless told otherwise.
+- Follow the module pattern (`router` / `schema` / `service`) and existing oRPC + TanStack Query patterns in `apps/dashboard/src/features/<feature>/{queries,ui}`.
+- No new dependencies unless necessary; no large refactors without approval.
+- Dashboard redesigns are visual only: keep flow, structure and content.
 
-* Introduce new dependencies unless necessary
-* Perform large refactors without approval
-* Change database schemas without approval
-* Change authentication logic without approval
-* Change billing logic without approval
-
----
-
-# Cost Optimization Rules
-
-IMPORTANT:
-
-The repository is large.
-
-Do NOT scan the entire repository unless explicitly requested.
-
-Always minimize token usage.
-
-Before reading files:
-
-1. Identify the smallest possible set of files required.
-2. Read only directly relevant files.
-3. Avoid recursive exploration.
-4. Avoid project-wide searches unless necessary.
-
-When solving issues:
-
-* Start with the file explicitly mentioned by the user.
-* Read neighboring files only if required.
-* Do not inspect unrelated folders.
-
-Avoid commands and behaviors that result in large-scale repository analysis.
-
-Examples of what NOT to do:
-
-* Analyze the entire codebase
-* Review the whole architecture
-* Find all bugs in the project
-* Scan every component
-* Read all Convex functions
-
-Examples of preferred behavior:
-
-* Fix a specific component
-* Fix a specific TypeScript error
-* Update a single feature
-* Review only relevant files
-
----
-
-# Debugging Strategy
-
-When debugging:
-
-1. Read the failing file first.
-2. Identify imports and dependencies.
-3. Read only directly connected files.
-4. Stop exploring once sufficient context is found.
-5. Propose the smallest safe fix.
-
-Never perform broad exploratory debugging without a clear reason.
-
----
-
-# Context Handling
-
-Prefer focused context over large context.
-
-Only use 1M context mode when:
-
-* explicitly requested
-* performing architecture reviews
-* performing large migrations
-* analyzing multiple subsystems
-
-For normal development tasks:
-
-* Use standard Sonnet mode
-* Keep context focused
-* Avoid unnecessary file reads
-
----
-
-# Convex Rules
-
-Authentication:
-
-* Use getOrgIdOrNull(ctx)
-* Dashboard routes require a Better Auth session (`privateProcedure`)
-* Widget routes use anonymous contact sessions
-
-Knowledge Base:
-
-* Namespace format: ${orgId}:${agentId}
-* Use existing ingestion pipeline
-* Preserve deduplication behavior
-
-AI Agent:
-
-* Mastra library (`@agenci/mastra`) — e-commerce + healthcare support
-* Invoked from Inngest / API (not a public Mastra HTTP server)
-* Norwegian system prompts
-* Use existing search tools
-* Preserve escalation flows
-* RAG namespace: `${organizationId}:${agentId}`
-
----
-
-# Output Expectations
-
-When making changes:
-
-* Explain what changed
-* Explain why
-* Keep edits minimal
-* Avoid unrelated modifications
-
-When uncertain:
-
-* Ask before making architectural decisions
-* Ask before changing database structures
-* Ask before changing billing or auth systems
-
-Optimize for correctness, maintainability, and minimal token usage.
+## Token economy
+The repo is large. Start from the file the user names, read only direct imports/neighbors, and avoid repo-wide scans or recursive exploration unless explicitly asked. Don't read `packages/backend` (Convex) unless the task is about it.
