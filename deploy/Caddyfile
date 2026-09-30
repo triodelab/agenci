@@ -1,6 +1,14 @@
 app.agenci.no {
 	encode zstd gzip
 
+	# TEMPORARY: the dashboard (incl. sign-up) sits behind a shared password
+	# until launch. The widget's public API stays open so chats keep working.
+	# Remove this block + BASIC_AUTH_* in deploy/.env to open up.
+	@gated not path /rpc/public/* /ws /api/ws/ticket
+	basic_auth @gated {
+		{$BASIC_AUTH_USER} {$BASIC_AUTH_HASH}
+	}
+
 	# API on the same origin as the dashboard (matches the Vite dev proxy).
 	@api path /rpc /rpc/* /api/* /ws
 	handle @api {
