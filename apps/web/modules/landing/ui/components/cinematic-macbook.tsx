@@ -13,8 +13,11 @@ import styles from "./cinematic-macbook.module.css";
 
 export type VideoTrack = {
 	duration: number;
-	/** Pointer actions, in seconds and 0–1 screen coordinates. */
-	marks: { t: number; x: number; y: number; kind: "click" | "drag" }[];
+	/**
+	 * Pointer actions, in seconds and 0–1 screen coordinates. "type" moves in
+	 * closer, so text being written in a small chat stays readable.
+	 */
+	marks: { t: number; x: number; y: number; kind: "click" | "drag" | "type" }[];
 };
 
 const smooth = (a: number, b: number, v: number) => {
@@ -94,10 +97,16 @@ export function CinematicMacbook({
 					mark = m;
 				}
 			}
+			const zoom =
+				mark?.kind === "type" ? 1.4 : mark?.kind === "drag" ? 0.45 : 0.65;
+			const z = 1 + zoom * w;
+			// The deep "type" zoom stays on the screen, never past its edge.
+			const edge = mark?.kind === "type" ? 0.5 / z : 0;
+			const clamp = (v: number) => Math.min(1 - edge, Math.max(edge, v));
 			const target = {
-				z: 1 + (mark?.kind === "drag" ? 0.45 : 0.65) * w,
-				fx: lerp(0.5, mark?.x ?? 0.5, w),
-				fy: lerp(0.5, mark?.y ?? 0.5, w),
+				z,
+				fx: clamp(lerp(0.5, mark?.x ?? 0.5, w)),
+				fy: clamp(lerp(0.5, mark?.y ?? 0.5, w)),
 				rx: 0,
 				ry: 0,
 			};
