@@ -26,7 +26,13 @@ export function App() {
   if (playground) {
     return (
       <div className="h-[100dvh] w-full overflow-hidden bg-background">
-        <WidgetView organizationId={organizationId} agentId={agentId} />
+        {/* The dashboard preview sizes the frame itself (desktop panel or
+            phone), so the widget fills it instead of its own max size. */}
+        <WidgetView
+          organizationId={organizationId}
+          agentId={agentId}
+          standalone={preview}
+        />
       </div>
     );
   }

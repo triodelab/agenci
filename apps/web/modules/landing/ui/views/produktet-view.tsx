@@ -11,6 +11,7 @@ import {
 	Palette,
 	ShieldCheck,
 	SlidersHorizontal,
+	Smartphone,
 	UserRound,
 } from "lucide-react";
 import Image from "next/image";
@@ -147,6 +148,27 @@ const FEATURES: Feature[] = [
 		shot: "tilpasning",
 		alt: "Oppførsel i Agenci: valg av AI-modell, personlighet, regler og overlevering",
 		backdrop: "touch",
+	},
+	{
+		id: "widget",
+		step: "05",
+		label: "Widget",
+		title: (
+			<>
+				Chatten i deres farger.
+				<br />
+				Prøv den før du lagrer.
+			</>
+		),
+		lead: "Velg fargene fra nettsiden eller en ferdig palett, og se chatten endre seg med en gang. Skriv et spørsmål i forhåndsvisningen, så ser du nøyaktig hva kundene dine får til svar.",
+		details: [
+			{ icon: Palette, text: "Farger hentet fra nettsiden" },
+			{ icon: MessageCircle, text: "Test agenten før den går live" },
+			{ icon: Smartphone, text: "Forhåndsvisning på mobil og desktop" },
+		],
+		shot: "widget",
+		alt: "Widget-tilpasning i Agenci: fargene byttes, og agenten svarer på et spørsmål i mobilforhåndsvisningen",
+		backdrop: "forest",
 	},
 ];
 
