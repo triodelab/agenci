@@ -14,3 +14,11 @@ app.agenci.no {
 		file_server
 	}
 }
+
+# Chat widget (framed on customers' sites) and the embed script.
+widget.agenci.no {
+	encode zstd gzip
+	root * /srv/widget
+	try_files {path} /index.html
+	file_server
+}
