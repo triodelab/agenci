@@ -1,0 +1,16 @@
+app.agenci.no {
+	encode zstd gzip
+
+	# API on the same origin as the dashboard (matches the Vite dev proxy).
+	@api path /rpc /rpc/* /api/* /ws
+	handle @api {
+		reverse_proxy server:3003
+	}
+
+	# Dashboard SPA: unknown paths fall back to index.html for client routing.
+	handle {
+		root * /srv/app
+		try_files {path} /index.html
+		file_server
+	}
+}
