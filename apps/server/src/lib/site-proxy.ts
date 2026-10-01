@@ -81,6 +81,11 @@ export async function createPreviewSession(
   url: string,
   opts: { resolved?: boolean } = {},
 ) {
+  // The default `*.localhost` origin only resolves on the developer's machine;
+  // without a public preview domain, let the caller fall back to a screenshot.
+  if (!process.env.SITE_PREVIEW_ORIGIN && process.env.NODE_ENV === "production") {
+    throw new Error("no public preview origin");
+  }
   await assertPublicUrl(url);
   // Lock the session to where the site actually lives (e.g. apex → www).
   const final = opts.resolved

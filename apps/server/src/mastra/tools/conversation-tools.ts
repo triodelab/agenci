@@ -29,7 +29,7 @@ export function createEscalateConversationTool(agentId: string) {
   return createTool({
     id: "escalate-conversation",
     description:
-      "Send samtalen videre til et menneske i teamet. Bruk når kunden ber om et menneske, er tydelig frustrert, eller saken krever noe du ikke kan gjøre (f.eks. refusjon, klage, personlige opplysninger).",
+      "Send samtalen videre til et menneske i teamet. Bruk KUN i situasjonene der «Overlevering til et menneske» i instruksjonene sier at du skal sette over — aldri ellers. Bruk ALDRI ved nødsituasjoner eller medisinske spørsmål — teamet kan ikke hjelpe med det; henvis til 113 (akutt) eller legevakten 116 117.",
     inputSchema: z.object({
       reason: z
         .string()

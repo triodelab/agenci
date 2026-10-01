@@ -3,9 +3,10 @@ import {
   widgetAppearanceToRootStyle,
   widgetAppearanceToStandaloneStyle,
 } from "@workspace/ui/lib/widget-appearance";
-import { useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { useEffect } from "react";
 import {
+  embedFullscreenAtom,
   screenAtom,
   widgetSettingsAtom,
 } from "@/modules/widget/atoms/widget-atoms";
@@ -14,6 +15,7 @@ import { WidgetChatScreen } from "@/modules/widget/ui/screens/widget-chat-screen
 import { WidgetErrorScreen } from "@/modules/widget/ui/screens/widget-error-screen";
 import { WidgetLoadingScreen } from "@/modules/widget/ui/screens/widget-loading-screen";
 import { WidgetBranding } from "../components/widget-branding";
+import { WidgetCloseButton } from "../components/widget-close-button";
 
 interface Props {
   organizationId: string | null;
@@ -27,6 +29,7 @@ export const WidgetView = ({
   standalone = false,
 }: Props) => {
   const screen = useAtomValue(screenAtom);
+  const setFullscreen = useSetAtom(embedFullscreenAtom);
   const widgetSettings = useAtomValue(widgetSettingsAtom);
   const appearance = mergeWidgetAppearance(
     widgetSettings?.appearance ?? undefined,
@@ -66,6 +69,18 @@ export const WidgetView = ({
       window.clearTimeout(stop);
     };
   }, [organizationId]);
+
+  // The embed script says when the chat fills a phone screen.
+  useEffect(() => {
+    if (window.parent === window) return;
+    const onMessage = (e: MessageEvent) => {
+      if (e.source !== window.parent) return;
+      const data = e.data as { type?: string; value?: unknown };
+      if (data?.type === "agenci:fullscreen") setFullscreen(data.value === true);
+    };
+    window.addEventListener("message", onMessage);
+    return () => window.removeEventListener("message", onMessage);
+  }, [setFullscreen]);
 
   // Dynamically load the brand font if one was extracted from the customer's domain
   useEffect(() => {
@@ -114,8 +129,12 @@ export const WidgetView = ({
       className="flex h-full min-h-0 w-full flex-col overflow-hidden"
       style={rootStyle}
     >
-      <div className="flex min-h-0 flex-1 flex-col">
+      <div className="relative flex min-h-0 flex-1 flex-col">
         {screenComponents[screen]}
+        {/* The chat header has its own; other screens get one in the corner. */}
+        {screen !== "chat" ? (
+          <WidgetCloseButton className="absolute right-2 top-2 z-20" />
+        ) : null}
       </div>
       <WidgetBranding />
     </main>

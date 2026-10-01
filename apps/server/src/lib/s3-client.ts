@@ -5,7 +5,6 @@ import { env } from "@agenci/env/server";
 export const s3Client = new S3Client({
   accessKeyId: env.MINIO_ACCESS_KEY,
   secretAccessKey: env.MINIO_SECRET_KEY,
-  region: env.MINIO_REGION,
   endpoint: env.MINIO_ENDPOINT,
   bucket: env.MINIO_BUCKET,
 });

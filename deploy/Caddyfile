@@ -1,0 +1,35 @@
+app.agenci.no {
+	encode zstd gzip
+
+	# TEMPORARY: the dashboard (incl. sign-up) sits behind a shared password
+	# until launch. The widget's public API stays open so chats keep working.
+	# Remove this block + BASIC_AUTH_* in deploy/.env to open up.
+	@gated not path /rpc/public/* /ws /api/ws/ticket
+	basic_auth @gated {
+		{$BASIC_AUTH_USER} {$BASIC_AUTH_HASH}
+	}
+
+	# API on the same origin as the dashboard (matches the Vite dev proxy).
+	@api path /rpc /rpc/* /api/* /ws
+	handle @api {
+		reverse_proxy server:3003
+	}
+
+	# Dashboard SPA: unknown paths fall back to index.html for client routing.
+	handle {
+		root * /srv/app
+		try_files {path} /index.html
+		file_server
+	}
+}
+
+# Chat widget (framed on customers' sites) and the embed script.
+widget.agenci.no {
+	encode zstd gzip
+	# The embed script has a fixed URL on customers' sites: keep caches short
+	# so updates reach them within minutes (Cloudflare honours this).
+	header /widget.iife.js Cache-Control "public, max-age=300"
+	root * /srv/widget
+	try_files {path} /index.html
+	file_server
+}

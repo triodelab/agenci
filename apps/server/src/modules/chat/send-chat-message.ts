@@ -5,6 +5,7 @@
  */
 import { ORPCError } from "@orpc/server";
 import { createPrismaClient } from "@agenci/db";
+import { buildTurnSystem } from "@/mastra/agent-behavior";
 import { getCustomerServiceAgent } from "@/mastra/register-customer-agent";
 import { AgentBehaviorSchema } from "@/modules/widget/schema";
 
@@ -42,13 +43,13 @@ export async function sendChatMessage(input: {
   // The customer's behaviour settings (tone, rules, model …) shape the agent.
   const settings = row.widgetBrand?.settings as { behavior?: unknown } | null;
   const behavior = AgentBehaviorSchema.safeParse(settings?.behavior ?? {});
-  const agent = getCustomerServiceAgent(
-    row,
-    behavior.success ? behavior.data : null,
-  );
+  const behaviorData = behavior.success ? behavior.data : null;
+  const agent = getCustomerServiceAgent(row, behaviorData);
   const threadId = input.threadId ?? crypto.randomUUID();
 
   const result = await agent.generate(input.message, {
+    // Time of day in Norway + the language rule, next to the message.
+    system: buildTurnSystem(behaviorData),
     memory: {
       resource: input.memoryResourceId,
       thread: threadId,

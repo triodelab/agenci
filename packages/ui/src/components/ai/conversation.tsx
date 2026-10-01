@@ -3,7 +3,7 @@
 import { Button } from "@workspace/ui/components/button";
 import { ArrowDownIcon } from "lucide-react";
 import type { ComponentProps } from "react";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { StickToBottom, useStickToBottomContext } from "use-stick-to-bottom";
 import { cn } from "@workspace/ui/lib/utils";
 
@@ -35,6 +35,19 @@ export const AIConversationContent = ({
 }: AIConversationContentProps) => (
   <StickToBottom.Content className={cn("p-4", className)} {...props} />
 );
+
+/**
+ * Scrolls to the newest message whenever `trigger` changes — also when the
+ * reader had scrolled up — so a sent or received message is always in view.
+ * Must be rendered inside `AIConversation`.
+ */
+export const AIConversationFollow = ({ trigger }: { trigger: unknown }) => {
+  const { scrollToBottom } = useStickToBottomContext();
+  useEffect(() => {
+    void scrollToBottom();
+  }, [trigger, scrollToBottom]);
+  return null;
+};
 
 export const AIConversationScrollButton = () => {
   const { isAtBottom, scrollToBottom } = useStickToBottomContext();

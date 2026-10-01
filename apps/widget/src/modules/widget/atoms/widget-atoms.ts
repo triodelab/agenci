@@ -9,6 +9,8 @@ import {
 } from "../constants";
 
 export const screenAtom = atom<WidgetScreen>("loading");
+/** Set by the embed script: the chat fills a phone screen (shows a close button). */
+export const embedFullscreenAtom = atom(false);
 export const organizationIdAtom = atom<string | null>(null);
 export const agentIdAtom = atom<string | null>(null);
 export const contactSessionIdAtomFamily = atomFamily(
