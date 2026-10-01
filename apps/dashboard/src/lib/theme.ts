@@ -1,6 +1,7 @@
 /**
  * Light / dark mode for the dashboard (Innstillinger → Preferanser → Utseende).
- * The choice lives in localStorage; "system" follows the OS. `index.html`
+ * The choice lives in localStorage; "system" follows the OS. Nothing chosen
+ * yet means light — a first visit never opens in dark mode. `index.html`
  * applies the stored theme before React loads, so there is no white flash.
  */
 import { useSyncExternalStore } from "react";
@@ -14,9 +15,9 @@ const listeners = new Set<() => void>();
 export function getTheme(): Theme {
   try {
     const v = window.localStorage.getItem(KEY);
-    return v === "light" || v === "dark" ? v : "system";
+    return v === "dark" || v === "system" ? v : "light";
   } catch {
-    return "system";
+    return "light";
   }
 }
 
@@ -57,7 +58,7 @@ const subscribe = (cb: () => void) => {
 
 /** Current choice + what is shown, re-rendering when either changes. */
 export function useTheme() {
-  const theme = useSyncExternalStore(subscribe, getTheme, () => "system" as Theme);
+  const theme = useSyncExternalStore(subscribe, getTheme, () => "light" as Theme);
   const resolved = useSyncExternalStore(
     subscribe,
     () => resolvedTheme(),
