@@ -13,19 +13,24 @@ export type AIResponseProps = HTMLAttributes<HTMLDivElement> & {
 
 const components: Options["components"] = {
   ol: ({ children, className, ...props }) => (
-    <ol className={cn("ml-4 list-outside list-decimal", className)} {...props}>
+    <ol className={cn("my-1.5 ml-4 list-outside list-decimal space-y-1", className)} {...props}>
       {children}
     </ol>
   ),
   li: ({ children, className, ...props }) => (
-    <li className={cn("py-1", className)} {...props}>
+    <li className={cn("pl-0.5", className)} {...props}>
       {children}
     </li>
   ),
   ul: ({ children, className, ...props }) => (
-    <ul className={cn("ml-4 list-outside list-decimal", className)} {...props}>
+    <ul className={cn("my-1.5 ml-4 list-outside list-disc space-y-1", className)} {...props}>
       {children}
     </ul>
+  ),
+  p: ({ children, className, ...props }) => (
+    <p className={cn("my-2", className)} {...props}>
+      {children}
+    </p>
   ),
   strong: ({ children, className, ...props }) => (
     <span className={cn("font-semibold", className)} {...props}>
@@ -34,7 +39,7 @@ const components: Options["components"] = {
   ),
   a: ({ children, className, ...props }) => (
     <a
-      className={cn("font-medium text-primary underline", className)}
+      className={cn("font-medium underline decoration-1 underline-offset-2", className)}
       rel="noreferrer"
       target="_blank"
       {...props}
@@ -44,7 +49,7 @@ const components: Options["components"] = {
   ),
   h1: ({ children, className, ...props }) => (
     <h1
-      className={cn("mt-6 mb-2 font-semibold text-3xl", className)}
+      className={cn("mt-3 mb-1 font-semibold text-[1em]", className)}
       {...props}
     >
       {children}
@@ -52,32 +57,32 @@ const components: Options["components"] = {
   ),
   h2: ({ children, className, ...props }) => (
     <h2
-      className={cn("mt-6 mb-2 font-semibold text-2xl", className)}
+      className={cn("mt-3 mb-1 font-semibold text-[1em]", className)}
       {...props}
     >
       {children}
     </h2>
   ),
   h3: ({ children, className, ...props }) => (
-    <h3 className={cn("mt-6 mb-2 font-semibold text-xl", className)} {...props}>
+    <h3 className={cn("mt-3 mb-1 font-semibold text-[1em]", className)} {...props}>
       {children}
     </h3>
   ),
   h4: ({ children, className, ...props }) => (
-    <h4 className={cn("mt-6 mb-2 font-semibold text-lg", className)} {...props}>
+    <h4 className={cn("mt-3 mb-1 font-semibold text-[1em]", className)} {...props}>
       {children}
     </h4>
   ),
   h5: ({ children, className, ...props }) => (
     <h5
-      className={cn("mt-6 mb-2 font-semibold text-base", className)}
+      className={cn("mt-3 mb-1 font-semibold text-[1em]", className)}
       {...props}
     >
       {children}
     </h5>
   ),
   h6: ({ children, className, ...props }) => (
-    <h6 className={cn("mt-6 mb-2 font-semibold text-sm", className)} {...props}>
+    <h6 className={cn("mt-3 mb-1 font-semibold text-[1em]", className)} {...props}>
       {children}
     </h6>
   ),

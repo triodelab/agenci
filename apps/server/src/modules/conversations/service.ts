@@ -5,6 +5,11 @@
  */
 import prisma from "@agenci/db";
 import { ORPCError } from "@orpc/server";
+import {
+  type ProductCard,
+  productsFromParts,
+  tidyReply,
+} from "@/mastra/tools/product-search-tool";
 import { memoryStore } from "@/mastra/store";
 
 const PREVIEW_LENGTH = 500;
@@ -96,6 +101,8 @@ export type ThreadMessage = {
   author: "visitor" | "agent" | "team";
   authorName: string | null;
   text: string;
+  /** Product cards the agent showed with this reply (from its tool results). */
+  products: ProductCard[];
   createdAt: string;
 };
 
@@ -148,7 +155,14 @@ export async function listThreadMessages(threadId: string): Promise<ThreadMessag
           | "team",
         authorName:
           team && typeof meta?.authorName === "string" ? meta.authorName : null,
-        text: textOf(m),
+        ...(() => {
+          const products =
+            m.role === "assistant"
+              ? productsFromParts((m.content as { parts?: unknown })?.parts)
+              : [];
+          const text = textOf(m);
+          return { text: m.role === "assistant" ? tidyReply(text, products) : text, products };
+        })(),
         createdAt: new Date(m.createdAt).toISOString(),
       };
     })

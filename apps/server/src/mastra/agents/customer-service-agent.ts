@@ -5,6 +5,7 @@ import {
   createResolveConversationTool,
 } from "../tools/conversation-tools";
 import { createKnowledgeSearchTool } from "../tools/knowledge-search-tool";
+import { createProductSearchTool } from "../tools/product-search-tool";
 import { CUSTOMER_AGENT_MODEL, customerAgentMemory } from "../store";
 import {
   type AgentBehaviorInput,
@@ -65,6 +66,7 @@ export function createCustomerServiceAgent({
     tools: {
       // Keys must match the names the system prompt uses.
       searchTool: createKnowledgeSearchTool(id),
+      productSearchTool: createProductSearchTool(id),
       // With every hand-over trigger off, the agent can't escalate at all.
       ...(handoverEnabled(behavior?.escalation)
         ? { escalateConversationTool: createEscalateConversationTool(id) }

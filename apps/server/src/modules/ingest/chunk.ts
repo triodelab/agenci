@@ -3,6 +3,10 @@ import { MDocument } from "@mastra/rag";
 export type MarkdownChunk = {
   text: string;
   section: string | null;
+  /** Page the chunk came from, when one source spans a whole website. */
+  sourceUrl?: string;
+  /** Extra searchable metadata, e.g. product fields for product cards. */
+  meta?: Record<string, string | number | boolean | null>;
 };
 
 /**

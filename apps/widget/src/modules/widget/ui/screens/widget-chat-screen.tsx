@@ -31,6 +31,10 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { api, setWidgetContactSessionId } from "@/lib/api";
 import { useWidgetDisplayTitle } from "@/lib/widget-display-title";
+import {
+  type ProductCardData,
+  ProductCards,
+} from "@/modules/widget/ui/components/product-cards";
 import { WidgetCloseButton } from "@/modules/widget/ui/components/widget-close-button";
 import { WidgetHeader } from "@/modules/widget/ui/components/widget-header";
 import {
@@ -62,6 +66,8 @@ type ChatMessage = {
   /** "team": written by a person from the company, not the AI agent. */
   author?: "visitor" | "agent" | "team";
   authorName?: string | null;
+  /** Product cards the agent showed with this reply. */
+  products?: ProductCardData[];
 };
 
 type ConversationStatus = "unresolved" | "escalated" | "resolved";
@@ -143,6 +149,7 @@ export const WidgetChatScreen = () => {
               content: m.text,
               author: m.author,
               authorName: m.authorName,
+              products: m.products,
             })),
           ]);
         }
@@ -228,7 +235,12 @@ export const WidgetChatScreen = () => {
         if (wait > 0) await new Promise((r) => setTimeout(r, wait));
         setMessages((prev) => [
           ...prev,
-          { id: crypto.randomUUID(), role: "assistant", content: text },
+          {
+            id: crypto.randomUUID(),
+            role: "assistant",
+            content: text,
+            products: reply.products,
+          },
         ]);
       }
     } catch {
@@ -386,15 +398,16 @@ export const WidgetChatScreen = () => {
                 ? { ...raw, content: widgetSettings.greeting.trim() }
                 : raw;
             return (
+              <div key={message.id} className="flex flex-col gap-1">
               <AIMessage
                 from={message.role === "user" ? "user" : "assistant"}
-                key={message.id}
+                className="py-1 [&>div]:max-w-[85%]"
               >
                 <AIMessageContent
                   className={cn(
                     message.role === "user"
-                      ? "!border-transparent !bg-[var(--widget-bubble-user-bg)] !text-[var(--widget-bubble-user-text)] dark:!bg-[var(--widget-bubble-user-bg)] dark:!text-[var(--widget-bubble-user-text)]"
-                      : "!border-[var(--widget-input-border)]/80 !bg-[var(--widget-bubble-assistant-bg)] !text-[var(--widget-bubble-assistant-text)] dark:!border-[var(--widget-input-border)]/80 dark:!bg-[var(--widget-bubble-assistant-bg)] dark:!text-[var(--widget-bubble-assistant-text)]",
+                      ? "!rounded-[18px] !px-3.5 !py-2.5 !text-[14.5px] !leading-[1.5]" + " !rounded-br-[6px] " + "!border-transparent !bg-[var(--widget-bubble-user-bg)] !text-[var(--widget-bubble-user-text)] dark:!bg-[var(--widget-bubble-user-bg)] dark:!text-[var(--widget-bubble-user-text)]"
+                      : "!rounded-[18px] !px-3.5 !py-2.5 !text-[14.5px] !leading-[1.5]" + " !rounded-bl-[6px] !border-transparent " + "!border-[var(--widget-input-border)]/80 !bg-[var(--widget-bubble-assistant-bg)] !text-[var(--widget-bubble-assistant-text)] dark:!border-[var(--widget-input-border)]/80 dark:!bg-[var(--widget-bubble-assistant-bg)] dark:!text-[var(--widget-bubble-assistant-text)]",
                   )}
                 >
                   {message.author === "team" ? (
@@ -402,23 +415,29 @@ export const WidgetChatScreen = () => {
                       {message.authorName ?? "Teamet"}
                     </span>
                   ) : null}
-                  <AIResponse>{message.content}</AIResponse>
+                  <AIResponse className="[&_a]:font-semibold [&_a]:text-inherit">
+                    {message.content}
+                  </AIResponse>
                 </AIMessageContent>
                 {message.role === "assistant" && (
                   <DicebearAvatar
                     imageUrl={assistantAvatarUrl}
                     seed="assistant"
-                    size={32}
+                    size={28}
                   />
                 )}
               </AIMessage>
+              {message.products?.length ? (
+                <ProductCards products={message.products} />
+              ) : null}
+              </div>
             );
           })}
           {showTypingIndicator ? (
             <AIMessage from="assistant" key="__typing">
               <AIMessageContent
                 className={cn(
-                  "!border-[var(--widget-input-border)]/80 !bg-[var(--widget-bubble-assistant-bg)] !text-[var(--widget-bubble-assistant-text)] dark:!border-[var(--widget-input-border)]/80 dark:!bg-[var(--widget-bubble-assistant-bg)] dark:!text-[var(--widget-bubble-assistant-text)]",
+                  "!rounded-[18px] !px-3.5 !py-2.5 !text-[14.5px] !leading-[1.5]" + " !rounded-bl-[6px] !border-transparent " + "!border-[var(--widget-input-border)]/80 !bg-[var(--widget-bubble-assistant-bg)] !text-[var(--widget-bubble-assistant-text)] dark:!border-[var(--widget-input-border)]/80 dark:!bg-[var(--widget-bubble-assistant-bg)] dark:!text-[var(--widget-bubble-assistant-text)]",
                 )}
               >
                 <span className="inline-flex items-center gap-1.5">
@@ -614,7 +633,7 @@ export const WidgetChatScreen = () => {
             <AIInputTools />
             <AIInputSubmit
               className={cn(
-                "size-10 shrink-0 rounded-xl border-0 shadow-sm",
+                "size-10 shrink-0 rounded-full border-0 shadow-sm",
                 "!bg-[var(--widget-header-bg)] !text-[var(--widget-header-text)]",
                 "hover:!bg-[var(--widget-header-bg)] hover:opacity-90",
                 "focus-visible:ring-2 focus-visible:ring-[var(--widget-header-text)]/25",
