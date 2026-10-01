@@ -247,6 +247,15 @@ export const WidgetChatScreen = () => {
     }
   };
 
+  /** Fresh thread for the same visitor; the old one stays in the team's inbox. */
+  const handleNewChat = () => {
+    setConversationId(null);
+    setMessages([GREETING]);
+    setStatus(null);
+    form.reset();
+    setShowPrivacyPanel(false);
+  };
+
   const handleDeleteHistory = async () => {
     if (!contactSessionId) return;
     setIsDeleting(true);
@@ -310,6 +319,24 @@ export const WidgetChatScreen = () => {
               className="overflow-hidden rounded-2xl"
               style={{ backgroundColor: "var(--widget-bg, #fff)" }}
             >
+              {conversationId ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={handleNewChat}
+                    className="w-full px-4 py-[15px] text-[15px] font-normal transition-opacity active:opacity-50"
+                    style={{ color: "var(--widget-input-text, #18181b)" }}
+                  >
+                    Start ny samtale
+                  </button>
+                  <div
+                    style={{
+                      height: "0.5px",
+                      backgroundColor: "var(--widget-input-border, #e4e4e7)",
+                    }}
+                  />
+                </>
+              ) : null}
               <button
                 type="button"
                 onClick={handleDeleteHistory}
