@@ -161,10 +161,20 @@ export const SendPublicChatMessageSchema = z.object({
 
 const ConversationStatus = z.enum(["unresolved", "escalated", "resolved"]);
 
+const ProductCardSchema = z.object({
+  title: z.string(),
+  price: z.string().nullable(),
+  image: z.string().nullable(),
+  url: z.string(),
+  inStock: z.boolean().nullable(),
+});
+
 export const SendPublicChatMessageResponseSchema = z.object({
   threadId: z.string(),
   /** The agent's reply — null while a person from the team has the chat. */
   message: z.string().nullable(),
+  /** Product cards to show under the reply. */
+  products: z.array(ProductCardSchema).default([]),
   /** "escalated": the team has taken over; replies arrive via `chat.history`. */
   status: ConversationStatus,
 });
@@ -182,6 +192,7 @@ export const PublicChatHistoryResponseSchema = z.object({
       author: z.enum(["visitor", "agent", "team"]),
       authorName: z.string().nullable(),
       text: z.string(),
+      products: z.array(ProductCardSchema).default([]),
       createdAt: z.string(),
     }),
   ),

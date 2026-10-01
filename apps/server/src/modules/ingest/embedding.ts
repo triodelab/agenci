@@ -133,9 +133,10 @@ export async function embedAndStoreChunks({
           documentId,
           chunkIndex: i + offset,
           section: chunk.section,
-          sourceUrl: sourceUrl ?? null,
+          sourceUrl: chunk.sourceUrl ?? sourceUrl ?? null,
           sourceType,
           storageKey,
+          ...chunk.meta,
         })),
       });
     } catch (error) {

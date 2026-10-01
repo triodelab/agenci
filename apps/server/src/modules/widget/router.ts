@@ -247,6 +247,7 @@ const publicChatRouter = {
       return {
         threadId,
         message: result.message,
+        products: result.products,
         status: after?.status ?? "unresolved",
       };
     }),

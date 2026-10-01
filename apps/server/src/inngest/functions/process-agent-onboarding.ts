@@ -1,9 +1,18 @@
 import { NonRetriableError, type InngestFunction } from "inngest";
 import prisma from "@agenci/db";
-import { scrapeWebsiteForAgentOnboarding } from "@/lib/firecrawl";
+import {
+  mapWebsite,
+  type ScrapedPage,
+  scrapePages,
+  scrapeWebsiteForAgentOnboarding,
+} from "@/lib/firecrawl";
 import { upsertAgentWidgetBrand } from "@/modules/agents/branding";
 import { syncAgentStatus } from "@/modules/agents/status";
-import { chunkMarkdown, embedAndStoreChunks } from "@/modules/ingest/service";
+import {
+  chunkMarkdown,
+  embedAndStoreChunks,
+  type MarkdownChunk,
+} from "@/modules/ingest/service";
 import { isInvalidOpenAIKeyError } from "@/modules/ingest/embedding";
 import { agentOnboardingEvent, inngest } from "../client";
 
@@ -11,7 +20,8 @@ import { agentOnboardingEvent, inngest } from "../client";
  * Website ingest — used both when an agent is created and when a page is
  * added later (`agents.addWebpage`):
  *
- *   Firecrawl scrape (markdown + branding) → chunk → embed → pgvector
+ *   Firecrawl scrape (markdown + branding) → for a site root, also every page
+ *   of the site (map + batch scrape, incl. product data) → chunk → embed → pgvector
  *   (metadata `organizationId` + `agentId`) → agent status from its sources
  *   (see `syncAgentStatus`), which registers the Mastra agent once ready.
  */
@@ -22,6 +32,45 @@ async function markFailed(documentId: string, agentId: string) {
   });
   await syncAgentStatus(agentId);
 }
+
+/** A site root (no path) is read whole; a specific page only itself. */
+function isSiteRoot(url: string) {
+  try {
+    return new URL(url).pathname.replace(/\/+$/, "") === "";
+  } catch {
+    return false;
+  }
+}
+
+/** One extra chunk per product: what product cards and product search use. */
+function productChunk(page: ScrapedPage): MarkdownChunk | null {
+  const p = page.product;
+  if (!p) return null;
+  const lines = [
+    `Produkt: ${p.title}`,
+    p.category ? `Kategori: ${p.category}` : null,
+    p.price ? `Pris: ${p.price}` : null,
+    p.inStock === null ? null : `Lager: ${p.inStock ? "På lager" : "Utsolgt"}`,
+    p.description ? `Beskrivelse: ${p.description}` : null,
+    `Lenke: ${p.url}`,
+  ].filter(Boolean);
+  return {
+    text: lines.join("\n"),
+    section: p.title,
+    sourceUrl: p.url,
+    meta: {
+      kind: "product",
+      productTitle: p.title,
+      productPrice: p.price,
+      productImage: p.image,
+      productUrl: p.url,
+      productInStock: p.inStock,
+    },
+  };
+}
+
+// Keeps the step payloads well under Inngest limits on very large pages.
+const MAX_PAGE_CHARS = 30_000;
 
 function eventData(event: unknown): { documentId?: string; agentId?: string } {
   const data = (event as { data?: { event?: { data?: unknown } } } | null)?.data
@@ -94,8 +143,33 @@ export const processAgentOnboarding: InngestFunction.Any = inngest.createFunctio
       });
     });
 
+    // Whole website: every other page of the site, with product data.
+    const pages = (await step.run("scrape-site-pages", async () => {
+      if (!isSiteRoot(url)) return [] as ScrapedPage[];
+      const urls = (await mapWebsite(url)).slice(1);
+      const scrapedPages = await scrapePages(urls);
+      return scrapedPages.map((pg) => ({ ...pg, markdown: pg.markdown.slice(0, MAX_PAGE_CHARS) }));
+    })) as ScrapedPage[];
+
+    if (pages.length > 0) {
+      await step.run("persist-site-markdown", async () => {
+        await prisma.document.update({
+          where: { id: documentId },
+          data: {
+            markdownContent: [markdown, ...pages.map((pg) => `# Side: ${pg.url}\n\n${pg.markdown}`)].join("\n\n---\n\n"),
+          },
+        });
+      });
+    }
+
     const chunks = await step.run("chunk-markdown", async () => {
-      return chunkMarkdown(markdown);
+      const all: MarkdownChunk[] = (await chunkMarkdown(markdown)).map((c) => ({ ...c, sourceUrl: url }));
+      for (const pg of pages) {
+        for (const c of await chunkMarkdown(pg.markdown)) all.push({ ...c, sourceUrl: pg.url });
+        const product = productChunk(pg);
+        if (product) all.push(product);
+      }
+      return all;
     });
 
     if (chunks.length === 0) {
@@ -142,6 +216,8 @@ export const processAgentOnboarding: InngestFunction.Any = inngest.createFunctio
       agentId,
       documentId,
       chunkCount: ingest.chunkCount,
+      pageCount: pages.length + 1,
+      productCount: pages.filter((pg) => pg.product).length,
     });
     return {
       ok: true as const,

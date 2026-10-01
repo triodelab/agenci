@@ -7,9 +7,11 @@ import { ORPCError } from "@orpc/server";
 import { createPrismaClient } from "@agenci/db";
 import { buildTurnSystem } from "@/mastra/agent-behavior";
 import { getCustomerServiceAgent } from "@/mastra/register-customer-agent";
+import { productsFromSteps, tidyReply } from "@/mastra/tools/product-search-tool";
 import { AgentBehaviorSchema } from "@/modules/widget/schema";
 
 const prisma = createPrismaClient();
+
 
 export async function sendChatMessage(input: {
   organizationId: string;
@@ -56,5 +58,6 @@ export async function sendChatMessage(input: {
     },
   });
 
-  return { threadId, message: result.text };
+  const products = productsFromSteps(result.steps);
+  return { threadId, message: tidyReply(result.text, products), products };
 }
