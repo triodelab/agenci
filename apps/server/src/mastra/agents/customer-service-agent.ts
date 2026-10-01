@@ -9,6 +9,9 @@ import { CUSTOMER_AGENT_MODEL, customerAgentMemory } from "../store";
 import {
   type AgentBehaviorInput,
   buildBehaviorInstructions,
+  buildHandoverInstructions,
+  buildLanguageLead,
+  handoverEnabled,
 } from "../agent-behavior";
 
 export type CustomerServiceAgentInput = {
@@ -46,12 +49,26 @@ export function createCustomerServiceAgent({
     id,
     name,
     instructions:
-      buildInstructions(name, description) + buildBehaviorInstructions(behavior),
-    model: behavior?.model || CUSTOMER_AGENT_MODEL,
+      buildLanguageLead(behavior) +
+      buildInstructions(name, description) +
+      buildBehaviorInstructions(behavior) +
+      // Hand-over rules always apply; the defaults when not customised.
+      (behavior?.escalation
+        ? ""
+        : `\n## Overlevering\n${buildHandoverInstructions(undefined)}\n`),
+    // Mini models keep answering in Norwegian; replying in the customer's own
+    // language needs GPT-4o unless a stronger model is already chosen.
+    model:
+      behavior?.language === "kundens" && (!behavior.model || behavior.model.endsWith("-mini"))
+        ? "openai/gpt-4o"
+        : behavior?.model || CUSTOMER_AGENT_MODEL,
     tools: {
       // Keys must match the names the system prompt uses.
       searchTool: createKnowledgeSearchTool(id),
-      escalateConversationTool: createEscalateConversationTool(id),
+      // With every hand-over trigger off, the agent can't escalate at all.
+      ...(handoverEnabled(behavior?.escalation)
+        ? { escalateConversationTool: createEscalateConversationTool(id) }
+        : {}),
       resolveConversationTool: createResolveConversationTool(id),
     },
     memory: customerAgentMemory,

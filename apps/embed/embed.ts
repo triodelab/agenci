@@ -10,6 +10,11 @@ import { chatBubbleIcon, closeIcon } from './icons';
   let bubbleColor = '#0f172a';
   let bubbleIconColor = '#ffffff';
   let bubbleSize = 60;
+  // Desktop panel size/offset (the widget may resize it; bubble-config moves it).
+  let panelHeight = 600;
+  let panelBottom = '90px';
+  let pageOverflow = '';
+  const widgetOrigin = new URL(EMBED_CONFIG.WIDGET_URL).origin;
 
   // Get configuration from script tag
   let organizationId: string | null = null;
@@ -121,6 +126,9 @@ import { chatBubbleIcon, closeIcon } from './icons';
     
     // Handle messages from widget
     window.addEventListener('message', handleMessage);
+    window.visualViewport?.addEventListener('resize', fitToViewport);
+    window.visualViewport?.addEventListener('scroll', fitToViewport);
+    window.addEventListener('resize', applyLayout);
   }
   
   function buildWidgetUrl(): string {
@@ -139,9 +147,14 @@ import { chatBubbleIcon, closeIcon } from './icons';
       case 'close':
         hide();
         break;
+      case 'agenci-widget-handshake':
+        // The widget (re)loaded: tell it whether it is full screen.
+        sendMode();
+        break;
       case 'resize':
-        if (payload.height && container) {
-          container.style.height = `${payload.height}px`;
+        if (payload.height) {
+          panelHeight = payload.height;
+          if (container && !isFullscreen()) container.style.height = `${panelHeight}px`;
         }
         break;
       case 'bubble-config':
@@ -158,15 +171,60 @@ import { chatBubbleIcon, closeIcon } from './icons';
             bubbleSize = payload.size;
             button.style.width = `${bubbleSize}px`;
             button.style.height = `${bubbleSize}px`;
-            if (container) {
-              container.style.bottom = `${bubbleSize + 20}px`;
-            }
+            panelBottom = `${bubbleSize + 20}px`;
+            if (container && !isFullscreen()) container.style.bottom = panelBottom;
           }
         }
         break;
     }
   }
   
+  /** Phones get the chat full screen; a floating panel would be half hidden. */
+  function isPhone() {
+    return window.matchMedia('(max-width: 640px)').matches;
+  }
+
+  function isFullscreen() {
+    return isOpen && isPhone();
+  }
+
+  function sendMode() {
+    iframe?.contentWindow?.postMessage({ type: 'agenci:fullscreen', value: isFullscreen() }, widgetOrigin);
+  }
+
+  /** Full screen follows the visible viewport, so the on-screen keyboard never covers the input. */
+  function fitToViewport() {
+    if (!container || !isFullscreen()) return;
+    const vv = window.visualViewport;
+    container.style.top = `${vv ? vv.offsetTop : 0}px`;
+    container.style.height = `${vv ? vv.height : window.innerHeight}px`;
+  }
+
+  function applyLayout() {
+    if (!container) return;
+    const side = position === 'bottom-right';
+    if (isFullscreen()) {
+      Object.assign(container.style, {
+        top: '0', left: '0', right: '0', bottom: 'auto',
+        width: '100%', maxWidth: 'none', maxHeight: 'none',
+        borderRadius: '0', boxShadow: 'none',
+      });
+      fitToViewport();
+      if (button) button.style.display = 'none';
+      document.documentElement.style.overflow = 'hidden';
+    } else {
+      Object.assign(container.style, {
+        top: 'auto', left: side ? 'auto' : '20px', right: side ? '20px' : 'auto', bottom: panelBottom,
+        width: '400px', height: `${panelHeight}px`,
+        maxWidth: 'calc(100vw - 40px)', maxHeight: 'calc(100vh - 110px)',
+        borderRadius: '16px', boxShadow: '0 4px 24px rgba(0, 0, 0, 0.15)',
+      });
+      if (button) button.style.display = 'flex';
+      document.documentElement.style.overflow = pageOverflow;
+    }
+    sendMode();
+  }
+
   function toggleWidget() {
     if (isOpen) {
       hide();
@@ -178,7 +236,9 @@ import { chatBubbleIcon, closeIcon } from './icons';
   function show() {
     if (container && button) {
       isOpen = true;
+      pageOverflow = document.documentElement.style.overflow;
       container.style.display = 'block';
+      applyLayout();
       // Trigger animation
       setTimeout(() => {
         if (container) {
@@ -194,6 +254,7 @@ import { chatBubbleIcon, closeIcon } from './icons';
   function hide() {
     if (container && button) {
       isOpen = false;
+      applyLayout();
       container.style.opacity = '0';
       container.style.transform = 'translateY(10px)';
       // Hide after animation
@@ -209,6 +270,10 @@ import { chatBubbleIcon, closeIcon } from './icons';
   
   function destroy() {
     window.removeEventListener('message', handleMessage);
+    window.visualViewport?.removeEventListener('resize', fitToViewport);
+    window.visualViewport?.removeEventListener('scroll', fitToViewport);
+    window.removeEventListener('resize', applyLayout);
+    if (isOpen) document.documentElement.style.overflow = pageOverflow;
     if (container) {
       container.remove();
       container = null;

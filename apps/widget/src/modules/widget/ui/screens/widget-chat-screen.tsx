@@ -2,6 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   AIConversation,
   AIConversationContent,
+  AIConversationFollow,
 } from "@workspace/ui/components/ai/conversation";
 import {
   AIInput,
@@ -30,6 +31,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { api, setWidgetContactSessionId } from "@/lib/api";
 import { useWidgetDisplayTitle } from "@/lib/widget-display-title";
+import { WidgetCloseButton } from "@/modules/widget/ui/components/widget-close-button";
 import { WidgetHeader } from "@/modules/widget/ui/components/widget-header";
 import {
   agentIdAtom,
@@ -40,6 +42,14 @@ import {
   sessionIsAnonymousAtomFamily,
   widgetSettingsAtom,
 } from "../../atoms/widget-atoms";
+
+/** Pause before the "typing" dots appear, as if the message is being read. */
+const READ_DELAY_MS = 700;
+
+/** Total time from sending to the reply showing: read, then type. */
+function humanReplyDelay(text: string) {
+  return READ_DELAY_MS + Math.min(600 + text.length * 18, 3200);
+}
 
 const formSchema = z.object({
   message: z.string().min(1, "Skriv en melding"),
@@ -109,6 +119,7 @@ export const WidgetChatScreen = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([GREETING]);
   const [status, setStatus] = useState<ConversationStatus | null>(null);
   const [isAwaitingAssistant, setIsAwaitingAssistant] = useState(false);
+  const [isSending, setIsSending] = useState(false);
   const teamHasChat = status === "escalated";
 
   // Restore the conversation after a reload, and — while the team has the
@@ -193,8 +204,14 @@ export const WidgetChatScreen = () => {
       ...prev,
       { id: crypto.randomUUID(), role: "user", content: values.message },
     ]);
-    // While the team has the chat there is no AI reply to wait for.
-    setIsAwaitingAssistant(!teamHasChat);
+    setIsSending(true);
+    const sentAt = Date.now();
+    // Feels like a person: a beat to "read" before typing starts, and the
+    // reply lands after a typing time that fits its length. While the team
+    // has the chat there is no AI reply to wait for.
+    const typingTimer = teamHasChat
+      ? undefined
+      : setTimeout(() => setIsAwaitingAssistant(true), READ_DELAY_MS);
     try {
       const reply = await api.public.chat.send({
         agentId,
@@ -207,6 +224,8 @@ export const WidgetChatScreen = () => {
       setStatus(reply.status);
       const text = reply.message;
       if (text) {
+        const wait = humanReplyDelay(text) - (Date.now() - sentAt);
+        if (wait > 0) await new Promise((r) => setTimeout(r, wait));
         setMessages((prev) => [
           ...prev,
           { id: crypto.randomUUID(), role: "assistant", content: text },
@@ -222,7 +241,9 @@ export const WidgetChatScreen = () => {
         },
       ]);
     } finally {
+      clearTimeout(typingTimer);
       setIsAwaitingAssistant(false);
+      setIsSending(false);
     }
   };
 
@@ -272,6 +293,7 @@ export const WidgetChatScreen = () => {
         >
           <MenuIcon />
         </Button>
+        <WidgetCloseButton />
       </WidgetHeader>
 
       {/* Action sheet */}
@@ -394,6 +416,9 @@ export const WidgetChatScreen = () => {
             </AIMessage>
           ) : null}
         </AIConversationContent>
+        <AIConversationFollow
+          trigger={`${messages.length}:${showTypingIndicator}`}
+        />
       </AIConversation>
       {messages.length === 1 && (
         <AISuggestions className="flex w-full flex-col items-end gap-1.5 px-3 pb-2 sm:px-4">
@@ -537,12 +562,12 @@ export const WidgetChatScreen = () => {
           <div className="min-w-0 flex-1">
             <FormField
               control={form.control}
-              disabled={isAwaitingAssistant}
+              disabled={isSending}
               name="message"
               render={({ field }) => (
                 <AIInputTextarea
                   className="!min-h-[44px] !max-h-[120px] !resize-none !bg-transparent !py-2.5 !text-[var(--widget-input-text)] placeholder:!text-[var(--widget-input-placeholder)] dark:!bg-transparent"
-                  disabled={isAwaitingAssistant}
+                  disabled={isSending}
                   maxHeight={120}
                   minHeight={44}
                   onChange={field.onChange}
@@ -568,8 +593,8 @@ export const WidgetChatScreen = () => {
                 "focus-visible:ring-2 focus-visible:ring-[var(--widget-header-text)]/25",
                 "[&_svg]:text-[var(--widget-header-text)]",
               )}
-              disabled={!form.formState.isValid || isAwaitingAssistant}
-              status={isAwaitingAssistant ? "submitted" : "ready"}
+              disabled={!form.formState.isValid || isSending}
+              status={isSending ? "submitted" : "ready"}
               type="submit"
             />
           </AIInputToolbar>

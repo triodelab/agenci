@@ -26,6 +26,9 @@ app.agenci.no {
 # Chat widget (framed on customers' sites) and the embed script.
 widget.agenci.no {
 	encode zstd gzip
+	# The embed script has a fixed URL on customers' sites: keep caches short
+	# so updates reach them within minutes (Cloudflare honours this).
+	header /widget.iife.js Cache-Control "public, max-age=300"
 	root * /srv/widget
 	try_files {path} /index.html
 	file_server

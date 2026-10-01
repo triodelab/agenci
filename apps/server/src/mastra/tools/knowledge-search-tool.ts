@@ -9,7 +9,8 @@ const embedder = new ModelRouterEmbeddingModel(GRAPH_RAG_EMBEDDING_MODEL);
 
 const DEFAULT_TOP_K = 5;
 /** Below this cosine score the chunk is noise rather than an answer. */
-const MIN_SCORE = 0.4;
+// Short questions score lower against long pages; the model filters what it gets.
+const MIN_SCORE = 0.3;
 
 export type KnowledgeSearchResult = {
   text: string;
@@ -45,12 +46,12 @@ export function createKnowledgeSearchTool(agentId: string) {
   return createTool({
     id: "search-knowledge-base",
     description:
-      "Søk i bedriftens kunnskapsbase (nettsider og opplastede dokumenter). Bruk dette før du svarer på spørsmål om bedriften, tjenestene, priser eller rutiner.",
+      "Søk i bedriftens kunnskapsbase (nettsider og opplastede dokumenter). Bruk dette før du svarer på ethvert spørsmål — også spørsmål som virker generelle, siden de ofte handler om noe bedriften tilbyr. Søk gjerne flere ganger med ulike formuleringer.",
     inputSchema: z.object({
       query: z
         .string()
         .min(1)
-        .describe("Kundens spørsmål, formulert som en søkestreng på norsk."),
+        .describe("Kundens spørsmål som en hel, naturlig setning på norsk (f.eks. «Hvilke tjenester tilbyr dere innen nettbutikk?»). Ikke bare ett ord."),
       topK: z
         .number()
         .int()
