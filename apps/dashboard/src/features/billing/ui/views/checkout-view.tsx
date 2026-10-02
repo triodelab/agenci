@@ -1,5 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
+import { cn } from "@workspace/ui/lib/utils";
 import { ArrowLeftIcon, CheckIcon, LockIcon, MessageCircleIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { AgenciLoader } from "@/components/agenci-loader";
@@ -216,7 +217,14 @@ export default function CheckoutView({
             {!config && status.isSuccess ? (
               <p className="p-6 text-[14px] text-(--agenci-ink-2)">Betaling er ikke satt opp ennå.</p>
             ) : null}
-            <div id="nexi-checkout" className={phase === "ready" ? "" : "hidden"} />
+            {/* Never display:none — Nexi sizes its frame from this width when it starts. */}
+            <div
+              id="nexi-checkout"
+              className={cn(
+                "w-full [&_iframe]:!w-full [&_iframe]:min-w-[320px]",
+                phase !== "ready" && "h-0 overflow-hidden",
+              )}
+            />
           </section>
         </div>
       </div>
