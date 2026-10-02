@@ -197,7 +197,7 @@ export default function BillingView() {
           : { title: "Ingen aktiv plan", pill: <Pill tone="muted">Inaktiv</Pill>, line: "Agentene svarer ikke kundene før dere velger en plan.", price: 0 };
 
   return (
-    <div className="flex w-full min-w-0 flex-col gap-6">
+    <div className="flex w-full min-w-0 flex-col gap-6 *:shrink-0">
       <header className="flex flex-wrap items-end gap-x-6 gap-y-3 px-1">
         <div className="min-w-0">
           <h1 className="[font-family:var(--font-agenci-title)] text-[26px] leading-[1.15] font-medium tracking-[-0.03em] text-(--agenci-ink)">

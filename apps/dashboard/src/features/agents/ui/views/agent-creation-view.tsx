@@ -166,6 +166,7 @@ function PreviewCard({
   status = "draft",
   sources,
   conversations,
+  className,
 }: {
   name: string;
   description: string;
@@ -175,6 +176,7 @@ function PreviewCard({
   status?: CardStatus;
   sources?: number;
   conversations?: number;
+  className?: string;
 }) {
   const host = hostOf(url);
   const color =
@@ -186,7 +188,12 @@ function PreviewCard({
     ["Språk", "Norsk"],
   ];
   return (
-    <div className="relative overflow-hidden rounded-[24px] border border-(--agenci-line) bg-(--dash-surface) shadow-[0_1px_2px_rgb(5_6_7/0.04),0_32px_64px_-32px_rgb(5_6_7/0.32)] dark:bg-(--card)">
+    <div
+      className={cn(
+        "relative flex flex-col overflow-hidden rounded-[24px] border border-(--agenci-line) bg-(--dash-surface) shadow-[0_1px_2px_rgb(5_6_7/0.04),0_32px_64px_-32px_rgb(5_6_7/0.32)] dark:bg-(--card)",
+        className,
+      )}
+    >
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-0 top-0 h-44 transition-[background] duration-700"
@@ -194,7 +201,7 @@ function PreviewCard({
           background: `radial-gradient(120% 100% at 0% 0%, color-mix(in srgb, ${color} 12%, transparent), transparent 70%)`,
         }}
       />
-      <div className="relative p-7">
+      <div className="relative flex flex-1 flex-col p-7">
         <div className="flex items-center gap-4">
           {logoUrl ? (
             <span className="kb-card-in flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-[18px] bg-white p-2.5 shadow-[inset_0_0_0_1px_rgb(5_6_7/0.08),0_6px_16px_-8px_rgb(5_6_7/0.25)]">
@@ -245,13 +252,13 @@ function PreviewCard({
         </div>
         <p
           className={cn(
-            "mt-6 line-clamp-4 min-h-[72px] text-[15px] leading-[1.6]",
+            "mt-6 mb-6 line-clamp-4 min-h-[72px] text-[15px] leading-[1.6]",
             description ? "text-(--agenci-ink-2)" : "text-(--agenci-ink-3)",
           )}
         >
           {description || "Hva agenten hjelper kundene med."}
         </p>
-        <div className="mt-6 grid grid-cols-3 divide-x divide-(--agenci-line) border-t border-(--agenci-line) pt-5">
+        <div className="mt-auto grid grid-cols-3 divide-x divide-(--agenci-line) border-t border-(--agenci-line) pt-5">
           {stats.map(([label, value]) => (
             <div key={label} className="min-w-0 px-4 first:pl-0 last:pr-0">
               <p className="text-[12.5px] text-(--agenci-ink-3)">{label}</p>
@@ -628,8 +635,8 @@ function Learning({
   const host = hostOf(url);
 
   return (
-    <div className="mx-auto grid w-full max-w-6xl items-start gap-10 lg:grid-cols-[minmax(0,1fr)_460px] lg:gap-20">
-      <div className="kb-enter">
+    <div className="kb-enter mx-auto w-full max-w-5xl">
+      <header className="max-w-[640px]">
         <h1
           className={cn(
             titleText,
@@ -642,15 +649,17 @@ function Learning({
               ? "Vi fikk ikke lest nettsiden"
               : `${name} lærer ${host ?? "nettsiden"}`}
         </h1>
-        <p className="mt-4 max-w-[520px] text-[16px] leading-relaxed text-(--agenci-ink-2)">
+        <p className="mt-4 text-[16px] leading-relaxed text-(--agenci-ink-2)">
           {done
-            ? "Kunnskapsbasen er bygget. Test agenten eller tilpass widgeten."
+            ? "Kunnskapsbasen er bygget, og agenten kan svare kundene dine. Test den, tilpass chatten, eller gå videre til oversikten."
             : failed
               ? "Sjekk at adressen stemmer og at siden er offentlig, og prøv igjen."
-              : "Dette tar vanligvis under ett minutt. Du kan gå videre imens."}
+              : "Dette tar vanligvis under ett minutt. Du kan gå videre imens, agenten blir ferdig i bakgrunnen."}
         </p>
+      </header>
 
-        <ol className="mt-10 overflow-hidden rounded-[20px] border border-(--agenci-line) bg-(--dash-surface) dark:bg-transparent">
+      <div className="mt-10 grid items-stretch gap-6 lg:grid-cols-2">
+        <ol className="flex flex-col overflow-hidden rounded-[24px] border border-(--agenci-line) bg-(--dash-surface) shadow-[0_1px_2px_rgb(5_6_7/0.04)] dark:bg-transparent">
           {PHASES.map((p, i) => {
             const state =
               failed && i === phase
@@ -664,7 +673,7 @@ function Learning({
               <li
                 key={p.label}
                 className={cn(
-                  "relative flex items-center gap-4 px-5 py-4 transition-colors duration-300",
+                  "relative flex flex-1 items-center gap-4 px-6 py-4 transition-colors duration-300",
                   i > 0 && "border-t border-(--agenci-line)",
                   state === "active" && "bg-(--dash-subtle-2) dark:bg-white/[0.03]",
                 )}
@@ -694,7 +703,7 @@ function Learning({
                 <span className="min-w-0 flex-1">
                   <span
                     className={cn(
-                      "block text-[16px] leading-snug font-medium transition-colors duration-300",
+                      "block text-[15.5px] leading-snug font-medium transition-colors duration-300",
                       state === "todo"
                         ? "text-(--agenci-ink-3)"
                         : "text-(--agenci-ink)",
@@ -709,10 +718,11 @@ function Learning({
                 <span
                   className={cn(
                     dataText,
-                    "shrink-0 text-[12.5px]",
-                    state === "failed"
-                      ? "text-(--dash-bad)"
-                      : "text-(--agenci-ink-3)",
+                    "shrink-0 rounded-full px-2.5 py-1 text-[12px]",
+                    state === "done" && "bg-(--dash-subtle) text-(--agenci-ink-2) dark:bg-white/5",
+                    state === "active" && "text-(--agenci-ink-2)",
+                    state === "todo" && "text-(--agenci-ink-3)",
+                    state === "failed" && "bg-(--dash-bad-bg) text-(--dash-bad)",
                   )}
                 >
                   {state === "done"
@@ -728,62 +738,8 @@ function Learning({
           })}
         </ol>
 
-        <div className="mt-10 flex flex-wrap items-center gap-2">
-          {failed ? (
-            <PrimaryButton
-              disabled={retry.isPending}
-              onClick={() => retry.mutate({ url })}
-            >
-              <RotateCcwIcon className="size-4" {...icon} />
-              Prøv igjen
-            </PrimaryButton>
-          ) : null}
-          {done ? (
-            <Link
-              to="/org/$orgSlug/agents/$agentId/customization"
-              params={params}
-              className="group inline-flex h-12 items-center gap-2 rounded-full bg-(--agenci-ink) pr-5 pl-6 text-[15px] font-medium text-white shadow-[0_8px_20px_-10px_rgb(5_6_7/0.6)] transition-transform active:scale-[0.97] dark:text-[#0b0c0e]"
-            >
-              <PaletteIcon className="size-4" {...icon} />
-              Tilpass og test widgeten
-            </Link>
-          ) : null}
-          <Link
-            to={
-              done
-                ? "/org/$orgSlug/agents/$agentId/files"
-                : "/org/$orgSlug/agents/$agentId"
-            }
-            params={params}
-            className="inline-flex h-12 items-center gap-2 rounded-full px-5 text-[15px] font-medium text-(--agenci-ink-2) transition-colors hover:bg-(--dash-subtle) hover:text-(--agenci-ink) dark:hover:bg-white/5"
-          >
-            {done ? (
-              <>
-                <BookOpenIcon className="size-4" {...icon} />
-                Se kunnskapsbasen
-              </>
-            ) : (
-              <>
-                Gå til agenten
-                <ArrowRightIcon className="size-4" {...icon} />
-              </>
-            )}
-          </Link>
-          {done ? (
-            <Link
-              to="/org/$orgSlug/agents/$agentId/conversations"
-              params={params}
-              className="inline-flex h-12 items-center gap-2 rounded-full px-5 text-[15px] font-medium text-(--agenci-ink-2) transition-colors hover:bg-(--dash-subtle) hover:text-(--agenci-ink) dark:hover:bg-white/5"
-            >
-              <MessagesSquareIcon className="size-4" {...icon} />
-              Samtaler
-            </Link>
-          ) : null}
-        </div>
-      </div>
-
-      <div className="lg:sticky lg:top-6">
         <PreviewCard
+          className="h-full"
           name={agent?.name ?? name}
           description={agent?.description ?? description}
           url={agent?.websiteUrl ?? url}
@@ -793,6 +749,60 @@ function Learning({
           sources={agent?.sourceCount}
           conversations={agent?.conversationCount}
         />
+      </div>
+
+      <div className="mt-8 flex flex-col-reverse gap-3 border-t border-(--agenci-line) pt-8 sm:flex-row sm:items-center">
+        <div className="flex flex-wrap items-center gap-1">
+          {done ? (
+            <>
+              <Link
+                to="/org/$orgSlug/agents/$agentId/customization"
+                params={params}
+                className="inline-flex h-11 items-center gap-2 rounded-full px-4 text-[14px] font-medium text-(--agenci-ink-2) transition-colors hover:bg-(--dash-subtle) hover:text-(--agenci-ink) dark:hover:bg-white/5"
+              >
+                <PaletteIcon className="size-4" {...icon} />
+                Tilpass og test chatten
+              </Link>
+              <Link
+                to="/org/$orgSlug/agents/$agentId/files"
+                params={params}
+                className="inline-flex h-11 items-center gap-2 rounded-full px-4 text-[14px] font-medium text-(--agenci-ink-2) transition-colors hover:bg-(--dash-subtle) hover:text-(--agenci-ink) dark:hover:bg-white/5"
+              >
+                <BookOpenIcon className="size-4" {...icon} />
+                Kunnskapsbasen
+              </Link>
+              <Link
+                to="/org/$orgSlug/agents/$agentId/conversations"
+                params={params}
+                className="inline-flex h-11 items-center gap-2 rounded-full px-4 text-[14px] font-medium text-(--agenci-ink-2) transition-colors hover:bg-(--dash-subtle) hover:text-(--agenci-ink) dark:hover:bg-white/5"
+              >
+                <MessagesSquareIcon className="size-4" {...icon} />
+                Samtaler
+              </Link>
+            </>
+          ) : failed ? (
+            <button
+              type="button"
+              disabled={retry.isPending}
+              onClick={() => retry.mutate({ url })}
+              className="inline-flex h-11 items-center gap-2 rounded-full px-4 text-[14px] font-medium text-(--agenci-ink-2) transition-colors hover:bg-(--dash-subtle) hover:text-(--agenci-ink) dark:hover:bg-white/5 disabled:opacity-50"
+            >
+              <RotateCcwIcon className="size-4" {...icon} />
+              Prøv igjen
+            </button>
+          ) : null}
+        </div>
+        <Link
+          to="/org/$orgSlug/agents/$agentId"
+          params={params}
+          className="group inline-flex h-12 items-center justify-center gap-2 rounded-full bg-(--agenci-ink) pr-5 pl-6 text-[15px] font-medium text-white shadow-[0_8px_20px_-10px_rgb(5_6_7/0.6)] transition-[background-color,transform] duration-150 hover:bg-(--agenci-accent-hover) active:scale-[0.97] sm:ml-auto dark:text-[#0b0c0e]"
+        >
+          Fortsett
+          <ArrowRightIcon
+            className="size-4 transition-transform duration-200 group-hover:translate-x-0.5"
+            {...icon}
+          />
+        </Link>
       </div>
     </div>
   );
