@@ -362,8 +362,8 @@ function PlanCard({
 }) {
   const { data: billing } = useBillingStatus();
   if (collapsed) return null;
-  // Paying and fine: no nagging card.
-  if (billing?.status === "active" && !billing.cancelAtPeriodEnd) return null;
+  // Paying and fine, or the Agenci team: no nagging card.
+  if (billing?.status === "developer" || (billing?.status === "active" && !billing.cancelAtPeriodEnd)) return null;
   const left = billing?.trialEndsAt
     ? Math.max(0, Math.ceil((new Date(billing.trialEndsAt).getTime() - Date.now()) / 86_400_000))
     : 0;

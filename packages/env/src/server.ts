@@ -75,6 +75,13 @@ export const env = createEnv({
      * deploy can't lock out existing customers before billing is live.
      */
     BILLING_ENFORCE: z.enum(["0", "1"]).default("0"),
+    /**
+     * People building Agenci: their organizations get full access without
+     * paying, and only they can open the payment page while NEXI_MODE=test.
+     */
+    DEV_ACCESS_EMAILS: z
+      .string()
+      .default("abdifatah@triodelab.no,jack@triodelab.no,ima@triodelab.no"),
   },
   runtimeEnv: process.env,
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,

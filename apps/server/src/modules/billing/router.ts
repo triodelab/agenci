@@ -11,6 +11,7 @@ import { NEXI_CHECKOUT_JS, nexiConfigured } from "./nexi";
 import { PLAN_IDS, type PlanId, PLANS, planAmounts, TRIAL_DAYS } from "./plans";
 import {
   changePlan,
+  canPay,
   confirmCheckout,
   conversationsThisMonth,
   getBillingState,
@@ -40,6 +41,8 @@ export const billingRouter = {
     return {
       ...state,
       conversationsThisMonth: used,
+      /** False while Nexi is in test mode, except for the developers. */
+      canPay: canPay(context.user.email),
       checkout: nexiConfigured() ? { checkoutKey: env.NEXI_CHECKOUT_KEY as string, scriptUrl: NEXI_CHECKOUT_JS } : null,
       trialDays: TRIAL_DAYS,
       plans: Object.values(PLANS).map((p) => ({ ...p, priceWithVat: planAmounts(p.id).gross })),
@@ -66,12 +69,12 @@ export const billingRouter = {
     .output(CheckoutResponse)
     .handler(async ({ input, context }) => {
       requireManager(context.role);
-      return startCheckout(context.organizationId, input.plan);
+      return startCheckout(context.organizationId, input.plan, context.user.email);
     }),
 
   startCardUpdate: privateProcedure.output(CheckoutResponse).handler(async ({ context }) => {
     requireManager(context.role);
-    return startCardUpdate(context.organizationId);
+    return startCardUpdate(context.organizationId, context.user.email);
   }),
 
   confirmCheckout: privateProcedure
