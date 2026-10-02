@@ -124,7 +124,7 @@ export const POSTS: BlogPost[] = [
 			{
 				question: "Hvilke prisplaner tilbyr Agenci?",
 				answer:
-					"Agenci tilbyr en gratis plan med opptil 50 samtaler per måned. Betalte planer inkluderer Starter, Pro og Business med varierende antall samtaler og funksjoner, og et skreddersydd oppsett for større organisasjoner. Ingen bindingstid.",
+					"Agenci har tre planer: Starter (499 kr), Pro (1 499 kr) og Business (3 999 kr) i måneden, eks. mva. Alle starter med 30 dager gratis uten kort. Med årlig betaling sparer du 20 %. Ingen bindingstid.",
 			},
 		],
 		Body: ChatbotArticle,
