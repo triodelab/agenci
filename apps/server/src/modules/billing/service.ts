@@ -135,7 +135,7 @@ export async function registerCompany(organizationId: string, orgNumberInput: st
   const taken = await prisma.billingAccount.findUnique({ where: { orgNumber: found.orgNumber } });
   if (taken) {
     throw new ORPCError("CONFLICT", {
-      message: "Dette organisasjonsnummeret er allerede i bruk i Agenci. Be eieren invitere deg til organisasjonen.",
+      message: "Dette organisasjonsnummeret er allerede registrert. Ta kontakt på post@triodelab.no hvis du mener det er feil.",
     });
   }
 
@@ -178,8 +178,15 @@ function requireNexi() {
  * Who may open the payment page: anyone once Nexi is live; while it is in
  * test mode only the developers (test cards would otherwise unlock a plan).
  */
+function isTestPayer(email: string | null | undefined) {
+  if (!email) return false;
+  const list = env.TEST_PAYER_EMAILS.split(",").map((e) => e.trim().toLowerCase());
+  return list.includes(email.toLowerCase());
+}
+
+/** Live: everyone. Test mode: the developers and the listed test payers. */
 export function canPay(email: string | null | undefined) {
-  return env.NEXI_MODE === "live" || isDeveloperEmail(email);
+  return env.NEXI_MODE === "live" || isDeveloperEmail(email) || isTestPayer(email);
 }
 
 function requirePayer(email: string | null | undefined) {

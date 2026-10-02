@@ -84,6 +84,11 @@ export const env = createEnv({
     DEV_ACCESS_EMAILS: z
       .string()
       .default("abdifatah@triodelab.no,jack@triodelab.no,ima@triodelab.no"),
+    /**
+     * Ordinary customer accounts that may still pay with Nexi's test cards
+     * while NEXI_MODE=test — for testing the whole flow as a normal customer.
+     */
+    TEST_PAYER_EMAILS: z.string().default("abdifattah96@hotmail.com"),
   },
   runtimeEnv: process.env,
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,
