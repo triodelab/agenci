@@ -152,7 +152,7 @@ export default async function BlogPostPage({ params }: Props) {
 									<div className={s.asideCta}>
 										<p>
 											<strong>Prøv Agenci gratis</strong>
-											50 samtaler i måneden. Ingen bindingstid.
+											30 dager gratis, uten kort. Ingen bindingstid.
 										</p>
 										<AuthAwareLink
 											href={LANDING_AUTH_PATHS.signUp}

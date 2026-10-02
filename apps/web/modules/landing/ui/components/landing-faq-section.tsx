@@ -42,6 +42,22 @@ const faqs = [
     q: "Hva koster det etter prøveperioden?",
     a: "De første 30 dagene er gratis, med alt i Starter og 500 samtaler. Du legger ikke inn kort for å prøve. Etterpå velger du Starter (499 kr), Pro (1 499 kr) eller Business (3 999 kr) i måneden, eks. mva. Velger du ingenting, slutter chatten å svare, og ingenting trekkes. Ingen bindingstid.",
   },
+  {
+    q: "Kan chatten anbefale produkter fra nettbutikken min?",
+    a: "Ja. Spør en kunde etter en vare eller ber om en anbefaling, søker agenten blant produktene på nettsiden din og viser de som passer som kort i chatten, med bilde, pris og lenke til produktsiden. Den forstår vanlige ord og synonymer, og viser bare produkter som faktisk passer det kunden spurte om.",
+  },
+  {
+    q: "Hva regnes som én samtale?",
+    a: "Én samtale er én chat med én kunde, uansett hvor mange meldinger den har. Starter har 500 samtaler i måneden, Pro 2 000 og Business 10 000. Du ser hvor mange du har brukt under Plan og faktura i dashbordet.",
+  },
+  {
+    q: "Kan jeg betale årlig?",
+    a: "Ja. Med årlig betaling sparer du 20 %, og du betaler for 12 måneder om gangen. Du kan også betale måned for måned. Begge deler uten bindingstid, og du kan bytte plan når du vil.",
+  },
+  {
+    q: "Har jeg angrerett?",
+    a: "Agenci selges bare til bedrifter med organisasjonsnummer, og angrerettloven gjelder kjøp gjort av forbrukere. I stedet kan du prøve gratis i 30 dager uten kort, og det er ingen bindingstid etterpå. Du kan si opp når som helst, og agenten svarer ut perioden du har betalt for.",
+  },
 ] as const;
 
 export function LandingFaqSection() {
