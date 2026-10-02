@@ -7,11 +7,15 @@ import CheckoutView from "@/features/billing/ui/views/checkout-view";
  * page URL when the payment is created (see the server's billing service).
  */
 export const Route = createFileRoute("/_authed/betaling")({
-  validateSearch: z.object({ paymentId: z.string().catch("") }),
+  validateSearch: z.object({
+    paymentId: z.string().catch(""),
+    /** The plan being bought; absent when only the card is updated. */
+    plan: z.enum(["starter", "pro", "business"]).optional().catch(undefined),
+  }),
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  const { paymentId } = Route.useSearch();
-  return <CheckoutView paymentId={paymentId} />;
+  const { paymentId, plan } = Route.useSearch();
+  return <CheckoutView paymentId={paymentId} plan={plan} />;
 }

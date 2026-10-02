@@ -213,6 +213,7 @@ export async function startCheckout(organizationId: string, plan: PlanId, email?
   const { paymentId } = await createSubscriptionCheckout({
     plan,
     reference: `${organizationId}:${plan}:${Date.now()}`,
+    email,
     ...urls,
   });
   await prisma.subscription.upsert({
@@ -235,6 +236,7 @@ export async function startCardUpdate(organizationId: string, email?: string | n
     plan: sub.plan,
     reference: `${organizationId}:${sub.plan}:card:${Date.now()}`,
     subscriptionId: sub.nexiSubscriptionId,
+    email,
     ...publicUrls(),
   });
   return { paymentId, checkoutKey: env.NEXI_CHECKOUT_KEY as string, scriptUrl: NEXI_CHECKOUT_JS };
