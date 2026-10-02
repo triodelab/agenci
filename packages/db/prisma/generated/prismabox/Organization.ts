@@ -194,6 +194,9 @@ with the same id; this row is kept in step on every message
           status: t.String({
             description: `"pending" (checkout started) | "active" | "past_due" | "canceled"`,
           }),
+          interval: t.String({
+            description: `"month" | "year" — how often it is charged.`,
+          }),
           nexiSubscriptionId: __nullable__(
             t.String({
               description: `Nexi Checkout subscription id — charged every month.`,
@@ -242,6 +245,9 @@ with the same id; this row is kept in step on every message
           vatAmount: t.Integer(),
           currency: t.String(),
           status: t.String({ description: `"pending" | "paid" | "failed"` }),
+          interval: t.String({
+            description: `"month" | "year" — the period this payment covers.`,
+          }),
           periodStart: t.Date(),
           periodEnd: t.Date(),
           createdAt: t.Date(),

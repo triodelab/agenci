@@ -51,6 +51,7 @@ export type BillingPaymentMinAggregateOutputType = {
   vatAmount: number | null
   currency: string | null
   status: string | null
+  interval: string | null
   periodStart: Date | null
   periodEnd: Date | null
   createdAt: Date | null
@@ -68,6 +69,7 @@ export type BillingPaymentMaxAggregateOutputType = {
   vatAmount: number | null
   currency: string | null
   status: string | null
+  interval: string | null
   periodStart: Date | null
   periodEnd: Date | null
   createdAt: Date | null
@@ -85,6 +87,7 @@ export type BillingPaymentCountAggregateOutputType = {
   vatAmount: number
   currency: number
   status: number
+  interval: number
   periodStart: number
   periodEnd: number
   createdAt: number
@@ -118,6 +121,7 @@ export type BillingPaymentMinAggregateInputType = {
   vatAmount?: true
   currency?: true
   status?: true
+  interval?: true
   periodStart?: true
   periodEnd?: true
   createdAt?: true
@@ -135,6 +139,7 @@ export type BillingPaymentMaxAggregateInputType = {
   vatAmount?: true
   currency?: true
   status?: true
+  interval?: true
   periodStart?: true
   periodEnd?: true
   createdAt?: true
@@ -152,6 +157,7 @@ export type BillingPaymentCountAggregateInputType = {
   vatAmount?: true
   currency?: true
   status?: true
+  interval?: true
   periodStart?: true
   periodEnd?: true
   createdAt?: true
@@ -256,6 +262,7 @@ export type BillingPaymentGroupByOutputType = {
   vatAmount: number
   currency: string
   status: string
+  interval: string
   periodStart: Date
   periodEnd: Date
   createdAt: Date
@@ -296,6 +303,7 @@ export type BillingPaymentWhereInput = {
   vatAmount?: Prisma.IntFilter<"BillingPayment"> | number
   currency?: Prisma.StringFilter<"BillingPayment"> | string
   status?: Prisma.StringFilter<"BillingPayment"> | string
+  interval?: Prisma.StringFilter<"BillingPayment"> | string
   periodStart?: Prisma.DateTimeFilter<"BillingPayment"> | Date | string
   periodEnd?: Prisma.DateTimeFilter<"BillingPayment"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"BillingPayment"> | Date | string
@@ -314,6 +322,7 @@ export type BillingPaymentOrderByWithRelationInput = {
   vatAmount?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  interval?: Prisma.SortOrder
   periodStart?: Prisma.SortOrder
   periodEnd?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -335,6 +344,7 @@ export type BillingPaymentWhereUniqueInput = Prisma.AtLeast<{
   vatAmount?: Prisma.IntFilter<"BillingPayment"> | number
   currency?: Prisma.StringFilter<"BillingPayment"> | string
   status?: Prisma.StringFilter<"BillingPayment"> | string
+  interval?: Prisma.StringFilter<"BillingPayment"> | string
   periodStart?: Prisma.DateTimeFilter<"BillingPayment"> | Date | string
   periodEnd?: Prisma.DateTimeFilter<"BillingPayment"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"BillingPayment"> | Date | string
@@ -353,6 +363,7 @@ export type BillingPaymentOrderByWithAggregationInput = {
   vatAmount?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  interval?: Prisma.SortOrder
   periodStart?: Prisma.SortOrder
   periodEnd?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -378,6 +389,7 @@ export type BillingPaymentScalarWhereWithAggregatesInput = {
   vatAmount?: Prisma.IntWithAggregatesFilter<"BillingPayment"> | number
   currency?: Prisma.StringWithAggregatesFilter<"BillingPayment"> | string
   status?: Prisma.StringWithAggregatesFilter<"BillingPayment"> | string
+  interval?: Prisma.StringWithAggregatesFilter<"BillingPayment"> | string
   periodStart?: Prisma.DateTimeWithAggregatesFilter<"BillingPayment"> | Date | string
   periodEnd?: Prisma.DateTimeWithAggregatesFilter<"BillingPayment"> | Date | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"BillingPayment"> | Date | string
@@ -394,6 +406,7 @@ export type BillingPaymentCreateInput = {
   vatAmount?: number
   currency?: string
   status?: string
+  interval?: string
   periodStart: Date | string
   periodEnd: Date | string
   createdAt?: Date | string
@@ -412,6 +425,7 @@ export type BillingPaymentUncheckedCreateInput = {
   vatAmount?: number
   currency?: string
   status?: string
+  interval?: string
   periodStart: Date | string
   periodEnd: Date | string
   createdAt?: Date | string
@@ -427,6 +441,7 @@ export type BillingPaymentUpdateInput = {
   vatAmount?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  interval?: Prisma.StringFieldUpdateOperationsInput | string
   periodStart?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   periodEnd?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -445,6 +460,7 @@ export type BillingPaymentUncheckedUpdateInput = {
   vatAmount?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  interval?: Prisma.StringFieldUpdateOperationsInput | string
   periodStart?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   periodEnd?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -462,6 +478,7 @@ export type BillingPaymentCreateManyInput = {
   vatAmount?: number
   currency?: string
   status?: string
+  interval?: string
   periodStart: Date | string
   periodEnd: Date | string
   createdAt?: Date | string
@@ -477,6 +494,7 @@ export type BillingPaymentUpdateManyMutationInput = {
   vatAmount?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  interval?: Prisma.StringFieldUpdateOperationsInput | string
   periodStart?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   periodEnd?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -494,6 +512,7 @@ export type BillingPaymentUncheckedUpdateManyInput = {
   vatAmount?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  interval?: Prisma.StringFieldUpdateOperationsInput | string
   periodStart?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   periodEnd?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -521,6 +540,7 @@ export type BillingPaymentCountOrderByAggregateInput = {
   vatAmount?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  interval?: Prisma.SortOrder
   periodStart?: Prisma.SortOrder
   periodEnd?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -545,6 +565,7 @@ export type BillingPaymentMaxOrderByAggregateInput = {
   vatAmount?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  interval?: Prisma.SortOrder
   periodStart?: Prisma.SortOrder
   periodEnd?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -562,6 +583,7 @@ export type BillingPaymentMinOrderByAggregateInput = {
   vatAmount?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  interval?: Prisma.SortOrder
   periodStart?: Prisma.SortOrder
   periodEnd?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -627,6 +649,7 @@ export type BillingPaymentCreateWithoutOrganizationInput = {
   vatAmount?: number
   currency?: string
   status?: string
+  interval?: string
   periodStart: Date | string
   periodEnd: Date | string
   createdAt?: Date | string
@@ -643,6 +666,7 @@ export type BillingPaymentUncheckedCreateWithoutOrganizationInput = {
   vatAmount?: number
   currency?: string
   status?: string
+  interval?: string
   periodStart: Date | string
   periodEnd: Date | string
   createdAt?: Date | string
@@ -689,6 +713,7 @@ export type BillingPaymentScalarWhereInput = {
   vatAmount?: Prisma.IntFilter<"BillingPayment"> | number
   currency?: Prisma.StringFilter<"BillingPayment"> | string
   status?: Prisma.StringFilter<"BillingPayment"> | string
+  interval?: Prisma.StringFilter<"BillingPayment"> | string
   periodStart?: Prisma.DateTimeFilter<"BillingPayment"> | Date | string
   periodEnd?: Prisma.DateTimeFilter<"BillingPayment"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"BillingPayment"> | Date | string
@@ -705,6 +730,7 @@ export type BillingPaymentCreateManyOrganizationInput = {
   vatAmount?: number
   currency?: string
   status?: string
+  interval?: string
   periodStart: Date | string
   periodEnd: Date | string
   createdAt?: Date | string
@@ -720,6 +746,7 @@ export type BillingPaymentUpdateWithoutOrganizationInput = {
   vatAmount?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  interval?: Prisma.StringFieldUpdateOperationsInput | string
   periodStart?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   periodEnd?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -736,6 +763,7 @@ export type BillingPaymentUncheckedUpdateWithoutOrganizationInput = {
   vatAmount?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  interval?: Prisma.StringFieldUpdateOperationsInput | string
   periodStart?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   periodEnd?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -752,6 +780,7 @@ export type BillingPaymentUncheckedUpdateManyWithoutOrganizationInput = {
   vatAmount?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  interval?: Prisma.StringFieldUpdateOperationsInput | string
   periodStart?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   periodEnd?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -771,6 +800,7 @@ export type BillingPaymentSelect<ExtArgs extends runtime.Types.Extensions.Intern
   vatAmount?: boolean
   currency?: boolean
   status?: boolean
+  interval?: boolean
   periodStart?: boolean
   periodEnd?: boolean
   createdAt?: boolean
@@ -789,6 +819,7 @@ export type BillingPaymentSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   vatAmount?: boolean
   currency?: boolean
   status?: boolean
+  interval?: boolean
   periodStart?: boolean
   periodEnd?: boolean
   createdAt?: boolean
@@ -807,6 +838,7 @@ export type BillingPaymentSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   vatAmount?: boolean
   currency?: boolean
   status?: boolean
+  interval?: boolean
   periodStart?: boolean
   periodEnd?: boolean
   createdAt?: boolean
@@ -825,13 +857,14 @@ export type BillingPaymentSelectScalar = {
   vatAmount?: boolean
   currency?: boolean
   status?: boolean
+  interval?: boolean
   periodStart?: boolean
   periodEnd?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type BillingPaymentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "nexiPaymentId" | "invoiceNumber" | "plan" | "amount" | "netAmount" | "vatAmount" | "currency" | "status" | "periodStart" | "periodEnd" | "createdAt" | "updatedAt", ExtArgs["result"]["billingPayment"]>
+export type BillingPaymentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "nexiPaymentId" | "invoiceNumber" | "plan" | "amount" | "netAmount" | "vatAmount" | "currency" | "status" | "interval" | "periodStart" | "periodEnd" | "createdAt" | "updatedAt", ExtArgs["result"]["billingPayment"]>
 export type BillingPaymentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
 }
@@ -870,6 +903,10 @@ export type $BillingPaymentPayload<ExtArgs extends runtime.Types.Extensions.Inte
      * "pending" | "paid" | "failed"
      */
     status: string
+    /**
+     * "month" | "year" — the period this payment covers.
+     */
+    interval: string
     periodStart: Date
     periodEnd: Date
     createdAt: Date
@@ -1308,6 +1345,7 @@ export interface BillingPaymentFieldRefs {
   readonly vatAmount: Prisma.FieldRef<"BillingPayment", 'Int'>
   readonly currency: Prisma.FieldRef<"BillingPayment", 'String'>
   readonly status: Prisma.FieldRef<"BillingPayment", 'String'>
+  readonly interval: Prisma.FieldRef<"BillingPayment", 'String'>
   readonly periodStart: Prisma.FieldRef<"BillingPayment", 'DateTime'>
   readonly periodEnd: Prisma.FieldRef<"BillingPayment", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"BillingPayment", 'DateTime'>

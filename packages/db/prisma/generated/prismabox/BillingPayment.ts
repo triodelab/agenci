@@ -22,6 +22,9 @@ export const BillingPaymentPlain = t.Object(
     vatAmount: t.Integer(),
     currency: t.String(),
     status: t.String({ description: `"pending" | "paid" | "failed"` }),
+    interval: t.String({
+      description: `"month" | "year" — the period this payment covers.`,
+    }),
     periodStart: t.Date(),
     periodEnd: t.Date(),
     createdAt: t.Date(),
@@ -74,6 +77,11 @@ export const BillingPaymentPlainInputCreate = t.Object(
     status: t.Optional(
       t.String({ description: `"pending" | "paid" | "failed"` }),
     ),
+    interval: t.Optional(
+      t.String({
+        description: `"month" | "year" — the period this payment covers.`,
+      }),
+    ),
     periodStart: t.Date(),
     periodEnd: t.Date(),
   },
@@ -103,6 +111,11 @@ export const BillingPaymentPlainInputUpdate = t.Object(
     currency: t.Optional(t.String()),
     status: t.Optional(
       t.String({ description: `"pending" | "paid" | "failed"` }),
+    ),
+    interval: t.Optional(
+      t.String({
+        description: `"month" | "year" — the period this payment covers.`,
+      }),
     ),
     periodStart: t.Optional(t.Date()),
     periodEnd: t.Optional(t.Date()),
@@ -179,6 +192,9 @@ export const BillingPaymentWhere = t.Partial(
           vatAmount: t.Integer(),
           currency: t.String(),
           status: t.String({ description: `"pending" | "paid" | "failed"` }),
+          interval: t.String({
+            description: `"month" | "year" — the period this payment covers.`,
+          }),
           periodStart: t.Date(),
           periodEnd: t.Date(),
           createdAt: t.Date(),
@@ -260,6 +276,9 @@ export const BillingPaymentWhereUnique = t.Recursive(
               status: t.String({
                 description: `"pending" | "paid" | "failed"`,
               }),
+              interval: t.String({
+                description: `"month" | "year" — the period this payment covers.`,
+              }),
               periodStart: t.Date(),
               periodEnd: t.Date(),
               createdAt: t.Date(),
@@ -288,6 +307,7 @@ export const BillingPaymentSelect = t.Partial(
       vatAmount: t.Boolean(),
       currency: t.Boolean(),
       status: t.Boolean(),
+      interval: t.Boolean(),
       periodStart: t.Boolean(),
       periodEnd: t.Boolean(),
       createdAt: t.Boolean(),
@@ -342,6 +362,9 @@ export const BillingPaymentOrderBy = t.Partial(
         additionalProperties: false,
       }),
       status: t.Union([t.Literal("asc"), t.Literal("desc")], {
+        additionalProperties: false,
+      }),
+      interval: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
       periodStart: t.Union([t.Literal("asc"), t.Literal("desc")], {

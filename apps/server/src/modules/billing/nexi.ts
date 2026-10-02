@@ -4,7 +4,7 @@
  * Docs: https://developer.nexigroup.com/nexi-checkout/en-EU/api/payment-v1/
  */
 import { env } from "@agenci/env/server";
-import { type PlanId, PLANS, planAmounts } from "./plans";
+import { type BillingInterval, type PlanId, PLANS, planAmounts } from "./plans";
 
 const API = env.NEXI_MODE === "live" ? "https://api.dibspayment.eu" : "https://test.api.dibspayment.eu";
 
@@ -49,15 +49,16 @@ async function call<T>(method: string, path: string, body?: unknown): Promise<T>
   return (text ? JSON.parse(text) : {}) as T;
 }
 
-function orderFor(plan: PlanId, reference: string) {
-  const a = planAmounts(plan);
+function orderFor(plan: PlanId, reference: string, interval: BillingInterval) {
+  const a = planAmounts(plan, interval);
+  const yearly = interval === "year";
   return {
     items: [
       {
-        reference: `agenci-${plan}`,
-        name: `Agenci ${PLANS[plan].name} – 1 måned`,
+        reference: `agenci-${plan}-${interval}`,
+        name: `Agenci ${PLANS[plan].name} – ${yearly ? "12 måneder" : "1 måned"}`,
         quantity: 1,
-        unit: "mnd",
+        unit: yearly ? "år" : "mnd",
         unitPrice: a.net,
         taxRate: a.taxRate,
         taxAmount: a.tax,
@@ -87,6 +88,7 @@ function webhooks(publicUrl: string) {
  */
 export async function createSubscriptionCheckout(input: {
   plan: PlanId;
+  interval: BillingInterval;
   reference: string;
   checkoutUrl: string;
   termsUrl: string;
@@ -108,7 +110,7 @@ export async function createSubscriptionCheckout(input: {
       merchantHandlesConsumerData: true,
     },
     ...(input.email ? { consumer: { reference: input.reference.slice(0, 36), email: input.email } } : {}),
-    order: orderFor(input.plan, input.reference),
+    order: orderFor(input.plan, input.reference, input.interval),
     subscription: input.subscriptionId
       ? { subscriptionId: input.subscriptionId }
       : { endDate: fiveYears.toISOString(), interval: 0 },
@@ -136,14 +138,14 @@ export function getPayment(paymentId: string) {
 export function bulkCharge(input: {
   externalBulkChargeId: string;
   publicUrl: string;
-  charges: { subscriptionId: string; plan: PlanId; reference: string }[];
+  charges: { subscriptionId: string; plan: PlanId; interval: BillingInterval; reference: string }[];
 }) {
   return call<{ bulkId: string }>("POST", "/v1/subscriptions/charges", {
     externalBulkChargeId: input.externalBulkChargeId,
     notifications: { webhooks: webhooks(input.publicUrl) },
     subscriptions: input.charges.map((c) => ({
       subscriptionId: c.subscriptionId,
-      order: orderFor(c.plan, c.reference),
+      order: orderFor(c.plan, c.reference, c.interval),
     })),
   });
 }

@@ -11,11 +11,12 @@ export const Route = createFileRoute("/_authed/betaling")({
     paymentId: z.string().catch(""),
     /** The plan being bought; absent when only the card is updated. */
     plan: z.enum(["starter", "pro", "business"]).optional().catch(undefined),
+    interval: z.enum(["month", "year"]).optional().catch(undefined),
   }),
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  const { paymentId, plan } = Route.useSearch();
-  return <CheckoutView paymentId={paymentId} plan={plan} />;
+  const { paymentId, plan, interval } = Route.useSearch();
+  return <CheckoutView paymentId={paymentId} plan={plan} interval={interval ?? "month"} />;
 }

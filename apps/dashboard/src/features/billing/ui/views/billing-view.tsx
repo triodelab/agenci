@@ -8,7 +8,7 @@ import {
   CreditCardIcon,
   FileTextIcon,
   MessageCircleIcon,
-  XIcon,
+  MinusIcon,
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -26,6 +26,7 @@ import { UsageChart } from "../components/usage-chart";
 const PLANS = [
   {
     id: "starter",
+    yearly: 399,
     name: "Starter",
     price: 499,
     limit: 500,
@@ -43,6 +44,7 @@ const PLANS = [
   },
   {
     id: "pro",
+    yearly: 1199,
     name: "Pro",
     price: 1499,
     limit: 2000,
@@ -60,6 +62,7 @@ const PLANS = [
   },
   {
     id: "business",
+    yearly: 3199,
     name: "Business",
     price: 3999,
     limit: 10000,
@@ -79,12 +82,15 @@ const PLANS = [
   id: string;
   name: string;
   price: number;
+  /** Per month when billed yearly (20 % off). */
+  yearly: number;
   limit: number;
   blurb: string;
   featured: boolean;
   bullets: readonly (readonly [string, boolean])[];
 }[];
 type PlanId = (typeof PLANS)[number]["id"];
+type Interval = "month" | "year";
 
 const card =
   "rounded-[20px] border border-(--dash-edge)/80 bg-(--dash-surface) shadow-[0_1px_3px_rgb(5_6_7/0.06),0_14px_34px_-16px_rgb(5_6_7/0.18)] dark:border-white/5 dark:bg-(--card)";
@@ -130,6 +136,7 @@ export default function BillingView() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [busy, setBusy] = useState<string | null>(null);
+  const [cycle, setCycle] = useState<Interval | null>(null);
 
   const status = billing?.status;
   const developer = status === "developer";
@@ -142,6 +149,9 @@ export default function BillingView() {
   const used = usage?.total ?? 0;
   const trialDays = billing?.trialDays ?? 30;
   const left = daysLeft(billing?.trialEndsAt);
+  /** What the plan cards show; starts on how the subscription is billed. */
+  const interval: Interval = cycle ?? billing?.interval ?? "month";
+  const billedYearly = billing?.interval === "year";
   const trend = useMemo(() => {
     if (!usage || !usage.previousTotal) return null;
     return Math.round(((usage.total - usage.previousTotal) / usage.previousTotal) * 100);
@@ -163,15 +173,29 @@ export default function BillingView() {
       setBusy(null);
     }
   };
-  const goToCheckout = (start: () => Promise<{ paymentId: string }>, key: string, plan?: PlanId) =>
+  const goToCheckout = (
+    start: () => Promise<{ paymentId: string }>,
+    key: string,
+    plan?: PlanId,
+    every?: Interval,
+  ) =>
     act(key, async () => {
       const { paymentId } = await start();
-      await navigate({ to: "/betaling", search: { paymentId, plan } });
+      await navigate({ to: "/betaling", search: { paymentId, plan, interval: every } });
     });
   const choose = (id: PlanId) =>
     subscribed
-      ? act(`plan-${id}`, () => client.private.billing.changePlan({ plan: id }), "Planen byttes ved neste trekk.")
-      : goToCheckout(() => client.private.billing.startCheckout({ plan: id }), `plan-${id}`, id);
+      ? act(
+          `plan-${id}`,
+          () => client.private.billing.changePlan({ plan: id, interval }),
+          "Endringen gjelder fra neste trekk.",
+        )
+      : goToCheckout(
+          () => client.private.billing.startCheckout({ plan: id, interval }),
+          `plan-${id}`,
+          id,
+          interval,
+        );
 
   // What the plan card says, per state.
   const summary = developer
@@ -189,11 +213,11 @@ export default function BillingView() {
             pill: billing?.cancelAtPeriodEnd ? <Pill tone="warn">Avsluttes</Pill> : <Pill>Aktiv</Pill>,
             line: billing?.cancelAtPeriodEnd
               ? `Avsluttes ${date(billing?.currentPeriodEnd)}. Agentene svarer til da.`
-              : `Neste trekk ${date(billing?.currentPeriodEnd)}.`,
-            price: plan.price,
+              : `${billedYearly ? "Faktureres årlig." : "Faktureres månedlig."} Neste trekk ${date(billing?.currentPeriodEnd)}.`,
+            price: billedYearly ? plan.yearly : plan.price,
           }
         : status === "past_due"
-          ? { title: plan.name, pill: <Pill tone="bad">Betaling feilet</Pill>, line: "Oppdater kortet innen en uke, ellers stopper agentene å svare.", price: plan.price }
+          ? { title: plan.name, pill: <Pill tone="bad">Betaling feilet</Pill>, line: "Oppdater kortet innen en uke, ellers stopper agentene å svare.", price: billedYearly ? plan.yearly : plan.price }
           : { title: "Ingen aktiv plan", pill: <Pill tone="muted">Inaktiv</Pill>, line: "Agentene svarer ikke kundene før dere velger en plan.", price: 0 };
 
   return (
@@ -353,69 +377,120 @@ export default function BillingView() {
 
       {/* ── Plans (as on agenci.no/priser) ─────────────────────────── */}
       <section id="planer" className="scroll-mt-6">
-        <div className="mb-4 flex flex-wrap items-end justify-between gap-2 px-1">
+        <div className="mb-5 flex flex-wrap items-end justify-between gap-4 px-1">
           <div>
             <h2 className="text-[17px] font-semibold text-(--agenci-ink)">Planer</h2>
             <p className="mt-1 text-[13px] text-(--agenci-ink-2)">
-              Priser eks. mva. Faktureres månedlig, ingen binding. Oppsigelse gjelder ut perioden som er betalt.
+              Priser eks. mva. Ingen binding. Oppsigelse gjelder ut perioden som er betalt.
             </p>
           </div>
+          <div className="flex items-center gap-3">
+            <span
+              className={cn(
+                "inline-flex h-7 items-center rounded-full bg-[#edf1ee] px-3 text-[12.5px] font-medium text-[#243236] transition-opacity duration-300",
+                interval === "year" ? "opacity-100" : "opacity-55",
+              )}
+            >
+              Spar 20 % med årlig fakturering
+            </span>
+            <div
+              role="group"
+              aria-label="Fakturering"
+              className="relative inline-grid grid-cols-2 rounded-full border border-[#dfe5e6] bg-white p-1 dark:border-white/10 dark:bg-transparent"
+            >
+              <span
+                aria-hidden
+                className={cn(
+                  "absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] rounded-full bg-[#243236] transition-[translate] duration-[450ms] ease-[cubic-bezier(.23,1,.32,1)] dark:bg-white",
+                  interval === "year" && "translate-x-full",
+                )}
+              />
+              {(["month", "year"] as const).map((v) => (
+                <button
+                  key={v}
+                  type="button"
+                  aria-pressed={interval === v}
+                  onClick={() => setCycle(v)}
+                  className={cn(
+                    "relative z-10 h-[34px] min-w-[96px] rounded-full text-[13.5px] transition-colors duration-200",
+                    interval === v ? "text-white dark:text-[#0b0c0e]" : "text-[#617074] hover:text-[#243236]",
+                  )}
+                >
+                  {v === "month" ? "Månedlig" : "Årlig"}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid items-stretch gap-3.5 md:grid-cols-3">
           {PLANS.map((p) => {
-            const current = subscribed && p.id === planId;
+            const isCurrent = subscribed && p.id === planId && billing?.interval === interval;
             const next = billing?.nextPlan === p.id;
             const dark = p.featured;
+            const perMonth = interval === "year" ? p.yearly : p.price;
             return (
               <article
                 key={p.id}
                 className={cn(
-                  "relative flex flex-col rounded-[22px] border p-6 transition-[translate,box-shadow] duration-300 hover:-translate-y-0.5",
+                  "relative flex flex-col rounded-[24px] border px-6 pt-7 pb-6 transition-[translate,box-shadow] duration-[350ms] ease-[cubic-bezier(.23,1,.32,1)] hover:-translate-y-[3px]",
                   dark
-                    ? "border-transparent bg-[linear-gradient(160deg,#23272c_0%,#16191c_60%,#0e1012_100%)] text-white shadow-[0_30px_60px_-32px_rgb(5_6_7/0.75)]"
-                    : "border-(--dash-edge)/80 bg-(--dash-surface) text-(--agenci-ink) hover:shadow-[0_24px_48px_-32px_rgb(5_6_7/0.35)] dark:border-white/5 dark:bg-(--card)",
-                  current && !dark && "border-(--agenci-ink)",
+                    ? "border-transparent bg-[radial-gradient(120%_80%_at_100%_0%,rgb(143_179_148/30%),transparent_60%),linear-gradient(160deg,#264634_0%,#1a3326_55%,#12241b_100%)] text-[#f4f7f5] shadow-[0_30px_60px_-30px_rgb(18_36_27/70%)]"
+                    : "border-[#dfe5e6] bg-white text-[#243236] hover:shadow-[0_24px_48px_-32px_rgb(21_41_30/35%)] dark:border-white/10 dark:bg-(--card) dark:text-(--agenci-ink)",
+                  isCurrent && !dark && "border-[#243236]",
                 )}
               >
-                {p.featured ? (
-                  <span className="absolute top-5 right-5 rounded-full bg-white/15 px-2.5 py-1 text-[11.5px] font-medium text-white backdrop-blur">
+                {dark ? (
+                  <span className="absolute top-[22px] right-5 rounded-full bg-white/14 px-2.5 py-[5px] text-[11.5px] font-medium tracking-[0.01em] text-white backdrop-blur-md">
                     Mest populær
                   </span>
                 ) : null}
                 <h3 className="[font-family:var(--font-agenci-title)] text-[22px] font-medium tracking-[-0.03em]">{p.name}</h3>
-                <p className={cn("mt-2.5 min-h-[44px] text-[13.5px] leading-relaxed", dark ? "text-white/65" : "text-(--agenci-ink-2)")}>
+                <p className={cn("mt-2.5 min-h-[66px] text-[14px] leading-[1.55]", dark ? "text-[rgb(236_243_238/70%)]" : "text-[#617074]")}>
                   {p.blurb}
                 </p>
-                <p className="mt-6 flex items-baseline gap-1.5">
-                  <span className="[font-family:var(--font-agenci-title)] text-[44px] leading-none font-medium tracking-[-0.045em] tabular-nums">
-                    {kr(p.price)}
+                <p className="mt-[26px] flex items-baseline gap-1.5">
+                  <span className="[font-family:var(--font-agenci-title)] text-[clamp(40px,3.6vw,50px)] leading-none font-medium tracking-[-0.045em] tabular-nums">
+                    {kr(perMonth)}
                   </span>
-                  <span className={cn("text-[13.5px]", dark ? "text-white/60" : "text-(--agenci-ink-3)")}>kr / mnd</span>
+                  <span className={cn("text-[14px] whitespace-nowrap", dark ? "text-[rgb(236_243_238/70%)]" : "text-[#617074]")}>
+                    kr / mnd
+                  </span>
                 </p>
-                <p className={cn("mt-2 text-[12.5px]", dark ? "text-white/55" : "text-(--agenci-ink-3)")}>Faktureres månedlig</p>
+                <p className={cn("mt-2 min-h-5 text-[13px]", dark ? "text-[rgb(236_243_238/70%)]" : "text-[#617074]")}>
+                  {interval === "year" ? (
+                    <>
+                      <s className={cn("mr-2 text-[14px]", dark ? "text-[rgb(236_243_238/45%)]" : "text-[#79898d]")}>
+                        {kr(p.price)} kr
+                      </s>
+                      Faktureres {kr(p.yearly * 12)} kr/år
+                    </>
+                  ) : (
+                    "Faktureres månedlig"
+                  )}
+                </p>
                 <p
                   className={cn(
-                    "mt-5 flex items-center gap-2 rounded-[12px] px-3 py-2.5 text-[13px] font-medium",
-                    dark ? "bg-white/10" : "bg-(--dash-subtle) dark:bg-white/5",
+                    "mt-5 flex items-center gap-2 rounded-[12px] px-3 py-2.5 text-[13.5px] font-medium",
+                    dark ? "bg-white/9" : "bg-[#f3f5f4] dark:bg-white/5",
                   )}
                 >
-                  <MessageCircleIcon className="size-4" strokeWidth={1.7} />
+                  <MessageCircleIcon className={cn("size-4 shrink-0", dark ? "text-[#b9d6be]" : "text-[#243236] dark:text-(--agenci-ink)")} strokeWidth={1.8} />
                   {kr(p.limit)} samtaler / mnd
                 </p>
 
-                {current ? (
-                  <span className={cn("mt-5 flex h-11 items-center justify-center rounded-full border text-[13.5px] font-medium", dark ? "border-white/25" : "border-(--agenci-line)")}>
+                {isCurrent ? (
+                  <span className={cn("mt-[22px] flex h-[46px] items-center justify-center rounded-full border text-[14.5px] font-medium", dark ? "border-white/30" : "border-[#c7d2d5]")}>
                     Din plan
                   </span>
                 ) : next ? (
-                  <span className="mt-5 flex h-11 items-center justify-center rounded-full border border-(--agenci-line) text-[13.5px] font-medium">
+                  <span className="mt-[22px] flex h-[46px] items-center justify-center rounded-full border border-[#c7d2d5] text-[14.5px] font-medium">
                     Fra neste trekk
                   </span>
                 ) : developer || !canPay ? (
                   <span
                     className={cn(
-                      "mt-5 flex h-11 items-center justify-center rounded-full text-[13px]",
-                      dark ? "bg-white/10 text-white/70" : "bg-(--dash-subtle) text-(--agenci-ink-3)",
+                      "mt-[22px] flex h-[46px] items-center justify-center rounded-full text-[13.5px]",
+                      dark ? "bg-white/10 text-white/70" : "bg-[#f3f5f4] text-[#79898d] dark:bg-white/5",
                     )}
                   >
                     {developer ? "Inkludert i utviklertilgang" : "Betaling åpner snart"}
@@ -426,29 +501,32 @@ export default function BillingView() {
                     disabled={busy === `plan-${p.id}`}
                     onClick={() => void choose(p.id)}
                     className={cn(
-                      "mt-5 inline-flex h-11 items-center justify-center gap-1.5 rounded-full text-[14px] font-medium transition-[background-color,opacity] disabled:opacity-50",
-                      dark ? "bg-white text-[#111214] hover:bg-white/90" : "bg-(--agenci-ink) text-white hover:bg-(--agenci-accent-hover) dark:text-[#0b0c0e]",
+                      "group mt-[22px] inline-flex h-[46px] items-center justify-center gap-2 rounded-full border text-[14.5px] font-medium transition-[background-color,border-color,scale] duration-200 active:scale-[0.97] disabled:opacity-50",
+                      dark
+                        ? "border-white bg-white text-[#173a28] hover:bg-[#eef4ef]"
+                        : "border-[#c7d2d5] text-[#243236] hover:border-[#243236] hover:bg-[#f3f5f4] dark:text-(--agenci-ink) dark:hover:bg-white/5",
                     )}
                   >
-                    {subscribed ? `Bytt til ${p.name}` : `Velg ${p.name}`} <ArrowRightIcon className="size-4" strokeWidth={1.8} />
+                    {subscribed ? `Bytt til ${p.name}` : `Velg ${p.name}`}
+                    <ArrowRightIcon className="size-4 transition-transform duration-200 group-hover:translate-x-[3px]" strokeWidth={1.8} />
                   </button>
                 )}
 
-                <ul className="mt-6 flex flex-col gap-2.5">
+                <ul className={cn("mt-6 flex flex-1 flex-col gap-[11px] border-t pt-[22px]", dark ? "border-white/12" : "border-[#dfe5e6] dark:border-white/10")}>
                   {p.bullets.map(([text, included]) => (
                     <li
                       key={text}
                       className={cn(
-                        "flex items-center gap-2.5 text-[13.5px]",
-                        included ? "" : dark ? "text-white/40" : "text-(--agenci-ink-3)",
+                        "flex items-start gap-2.5 text-[14px] leading-[1.45]",
+                        !included && (dark ? "text-[rgb(236_243_238/70%)]" : "text-[#79898d]"),
                       )}
                     >
                       {included ? (
-                        <CheckIcon className="size-4 shrink-0" strokeWidth={2} />
+                        <CheckIcon className={cn("mt-0.5 size-4 shrink-0", dark ? "text-[#b9d6be]" : "text-[#243236] dark:text-(--agenci-ink)")} strokeWidth={2.2} />
                       ) : (
-                        <XIcon className="size-4 shrink-0 opacity-70" strokeWidth={2} />
+                        <MinusIcon className={cn("mt-0.5 size-4 shrink-0", dark ? "text-white/30" : "text-[#c7d2d5]")} />
                       )}
-                      <span className={included ? "" : "line-through decoration-1"}>{text}</span>
+                      <span>{text}</span>
                     </li>
                   ))}
                 </ul>
@@ -456,6 +534,9 @@ export default function BillingView() {
             );
           })}
         </div>
+        <p className="mt-4 text-center text-[13px] text-(--agenci-ink-3)">
+          Alle priser eks. mva. · Ingen bindingstid{interval === "year" ? " · Faktureres årlig" : ""}
+        </p>
       </section>
 
       {/* ── Invoices ──────────────────────────────────────────────── */}
@@ -490,7 +571,10 @@ export default function BillingView() {
                       <td className="px-3 text-(--agenci-ink-2)">
                         {date(p.periodStart, { day: "numeric", month: "short" })} – {date(p.periodEnd, { day: "numeric", month: "short" })}
                       </td>
-                      <td className="px-3">{PLANS.find((x) => x.id === p.plan)?.name ?? p.plan}</td>
+                      <td className="px-3">
+                        {PLANS.find((x) => x.id === p.plan)?.name ?? p.plan}
+                        <span className="text-(--agenci-ink-3)"> · {p.interval === "year" ? "årlig" : "månedlig"}</span>
+                      </td>
                       <td className="px-3 text-right tabular-nums">{kr(p.amount / 100)} kr</td>
                       <td className="px-3">
                         <span className={cn("inline-flex rounded-full border px-2 py-px text-[12px] font-medium", s?.cls)}>{s?.label}</span>

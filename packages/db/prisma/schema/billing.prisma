@@ -7,6 +7,8 @@ model Subscription {
   plan               String
   /// "pending" (checkout started) | "active" | "past_due" | "canceled"
   status             String       @default("pending")
+  /// "month" | "year" — how often it is charged.
+  interval           String       @default("month")
   /// Nexi Checkout subscription id — charged every month.
   nexiSubscriptionId String?      @unique
   /// The checkout payment that created (or last updated) the subscription.
@@ -40,6 +42,8 @@ model BillingPayment {
   currency       String       @default("NOK")
   /// "pending" | "paid" | "failed"
   status         String       @default("pending")
+  /// "month" | "year" — the period this payment covers.
+  interval       String       @default("month")
   periodStart    DateTime
   periodEnd      DateTime
   createdAt      DateTime     @default(now())

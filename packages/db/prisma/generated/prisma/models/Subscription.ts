@@ -29,6 +29,7 @@ export type SubscriptionMinAggregateOutputType = {
   organizationId: string | null
   plan: string | null
   status: string | null
+  interval: string | null
   nexiSubscriptionId: string | null
   nexiPaymentId: string | null
   currentPeriodStart: Date | null
@@ -44,6 +45,7 @@ export type SubscriptionMaxAggregateOutputType = {
   organizationId: string | null
   plan: string | null
   status: string | null
+  interval: string | null
   nexiSubscriptionId: string | null
   nexiPaymentId: string | null
   currentPeriodStart: Date | null
@@ -59,6 +61,7 @@ export type SubscriptionCountAggregateOutputType = {
   organizationId: number
   plan: number
   status: number
+  interval: number
   nexiSubscriptionId: number
   nexiPaymentId: number
   currentPeriodStart: number
@@ -76,6 +79,7 @@ export type SubscriptionMinAggregateInputType = {
   organizationId?: true
   plan?: true
   status?: true
+  interval?: true
   nexiSubscriptionId?: true
   nexiPaymentId?: true
   currentPeriodStart?: true
@@ -91,6 +95,7 @@ export type SubscriptionMaxAggregateInputType = {
   organizationId?: true
   plan?: true
   status?: true
+  interval?: true
   nexiSubscriptionId?: true
   nexiPaymentId?: true
   currentPeriodStart?: true
@@ -106,6 +111,7 @@ export type SubscriptionCountAggregateInputType = {
   organizationId?: true
   plan?: true
   status?: true
+  interval?: true
   nexiSubscriptionId?: true
   nexiPaymentId?: true
   currentPeriodStart?: true
@@ -194,6 +200,7 @@ export type SubscriptionGroupByOutputType = {
   organizationId: string
   plan: string
   status: string
+  interval: string
   nexiSubscriptionId: string | null
   nexiPaymentId: string | null
   currentPeriodStart: Date | null
@@ -230,6 +237,7 @@ export type SubscriptionWhereInput = {
   organizationId?: Prisma.StringFilter<"Subscription"> | string
   plan?: Prisma.StringFilter<"Subscription"> | string
   status?: Prisma.StringFilter<"Subscription"> | string
+  interval?: Prisma.StringFilter<"Subscription"> | string
   nexiSubscriptionId?: Prisma.StringNullableFilter<"Subscription"> | string | null
   nexiPaymentId?: Prisma.StringNullableFilter<"Subscription"> | string | null
   currentPeriodStart?: Prisma.DateTimeNullableFilter<"Subscription"> | Date | string | null
@@ -246,6 +254,7 @@ export type SubscriptionOrderByWithRelationInput = {
   organizationId?: Prisma.SortOrder
   plan?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  interval?: Prisma.SortOrder
   nexiSubscriptionId?: Prisma.SortOrderInput | Prisma.SortOrder
   nexiPaymentId?: Prisma.SortOrderInput | Prisma.SortOrder
   currentPeriodStart?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -266,6 +275,7 @@ export type SubscriptionWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.SubscriptionWhereInput | Prisma.SubscriptionWhereInput[]
   plan?: Prisma.StringFilter<"Subscription"> | string
   status?: Prisma.StringFilter<"Subscription"> | string
+  interval?: Prisma.StringFilter<"Subscription"> | string
   nexiPaymentId?: Prisma.StringNullableFilter<"Subscription"> | string | null
   currentPeriodStart?: Prisma.DateTimeNullableFilter<"Subscription"> | Date | string | null
   currentPeriodEnd?: Prisma.DateTimeNullableFilter<"Subscription"> | Date | string | null
@@ -281,6 +291,7 @@ export type SubscriptionOrderByWithAggregationInput = {
   organizationId?: Prisma.SortOrder
   plan?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  interval?: Prisma.SortOrder
   nexiSubscriptionId?: Prisma.SortOrderInput | Prisma.SortOrder
   nexiPaymentId?: Prisma.SortOrderInput | Prisma.SortOrder
   currentPeriodStart?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -302,6 +313,7 @@ export type SubscriptionScalarWhereWithAggregatesInput = {
   organizationId?: Prisma.StringWithAggregatesFilter<"Subscription"> | string
   plan?: Prisma.StringWithAggregatesFilter<"Subscription"> | string
   status?: Prisma.StringWithAggregatesFilter<"Subscription"> | string
+  interval?: Prisma.StringWithAggregatesFilter<"Subscription"> | string
   nexiSubscriptionId?: Prisma.StringNullableWithAggregatesFilter<"Subscription"> | string | null
   nexiPaymentId?: Prisma.StringNullableWithAggregatesFilter<"Subscription"> | string | null
   currentPeriodStart?: Prisma.DateTimeNullableWithAggregatesFilter<"Subscription"> | Date | string | null
@@ -316,6 +328,7 @@ export type SubscriptionCreateInput = {
   id?: string
   plan: string
   status?: string
+  interval?: string
   nexiSubscriptionId?: string | null
   nexiPaymentId?: string | null
   currentPeriodStart?: Date | string | null
@@ -332,6 +345,7 @@ export type SubscriptionUncheckedCreateInput = {
   organizationId: string
   plan: string
   status?: string
+  interval?: string
   nexiSubscriptionId?: string | null
   nexiPaymentId?: string | null
   currentPeriodStart?: Date | string | null
@@ -346,6 +360,7 @@ export type SubscriptionUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  interval?: Prisma.StringFieldUpdateOperationsInput | string
   nexiSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nexiPaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   currentPeriodStart?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -362,6 +377,7 @@ export type SubscriptionUncheckedUpdateInput = {
   organizationId?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  interval?: Prisma.StringFieldUpdateOperationsInput | string
   nexiSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nexiPaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   currentPeriodStart?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -377,6 +393,7 @@ export type SubscriptionCreateManyInput = {
   organizationId: string
   plan: string
   status?: string
+  interval?: string
   nexiSubscriptionId?: string | null
   nexiPaymentId?: string | null
   currentPeriodStart?: Date | string | null
@@ -391,6 +408,7 @@ export type SubscriptionUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  interval?: Prisma.StringFieldUpdateOperationsInput | string
   nexiSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nexiPaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   currentPeriodStart?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -406,6 +424,7 @@ export type SubscriptionUncheckedUpdateManyInput = {
   organizationId?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  interval?: Prisma.StringFieldUpdateOperationsInput | string
   nexiSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nexiPaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   currentPeriodStart?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -426,6 +445,7 @@ export type SubscriptionCountOrderByAggregateInput = {
   organizationId?: Prisma.SortOrder
   plan?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  interval?: Prisma.SortOrder
   nexiSubscriptionId?: Prisma.SortOrder
   nexiPaymentId?: Prisma.SortOrder
   currentPeriodStart?: Prisma.SortOrder
@@ -441,6 +461,7 @@ export type SubscriptionMaxOrderByAggregateInput = {
   organizationId?: Prisma.SortOrder
   plan?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  interval?: Prisma.SortOrder
   nexiSubscriptionId?: Prisma.SortOrder
   nexiPaymentId?: Prisma.SortOrder
   currentPeriodStart?: Prisma.SortOrder
@@ -456,6 +477,7 @@ export type SubscriptionMinOrderByAggregateInput = {
   organizationId?: Prisma.SortOrder
   plan?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  interval?: Prisma.SortOrder
   nexiSubscriptionId?: Prisma.SortOrder
   nexiPaymentId?: Prisma.SortOrder
   currentPeriodStart?: Prisma.SortOrder
@@ -502,6 +524,7 @@ export type SubscriptionCreateWithoutOrganizationInput = {
   id?: string
   plan: string
   status?: string
+  interval?: string
   nexiSubscriptionId?: string | null
   nexiPaymentId?: string | null
   currentPeriodStart?: Date | string | null
@@ -516,6 +539,7 @@ export type SubscriptionUncheckedCreateWithoutOrganizationInput = {
   id?: string
   plan: string
   status?: string
+  interval?: string
   nexiSubscriptionId?: string | null
   nexiPaymentId?: string | null
   currentPeriodStart?: Date | string | null
@@ -546,6 +570,7 @@ export type SubscriptionUpdateWithoutOrganizationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  interval?: Prisma.StringFieldUpdateOperationsInput | string
   nexiSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nexiPaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   currentPeriodStart?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -560,6 +585,7 @@ export type SubscriptionUncheckedUpdateWithoutOrganizationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  interval?: Prisma.StringFieldUpdateOperationsInput | string
   nexiSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nexiPaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   currentPeriodStart?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -577,6 +603,7 @@ export type SubscriptionSelect<ExtArgs extends runtime.Types.Extensions.Internal
   organizationId?: boolean
   plan?: boolean
   status?: boolean
+  interval?: boolean
   nexiSubscriptionId?: boolean
   nexiPaymentId?: boolean
   currentPeriodStart?: boolean
@@ -593,6 +620,7 @@ export type SubscriptionSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   organizationId?: boolean
   plan?: boolean
   status?: boolean
+  interval?: boolean
   nexiSubscriptionId?: boolean
   nexiPaymentId?: boolean
   currentPeriodStart?: boolean
@@ -609,6 +637,7 @@ export type SubscriptionSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   organizationId?: boolean
   plan?: boolean
   status?: boolean
+  interval?: boolean
   nexiSubscriptionId?: boolean
   nexiPaymentId?: boolean
   currentPeriodStart?: boolean
@@ -625,6 +654,7 @@ export type SubscriptionSelectScalar = {
   organizationId?: boolean
   plan?: boolean
   status?: boolean
+  interval?: boolean
   nexiSubscriptionId?: boolean
   nexiPaymentId?: boolean
   currentPeriodStart?: boolean
@@ -635,7 +665,7 @@ export type SubscriptionSelectScalar = {
   updatedAt?: boolean
 }
 
-export type SubscriptionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "plan" | "status" | "nexiSubscriptionId" | "nexiPaymentId" | "currentPeriodStart" | "currentPeriodEnd" | "cancelAtPeriodEnd" | "pastDueSince" | "createdAt" | "updatedAt", ExtArgs["result"]["subscription"]>
+export type SubscriptionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "plan" | "status" | "interval" | "nexiSubscriptionId" | "nexiPaymentId" | "currentPeriodStart" | "currentPeriodEnd" | "cancelAtPeriodEnd" | "pastDueSince" | "createdAt" | "updatedAt", ExtArgs["result"]["subscription"]>
 export type SubscriptionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
 }
@@ -662,6 +692,10 @@ export type $SubscriptionPayload<ExtArgs extends runtime.Types.Extensions.Intern
      * "pending" (checkout started) | "active" | "past_due" | "canceled"
      */
     status: string
+    /**
+     * "month" | "year" — how often it is charged.
+     */
+    interval: string
     /**
      * Nexi Checkout subscription id — charged every month.
      */
@@ -1110,6 +1144,7 @@ export interface SubscriptionFieldRefs {
   readonly organizationId: Prisma.FieldRef<"Subscription", 'String'>
   readonly plan: Prisma.FieldRef<"Subscription", 'String'>
   readonly status: Prisma.FieldRef<"Subscription", 'String'>
+  readonly interval: Prisma.FieldRef<"Subscription", 'String'>
   readonly nexiSubscriptionId: Prisma.FieldRef<"Subscription", 'String'>
   readonly nexiPaymentId: Prisma.FieldRef<"Subscription", 'String'>
   readonly currentPeriodStart: Prisma.FieldRef<"Subscription", 'DateTime'>
