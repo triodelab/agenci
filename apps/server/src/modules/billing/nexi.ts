@@ -93,6 +93,8 @@ export async function createSubscriptionCheckout(input: {
   publicUrl: string;
   /** Update the card on an existing subscription instead of creating one. */
   subscriptionId?: string;
+  /** Payer's e-mail, for Nexi's receipt. */
+  email?: string | null;
 }) {
   const fiveYears = new Date();
   fiveYears.setFullYear(fiveYears.getFullYear() + 5);
@@ -102,8 +104,10 @@ export async function createSubscriptionCheckout(input: {
       url: input.checkoutUrl,
       termsUrl: input.termsUrl,
       charge: !input.subscriptionId,
-      consumerType: { supportedTypes: ["B2B", "B2C"], default: "B2B" },
+      // The company is already verified in Brønnøysund: show only the card form.
+      merchantHandlesConsumerData: true,
     },
+    ...(input.email ? { consumer: { reference: input.reference.slice(0, 36), email: input.email } } : {}),
     order: orderFor(input.plan, input.reference),
     subscription: input.subscriptionId
       ? { subscriptionId: input.subscriptionId }

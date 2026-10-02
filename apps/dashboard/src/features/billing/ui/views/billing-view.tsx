@@ -163,15 +163,15 @@ export default function BillingView() {
       setBusy(null);
     }
   };
-  const goToCheckout = (start: () => Promise<{ paymentId: string }>, key: string) =>
+  const goToCheckout = (start: () => Promise<{ paymentId: string }>, key: string, plan?: PlanId) =>
     act(key, async () => {
       const { paymentId } = await start();
-      await navigate({ to: "/betaling", search: { paymentId } });
+      await navigate({ to: "/betaling", search: { paymentId, plan } });
     });
   const choose = (id: PlanId) =>
     subscribed
       ? act(`plan-${id}`, () => client.private.billing.changePlan({ plan: id }), "Planen byttes ved neste trekk.")
-      : goToCheckout(() => client.private.billing.startCheckout({ plan: id }), `plan-${id}`);
+      : goToCheckout(() => client.private.billing.startCheckout({ plan: id }), `plan-${id}`, id);
 
   // What the plan card says, per state.
   const summary = developer
