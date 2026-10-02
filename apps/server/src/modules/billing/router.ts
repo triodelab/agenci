@@ -4,10 +4,12 @@
  */
 import { ORPCError } from "@orpc/server";
 import { z } from "zod";
+import prisma from "@agenci/db";
 import { base, privateProcedure } from "@/routers/procedures";
 import { env } from "@agenci/env/server";
 import { lookupCompany } from "./brreg";
 import { NEXI_CHECKOUT_JS, nexiConfigured } from "./nexi";
+import { sellerVatRegistered } from "./seller";
 import { PLAN_IDS, type PlanId, PLANS, planAmounts, TRIAL_DAYS } from "./plans";
 import {
   changePlan,
@@ -15,6 +17,7 @@ import {
   confirmCheckout,
   conversationsThisMonth,
   getBillingState,
+  getInvoice,
   listPayments,
   registerCompany,
   setCancelAtPeriodEnd,
@@ -24,8 +27,17 @@ import {
 
 const PlanSchema = z.enum(PLAN_IDS as [PlanId, ...PlanId[]]);
 
-function requireManager(role: string | null) {
-  if (role !== "owner" && role !== "admin") {
+/**
+ * The session carries no role (Better Auth doesn't set activeOrganizationRole),
+ * so read it from the membership itself.
+ */
+async function requireManager(context: { userId: string; organizationId: string }) {
+  const member = await prisma.member.findFirst({
+    where: { userId: context.userId, organizationId: context.organizationId },
+    select: { role: true },
+  });
+  const roles = (member?.role ?? "").split(",").map((r) => r.trim());
+  if (!roles.includes("owner") && !roles.includes("admin")) {
     throw new ORPCError("FORBIDDEN", { message: "Bare eiere og administratorer kan endre betaling." });
   }
 }
@@ -46,6 +58,7 @@ export const billingRouter = {
       checkout: nexiConfigured() ? { checkoutKey: env.NEXI_CHECKOUT_KEY as string, scriptUrl: NEXI_CHECKOUT_JS } : null,
       trialDays: TRIAL_DAYS,
       plans: Object.values(PLANS).map((p) => ({ ...p, priceWithVat: planAmounts(p.id).gross })),
+      vatRegistered: sellerVatRegistered(),
     };
   }),
 
@@ -60,7 +73,7 @@ export const billingRouter = {
   registerCompany: privateProcedure
     .input(z.object({ orgNumber: z.string().min(9).max(20) }))
     .handler(async ({ input, context }) => {
-      requireManager(context.role);
+      await requireManager(context);
       return registerCompany(context.organizationId, input.orgNumber);
     }),
 
@@ -68,12 +81,12 @@ export const billingRouter = {
     .input(z.object({ plan: PlanSchema }))
     .output(CheckoutResponse)
     .handler(async ({ input, context }) => {
-      requireManager(context.role);
+      await requireManager(context);
       return startCheckout(context.organizationId, input.plan, context.user.email);
     }),
 
   startCardUpdate: privateProcedure.output(CheckoutResponse).handler(async ({ context }) => {
-    requireManager(context.role);
+    await requireManager(context);
     return startCardUpdate(context.organizationId, context.user.email);
   }),
 
@@ -82,16 +95,20 @@ export const billingRouter = {
     .handler(async ({ input, context }) => confirmCheckout(context.organizationId, input.paymentId)),
 
   changePlan: privateProcedure.input(z.object({ plan: PlanSchema })).handler(async ({ input, context }) => {
-    requireManager(context.role);
+    await requireManager(context);
     await changePlan(context.organizationId, input.plan);
     return { ok: true };
   }),
 
   setCancel: privateProcedure.input(z.object({ cancel: z.boolean() })).handler(async ({ input, context }) => {
-    requireManager(context.role);
+    await requireManager(context);
     await setCancelAtPeriodEnd(context.organizationId, input.cancel);
     return { ok: true };
   }),
 
   payments: privateProcedure.handler(async ({ context }) => listPayments(context.organizationId)),
+
+  invoice: privateProcedure
+    .input(z.object({ id: z.string().min(1) }))
+    .handler(async ({ input, context }) => getInvoice(context.organizationId, input.id)),
 };

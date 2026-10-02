@@ -27,7 +27,6 @@ import {
   useReplyMutation,
   useSetConversationStatusMutation,
 } from "../../queries/conversations-queries";
-import { isDemoId } from "@/features/agents/ui/components/overview-mock";
 import {
   arrowChipClass,
   ContactAvatar,
@@ -545,7 +544,7 @@ export function ConversationIdView() {
               rows={2}
               value={draft}
               maxLength={4000}
-              disabled={reply.isPending || isDemoId(c.threadId)}
+              disabled={reply.isPending}
               onChange={(e) => setDraft(e.currentTarget.value)}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
@@ -555,9 +554,7 @@ export function ConversationIdView() {
               }}
               aria-label="Svar kunden"
               placeholder={
-                isDemoId(c.threadId)
-                  ? "Du kan ikke svare i en demosamtale."
-                  : escalated
+                escalated
                     ? "Skriv et svar til kunden …"
                     : "Svar kunden selv. Da tar teamet over, og agenten tar pause."
               }

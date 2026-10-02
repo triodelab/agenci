@@ -9,10 +9,17 @@ export const BillingPaymentPlain = t.Object(
     id: t.String(),
     organizationId: t.String(),
     nexiPaymentId: t.String(),
+    invoiceNumber: t.Integer({
+      description: `Fortløpende fakturanummer (shown as e.g. «AG-1001»).`,
+    }),
     plan: t.String(),
     amount: t.Integer({
-      description: `Including VAT, in øre (499 kr = 49900).`,
+      description: `Total charged, in øre (499 kr = 49900).`,
     }),
+    netAmount: t.Integer({
+      description: `Amount before VAT, and the VAT in it (0 while not VAT-registered).`,
+    }),
+    vatAmount: t.Integer(),
     currency: t.String(),
     status: t.String({ description: `"pending" | "paid" | "failed"` }),
     periodStart: t.Date(),
@@ -48,10 +55,21 @@ export const BillingPaymentRelations = t.Object(
 
 export const BillingPaymentPlainInputCreate = t.Object(
   {
+    invoiceNumber: t.Optional(
+      t.Integer({
+        description: `Fortløpende fakturanummer (shown as e.g. «AG-1001»).`,
+      }),
+    ),
     plan: t.String(),
     amount: t.Integer({
-      description: `Including VAT, in øre (499 kr = 49900).`,
+      description: `Total charged, in øre (499 kr = 49900).`,
     }),
+    netAmount: t.Optional(
+      t.Integer({
+        description: `Amount before VAT, and the VAT in it (0 while not VAT-registered).`,
+      }),
+    ),
+    vatAmount: t.Optional(t.Integer()),
     currency: t.Optional(t.String()),
     status: t.Optional(
       t.String({ description: `"pending" | "paid" | "failed"` }),
@@ -67,10 +85,21 @@ export const BillingPaymentPlainInputCreate = t.Object(
 
 export const BillingPaymentPlainInputUpdate = t.Object(
   {
+    invoiceNumber: t.Optional(
+      t.Integer({
+        description: `Fortløpende fakturanummer (shown as e.g. «AG-1001»).`,
+      }),
+    ),
     plan: t.Optional(t.String()),
     amount: t.Optional(
-      t.Integer({ description: `Including VAT, in øre (499 kr = 49900).` }),
+      t.Integer({ description: `Total charged, in øre (499 kr = 49900).` }),
     ),
+    netAmount: t.Optional(
+      t.Integer({
+        description: `Amount before VAT, and the VAT in it (0 while not VAT-registered).`,
+      }),
+    ),
+    vatAmount: t.Optional(t.Integer()),
     currency: t.Optional(t.String()),
     status: t.Optional(
       t.String({ description: `"pending" | "paid" | "failed"` }),
@@ -137,10 +166,17 @@ export const BillingPaymentWhere = t.Partial(
           id: t.String(),
           organizationId: t.String(),
           nexiPaymentId: t.String(),
+          invoiceNumber: t.Integer({
+            description: `Fortløpende fakturanummer (shown as e.g. «AG-1001»).`,
+          }),
           plan: t.String(),
           amount: t.Integer({
-            description: `Including VAT, in øre (499 kr = 49900).`,
+            description: `Total charged, in øre (499 kr = 49900).`,
           }),
+          netAmount: t.Integer({
+            description: `Amount before VAT, and the VAT in it (0 while not VAT-registered).`,
+          }),
+          vatAmount: t.Integer(),
           currency: t.String(),
           status: t.String({ description: `"pending" | "paid" | "failed"` }),
           periodStart: t.Date(),
@@ -163,7 +199,13 @@ export const BillingPaymentWhereUnique = t.Recursive(
       [
         t.Partial(
           t.Object(
-            { id: t.String(), nexiPaymentId: t.String() },
+            {
+              id: t.String(),
+              nexiPaymentId: t.String(),
+              invoiceNumber: t.Integer({
+                description: `Fortløpende fakturanummer (shown as e.g. «AG-1001»).`,
+              }),
+            },
             {
               additionalProperties: false,
               description: `Every charge attempt — the invoice list in the dashboard.`,
@@ -175,6 +217,11 @@ export const BillingPaymentWhereUnique = t.Recursive(
           [
             t.Object({ id: t.String() }),
             t.Object({ nexiPaymentId: t.String() }),
+            t.Object({
+              invoiceNumber: t.Integer({
+                description: `Fortløpende fakturanummer (shown as e.g. «AG-1001»).`,
+              }),
+            }),
           ],
           { additionalProperties: false },
         ),
@@ -198,10 +245,17 @@ export const BillingPaymentWhereUnique = t.Recursive(
               id: t.String(),
               organizationId: t.String(),
               nexiPaymentId: t.String(),
+              invoiceNumber: t.Integer({
+                description: `Fortløpende fakturanummer (shown as e.g. «AG-1001»).`,
+              }),
               plan: t.String(),
               amount: t.Integer({
-                description: `Including VAT, in øre (499 kr = 49900).`,
+                description: `Total charged, in øre (499 kr = 49900).`,
               }),
+              netAmount: t.Integer({
+                description: `Amount before VAT, and the VAT in it (0 while not VAT-registered).`,
+              }),
+              vatAmount: t.Integer(),
               currency: t.String(),
               status: t.String({
                 description: `"pending" | "paid" | "failed"`,
@@ -227,8 +281,11 @@ export const BillingPaymentSelect = t.Partial(
       organizationId: t.Boolean(),
       organization: t.Boolean(),
       nexiPaymentId: t.Boolean(),
+      invoiceNumber: t.Boolean(),
       plan: t.Boolean(),
       amount: t.Boolean(),
+      netAmount: t.Boolean(),
+      vatAmount: t.Boolean(),
       currency: t.Boolean(),
       status: t.Boolean(),
       periodStart: t.Boolean(),
@@ -266,10 +323,19 @@ export const BillingPaymentOrderBy = t.Partial(
       nexiPaymentId: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
+      invoiceNumber: t.Union([t.Literal("asc"), t.Literal("desc")], {
+        additionalProperties: false,
+      }),
       plan: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
       amount: t.Union([t.Literal("asc"), t.Literal("desc")], {
+        additionalProperties: false,
+      }),
+      netAmount: t.Union([t.Literal("asc"), t.Literal("desc")], {
+        additionalProperties: false,
+      }),
+      vatAmount: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
       currency: t.Union([t.Literal("asc"), t.Literal("desc")], {

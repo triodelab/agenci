@@ -15,13 +15,11 @@ import {
   useState,
 } from "react";
 import { toast } from "sonner";
-import { DemoSwitch } from "@/components/demo-switch";
 import { Segment } from "@/components/segment";
 import {
   cardClass,
   dataTextClass,
 } from "@/features/conversations/ui/components/conversation-ui";
-import { setDemoMode, useDemoMode } from "@/lib/demo-mode";
 import {
   type KnowledgeSource,
   useAddWebpageSourceMutation,
@@ -69,7 +67,6 @@ const pillButton =
   "inline-flex h-9 items-center gap-1.5 rounded-full px-3.5 text-[13px] font-medium transition-[background-color,color,transform] duration-150 active:scale-[0.985] disabled:pointer-events-none disabled:opacity-40";
 
 export function KnowledgeView({ agentId }: { agentId: string }) {
-  const { on: demo } = useDemoMode();
   const { data, isPending, isError } = useKnowledgeOverviewQuery(agentId);
   const addWebpage = useAddWebpageSourceMutation(agentId);
   const upload = useUploadSourceMutation(agentId);
@@ -132,14 +129,6 @@ export function KnowledgeView({ agentId }: { agentId: string }) {
       )
     : 0;
 
-  /** Real actions always hit the real knowledge base — leave demo mode. */
-  const ensureLive = () => {
-    if (!demo) return;
-    setDemoMode(false);
-    setSelection(null);
-    toast.info("Demodata er slått av — du ser nå den ekte kunnskapsbasen.");
-  };
-
   const uploadFiles = async (files: File[]) => {
     const valid = files.filter((f) => {
       if (f.size > MAX_FILE_MB * 1024 * 1024) {
@@ -149,7 +138,6 @@ export function KnowledgeView({ agentId }: { agentId: string }) {
       return true;
     });
     if (!valid.length) return;
-    ensureLive();
     const items = valid.map((f) => ({
       file: f,
       pending: {
@@ -179,29 +167,18 @@ export function KnowledgeView({ agentId }: { agentId: string }) {
     e.preventDefault();
     const trimmed = url.trim();
     if (!isValidHttpUrl(trimmed)) return;
-    ensureLive();
     await addWebpage.mutateAsync(trimmed);
     setUrl("");
     setAdding(false);
   };
 
   const removeSource = (id: string) => {
-    if (demo) {
-      toast.info(
-        "Demokilder kan ikke fjernes. Slå av demodata for å endre kunnskapsbasen.",
-      );
-      return;
-    }
     remove.mutate(id, {
       onSuccess: () => setSelection((s) => (s?.sourceId === id ? null : s)),
     });
   };
 
   const retrySource = async (s: KnowledgeSource) => {
-    if (demo) {
-      toast.info("Slå av demodata for å prøve på nytt.");
-      return;
-    }
     if (s.type === "WEBPAGE" && s.url) {
       await remove.mutateAsync(s.id);
       await addWebpage.mutateAsync(s.url);
@@ -213,13 +190,6 @@ export function KnowledgeView({ agentId }: { agentId: string }) {
 
   /** Citation click: open that exact chunk in the graph + panel. */
   const showChunk = (documentId: string, index: number) => {
-    if (demo) {
-      // Citations always point at real sources.
-      setDemoMode(false);
-      toast.info(
-        "Demodata er slått av — viser kilden fra den ekte kunnskapsbasen.",
-      );
-    }
     setTypeFilter("all");
     setQuery("");
     setSelection({ kind: "chunk", sourceId: documentId, index });
@@ -320,7 +290,6 @@ export function KnowledgeView({ agentId }: { agentId: string }) {
             </p>
           </div>
           <div className="ml-auto flex shrink-0 flex-wrap items-center gap-2">
-            <DemoSwitch />
             <button
               type="button"
               onClick={() => setAskOpen(true)}
@@ -574,7 +543,6 @@ export function KnowledgeView({ agentId }: { agentId: string }) {
                 onSelect={setSelection}
                 onDelete={removeSource}
                 deleting={remove.isPending}
-                readOnly={demo}
               />
             ) : (
               <div className="space-y-3">
@@ -614,13 +582,11 @@ export function KnowledgeView({ agentId }: { agentId: string }) {
           agentId={agentId}
           agentName={data.agent.name}
           sources={sources}
-          // Demo sources aren't real, so only focus on a real selected source.
           focusSource={
-            !demo && selection
+            selection
               ? (sources.find((s) => s.id === selection.sourceId) ?? null)
               : null
           }
-          demo={demo}
           onClearFocus={() => setSelection(null)}
           onShowChunk={showChunk}
           open={askOpen}

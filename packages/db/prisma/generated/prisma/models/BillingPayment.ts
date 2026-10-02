@@ -27,19 +27,28 @@ export type AggregateBillingPayment = {
 }
 
 export type BillingPaymentAvgAggregateOutputType = {
+  invoiceNumber: number | null
   amount: number | null
+  netAmount: number | null
+  vatAmount: number | null
 }
 
 export type BillingPaymentSumAggregateOutputType = {
+  invoiceNumber: number | null
   amount: number | null
+  netAmount: number | null
+  vatAmount: number | null
 }
 
 export type BillingPaymentMinAggregateOutputType = {
   id: string | null
   organizationId: string | null
   nexiPaymentId: string | null
+  invoiceNumber: number | null
   plan: string | null
   amount: number | null
+  netAmount: number | null
+  vatAmount: number | null
   currency: string | null
   status: string | null
   periodStart: Date | null
@@ -52,8 +61,11 @@ export type BillingPaymentMaxAggregateOutputType = {
   id: string | null
   organizationId: string | null
   nexiPaymentId: string | null
+  invoiceNumber: number | null
   plan: string | null
   amount: number | null
+  netAmount: number | null
+  vatAmount: number | null
   currency: string | null
   status: string | null
   periodStart: Date | null
@@ -66,8 +78,11 @@ export type BillingPaymentCountAggregateOutputType = {
   id: number
   organizationId: number
   nexiPaymentId: number
+  invoiceNumber: number
   plan: number
   amount: number
+  netAmount: number
+  vatAmount: number
   currency: number
   status: number
   periodStart: number
@@ -79,19 +94,28 @@ export type BillingPaymentCountAggregateOutputType = {
 
 
 export type BillingPaymentAvgAggregateInputType = {
+  invoiceNumber?: true
   amount?: true
+  netAmount?: true
+  vatAmount?: true
 }
 
 export type BillingPaymentSumAggregateInputType = {
+  invoiceNumber?: true
   amount?: true
+  netAmount?: true
+  vatAmount?: true
 }
 
 export type BillingPaymentMinAggregateInputType = {
   id?: true
   organizationId?: true
   nexiPaymentId?: true
+  invoiceNumber?: true
   plan?: true
   amount?: true
+  netAmount?: true
+  vatAmount?: true
   currency?: true
   status?: true
   periodStart?: true
@@ -104,8 +128,11 @@ export type BillingPaymentMaxAggregateInputType = {
   id?: true
   organizationId?: true
   nexiPaymentId?: true
+  invoiceNumber?: true
   plan?: true
   amount?: true
+  netAmount?: true
+  vatAmount?: true
   currency?: true
   status?: true
   periodStart?: true
@@ -118,8 +145,11 @@ export type BillingPaymentCountAggregateInputType = {
   id?: true
   organizationId?: true
   nexiPaymentId?: true
+  invoiceNumber?: true
   plan?: true
   amount?: true
+  netAmount?: true
+  vatAmount?: true
   currency?: true
   status?: true
   periodStart?: true
@@ -219,8 +249,11 @@ export type BillingPaymentGroupByOutputType = {
   id: string
   organizationId: string
   nexiPaymentId: string
+  invoiceNumber: number
   plan: string
   amount: number
+  netAmount: number
+  vatAmount: number
   currency: string
   status: string
   periodStart: Date
@@ -256,8 +289,11 @@ export type BillingPaymentWhereInput = {
   id?: Prisma.StringFilter<"BillingPayment"> | string
   organizationId?: Prisma.StringFilter<"BillingPayment"> | string
   nexiPaymentId?: Prisma.StringFilter<"BillingPayment"> | string
+  invoiceNumber?: Prisma.IntFilter<"BillingPayment"> | number
   plan?: Prisma.StringFilter<"BillingPayment"> | string
   amount?: Prisma.IntFilter<"BillingPayment"> | number
+  netAmount?: Prisma.IntFilter<"BillingPayment"> | number
+  vatAmount?: Prisma.IntFilter<"BillingPayment"> | number
   currency?: Prisma.StringFilter<"BillingPayment"> | string
   status?: Prisma.StringFilter<"BillingPayment"> | string
   periodStart?: Prisma.DateTimeFilter<"BillingPayment"> | Date | string
@@ -271,8 +307,11 @@ export type BillingPaymentOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   organizationId?: Prisma.SortOrder
   nexiPaymentId?: Prisma.SortOrder
+  invoiceNumber?: Prisma.SortOrder
   plan?: Prisma.SortOrder
   amount?: Prisma.SortOrder
+  netAmount?: Prisma.SortOrder
+  vatAmount?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   status?: Prisma.SortOrder
   periodStart?: Prisma.SortOrder
@@ -285,12 +324,15 @@ export type BillingPaymentOrderByWithRelationInput = {
 export type BillingPaymentWhereUniqueInput = Prisma.AtLeast<{
   id?: string
   nexiPaymentId?: string
+  invoiceNumber?: number
   AND?: Prisma.BillingPaymentWhereInput | Prisma.BillingPaymentWhereInput[]
   OR?: Prisma.BillingPaymentWhereInput[]
   NOT?: Prisma.BillingPaymentWhereInput | Prisma.BillingPaymentWhereInput[]
   organizationId?: Prisma.StringFilter<"BillingPayment"> | string
   plan?: Prisma.StringFilter<"BillingPayment"> | string
   amount?: Prisma.IntFilter<"BillingPayment"> | number
+  netAmount?: Prisma.IntFilter<"BillingPayment"> | number
+  vatAmount?: Prisma.IntFilter<"BillingPayment"> | number
   currency?: Prisma.StringFilter<"BillingPayment"> | string
   status?: Prisma.StringFilter<"BillingPayment"> | string
   periodStart?: Prisma.DateTimeFilter<"BillingPayment"> | Date | string
@@ -298,14 +340,17 @@ export type BillingPaymentWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"BillingPayment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"BillingPayment"> | Date | string
   organization?: Prisma.XOR<Prisma.OrganizationScalarRelationFilter, Prisma.OrganizationWhereInput>
-}, "id" | "nexiPaymentId">
+}, "id" | "nexiPaymentId" | "invoiceNumber">
 
 export type BillingPaymentOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   organizationId?: Prisma.SortOrder
   nexiPaymentId?: Prisma.SortOrder
+  invoiceNumber?: Prisma.SortOrder
   plan?: Prisma.SortOrder
   amount?: Prisma.SortOrder
+  netAmount?: Prisma.SortOrder
+  vatAmount?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   status?: Prisma.SortOrder
   periodStart?: Prisma.SortOrder
@@ -326,8 +371,11 @@ export type BillingPaymentScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"BillingPayment"> | string
   organizationId?: Prisma.StringWithAggregatesFilter<"BillingPayment"> | string
   nexiPaymentId?: Prisma.StringWithAggregatesFilter<"BillingPayment"> | string
+  invoiceNumber?: Prisma.IntWithAggregatesFilter<"BillingPayment"> | number
   plan?: Prisma.StringWithAggregatesFilter<"BillingPayment"> | string
   amount?: Prisma.IntWithAggregatesFilter<"BillingPayment"> | number
+  netAmount?: Prisma.IntWithAggregatesFilter<"BillingPayment"> | number
+  vatAmount?: Prisma.IntWithAggregatesFilter<"BillingPayment"> | number
   currency?: Prisma.StringWithAggregatesFilter<"BillingPayment"> | string
   status?: Prisma.StringWithAggregatesFilter<"BillingPayment"> | string
   periodStart?: Prisma.DateTimeWithAggregatesFilter<"BillingPayment"> | Date | string
@@ -339,8 +387,11 @@ export type BillingPaymentScalarWhereWithAggregatesInput = {
 export type BillingPaymentCreateInput = {
   id?: string
   nexiPaymentId: string
+  invoiceNumber?: number
   plan: string
   amount: number
+  netAmount?: number
+  vatAmount?: number
   currency?: string
   status?: string
   periodStart: Date | string
@@ -354,8 +405,11 @@ export type BillingPaymentUncheckedCreateInput = {
   id?: string
   organizationId: string
   nexiPaymentId: string
+  invoiceNumber?: number
   plan: string
   amount: number
+  netAmount?: number
+  vatAmount?: number
   currency?: string
   status?: string
   periodStart: Date | string
@@ -369,6 +423,8 @@ export type BillingPaymentUpdateInput = {
   nexiPaymentId?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
   amount?: Prisma.IntFieldUpdateOperationsInput | number
+  netAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  vatAmount?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   periodStart?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -382,8 +438,11 @@ export type BillingPaymentUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   organizationId?: Prisma.StringFieldUpdateOperationsInput | string
   nexiPaymentId?: Prisma.StringFieldUpdateOperationsInput | string
+  invoiceNumber?: Prisma.IntFieldUpdateOperationsInput | number
   plan?: Prisma.StringFieldUpdateOperationsInput | string
   amount?: Prisma.IntFieldUpdateOperationsInput | number
+  netAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  vatAmount?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   periodStart?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -396,8 +455,11 @@ export type BillingPaymentCreateManyInput = {
   id?: string
   organizationId: string
   nexiPaymentId: string
+  invoiceNumber?: number
   plan: string
   amount: number
+  netAmount?: number
+  vatAmount?: number
   currency?: string
   status?: string
   periodStart: Date | string
@@ -411,6 +473,8 @@ export type BillingPaymentUpdateManyMutationInput = {
   nexiPaymentId?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
   amount?: Prisma.IntFieldUpdateOperationsInput | number
+  netAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  vatAmount?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   periodStart?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -423,8 +487,11 @@ export type BillingPaymentUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   organizationId?: Prisma.StringFieldUpdateOperationsInput | string
   nexiPaymentId?: Prisma.StringFieldUpdateOperationsInput | string
+  invoiceNumber?: Prisma.IntFieldUpdateOperationsInput | number
   plan?: Prisma.StringFieldUpdateOperationsInput | string
   amount?: Prisma.IntFieldUpdateOperationsInput | number
+  netAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  vatAmount?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   periodStart?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -447,8 +514,11 @@ export type BillingPaymentCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   organizationId?: Prisma.SortOrder
   nexiPaymentId?: Prisma.SortOrder
+  invoiceNumber?: Prisma.SortOrder
   plan?: Prisma.SortOrder
   amount?: Prisma.SortOrder
+  netAmount?: Prisma.SortOrder
+  vatAmount?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   status?: Prisma.SortOrder
   periodStart?: Prisma.SortOrder
@@ -458,15 +528,21 @@ export type BillingPaymentCountOrderByAggregateInput = {
 }
 
 export type BillingPaymentAvgOrderByAggregateInput = {
+  invoiceNumber?: Prisma.SortOrder
   amount?: Prisma.SortOrder
+  netAmount?: Prisma.SortOrder
+  vatAmount?: Prisma.SortOrder
 }
 
 export type BillingPaymentMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   organizationId?: Prisma.SortOrder
   nexiPaymentId?: Prisma.SortOrder
+  invoiceNumber?: Prisma.SortOrder
   plan?: Prisma.SortOrder
   amount?: Prisma.SortOrder
+  netAmount?: Prisma.SortOrder
+  vatAmount?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   status?: Prisma.SortOrder
   periodStart?: Prisma.SortOrder
@@ -479,8 +555,11 @@ export type BillingPaymentMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   organizationId?: Prisma.SortOrder
   nexiPaymentId?: Prisma.SortOrder
+  invoiceNumber?: Prisma.SortOrder
   plan?: Prisma.SortOrder
   amount?: Prisma.SortOrder
+  netAmount?: Prisma.SortOrder
+  vatAmount?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   status?: Prisma.SortOrder
   periodStart?: Prisma.SortOrder
@@ -490,7 +569,10 @@ export type BillingPaymentMinOrderByAggregateInput = {
 }
 
 export type BillingPaymentSumOrderByAggregateInput = {
+  invoiceNumber?: Prisma.SortOrder
   amount?: Prisma.SortOrder
+  netAmount?: Prisma.SortOrder
+  vatAmount?: Prisma.SortOrder
 }
 
 export type BillingPaymentCreateNestedManyWithoutOrganizationInput = {
@@ -538,8 +620,11 @@ export type BillingPaymentUncheckedUpdateManyWithoutOrganizationNestedInput = {
 export type BillingPaymentCreateWithoutOrganizationInput = {
   id?: string
   nexiPaymentId: string
+  invoiceNumber?: number
   plan: string
   amount: number
+  netAmount?: number
+  vatAmount?: number
   currency?: string
   status?: string
   periodStart: Date | string
@@ -551,8 +636,11 @@ export type BillingPaymentCreateWithoutOrganizationInput = {
 export type BillingPaymentUncheckedCreateWithoutOrganizationInput = {
   id?: string
   nexiPaymentId: string
+  invoiceNumber?: number
   plan: string
   amount: number
+  netAmount?: number
+  vatAmount?: number
   currency?: string
   status?: string
   periodStart: Date | string
@@ -594,8 +682,11 @@ export type BillingPaymentScalarWhereInput = {
   id?: Prisma.StringFilter<"BillingPayment"> | string
   organizationId?: Prisma.StringFilter<"BillingPayment"> | string
   nexiPaymentId?: Prisma.StringFilter<"BillingPayment"> | string
+  invoiceNumber?: Prisma.IntFilter<"BillingPayment"> | number
   plan?: Prisma.StringFilter<"BillingPayment"> | string
   amount?: Prisma.IntFilter<"BillingPayment"> | number
+  netAmount?: Prisma.IntFilter<"BillingPayment"> | number
+  vatAmount?: Prisma.IntFilter<"BillingPayment"> | number
   currency?: Prisma.StringFilter<"BillingPayment"> | string
   status?: Prisma.StringFilter<"BillingPayment"> | string
   periodStart?: Prisma.DateTimeFilter<"BillingPayment"> | Date | string
@@ -607,8 +698,11 @@ export type BillingPaymentScalarWhereInput = {
 export type BillingPaymentCreateManyOrganizationInput = {
   id?: string
   nexiPaymentId: string
+  invoiceNumber?: number
   plan: string
   amount: number
+  netAmount?: number
+  vatAmount?: number
   currency?: string
   status?: string
   periodStart: Date | string
@@ -622,6 +716,8 @@ export type BillingPaymentUpdateWithoutOrganizationInput = {
   nexiPaymentId?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
   amount?: Prisma.IntFieldUpdateOperationsInput | number
+  netAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  vatAmount?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   periodStart?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -633,8 +729,11 @@ export type BillingPaymentUpdateWithoutOrganizationInput = {
 export type BillingPaymentUncheckedUpdateWithoutOrganizationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   nexiPaymentId?: Prisma.StringFieldUpdateOperationsInput | string
+  invoiceNumber?: Prisma.IntFieldUpdateOperationsInput | number
   plan?: Prisma.StringFieldUpdateOperationsInput | string
   amount?: Prisma.IntFieldUpdateOperationsInput | number
+  netAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  vatAmount?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   periodStart?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -646,8 +745,11 @@ export type BillingPaymentUncheckedUpdateWithoutOrganizationInput = {
 export type BillingPaymentUncheckedUpdateManyWithoutOrganizationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   nexiPaymentId?: Prisma.StringFieldUpdateOperationsInput | string
+  invoiceNumber?: Prisma.IntFieldUpdateOperationsInput | number
   plan?: Prisma.StringFieldUpdateOperationsInput | string
   amount?: Prisma.IntFieldUpdateOperationsInput | number
+  netAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  vatAmount?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   periodStart?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -662,8 +764,11 @@ export type BillingPaymentSelect<ExtArgs extends runtime.Types.Extensions.Intern
   id?: boolean
   organizationId?: boolean
   nexiPaymentId?: boolean
+  invoiceNumber?: boolean
   plan?: boolean
   amount?: boolean
+  netAmount?: boolean
+  vatAmount?: boolean
   currency?: boolean
   status?: boolean
   periodStart?: boolean
@@ -677,8 +782,11 @@ export type BillingPaymentSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   id?: boolean
   organizationId?: boolean
   nexiPaymentId?: boolean
+  invoiceNumber?: boolean
   plan?: boolean
   amount?: boolean
+  netAmount?: boolean
+  vatAmount?: boolean
   currency?: boolean
   status?: boolean
   periodStart?: boolean
@@ -692,8 +800,11 @@ export type BillingPaymentSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   id?: boolean
   organizationId?: boolean
   nexiPaymentId?: boolean
+  invoiceNumber?: boolean
   plan?: boolean
   amount?: boolean
+  netAmount?: boolean
+  vatAmount?: boolean
   currency?: boolean
   status?: boolean
   periodStart?: boolean
@@ -707,8 +818,11 @@ export type BillingPaymentSelectScalar = {
   id?: boolean
   organizationId?: boolean
   nexiPaymentId?: boolean
+  invoiceNumber?: boolean
   plan?: boolean
   amount?: boolean
+  netAmount?: boolean
+  vatAmount?: boolean
   currency?: boolean
   status?: boolean
   periodStart?: boolean
@@ -717,7 +831,7 @@ export type BillingPaymentSelectScalar = {
   updatedAt?: boolean
 }
 
-export type BillingPaymentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "nexiPaymentId" | "plan" | "amount" | "currency" | "status" | "periodStart" | "periodEnd" | "createdAt" | "updatedAt", ExtArgs["result"]["billingPayment"]>
+export type BillingPaymentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "nexiPaymentId" | "invoiceNumber" | "plan" | "amount" | "netAmount" | "vatAmount" | "currency" | "status" | "periodStart" | "periodEnd" | "createdAt" | "updatedAt", ExtArgs["result"]["billingPayment"]>
 export type BillingPaymentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
 }
@@ -737,11 +851,20 @@ export type $BillingPaymentPayload<ExtArgs extends runtime.Types.Extensions.Inte
     id: string
     organizationId: string
     nexiPaymentId: string
+    /**
+     * Fortløpende fakturanummer (shown as e.g. «AG-1001»).
+     */
+    invoiceNumber: number
     plan: string
     /**
-     * Including VAT, in øre (499 kr = 49900).
+     * Total charged, in øre (499 kr = 49900).
      */
     amount: number
+    /**
+     * Amount before VAT, and the VAT in it (0 while not VAT-registered).
+     */
+    netAmount: number
+    vatAmount: number
     currency: string
     /**
      * "pending" | "paid" | "failed"
@@ -1178,8 +1301,11 @@ export interface BillingPaymentFieldRefs {
   readonly id: Prisma.FieldRef<"BillingPayment", 'String'>
   readonly organizationId: Prisma.FieldRef<"BillingPayment", 'String'>
   readonly nexiPaymentId: Prisma.FieldRef<"BillingPayment", 'String'>
+  readonly invoiceNumber: Prisma.FieldRef<"BillingPayment", 'Int'>
   readonly plan: Prisma.FieldRef<"BillingPayment", 'String'>
   readonly amount: Prisma.FieldRef<"BillingPayment", 'Int'>
+  readonly netAmount: Prisma.FieldRef<"BillingPayment", 'Int'>
+  readonly vatAmount: Prisma.FieldRef<"BillingPayment", 'Int'>
   readonly currency: Prisma.FieldRef<"BillingPayment", 'String'>
   readonly status: Prisma.FieldRef<"BillingPayment", 'String'>
   readonly periodStart: Prisma.FieldRef<"BillingPayment", 'DateTime'>

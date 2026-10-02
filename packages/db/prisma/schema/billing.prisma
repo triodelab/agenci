@@ -29,9 +29,14 @@ model BillingPayment {
   organizationId String
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   nexiPaymentId  String       @unique
+  /// Fortløpende fakturanummer (shown as e.g. «AG-1001»).
+  invoiceNumber  Int          @unique @default(autoincrement())
   plan           String
-  /// Including VAT, in øre (499 kr = 49900).
+  /// Total charged, in øre (499 kr = 49900).
   amount         Int
+  /// Amount before VAT, and the VAT in it (0 while not VAT-registered).
+  netAmount      Int          @default(0)
+  vatAmount      Int          @default(0)
   currency       String       @default("NOK")
   /// "pending" | "paid" | "failed"
   status         String       @default("pending")

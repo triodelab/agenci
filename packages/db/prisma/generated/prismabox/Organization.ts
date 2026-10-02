@@ -229,10 +229,17 @@ with the same id; this row is kept in step on every message
           id: t.String(),
           organizationId: t.String(),
           nexiPaymentId: t.String(),
+          invoiceNumber: t.Integer({
+            description: `Fortløpende fakturanummer (shown as e.g. «AG-1001»).`,
+          }),
           plan: t.String(),
           amount: t.Integer({
-            description: `Including VAT, in øre (499 kr = 49900).`,
+            description: `Total charged, in øre (499 kr = 49900).`,
           }),
+          netAmount: t.Integer({
+            description: `Amount before VAT, and the VAT in it (0 while not VAT-registered).`,
+          }),
+          vatAmount: t.Integer(),
           currency: t.String(),
           status: t.String({ description: `"pending" | "paid" | "failed"` }),
           periodStart: t.Date(),
