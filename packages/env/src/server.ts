@@ -61,6 +61,20 @@ export const env = createEnv({
      */
     RESEND_API_KEY: z.string().min(1).optional(),
     RESEND_FROM_EMAIL: z.string().min(3).default("Agenci <post@triodelab.no>"),
+    /**
+     * Nexi Checkout (payments). "test" until Nexi approves the account; the
+     * keys must match the mode (Nexi portal → Company → Integration).
+     */
+    NEXI_MODE: z.enum(["test", "live"]).default("test"),
+    NEXI_SECRET_KEY: z.string().min(1).optional(),
+    NEXI_CHECKOUT_KEY: z.string().min(1).optional(),
+    /** Sent by Nexi in the Authorization header of every webhook. */
+    NEXI_WEBHOOK_SECRET: z.string().min(16).optional(),
+    /**
+     * Enforce the trial and plan limits on the widget. Off by default so a
+     * deploy can't lock out existing customers before billing is live.
+     */
+    BILLING_ENFORCE: z.enum(["0", "1"]).default("0"),
   },
   runtimeEnv: process.env,
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,

@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthedRouteImport } from './routes/_authed'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthedIndexRouteImport } from './routes/_authed/index'
+import { Route as AuthedBetalingRouteImport } from './routes/_authed/betaling'
 import { Route as AcceptInvitationInvitationIdRouteImport } from './routes/accept-invitation.$invitationId'
 import { Route as AuthedOrgOrgSlugRouteRouteImport } from './routes/_authed/org/$orgSlug/route'
 import { Route as AuthedOrgCreateRouteImport } from './routes/_authed/org/create'
@@ -50,6 +51,11 @@ const LoginRoute = LoginRouteImport.update({
 const AuthedIndexRoute = AuthedIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedBetalingRoute = AuthedBetalingRouteImport.update({
+  id: '/betaling',
+  path: '/betaling',
   getParentRoute: () => AuthedRoute,
 } as any)
 const AcceptInvitationInvitationIdRoute =
@@ -199,6 +205,7 @@ const AuthedOrgOrgSlugAgentsAgentIdSettingsSectionRoute =
 export interface FileRoutesByFullPath {
   '/': typeof AuthedIndexRoute
   '/login': typeof LoginRoute
+  '/betaling': typeof AuthedBetalingRoute
   '/accept-invitation/$invitationId': typeof AcceptInvitationInvitationIdRoute
   '/org/$orgSlug': typeof AuthedOrgOrgSlugRouteRouteWithChildren
   '/org/create': typeof AuthedOrgCreateRoute
@@ -227,6 +234,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
+  '/betaling': typeof AuthedBetalingRoute
   '/accept-invitation/$invitationId': typeof AcceptInvitationInvitationIdRoute
   '/': typeof AuthedIndexRoute
   '/org/create': typeof AuthedOrgCreateRoute
@@ -254,6 +262,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authed': typeof AuthedRouteWithChildren
   '/login': typeof LoginRoute
+  '/_authed/betaling': typeof AuthedBetalingRoute
   '/accept-invitation/$invitationId': typeof AcceptInvitationInvitationIdRoute
   '/_authed/': typeof AuthedIndexRoute
   '/_authed/org/$orgSlug': typeof AuthedOrgOrgSlugRouteRouteWithChildren
@@ -286,6 +295,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/login'
+    | '/betaling'
     | '/accept-invitation/$invitationId'
     | '/org/$orgSlug'
     | '/org/create'
@@ -314,6 +324,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
+    | '/betaling'
     | '/accept-invitation/$invitationId'
     | '/'
     | '/org/create'
@@ -340,6 +351,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_authed'
     | '/login'
+    | '/_authed/betaling'
     | '/accept-invitation/$invitationId'
     | '/_authed/'
     | '/_authed/org/$orgSlug'
@@ -395,6 +407,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AuthedIndexRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/betaling': {
+      id: '/_authed/betaling'
+      path: '/betaling'
+      fullPath: '/betaling'
+      preLoaderRoute: typeof AuthedBetalingRouteImport
       parentRoute: typeof AuthedRoute
     }
     '/accept-invitation/$invitationId': {
@@ -677,6 +696,7 @@ const AuthedOrgOrgSlugRouteRouteWithChildren =
   )
 
 interface AuthedRouteChildren {
+  AuthedBetalingRoute: typeof AuthedBetalingRoute
   AuthedIndexRoute: typeof AuthedIndexRoute
   AuthedOrgOrgSlugRouteRoute: typeof AuthedOrgOrgSlugRouteRouteWithChildren
   AuthedOrgCreateRoute: typeof AuthedOrgCreateRoute
@@ -684,6 +704,7 @@ interface AuthedRouteChildren {
 }
 
 const AuthedRouteChildren: AuthedRouteChildren = {
+  AuthedBetalingRoute: AuthedBetalingRoute,
   AuthedIndexRoute: AuthedIndexRoute,
   AuthedOrgOrgSlugRouteRoute: AuthedOrgOrgSlugRouteRouteWithChildren,
   AuthedOrgCreateRoute: AuthedOrgCreateRoute,

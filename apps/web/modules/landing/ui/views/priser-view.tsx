@@ -37,25 +37,6 @@ type Plan = {
 
 const PLANS: Plan[] = [
 	{
-		id: "gratis",
-		name: "Gratis",
-		monthlyPrice: 0,
-		yearlyPrice: 0,
-		conversations: "50 samtaler / mnd",
-		blurb: "Prøv den på din egen nettside. Du trenger ikke legge inn kort.",
-		featured: false,
-		cta: "Start gratis",
-		bullets: [
-			{ text: "1 AI-agent", included: true },
-			{ text: "Timebestilling i chatten", included: false },
-			{ text: "Chat-widget på nettsiden", included: true },
-			{ text: "1 teammedlem", included: true },
-			{ text: "Grunnleggende analyser", included: true },
-			{ text: "Fjern «Powered by Agenci»", included: false },
-			{ text: "Prioritert support", included: false },
-		],
-	},
-	{
 		id: "starter",
 		name: "Starter",
 		monthlyPrice: 499,
@@ -63,7 +44,7 @@ const PLANS: Plan[] = [
 		conversations: "500 samtaler / mnd",
 		blurb: "For små bedrifter som er lei av å svare på de samme spørsmålene.",
 		featured: false,
-		cta: "Kom i gang",
+		cta: "Prøv gratis i 30 dager",
 		bullets: [
 			{ text: "1 AI-agent", included: true },
 			{ text: "Timebestilling i chatten", included: true },
@@ -82,7 +63,7 @@ const PLANS: Plan[] = [
 		conversations: "2 000 samtaler / mnd",
 		blurb: "For bedrifter med mye trafikk og et team som deler på kundeservicen.",
 		featured: true,
-		cta: "Kom i gang",
+		cta: "Prøv gratis i 30 dager",
 		bullets: [
 			{ text: "3 AI-agenter", included: true },
 			{ text: "Timebestilling i chatten", included: true },
@@ -101,7 +82,7 @@ const PLANS: Plan[] = [
 		conversations: "10 000 samtaler / mnd",
 		blurb: "Flere nettsider, flere agenter, og alt samlet på ett sted.",
 		featured: false,
-		cta: "Kom i gang",
+		cta: "Prøv gratis i 30 dager",
 		bullets: [
 			{ text: "10 AI-agenter", included: true },
 			{ text: "Timebestilling i chatten", included: true },
@@ -247,11 +228,11 @@ export function PriserView() {
 							<div className={story.startBar}>
 								<div>
 									<h3 id="pricing-cta-heading">
-										Prøv Agenci gratis. Ingen kort, ingen binding.
+										Prøv Agenci gratis i 30 dager. Uten kort.
 									</h3>
 									<p>
-										Kom i gang på under fem minutter, eller snakk med oss om et
-										oppsett som passer volumet deres.
+										Du trenger bare organisasjonsnummeret. Etter prøvemåneden
+										velger du plan, eller lar være. Ingenting trekkes automatisk.
 									</p>
 								</div>
 								<div className={story.actions}>
@@ -260,7 +241,7 @@ export function PriserView() {
 										loggedInHref={LANDING_AUTH_PATHS.marketingLoggedInCta}
 										className={story.primaryLink}
 									>
-										Start gratis <ArrowRight size={18} />
+										Prøv gratis i 30 dager <ArrowRight size={18} />
 									</AuthAwareLink>
 									<Link
 										className={story.secondaryLink}
@@ -312,7 +293,7 @@ function PlanCard({ plan, yearly }: { plan: Plan; yearly: boolean }) {
 					? "Alltid gratis"
 					: yearly
 						? `Faktureres ${nok(price * 12)} kr/år`
-						: "Faktureres månedlig"}
+						: "30 dager gratis, deretter månedlig"}
 			</p>
 
 			<div className={local.quota}>

@@ -6,7 +6,9 @@
 import { ORPCError } from "@orpc/server";
 import { createPrismaClient } from "@agenci/db";
 import { buildTurnSystem } from "@/mastra/agent-behavior";
+import { customerAgentModel } from "@/mastra/agents/customer-service-agent";
 import { getCustomerServiceAgent } from "@/mastra/register-customer-agent";
+import { recordUsage } from "@/modules/billing/service";
 import { productsFromSteps, tidyReply } from "@/mastra/tools/product-search-tool";
 import { AgentBehaviorSchema } from "@/modules/widget/schema";
 
@@ -57,6 +59,13 @@ export async function sendChatMessage(input: {
       thread: threadId,
     },
   });
+
+  // Cost tracking: never let it break a reply.
+  const usage = result.usage as { inputTokens?: number; outputTokens?: number; promptTokens?: number; completionTokens?: number } | undefined;
+  void recordUsage(input.organizationId, customerAgentModel(behaviorData), {
+    inputTokens: usage?.inputTokens ?? usage?.promptTokens,
+    outputTokens: usage?.outputTokens ?? usage?.completionTokens,
+  }).catch((error) => console.error("[usage]", error));
 
   const products = productsFromSteps(result.steps);
   return { threadId, message: tidyReply(result.text, products), products };

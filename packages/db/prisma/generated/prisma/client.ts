@@ -97,6 +97,35 @@ export type Member = Prisma.MemberModel
  */
 export type Invitation = Prisma.InvitationModel
 /**
+ * Model Subscription
+ * One per organization once it has started a paid plan (none = free plan).
+ */
+export type Subscription = Prisma.SubscriptionModel
+/**
+ * Model BillingPayment
+ * Every charge attempt — the invoice list in the dashboard.
+ */
+export type BillingPayment = Prisma.BillingPaymentModel
+/**
+ * Model UsageMonthly
+ * AI usage per organization per calendar month (Europe/Oslo), for cost
+ * tracking. Conversations are counted from the conversations table.
+ */
+export type UsageMonthly = Prisma.UsageMonthlyModel
+/**
+ * Model BillingAccount
+ * The company behind an organization. Required before agents can answer:
+ * the org number (Enhetsregisteret) is what limits the trial to one per company.
+ */
+export type BillingAccount = Prisma.BillingAccountModel
+/**
+ * Model TrialClaim
+ * Org numbers that have had the free trial. Deliberately NOT linked to the
+ * organization: it outlives deleted organizations, so the trial is once per
+ * company, ever.
+ */
+export type TrialClaim = Prisma.TrialClaimModel
+/**
  * Model ContactSession
  * Widget visitor identity — no Better Auth session; anonymous website
  * visitors are scoped by this token + org (docs/task.md Phase 4, Task 4.1).

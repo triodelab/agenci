@@ -3,8 +3,9 @@ app.agenci.no {
 
 	# TEMPORARY: the dashboard (incl. sign-up) sits behind a shared password
 	# until launch. The widget's public API stays open so chats keep working.
+	# Nexi webhooks are open too: they carry their own secret (see billing/webhook.ts).
 	# Remove this block + BASIC_AUTH_* in deploy/.env to open up.
-	@gated not path /rpc/public/* /ws /api/ws/ticket
+	@gated not path /rpc/public/* /ws /api/ws/ticket /api/billing/nexi/webhook
 	basic_auth @gated {
 		{$BASIC_AUTH_USER} {$BASIC_AUTH_HASH}
 	}

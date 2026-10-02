@@ -20,6 +20,7 @@ import {
   updateContactSessionIdentity,
 } from "@/lib/contact-session";
 import { sendChatMessage } from "@/modules/chat/send-chat-message";
+import { checkChatAllowed } from "@/modules/billing/service";
 import { brandToWidgetAppearance } from "./brand-appearance";
 import {
   ContactSessionIdResponseSchema,
@@ -211,6 +212,10 @@ const publicChatRouter = {
       const { organizationId, id: contactSessionId } = context.contactSession;
       const threadId = input.threadId ?? crypto.randomUUID();
       const memoryResourceId = `${organizationId}:contact:${contactSessionId}`;
+      // Trial over, no plan, or this month's conversations used up: no AI
+      // reply. The message still reaches the inbox so the team can answer.
+      const isNew = !(await prisma.conversation.findUnique({ where: { id: threadId }, select: { id: true } }));
+      const gate = await checkChatAllowed(organizationId, isNew);
       // Index row first: also stops a visitor from writing into someone
       // else's thread, and reopens a resolved conversation.
       const status = await recordVisitorMessage({
@@ -220,6 +225,14 @@ const publicChatRouter = {
         contactSessionId,
         text: input.message,
       });
+
+      if (!gate.allowed) {
+        const notice = "Chatten er ikke tilgjengelig akkurat nå. Meldingen din er sendt til teamet, og de svarer deg så snart de kan.";
+        await appendThreadMessage({ threadId, resourceId: memoryResourceId, role: "user", text: input.message });
+        await appendThreadMessage({ threadId, resourceId: memoryResourceId, role: "assistant", text: notice });
+        await recordAgentReply(threadId, notice);
+        return { threadId, message: notice, products: [], status };
+      }
 
       if (status === "escalated") {
         await appendThreadMessage({

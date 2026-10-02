@@ -183,6 +183,117 @@ with the same id; this row is kept in step on every message
       ),
       { additionalProperties: false },
     ),
+    subscription: __nullable__(
+      t.Object(
+        {
+          id: t.String(),
+          organizationId: t.String(),
+          plan: t.String({
+            description: `"starter" | "pro" (see apps/server/src/modules/billing/plans.ts)`,
+          }),
+          status: t.String({
+            description: `"pending" (checkout started) | "active" | "past_due" | "canceled"`,
+          }),
+          nexiSubscriptionId: __nullable__(
+            t.String({
+              description: `Nexi Checkout subscription id — charged every month.`,
+            }),
+          ),
+          nexiPaymentId: __nullable__(
+            t.String({
+              description: `The checkout payment that created (or last updated) the subscription.`,
+            }),
+          ),
+          currentPeriodStart: __nullable__(t.Date()),
+          currentPeriodEnd: __nullable__(t.Date()),
+          cancelAtPeriodEnd: t.Boolean({
+            description: `Cancelled by the customer: stays active until currentPeriodEnd.`,
+          }),
+          pastDueSince: __nullable__(
+            t.Date({
+              description: `When the last charge failed (drives the grace period).`,
+            }),
+          ),
+          createdAt: t.Date(),
+          updatedAt: t.Date(),
+        },
+        {
+          additionalProperties: false,
+          description: `One per organization once it has started a paid plan (none = free plan).`,
+        },
+      ),
+    ),
+    billingPayments: t.Array(
+      t.Object(
+        {
+          id: t.String(),
+          organizationId: t.String(),
+          nexiPaymentId: t.String(),
+          plan: t.String(),
+          amount: t.Integer({
+            description: `Including VAT, in øre (499 kr = 49900).`,
+          }),
+          currency: t.String(),
+          status: t.String({ description: `"pending" | "paid" | "failed"` }),
+          periodStart: t.Date(),
+          periodEnd: t.Date(),
+          createdAt: t.Date(),
+          updatedAt: t.Date(),
+        },
+        {
+          additionalProperties: false,
+          description: `Every charge attempt — the invoice list in the dashboard.`,
+        },
+      ),
+      { additionalProperties: false },
+    ),
+    usageMonthly: t.Array(
+      t.Object(
+        {
+          id: t.String(),
+          organizationId: t.String(),
+          period: t.String({ description: `"2026-10"` }),
+          messages: t.Integer(),
+          inputTokens: t.Integer(),
+          outputTokens: t.Integer(),
+          byModel: t.Any({
+            description: `Tokens per model, e.g. {"openai/gpt-4o-mini":{"in":1200,"out":300}}`,
+          }),
+          updatedAt: t.Date(),
+        },
+        {
+          additionalProperties: false,
+          description: `AI usage per organization per calendar month (Europe/Oslo), for cost
+tracking. Conversations are counted from the conversations table.`,
+        },
+      ),
+      { additionalProperties: false },
+    ),
+    billingAccount: __nullable__(
+      t.Object(
+        {
+          id: t.String(),
+          organizationId: t.String(),
+          orgNumber: t.String({
+            description: `9 digits, verified active in Enhetsregisteret. One organization per company.`,
+          }),
+          companyName: t.String(),
+          trialStartedAt: __nullable__(
+            t.Date({
+              description: `Null when the org number had already used its trial.`,
+            }),
+          ),
+          trialEndsAt: __nullable__(t.Date()),
+          createdAt: t.Date(),
+          updatedAt: t.Date(),
+        },
+        {
+          additionalProperties: false,
+          description: `The company behind an organization. Required before agents can answer:
+the org number (Enhetsregisteret) is what limits the trial to one per company.`,
+        },
+      ),
+    ),
   },
   { additionalProperties: false },
 );
@@ -317,6 +428,64 @@ export const OrganizationRelationsInputCreate = t.Object(
               },
               { additionalProperties: false },
             ),
+            { additionalProperties: false },
+          ),
+        },
+        { additionalProperties: false },
+      ),
+    ),
+    subscription: t.Optional(
+      t.Object(
+        {
+          connect: t.Object(
+            {
+              id: t.String({ additionalProperties: false }),
+            },
+            { additionalProperties: false },
+          ),
+        },
+        { additionalProperties: false },
+      ),
+    ),
+    billingPayments: t.Optional(
+      t.Object(
+        {
+          connect: t.Array(
+            t.Object(
+              {
+                id: t.String({ additionalProperties: false }),
+              },
+              { additionalProperties: false },
+            ),
+            { additionalProperties: false },
+          ),
+        },
+        { additionalProperties: false },
+      ),
+    ),
+    usageMonthly: t.Optional(
+      t.Object(
+        {
+          connect: t.Array(
+            t.Object(
+              {
+                id: t.String({ additionalProperties: false }),
+              },
+              { additionalProperties: false },
+            ),
+            { additionalProperties: false },
+          ),
+        },
+        { additionalProperties: false },
+      ),
+    ),
+    billingAccount: t.Optional(
+      t.Object(
+        {
+          connect: t.Object(
+            {
+              id: t.String({ additionalProperties: false }),
+            },
             { additionalProperties: false },
           ),
         },
@@ -505,6 +674,84 @@ export const OrganizationRelationsInputUpdate = t.Partial(
           { additionalProperties: false },
         ),
       ),
+      subscription: t.Partial(
+        t.Object(
+          {
+            connect: t.Object(
+              {
+                id: t.String({ additionalProperties: false }),
+              },
+              { additionalProperties: false },
+            ),
+            disconnect: t.Boolean(),
+          },
+          { additionalProperties: false },
+        ),
+      ),
+      billingPayments: t.Partial(
+        t.Object(
+          {
+            connect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+            disconnect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+          },
+          { additionalProperties: false },
+        ),
+      ),
+      usageMonthly: t.Partial(
+        t.Object(
+          {
+            connect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+            disconnect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+          },
+          { additionalProperties: false },
+        ),
+      ),
+      billingAccount: t.Partial(
+        t.Object(
+          {
+            connect: t.Object(
+              {
+                id: t.String({ additionalProperties: false }),
+              },
+              { additionalProperties: false },
+            ),
+            disconnect: t.Boolean(),
+          },
+          { additionalProperties: false },
+        ),
+      ),
     },
     { additionalProperties: false },
   ),
@@ -595,6 +842,10 @@ export const OrganizationSelect = t.Partial(
       agents: t.Boolean(),
       contactSessions: t.Boolean(),
       conversations: t.Boolean(),
+      subscription: t.Boolean(),
+      billingPayments: t.Boolean(),
+      usageMonthly: t.Boolean(),
+      billingAccount: t.Boolean(),
       _count: t.Boolean(),
     },
     { additionalProperties: false },
@@ -611,6 +862,10 @@ export const OrganizationInclude = t.Partial(
       agents: t.Boolean(),
       contactSessions: t.Boolean(),
       conversations: t.Boolean(),
+      subscription: t.Boolean(),
+      billingPayments: t.Boolean(),
+      usageMonthly: t.Boolean(),
+      billingAccount: t.Boolean(),
       _count: t.Boolean(),
     },
     { additionalProperties: false },

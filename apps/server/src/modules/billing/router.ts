@@ -1,0 +1,94 @@
+/**
+ * Billing for the dashboard. Everyone in the organization can see the state;
+ * only owners and admins can register the company or touch the payment.
+ */
+import { ORPCError } from "@orpc/server";
+import { z } from "zod";
+import { base, privateProcedure } from "@/routers/procedures";
+import { env } from "@agenci/env/server";
+import { lookupCompany } from "./brreg";
+import { NEXI_CHECKOUT_JS, nexiConfigured } from "./nexi";
+import { PLAN_IDS, type PlanId, PLANS, planAmounts, TRIAL_DAYS } from "./plans";
+import {
+  changePlan,
+  confirmCheckout,
+  conversationsThisMonth,
+  getBillingState,
+  listPayments,
+  registerCompany,
+  setCancelAtPeriodEnd,
+  startCardUpdate,
+  startCheckout,
+} from "./service";
+
+const PlanSchema = z.enum(PLAN_IDS as [PlanId, ...PlanId[]]);
+
+function requireManager(role: string | null) {
+  if (role !== "owner" && role !== "admin") {
+    throw new ORPCError("FORBIDDEN", { message: "Bare eiere og administratorer kan endre betaling." });
+  }
+}
+
+const CheckoutResponse = z.object({ paymentId: z.string(), checkoutKey: z.string(), scriptUrl: z.string() });
+
+export const billingRouter = {
+  status: privateProcedure.handler(async ({ context }) => {
+    const [state, used] = await Promise.all([
+      getBillingState(context.organizationId),
+      conversationsThisMonth(context.organizationId),
+    ]);
+    return {
+      ...state,
+      conversationsThisMonth: used,
+      checkout: nexiConfigured() ? { checkoutKey: env.NEXI_CHECKOUT_KEY as string, scriptUrl: NEXI_CHECKOUT_JS } : null,
+      trialDays: TRIAL_DAYS,
+      plans: Object.values(PLANS).map((p) => ({ ...p, priceWithVat: planAmounts(p.id).gross })),
+    };
+  }),
+
+  /**
+   * Live lookup while typing the org number (shows the company name). Public
+   * register data only, so it also works before the organization exists.
+   */
+  lookupCompany: base
+    .input(z.object({ orgNumber: z.string().min(1).max(20) }))
+    .handler(async ({ input }) => lookupCompany(input.orgNumber)),
+
+  registerCompany: privateProcedure
+    .input(z.object({ orgNumber: z.string().min(9).max(20) }))
+    .handler(async ({ input, context }) => {
+      requireManager(context.role);
+      return registerCompany(context.organizationId, input.orgNumber);
+    }),
+
+  startCheckout: privateProcedure
+    .input(z.object({ plan: PlanSchema }))
+    .output(CheckoutResponse)
+    .handler(async ({ input, context }) => {
+      requireManager(context.role);
+      return startCheckout(context.organizationId, input.plan);
+    }),
+
+  startCardUpdate: privateProcedure.output(CheckoutResponse).handler(async ({ context }) => {
+    requireManager(context.role);
+    return startCardUpdate(context.organizationId);
+  }),
+
+  confirmCheckout: privateProcedure
+    .input(z.object({ paymentId: z.string().min(8).max(64) }))
+    .handler(async ({ input, context }) => confirmCheckout(context.organizationId, input.paymentId)),
+
+  changePlan: privateProcedure.input(z.object({ plan: PlanSchema })).handler(async ({ input, context }) => {
+    requireManager(context.role);
+    await changePlan(context.organizationId, input.plan);
+    return { ok: true };
+  }),
+
+  setCancel: privateProcedure.input(z.object({ cancel: z.boolean() })).handler(async ({ input, context }) => {
+    requireManager(context.role);
+    await setCancelAtPeriodEnd(context.organizationId, input.cancel);
+    return { ok: true };
+  }),
+
+  payments: privateProcedure.handler(async ({ context }) => listPayments(context.organizationId)),
+};

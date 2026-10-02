@@ -8,25 +8,27 @@ import {
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { DemoSwitch } from "@/components/demo-switch";
-import { useUsageQuery } from "@/features/billing/billing-queries";
+import { useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
+import {
+  billingKeys,
+  useBillingPayments,
+  useBillingStatus,
+  useUsageQuery,
+} from "@/features/billing/billing-queries";
+import { client } from "@/lib/api";
 import { authClient } from "@/lib/auth-client";
 
 /** Plans as sold on agenci.no/priser (kr per month, billed monthly). */
 const PLANS = [
-  { id: "gratis", name: "Gratis", price: 0, limit: 50, blurb: "For å prøve Agenci på din egen nettside." },
   { id: "starter", name: "Starter", price: 499, limit: 500, blurb: "For små bedrifter som vil slippe de samme spørsmålene." },
   { id: "pro", name: "Pro", price: 1499, limit: 2000, blurb: "For bedrifter med mye trafikk og et team." },
   { id: "business", name: "Business", price: 3999, limit: 10000, blurb: "Flere nettsider, flere agenter, alt på ett sted." },
 ] as const;
+type PlanId = (typeof PLANS)[number]["id"];
 
-/** No subscriptions are stored yet, so every organization is on the free plan. */
-const CURRENT = PLANS[0];
-const NEXT = PLANS[1];
 
-const WEB_URL =
-  (import.meta.env.VITE_WEB_URL as string | undefined)?.replace(/\/$/, "") ||
-  "https://www.agenci.no";
-const PRICING_URL = `${WEB_URL}/priser`;
 
 const cardClass =
   "rounded-[18px] border border-(--dash-edge)/80 bg-(--dash-surface) shadow-[0_1px_3px_rgb(5_6_7/0.06),0_14px_34px_-16px_rgb(5_6_7/0.18)] dark:border-white/5 dark:bg-(--card)";
@@ -204,23 +206,83 @@ function UsageChart({ days, limit }: { days: number[]; limit: number }) {
 
 /* ─── Page ──────────────────────────────────────────────────────────────── */
 
+const dateFmt = (iso: string | null | undefined) =>
+  iso ? new Date(iso).toLocaleDateString("nb-NO", { day: "numeric", month: "long", year: "numeric" }) : "";
+const daysLeft = (iso: string | null | undefined) =>
+  iso ? Math.max(0, Math.ceil((new Date(iso).getTime() - Date.now()) / 86_400_000)) : 0;
+const STATUS_LABEL: Record<string, string> = {
+  paid: "Betalt",
+  pending: "Venter",
+  failed: "Feilet",
+};
+
 export default function BillingView() {
   const { data: usage, isPending } = useUsageQuery();
   const { data: org } = authClient.useActiveOrganization();
-  const [bannerHidden, setBannerHidden] = useState(false);
+  const { data: billing } = useBillingStatus();
+  const { data: payments } = useBillingPayments();
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const [busy, setBusy] = useState<string | null>(null);
   const [query, setQuery] = useState("");
 
+  const planId = billing?.plan ?? "starter";
+  const plan = PLANS.find((p) => p.id === planId) ?? PLANS[0];
+  const limit = billing?.conversationLimit || plan.limit;
   const used = usage?.total ?? 0;
-  const share = used / CURRENT.limit;
+  const share = limit ? used / limit : 0;
   const trend = useMemo(() => {
     if (!usage || !usage.previousTotal) return null;
     return Math.round(((usage.total - usage.previousTotal) / usage.previousTotal) * 100);
   }, [usage]);
   const memberNames = (org?.members ?? []).map((m) => m.user?.name || m.user?.email || "?");
-  const now = new Date();
-  const renew = new Date(now.getFullYear(), now.getMonth() + 1, 1).toLocaleDateString("nb-NO", {
-    day: "numeric",
-    month: "long",
+  const status = billing?.status;
+  const subscribed = status === "active" || status === "past_due";
+  const trialLeft = daysLeft(billing?.trialEndsAt);
+
+  const refresh = async () => {
+    await queryClient.invalidateQueries({ queryKey: billingKeys.status });
+    await queryClient.invalidateQueries({ queryKey: billingKeys.payments });
+  };
+  /** Runs a billing action, with the server's message on failure. */
+  const act = async (key: string, fn: () => Promise<unknown>, done?: string) => {
+    setBusy(key);
+    try {
+      await fn();
+      if (done) toast.success(done);
+      await refresh();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Noe gikk galt.");
+    } finally {
+      setBusy(null);
+    }
+  };
+  const goToCheckout = (start: () => Promise<{ paymentId: string }>, key: string) =>
+    act(key, async () => {
+      const { paymentId } = await start();
+      await navigate({ to: "/betaling", search: { paymentId } });
+    });
+  const choose = (id: PlanId) =>
+    subscribed
+      ? act(`plan-${id}`, () => client.private.billing.changePlan({ plan: id }), "Planen byttes ved neste trekk.")
+      : goToCheckout(() => client.private.billing.startCheckout({ plan: id }), `plan-${id}`);
+
+  const headline =
+    status === "trialing"
+      ? `er i prøveperioden – ${trialLeft} ${trialLeft === 1 ? "dag" : "dager"} igjen (til ${dateFmt(billing?.trialEndsAt)}).`
+      : status === "active"
+        ? billing?.cancelAtPeriodEnd
+          ? `er på ${plan.name}, som avsluttes ${dateFmt(billing?.currentPeriodEnd)}.`
+          : `er på ${plan.name}. Neste trekk ${dateFmt(billing?.currentPeriodEnd)}.`
+        : status === "past_due"
+          ? `er på ${plan.name}, men siste betaling feilet.`
+          : status === "trial_ended" || status === "canceled"
+            ? "har ingen aktiv plan. Agentene svarer ikke kundene før dere velger en plan."
+            : "";
+
+  const shownPayments = (payments ?? []).filter((p) => {
+    const q = query.trim().toLowerCase();
+    return !q || p.plan.includes(q) || dateFmt(p.createdAt.toString()).toLowerCase().includes(q);
   });
 
   return (
@@ -231,35 +293,60 @@ export default function BillingView() {
             Plan og faktura
           </h1>
           <p className="mt-1.5 text-[13.5px] text-(--agenci-ink-2)">
-            {org ? <span className="text-(--agenci-ink)">{org.name}</span> : "Organisasjonen"} er på{" "}
-            <span className="text-(--agenci-ink)">{CURRENT.name}</span>. Kvoten nullstilles {renew}.
+            {org ? <span className="text-(--agenci-ink)">{org.name}</span> : "Organisasjonen"} {headline}
           </p>
         </div>
-        <div className="ml-auto">
+        <div className="ml-auto flex items-center gap-3">
+          {billing?.testMode ? (
+            <span className="rounded-full border border-[#ecd9a4] bg-[#fdf8e8] px-2.5 py-1 text-[11.5px] font-medium text-[#6b5413]">
+              Testmodus
+            </span>
+          ) : null}
           <DemoSwitch />
         </div>
       </header>
 
-      {/* Usage banner */}
-      {!bannerHidden ? (
-        <section className={cn(cardClass, "flex flex-wrap items-center gap-4 px-5 py-4")}>
-          <Ring value={share} />
+      {/* Action banner: trial ending, no plan, or a failed payment */}
+      {status === "past_due" ? (
+        <section className={cn(cardClass, "flex flex-wrap items-center gap-4 border-(--dash-bad)/40 px-5 py-4")}>
           <div className="min-w-0 flex-1">
-            <p className="text-[14px] font-medium text-(--agenci-ink)">
-              Du har brukt {isPending ? "…" : used} av {CURRENT.limit} samtaler denne måneden
-            </p>
+            <p className="text-[14px] font-medium text-(--agenci-ink)">Betalingen gikk ikke gjennom</p>
             <p className="mt-0.5 text-[13px] text-(--agenci-ink-2)">
-              Med {NEXT.name} får du {kr(NEXT.limit)} samtaler i måneden, uten Agenci-merket i chatten.
+              Oppdater kortet innen en uke, ellers stopper agentene å svare.
             </p>
           </div>
-          <span className="flex gap-2">
-            <button type="button" className={outlineBtn} onClick={() => setBannerHidden(true)}>
-              Skjul
-            </button>
-            <a href={PRICING_URL} target="_blank" rel="noreferrer" className={inkBtn}>
-              Oppgrader plan
-            </a>
-          </span>
+          <button
+            type="button"
+            className={inkBtn}
+            disabled={busy === "card"}
+            onClick={() => void goToCheckout(() => client.private.billing.startCardUpdate(), "card")}
+          >
+            Oppdater kort
+          </button>
+        </section>
+      ) : !subscribed && status ? (
+        <section className={cn(cardClass, "flex flex-wrap items-center gap-4 px-5 py-4")}>
+          <Ring value={status === "trialing" ? 1 - trialLeft / (billing?.trialDays ?? 30) : 1} />
+          <div className="min-w-0 flex-1">
+            <p className="text-[14px] font-medium text-(--agenci-ink)">
+              {status === "trialing"
+                ? `${trialLeft} ${trialLeft === 1 ? "dag" : "dager"} igjen av prøveperioden`
+                : "Prøveperioden er over"}
+            </p>
+            <p className="mt-0.5 text-[13px] text-(--agenci-ink-2)">
+              {status === "trialing"
+                ? "Velg en plan når du vil. Du betaler først når du velger, og ingenting trekkes automatisk."
+                : "Velg en plan, så svarer agentene kundene igjen med en gang."}
+            </p>
+          </div>
+          <button
+            type="button"
+            className={inkBtn}
+            disabled={busy === "plan-starter"}
+            onClick={() => void choose("starter")}
+          >
+            Velg Starter
+          </button>
         </section>
       ) : null}
 
@@ -269,22 +356,39 @@ export default function BillingView() {
           <div className="flex items-start gap-3 p-5">
             <div className="min-w-0 flex-1">
               <p className="flex items-center gap-2 text-[15px] font-semibold text-(--agenci-ink)">
-                {CURRENT.name}
-                <span className="inline-flex items-center gap-1 rounded-full border border-(--agenci-line) px-2 py-px text-[11.5px] font-medium text-(--dash-good)">
-                  <span className="size-1.5 rounded-full bg-[#5FA06F]" />
-                  Aktiv
-                </span>
+                {status === "trialing" ? `Prøveperiode · ${plan.name}` : subscribed ? plan.name : "Ingen plan"}
+                {status === "trialing" || status === "active" ? (
+                  <span className="inline-flex items-center gap-1 rounded-full border border-(--agenci-line) px-2 py-px text-[11.5px] font-medium text-(--dash-good)">
+                    <span className="size-1.5 rounded-full bg-[#5FA06F]" />
+                    {billing?.cancelAtPeriodEnd ? "Avsluttes" : "Aktiv"}
+                  </span>
+                ) : null}
               </p>
-              <p className="mt-1 text-[13px] text-(--agenci-ink-2)">{CURRENT.blurb}</p>
+              <p className="mt-1 text-[13px] text-(--agenci-ink-2)">
+                {billing?.company ? `${billing.company.name} · org.nr. ${billing.company.orgNumber}` : plan.blurb}
+              </p>
             </div>
-            <a href={PRICING_URL} target="_blank" rel="noreferrer" className={outlineBtn}>
-              Bytt plan
-            </a>
+            {subscribed ? (
+              <button
+                type="button"
+                className={outlineBtn}
+                disabled={busy === "cancel"}
+                onClick={() =>
+                  void act(
+                    "cancel",
+                    () => client.private.billing.setCancel({ cancel: !billing?.cancelAtPeriodEnd }),
+                    billing?.cancelAtPeriodEnd ? "Abonnementet fortsetter." : "Abonnementet avsluttes ved periodens slutt.",
+                  )
+                }
+              >
+                {billing?.cancelAtPeriodEnd ? "Fortsett abonnementet" : "Si opp"}
+              </button>
+            ) : null}
           </div>
           <div className="mt-auto flex flex-wrap items-center gap-3 border-t border-(--agenci-line) px-5 py-4 dark:border-white/5">
             <p className="text-(--agenci-ink)">
               <span className="[font-family:var(--font-agenci-title)] text-[30px] leading-none font-medium tracking-[-0.03em]">
-                {kr(CURRENT.price)} kr
+                {status === "trialing" ? "0" : kr(plan.price)} kr
               </span>
               <span className="ml-1 text-[13px] text-(--agenci-ink-3)">/mnd</span>
             </p>
@@ -299,20 +403,31 @@ export default function BillingView() {
           <div className="flex items-start gap-3 p-5">
             <div className="min-w-0 flex-1">
               <p className="text-[15px] font-semibold text-(--agenci-ink)">Betalingsmåte</p>
-              <p className="mt-1 text-[13px] text-(--agenci-ink-2)">Kortet trekkes automatisk hver måned.</p>
+              <p className="mt-1 text-[13px] text-(--agenci-ink-2)">Kortet trekkes automatisk hver måned via Nexi.</p>
             </div>
-            <a href={PRICING_URL} target="_blank" rel="noreferrer" className={outlineBtn}>
-              Legg til kort
-            </a>
+            {subscribed ? (
+              <button
+                type="button"
+                className={outlineBtn}
+                disabled={busy === "card"}
+                onClick={() => void goToCheckout(() => client.private.billing.startCardUpdate(), "card")}
+              >
+                Oppdater kort
+              </button>
+            ) : null}
           </div>
           <div className="mt-auto flex items-center gap-3 border-t border-(--agenci-line) px-5 py-4 dark:border-white/5">
             <span className="flex size-10 items-center justify-center rounded-[10px] border border-dashed border-(--chart-muted-dot) text-(--agenci-ink-3)">
               <CreditCardIcon className="size-4.5" strokeWidth={1.6} />
             </span>
             <div className="min-w-0">
-              <p className="text-[13.5px] font-medium text-(--agenci-ink)">Ingen kort lagt inn</p>
+              <p className="text-[13.5px] font-medium text-(--agenci-ink)">
+                {subscribed ? "Kort registrert hos Nexi" : "Ingen kort lagt inn"}
+              </p>
               <p className="text-[12.5px] text-(--agenci-ink-3)">
-                Gratisplanen trenger ikke kort. Du legger det inn når du oppgraderer.
+                {subscribed
+                  ? "Vi lagrer aldri kortnummeret. Visa, Mastercard, Amex, Apple Pay og Google Pay."
+                  : "Prøveperioden trenger ikke kort. Du legger det inn når du velger plan."}
               </p>
             </div>
           </div>
@@ -337,7 +452,7 @@ export default function BillingView() {
               ) : null}
             </p>
             <p className="mt-1 text-[13px] text-(--agenci-ink-2)">
-              Du har brukt {Math.round(share * 100)} % av samtalene i planen denne måneden.
+              Du har brukt {isPending ? "…" : Math.round(share * 100)} % av samtalene i planen denne måneden.
             </p>
           </div>
           <span className="flex items-center gap-4 text-[12px] text-(--agenci-ink-3)">
@@ -353,17 +468,17 @@ export default function BillingView() {
           <span className="[font-family:var(--font-agenci-title)] text-[30px] leading-none font-medium tracking-[-0.03em] tabular-nums">
             {used}
           </span>
-          <span className="ml-1.5 text-[13px] text-(--agenci-ink-3)">av {CURRENT.limit}</span>
+          <span className="ml-1.5 text-[13px] text-(--agenci-ink-3)">av {kr(limit)}</span>
         </p>
         <div className="mt-4">
-          {usage ? <UsageChart days={usage.days} limit={CURRENT.limit} /> : <div className="h-[206px] animate-pulse rounded-[12px] bg-(--dash-subtle)" />}
+          {usage ? <UsageChart days={usage.days} limit={limit} /> : <div className="h-[206px] animate-pulse rounded-[12px] bg-(--dash-subtle)" />}
         </div>
       </section>
 
       {/* Invoices */}
       <section className={cn(cardClass, "overflow-hidden")}>
         <div className="flex flex-wrap items-center gap-3 px-5 pt-5 pb-4">
-          <p className="flex-1 text-[15px] font-semibold text-(--agenci-ink)">Fakturaer</p>
+          <p className="flex-1 text-[15px] font-semibold text-(--agenci-ink)">Betalinger</p>
           <label className="flex h-9 w-60 items-center gap-2 rounded-[10px] border border-(--agenci-line) bg-(--dash-surface) px-3 dark:bg-transparent">
             <SearchIcon className="size-4 text-(--agenci-ink-3)" strokeWidth={1.6} />
             <input
@@ -378,41 +493,54 @@ export default function BillingView() {
           <table className="w-full min-w-[640px] border-collapse">
             <thead className="bg-(--dash-subtle-2) dark:bg-white/5">
               <tr className="text-left text-[12.5px] text-(--agenci-ink-2)">
-                <th className="h-10 px-5 font-medium">Faktura</th>
-                <th className="h-10 px-3 font-medium">Dato</th>
+                <th className="h-10 px-5 font-medium">Dato</th>
+                <th className="h-10 px-3 font-medium">Periode</th>
                 <th className="h-10 px-3 font-medium">Plan</th>
-                <th className="h-10 px-3 font-medium">Beløp</th>
-                <th className="h-10 px-5 font-medium text-right">
-                  <span className="sr-only">Last ned</span>
-                </th>
+                <th className="h-10 px-3 font-medium">Beløp (inkl. mva)</th>
+                <th className="h-10 px-5 font-medium text-right">Status</th>
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td colSpan={5} className="px-5 py-14 text-center">
-                  <span className="mx-auto mb-3 flex size-10 items-center justify-center rounded-full bg-(--dash-subtle) text-(--agenci-ink-2) dark:bg-white/10">
-                    <FileTextIcon className="size-4.5" strokeWidth={1.6} />
-                  </span>
-                  <p className="text-[14px] font-medium text-(--agenci-ink)">Ingen fakturaer ennå</p>
-                  <p className="mt-1 text-[13px] text-(--agenci-ink-3)">
-                    Du er på gratisplanen. Fakturaene dukker opp her når du oppgraderer.
-                  </p>
-                  <a href={PRICING_URL} target="_blank" rel="noreferrer" className={cn(outlineBtn, "mt-4")}>
-                    Se planene <ArrowUpRightIcon className="size-3.5" strokeWidth={1.8} />
-                  </a>
-                </td>
-              </tr>
+              {shownPayments.length ? (
+                shownPayments.map((p) => (
+                  <tr key={p.id} className="border-t border-(--agenci-line) text-[13.5px] text-(--agenci-ink) dark:border-white/5">
+                    <td className="h-12 px-5">{dateFmt(p.createdAt.toString())}</td>
+                    <td className="px-3 text-(--agenci-ink-2)">
+                      {new Date(p.periodStart).toLocaleDateString("nb-NO", { day: "numeric", month: "short" })} –{" "}
+                      {new Date(p.periodEnd).toLocaleDateString("nb-NO", { day: "numeric", month: "short" })}
+                    </td>
+                    <td className="px-3">{PLANS.find((x) => x.id === p.plan)?.name ?? p.plan}</td>
+                    <td className="px-3 tabular-nums">{kr(p.amount / 100)} kr</td>
+                    <td className={cn("px-5 text-right", p.status === "failed" ? "text-(--dash-bad)" : "text-(--agenci-ink-2)")}>
+                      {STATUS_LABEL[p.status] ?? p.status}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={5} className="px-5 py-14 text-center">
+                    <span className="mx-auto mb-3 flex size-10 items-center justify-center rounded-full bg-(--dash-subtle) text-(--agenci-ink-2) dark:bg-white/10">
+                      <FileTextIcon className="size-4.5" strokeWidth={1.6} />
+                    </span>
+                    <p className="text-[14px] font-medium text-(--agenci-ink)">Ingen betalinger ennå</p>
+                    <p className="mt-1 text-[13px] text-(--agenci-ink-3)">
+                      Betalingene dukker opp her når dere har valgt en plan.
+                    </p>
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
       </section>
 
-      {/* Plan comparison */}
+      {/* Plans */}
       <section className={cn(cardClass, "p-5")}>
         <p className="text-[15px] font-semibold text-(--agenci-ink)">Planer</p>
-        <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="mt-4 grid gap-3 sm:grid-cols-3">
           {PLANS.map((p) => {
-            const current = p.id === CURRENT.id;
+            const current = subscribed && p.id === planId;
+            const next = billing?.nextPlan === p.id;
             return (
               <div
                 key={p.id}
@@ -433,10 +561,17 @@ export default function BillingView() {
                 <p className="mt-2 flex-1 text-[12.5px] text-(--agenci-ink-3)">{p.blurb}</p>
                 {current ? (
                   <span className="mt-3 text-[12.5px] font-medium text-(--agenci-ink-2)">Din plan</span>
+                ) : next ? (
+                  <span className="mt-3 text-[12.5px] font-medium text-(--agenci-ink-2)">Fra neste trekk</span>
                 ) : (
-                  <a href={PRICING_URL} target="_blank" rel="noreferrer" className="mt-3 inline-flex items-center gap-1 text-[12.5px] font-medium text-(--agenci-ink) hover:underline">
-                    Velg {p.name} <ArrowUpRightIcon className="size-3.5" />
-                  </a>
+                  <button
+                    type="button"
+                    disabled={busy === `plan-${p.id}`}
+                    onClick={() => void choose(p.id)}
+                    className="mt-3 inline-flex items-center gap-1 text-left text-[12.5px] font-medium text-(--agenci-ink) hover:underline disabled:opacity-50"
+                  >
+                    {subscribed ? `Bytt til ${p.name}` : `Velg ${p.name}`} <ArrowUpRightIcon className="size-3.5" />
+                  </button>
                 )}
               </div>
             );
@@ -444,7 +579,7 @@ export default function BillingView() {
         </div>
       </section>
       <p className="px-1 pb-2 text-[12px] text-(--agenci-ink-3)">
-        Priser eks. mva. Ingen bindingstid.
+        Priser eks. mva. Ingen bindingstid. Oppsigelse gjelder ut perioden som er betalt.
       </p>
     </div>
   );

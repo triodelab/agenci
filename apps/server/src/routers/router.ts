@@ -10,6 +10,7 @@ import { widgetCustomizationRouter } from "@/modules/widget/customization-router
 import { chatRouter } from "@/modules/chat/router";
 import { conversationsRouter } from "@/modules/conversations/router";
 import { widgetPublicRouter } from "@/modules/widget/router";
+import { billingRouter } from "@/modules/billing/router";
 
 const health = base
   .output(z.object({ ok: z.literal(true) }))
@@ -44,6 +45,7 @@ export const privateRouter = {
   conversations: conversationsRouter,
   knowledge: knowledgeRouter,
   widgetCustomization: widgetCustomizationRouter,
+  billing: billingRouter,
 };
 
 export const appRouter = {

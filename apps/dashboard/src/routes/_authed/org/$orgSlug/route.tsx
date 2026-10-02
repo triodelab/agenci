@@ -1,5 +1,7 @@
 import { createFileRoute, Outlet, redirect, useMatch } from "@tanstack/react-router";
 import AppSidebar from "@/components/app-sidebar";
+import { useBillingStatus } from "@/features/billing/billing-queries";
+import RegisterCompanyView from "@/features/billing/ui/views/register-company-view";
 import { authClient } from "@/lib/auth-client";
 
 /** Slug already made active in this tab (skips the call on every navigation). */
@@ -29,6 +31,15 @@ function RouteComponent() {
     from: "/_authed/org/$orgSlug/onboarding",
     shouldThrow: false,
   });
+  const billing = useBillingStatus();
+  const { data: session } = authClient.useSession();
+  const { data: org } = authClient.useActiveOrganization();
+  // No org number yet (organizations made before it was required): the
+  // company is registered first. The server enforces this too.
+  if (billing.data?.status === "needs_registration") {
+    const role = org?.members.find((m) => m.userId === session?.user.id)?.role;
+    return <RegisterCompanyView canEdit={role === "owner" || role === "admin"} />;
+  }
   if (onboarding) return <Outlet />;
   return (
     <AppSidebar>
