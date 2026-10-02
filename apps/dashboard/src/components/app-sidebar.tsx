@@ -42,6 +42,7 @@ import {
   LogOutIcon,
   MonitorIcon,
   MoonIcon,
+  ShieldCheckIcon,
   ShieldIcon,
   SunIcon,
   SlidersHorizontalIcon,
@@ -58,6 +59,7 @@ import {
 } from "lucide-react";
 import { useAgentQuery } from "@/features/agents/queries/agents-queries";
 import { authClient } from "@/lib/auth-client";
+import { useAdminAccess } from "@/features/admin/admin-queries";
 import { getSidebarStart } from "@/lib/preferences";
 import { useBillingStatus } from "@/features/billing/billing-queries";
 import { useTheme } from "@/lib/theme";
@@ -431,6 +433,7 @@ function UserMenu({ orgSlug, agentId }: { orgSlug: string; agentId?: string }) {
   const { data } = authClient.useSession();
   const { data: org } = authClient.useActiveOrganization();
   const { theme, setTheme } = useTheme();
+  const adminAccess = useAdminAccess();
   const user = data?.user;
   if (!user) return null;
 
@@ -515,6 +518,16 @@ function UserMenu({ orgSlug, agentId }: { orgSlug: string; agentId?: string }) {
           <CreditCardIcon className={iconClass} strokeWidth={1.6} />
           Plan og faktura
         </DropdownMenuItem>
+        {adminAccess.data?.admin ? (
+          <>
+            <DropdownMenuSeparator className="my-1.5" />
+            <DropdownMenuItem className={itemClass} onSelect={() => go("/admin")}>
+              <ShieldCheckIcon className={iconClass} strokeWidth={1.6} />
+              Admin
+              <span className="ml-auto rounded-full bg-(--dash-subtle) px-2 py-0.5 text-[11px] text-(--agenci-ink-3)">Kun utviklere</span>
+            </DropdownMenuItem>
+          </>
+        ) : null}
         <DropdownMenuSeparator className="my-1.5" />
         <div className="flex items-center justify-between gap-3 px-2.5 py-1.5">
           <span className="text-[13.5px] text-(--agenci-ink)">Utseende</span>
