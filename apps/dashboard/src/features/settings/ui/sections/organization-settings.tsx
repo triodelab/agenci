@@ -16,6 +16,18 @@ import {
   toSquareDataUrl,
 } from "../settings-ui";
 
+/** While typing: a trailing "-" is kept so "mitt-firma" can be typed. */
+const slugifyTyping = (s: string) =>
+  s
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/æ/g, "ae")
+    .replace(/ø/g, "o")
+    .replace(/å/g, "a")
+    .replace(/[^a-z0-9-]+/g, "-")
+    .replace(/^-+/, "")
+    .slice(0, 48);
+
 const slugify = (s: string) =>
   s
     .toLowerCase()
@@ -35,7 +47,8 @@ export function OrganizationSettings() {
   const fileRef = useRef<HTMLInputElement>(null);
 
   const [name, setName] = useState("");
-  const [slug, setSlug] = useState("");
+  const [typedSlug, setSlug] = useState("");
+  const slug = slugify(typedSlug);
   const [logo, setLogo] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [slugState, setSlugState] = useState<"idle" | "checking" | "free" | "taken">("idle");
@@ -43,16 +56,19 @@ export function OrganizationSettings() {
   const [confirmText, setConfirmText] = useState("");
   const [busy, setBusy] = useState<"leave" | "delete" | null>(null);
 
+  // Fill the form from what is saved — only when that changes. The address
+  // check refetches the organization, which must not wipe what is typed.
   useEffect(() => {
-    if (org) {
-      setName(org.name);
-      setSlug(org.slug);
-      setLogo(org.logo ?? null);
-    }
-  }, [org]);
+    if (!org) return;
+    setName(org.name);
+    setSlug(org.slug);
+    setLogo(org.logo ?? null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [org?.id, org?.name, org?.slug, org?.logo]);
 
   // Check that a new address is free before it can be saved.
   useEffect(() => {
+    const slug = slugify(typedSlug);
     if (!org || !slug || slug === org.slug) {
       setSlugState("idle");
       return;
@@ -63,7 +79,7 @@ export function OrganizationSettings() {
       setSlugState(!error && data?.status ? "free" : "taken");
     }, 400);
     return () => window.clearTimeout(t);
-  }, [slug, org]);
+  }, [typedSlug, org?.slug]);
 
   if (!org) return null;
 
@@ -174,8 +190,8 @@ export function OrganizationSettings() {
                 …/org/
               </span>
               <input
-                value={slug}
-                onChange={(e) => setSlug(slugify(e.currentTarget.value))}
+                value={typedSlug}
+                onChange={(e) => setSlug(slugifyTyping(e.currentTarget.value))}
                 className="h-11 min-w-0 flex-1 bg-transparent px-3 text-[14px] text-(--agenci-ink) outline-none"
               />
               <span className="pr-3">
