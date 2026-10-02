@@ -2,19 +2,70 @@
  * Admin (Agenci's own developers only): the whole platform at a glance —
  * every organization, user, agent and payment — and a few safe fixes.
  */
+import { auth } from "@agenci/auth";
 import prisma from "@agenci/db";
+import { env } from "@agenci/env/server";
 import { ORPCError } from "@orpc/server";
-import { getBillingState, isDeveloperEmail } from "@/modules/billing/service";
+import { getBillingState, isDeveloperEmail, isTrustedDeveloper } from "@/modules/billing/service";
 import { PLANS, isPlanId } from "@/modules/billing/plans";
 
 const DAY = 86_400_000;
 
+type AdminCandidate = { email?: string | null; emailVerified?: boolean | null; twoFactorEnabled?: boolean | null };
+
 /**
- * Developer e-mail AND manually verified. E-mail alone is not enough:
- * sign-up does not verify addresses, so anyone could register one of ours.
+ * Developer e-mail, verified by us, AND two-factor login on. A stolen
+ * password alone must never open the admin area.
  */
-export function isAdminUser(user: { email?: string | null; emailVerified?: boolean | null }) {
-  return Boolean(user.emailVerified) && isDeveloperEmail(user.email);
+export function isAdminUser(user: AdminCandidate) {
+  return isTrustedDeveloper(user) && user.twoFactorEnabled === true;
+}
+
+/** One of us, but 2FA not switched on yet (the UI says how to fix it). */
+export function needsTwoFactor(user: AdminCandidate) {
+  return isTrustedDeveloper(user) && user.twoFactorEnabled !== true;
+}
+
+/* ── Audit log ──────────────────────────────────────────────────────── */
+
+export type Actor = { userId: string; email: string };
+
+/** Records an admin action. Never throws: logging must not break the action. */
+export async function audit(actor: Actor, action: string, target?: string | null, details: Record<string, unknown> = {}) {
+  try {
+    await prisma.adminAuditLog.create({
+      data: { actorUserId: actor.userId, actorEmail: actor.email, action, target: target ?? null, details: details as object },
+    });
+  } catch (error) {
+    console.error("[admin audit]", action, error);
+  }
+}
+
+export async function listAudit(limit = 200) {
+  const rows = await prisma.adminAuditLog.findMany({ orderBy: { createdAt: "desc" }, take: limit });
+  return rows.map((r) => ({
+    id: r.id,
+    actorEmail: r.actorEmail,
+    action: r.action,
+    target: r.target,
+    details: JSON.stringify(r.details),
+    createdAt: r.createdAt,
+  }));
+}
+
+/** Sends the customer the normal «nytt passord» e-mail. We never see or set passwords. */
+export async function sendPasswordReset(userId: string) {
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: { email: true } });
+  if (!user) throw new ORPCError("NOT_FOUND", { message: "Brukeren finnes ikke." });
+  const base = (env.DASHBOARD_ORIGIN ?? env.CORS_ORIGIN).replace(/\/$/, "");
+  await auth.api.requestPasswordReset({ body: { email: user.email, redirectTo: `${base}/nytt-passord` } });
+  return { email: user.email };
+}
+
+/** Signs a user out everywhere (e.g. a lost laptop). */
+export async function revokeSessions(userId: string) {
+  const { count } = await prisma.session.deleteMany({ where: { userId } });
+  return { revoked: count };
 }
 
 export async function overview(now = new Date()) {
@@ -139,6 +190,7 @@ export async function listUsers() {
       name: true,
       email: true,
       emailVerified: true,
+      twoFactorEnabled: true,
       createdAt: true,
       members: { select: { role: true, organization: { select: { id: true, name: true } } } },
       sessions: { orderBy: { updatedAt: "desc" }, take: 1, select: { updatedAt: true } },

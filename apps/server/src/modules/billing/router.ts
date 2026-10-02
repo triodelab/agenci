@@ -55,7 +55,7 @@ export const billingRouter = {
       ...state,
       conversationsThisMonth: used,
       /** False while Nexi is in test mode, except for the developers. */
-      canPay: canPay(context.user.email),
+      canPay: canPay(context.user),
       checkout: nexiConfigured() ? { checkoutKey: env.NEXI_CHECKOUT_KEY as string, scriptUrl: NEXI_CHECKOUT_JS } : null,
       trialDays: TRIAL_DAYS,
       plans: Object.values(PLANS).map((p) => ({
@@ -89,12 +89,12 @@ export const billingRouter = {
     .output(CheckoutResponse)
     .handler(async ({ input, context }) => {
       await requireManager(context);
-      return startCheckout(context.organizationId, input.plan, input.interval, context.user.email);
+      return startCheckout(context.organizationId, input.plan, input.interval, context.user);
     }),
 
   startCardUpdate: privateProcedure.output(CheckoutResponse).handler(async ({ context }) => {
     await requireManager(context);
-    return startCardUpdate(context.organizationId, context.user.email);
+    return startCardUpdate(context.organizationId, context.user);
   }),
 
   confirmCheckout: privateProcedure

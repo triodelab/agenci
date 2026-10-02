@@ -13,7 +13,9 @@ import { betterAuth } from "better-auth";
 import { APIError } from "better-auth/api";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { organization } from "better-auth/plugins/organization";
+import { twoFactor } from "better-auth/plugins/two-factor";
 import { sendInvitationViaResend } from "./invitation-email";
+import { sendPasswordResetViaResend } from "./password-reset-email";
 import { ac, admin, member, owner } from "./permissions";
 
 /**
@@ -50,6 +52,28 @@ export function createAuth() {
 
     emailAndPassword: {
       enabled: true,
+      /**
+       * «Glemt passord»: e-mails a one-time link (1 hour). The link goes via
+       * /api/auth/reset-password/:token, which sends the user on to the
+       * dashboard's /nytt-passord page. Every other session is signed out.
+       */
+      resetPasswordTokenExpiresIn: 60 * 60,
+      revokeSessionsOnPasswordReset: true,
+      async sendResetPassword({ user, url }) {
+        if (!env.RESEND_API_KEY) {
+          // Only print the link locally; in production it would land in logs.
+          if (isProd) console.warn("[better-auth] password reset requested, but RESEND_API_KEY is not set");
+          else console.info("[better-auth] password reset (no RESEND_API_KEY, not e-mailed)", { email: user.email, url });
+          return;
+        }
+        await sendPasswordResetViaResend({
+          apiKey: env.RESEND_API_KEY,
+          from: env.RESEND_FROM_EMAIL,
+          to: user.email,
+          name: user.name,
+          link: url,
+        });
+      },
     },
 
     /**
@@ -106,6 +130,8 @@ export function createAuth() {
     },
 
     plugins: [
+      // Two-step login with an authenticator app. Required for the admin area.
+      twoFactor({ issuer: "Agenci" }),
       organization({
         ac,
         roles: {

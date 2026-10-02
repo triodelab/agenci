@@ -3,6 +3,8 @@ model User {
   name          String
   email         String
   emailVerified Boolean      @default(false)
+  /// Two-factor login on (Better Auth twoFactor plugin). Required for admin.
+  twoFactorEnabled Boolean?  @default(false)
   image         String?
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
@@ -11,6 +13,7 @@ model User {
   teammembers   TeamMember[]
   members       Member[]
   invitations   Invitation[]
+  twoFactors    TwoFactor[]
 
   @@unique([email])
   @@map("user")
@@ -150,4 +153,34 @@ model Invitation {
   @@index([organizationId])
   @@index([email])
   @@map("invitation")
+}
+
+/// TOTP secret + backup codes (encrypted by Better Auth).
+model TwoFactor {
+  id                      String    @id
+  secret                  String
+  backupCodes             String
+  userId                  String
+  user                    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  verified                Boolean?  @default(true)
+  failedVerificationCount Int?      @default(0)
+  lockedUntil             DateTime?
+
+  @@index([secret])
+  @@index([userId])
+  @@map("twoFactor")
+}
+
+/// Everything done in the admin area: who, what, on whom, when.
+model AdminAuditLog {
+  id          String   @id @default(cuid())
+  actorUserId String
+  actorEmail  String
+  action      String
+  target      String?
+  details     Json     @default("{}")
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt])
+  @@map("admin_audit_log")
 }

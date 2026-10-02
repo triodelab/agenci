@@ -62,6 +62,8 @@ export const ModelName = {
   TeamMember: 'TeamMember',
   Member: 'Member',
   Invitation: 'Invitation',
+  TwoFactor: 'TwoFactor',
+  AdminAuditLog: 'AdminAuditLog',
   Subscription: 'Subscription',
   BillingPayment: 'BillingPayment',
   UsageMonthly: 'UsageMonthly',
@@ -133,6 +135,7 @@ export const UserScalarFieldEnum = {
   name: 'name',
   email: 'email',
   emailVerified: 'emailVerified',
+  twoFactorEnabled: 'twoFactorEnabled',
   image: 'image',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -248,6 +251,32 @@ export const InvitationScalarFieldEnum = {
 } as const
 
 export type InvitationScalarFieldEnum = (typeof InvitationScalarFieldEnum)[keyof typeof InvitationScalarFieldEnum]
+
+
+export const TwoFactorScalarFieldEnum = {
+  id: 'id',
+  secret: 'secret',
+  backupCodes: 'backupCodes',
+  userId: 'userId',
+  verified: 'verified',
+  failedVerificationCount: 'failedVerificationCount',
+  lockedUntil: 'lockedUntil'
+} as const
+
+export type TwoFactorScalarFieldEnum = (typeof TwoFactorScalarFieldEnum)[keyof typeof TwoFactorScalarFieldEnum]
+
+
+export const AdminAuditLogScalarFieldEnum = {
+  id: 'id',
+  actorUserId: 'actorUserId',
+  actorEmail: 'actorEmail',
+  action: 'action',
+  target: 'target',
+  details: 'details',
+  createdAt: 'createdAt'
+} as const
+
+export type AdminAuditLogScalarFieldEnum = (typeof AdminAuditLogScalarFieldEnum)[keyof typeof AdminAuditLogScalarFieldEnum]
 
 
 export const SubscriptionScalarFieldEnum = {

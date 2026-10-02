@@ -10,7 +10,10 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthedRouteImport } from './routes/_authed'
+import { Route as GlemtPassordRouteImport } from './routes/glemt-passord'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as NyttPassordRouteImport } from './routes/nytt-passord'
+import { Route as ToTrinnRouteImport } from './routes/to-trinn'
 import { Route as AuthedIndexRouteImport } from './routes/_authed/index'
 import { Route as AuthedAdminRouteImport } from './routes/_authed/admin'
 import { Route as AuthedBetalingRouteImport } from './routes/_authed/betaling'
@@ -45,9 +48,24 @@ const AuthedRoute = AuthedRouteImport.update({
   id: '/_authed',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GlemtPassordRoute = GlemtPassordRouteImport.update({
+  id: '/glemt-passord',
+  path: '/glemt-passord',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NyttPassordRoute = NyttPassordRouteImport.update({
+  id: '/nytt-passord',
+  path: '/nytt-passord',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToTrinnRoute = ToTrinnRouteImport.update({
+  id: '/to-trinn',
+  path: '/to-trinn',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthedIndexRoute = AuthedIndexRouteImport.update({
@@ -216,7 +234,10 @@ const AuthedOrgOrgSlugAgentsAgentIdSettingsSectionRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthedIndexRoute
+  '/glemt-passord': typeof GlemtPassordRoute
   '/login': typeof LoginRoute
+  '/nytt-passord': typeof NyttPassordRoute
+  '/to-trinn': typeof ToTrinnRoute
   '/admin': typeof AuthedAdminRoute
   '/betaling': typeof AuthedBetalingRoute
   '/accept-invitation/$invitationId': typeof AcceptInvitationInvitationIdRoute
@@ -247,7 +268,10 @@ export interface FileRoutesByFullPath {
   '/org/$orgSlug/agents/$agentId/settings/': typeof AuthedOrgOrgSlugAgentsAgentIdSettingsIndexRoute
 }
 export interface FileRoutesByTo {
+  '/glemt-passord': typeof GlemtPassordRoute
   '/login': typeof LoginRoute
+  '/nytt-passord': typeof NyttPassordRoute
+  '/to-trinn': typeof ToTrinnRoute
   '/admin': typeof AuthedAdminRoute
   '/betaling': typeof AuthedBetalingRoute
   '/accept-invitation/$invitationId': typeof AcceptInvitationInvitationIdRoute
@@ -277,7 +301,10 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authed': typeof AuthedRouteWithChildren
+  '/glemt-passord': typeof GlemtPassordRoute
   '/login': typeof LoginRoute
+  '/nytt-passord': typeof NyttPassordRoute
+  '/to-trinn': typeof ToTrinnRoute
   '/_authed/admin': typeof AuthedAdminRoute
   '/_authed/betaling': typeof AuthedBetalingRoute
   '/accept-invitation/$invitationId': typeof AcceptInvitationInvitationIdRoute
@@ -312,7 +339,10 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/glemt-passord'
     | '/login'
+    | '/nytt-passord'
+    | '/to-trinn'
     | '/admin'
     | '/betaling'
     | '/accept-invitation/$invitationId'
@@ -343,7 +373,10 @@ export interface FileRouteTypes {
     | '/org/$orgSlug/agents/$agentId/settings/'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/glemt-passord'
     | '/login'
+    | '/nytt-passord'
+    | '/to-trinn'
     | '/admin'
     | '/betaling'
     | '/accept-invitation/$invitationId'
@@ -372,7 +405,10 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/_authed'
+    | '/glemt-passord'
     | '/login'
+    | '/nytt-passord'
+    | '/to-trinn'
     | '/_authed/admin'
     | '/_authed/betaling'
     | '/accept-invitation/$invitationId'
@@ -406,7 +442,10 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   AuthedRoute: typeof AuthedRouteWithChildren
+  GlemtPassordRoute: typeof GlemtPassordRoute
   LoginRoute: typeof LoginRoute
+  NyttPassordRoute: typeof NyttPassordRoute
+  ToTrinnRoute: typeof ToTrinnRoute
   AcceptInvitationInvitationIdRoute: typeof AcceptInvitationInvitationIdRoute
 }
 
@@ -419,11 +458,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/glemt-passord': {
+      id: '/glemt-passord'
+      path: '/glemt-passord'
+      fullPath: '/glemt-passord'
+      preLoaderRoute: typeof GlemtPassordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/nytt-passord': {
+      id: '/nytt-passord'
+      path: '/nytt-passord'
+      fullPath: '/nytt-passord'
+      preLoaderRoute: typeof NyttPassordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/to-trinn': {
+      id: '/to-trinn'
+      path: '/to-trinn'
+      fullPath: '/to-trinn'
+      preLoaderRoute: typeof ToTrinnRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authed/': {
@@ -758,7 +818,10 @@ const AuthedRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   AuthedRoute: AuthedRouteWithChildren,
+  GlemtPassordRoute: GlemtPassordRoute,
   LoginRoute: LoginRoute,
+  NyttPassordRoute: NyttPassordRoute,
+  ToTrinnRoute: ToTrinnRoute,
   AcceptInvitationInvitationIdRoute: AcceptInvitationInvitationIdRoute,
 }
 export const routeTree = rootRouteImport

@@ -74,20 +74,38 @@ export function osloPeriod(now = new Date()) {
   return `${p.find((x) => x.type === "year")?.value}-${p.find((x) => x.type === "month")?.value}`;
 }
 
-/** The team building Agenci (DEV_ACCESS_EMAILS). */
+/** A signed-in user as far as access checks are concerned. */
+export type Person = { email?: string | null; emailVerified?: boolean | null };
+
+const inList = (list: string, email: string | null | undefined) =>
+  Boolean(email) &&
+  list
+    .split(",")
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean)
+    .includes((email as string).trim().toLowerCase());
+
+/** On the team's list (DEV_ACCESS_EMAILS). Says nothing about who owns the account. */
 export function isDeveloperEmail(email: string | null | undefined) {
-  if (!email) return false;
-  const list = env.DEV_ACCESS_EMAILS.split(",").map((e) => e.trim().toLowerCase()).filter(Boolean);
-  return list.includes(email.trim().toLowerCase());
+  return inList(env.DEV_ACCESS_EMAILS, email);
 }
 
-/** An organization with one of the developers as a member: never billed. */
+/**
+ * One of the team, for real: on the list AND verified by us. Sign-up does not
+ * verify e-mail addresses, so anyone could register one of ours — the list
+ * alone must never grant anything.
+ */
+export function isTrustedDeveloper(person: Person) {
+  return person.emailVerified === true && isDeveloperEmail(person.email);
+}
+
+/** An organization with one of the (verified) developers as a member: never billed. */
 export async function isDeveloperOrganization(organizationId: string) {
   const members = await prisma.member.findMany({
     where: { organizationId },
-    select: { user: { select: { email: true } } },
+    select: { user: { select: { email: true, emailVerified: true } } },
   });
-  return members.some((m) => isDeveloperEmail(m.user.email));
+  return members.some((m) => isTrustedDeveloper(m.user));
 }
 
 export async function getBillingState(organizationId: string, now = new Date()): Promise<BillingState> {
@@ -194,19 +212,17 @@ function requireNexi() {
  * Who may open the payment page: anyone once Nexi is live; while it is in
  * test mode only the developers (test cards would otherwise unlock a plan).
  */
-function isTestPayer(email: string | null | undefined) {
-  if (!email) return false;
-  const list = env.TEST_PAYER_EMAILS.split(",").map((e) => e.trim().toLowerCase());
-  return list.includes(email.toLowerCase());
+function isTestPayer(person: Person) {
+  return person.emailVerified === true && inList(env.TEST_PAYER_EMAILS, person.email);
 }
 
-/** Live: everyone. Test mode: the developers and the listed test payers. */
-export function canPay(email: string | null | undefined) {
-  return env.NEXI_MODE === "live" || isDeveloperEmail(email) || isTestPayer(email);
+/** Live: everyone. Test mode: the verified developers and test payers. */
+export function canPay(person: Person) {
+  return env.NEXI_MODE === "live" || isTrustedDeveloper(person) || isTestPayer(person);
 }
 
-function requirePayer(email: string | null | undefined) {
-  if (!canPay(email)) {
+function requirePayer(person: Person) {
+  if (!canPay(person)) {
     throw new ORPCError("PRECONDITION_FAILED", {
       message: "Betaling åpner snart. Dere kan bruke prøveperioden fullt ut i mellomtiden.",
     });
@@ -218,10 +234,11 @@ export async function startCheckout(
   organizationId: string,
   plan: PlanId,
   interval: BillingInterval,
-  email?: string | null,
+  payer: Person,
 ) {
   requireNexi();
-  requirePayer(email);
+  requirePayer(payer);
+  const email = payer.email;
   const account = await prisma.billingAccount.findUnique({ where: { organizationId } });
   if (!account) {
     throw new ORPCError("PRECONDITION_FAILED", { message: "Registrer bedriften med organisasjonsnummer først." });
@@ -247,9 +264,10 @@ export async function startCheckout(
 }
 
 /** Lets the customer swap the card on the subscription (expired card etc.). */
-export async function startCardUpdate(organizationId: string, email?: string | null) {
+export async function startCardUpdate(organizationId: string, payer: Person) {
   requireNexi();
-  requirePayer(email);
+  requirePayer(payer);
+  const email = payer.email;
   const sub = await prisma.subscription.findUnique({ where: { organizationId } });
   if (!sub?.nexiSubscriptionId || !isPlanId(sub.plan)) {
     throw new ORPCError("PRECONDITION_FAILED", { message: "Det finnes ikke noe abonnement å oppdatere." });

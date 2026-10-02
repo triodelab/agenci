@@ -10,6 +10,11 @@ export const UserPlain = t.Object(
     name: t.String(),
     email: t.String(),
     emailVerified: t.Boolean(),
+    twoFactorEnabled: __nullable__(
+      t.Boolean({
+        description: `Two-factor login on (Better Auth twoFactor plugin). Required for admin.`,
+      }),
+    ),
     image: __nullable__(t.String()),
     createdAt: t.Date(),
     updatedAt: t.Date(),
@@ -102,6 +107,24 @@ export const UserRelations = t.Object(
       ),
       { additionalProperties: false },
     ),
+    twoFactors: t.Array(
+      t.Object(
+        {
+          id: t.String(),
+          secret: t.String(),
+          backupCodes: t.String(),
+          userId: t.String(),
+          verified: __nullable__(t.Boolean()),
+          failedVerificationCount: __nullable__(t.Integer()),
+          lockedUntil: __nullable__(t.Date()),
+        },
+        {
+          additionalProperties: false,
+          description: `TOTP secret + backup codes (encrypted by Better Auth).`,
+        },
+      ),
+      { additionalProperties: false },
+    ),
   },
   { additionalProperties: false },
 );
@@ -111,6 +134,13 @@ export const UserPlainInputCreate = t.Object(
     name: t.String(),
     email: t.String(),
     emailVerified: t.Optional(t.Boolean()),
+    twoFactorEnabled: t.Optional(
+      __nullable__(
+        t.Boolean({
+          description: `Two-factor login on (Better Auth twoFactor plugin). Required for admin.`,
+        }),
+      ),
+    ),
     image: t.Optional(__nullable__(t.String())),
   },
   { additionalProperties: false },
@@ -121,6 +151,13 @@ export const UserPlainInputUpdate = t.Object(
     name: t.Optional(t.String()),
     email: t.Optional(t.String()),
     emailVerified: t.Optional(t.Boolean()),
+    twoFactorEnabled: t.Optional(
+      __nullable__(
+        t.Boolean({
+          description: `Two-factor login on (Better Auth twoFactor plugin). Required for admin.`,
+        }),
+      ),
+    ),
     image: t.Optional(__nullable__(t.String())),
   },
   { additionalProperties: false },
@@ -193,6 +230,22 @@ export const UserRelationsInputCreate = t.Object(
       ),
     ),
     invitations: t.Optional(
+      t.Object(
+        {
+          connect: t.Array(
+            t.Object(
+              {
+                id: t.String({ additionalProperties: false }),
+              },
+              { additionalProperties: false },
+            ),
+            { additionalProperties: false },
+          ),
+        },
+        { additionalProperties: false },
+      ),
+    ),
+    twoFactors: t.Optional(
       t.Object(
         {
           connect: t.Array(
@@ -340,6 +393,31 @@ export const UserRelationsInputUpdate = t.Partial(
           { additionalProperties: false },
         ),
       ),
+      twoFactors: t.Partial(
+        t.Object(
+          {
+            connect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+            disconnect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+          },
+          { additionalProperties: false },
+        ),
+      ),
     },
     { additionalProperties: false },
   ),
@@ -357,6 +435,9 @@ export const UserWhere = t.Partial(
           name: t.String(),
           email: t.String(),
           emailVerified: t.Boolean(),
+          twoFactorEnabled: t.Boolean({
+            description: `Two-factor login on (Better Auth twoFactor plugin). Required for admin.`,
+          }),
           image: t.String(),
           createdAt: t.Date(),
           updatedAt: t.Date(),
@@ -403,6 +484,9 @@ export const UserWhereUnique = t.Recursive(
               name: t.String(),
               email: t.String(),
               emailVerified: t.Boolean(),
+              twoFactorEnabled: t.Boolean({
+                description: `Two-factor login on (Better Auth twoFactor plugin). Required for admin.`,
+              }),
               image: t.String(),
               createdAt: t.Date(),
               updatedAt: t.Date(),
@@ -423,6 +507,7 @@ export const UserSelect = t.Partial(
       name: t.Boolean(),
       email: t.Boolean(),
       emailVerified: t.Boolean(),
+      twoFactorEnabled: t.Boolean(),
       image: t.Boolean(),
       createdAt: t.Boolean(),
       updatedAt: t.Boolean(),
@@ -431,6 +516,7 @@ export const UserSelect = t.Partial(
       teammembers: t.Boolean(),
       members: t.Boolean(),
       invitations: t.Boolean(),
+      twoFactors: t.Boolean(),
       _count: t.Boolean(),
     },
     { additionalProperties: false },
@@ -445,6 +531,7 @@ export const UserInclude = t.Partial(
       teammembers: t.Boolean(),
       members: t.Boolean(),
       invitations: t.Boolean(),
+      twoFactors: t.Boolean(),
       _count: t.Boolean(),
     },
     { additionalProperties: false },
@@ -464,6 +551,9 @@ export const UserOrderBy = t.Partial(
         additionalProperties: false,
       }),
       emailVerified: t.Union([t.Literal("asc"), t.Literal("desc")], {
+        additionalProperties: false,
+      }),
+      twoFactorEnabled: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
       image: t.Union([t.Literal("asc"), t.Literal("desc")], {

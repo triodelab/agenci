@@ -518,7 +518,7 @@ function UserMenu({ orgSlug, agentId }: { orgSlug: string; agentId?: string }) {
           <CreditCardIcon className={iconClass} strokeWidth={1.6} />
           Plan og faktura
         </DropdownMenuItem>
-        {adminAccess.data?.admin ? (
+        {adminAccess.data?.admin || adminAccess.data?.needsTwoFactor ? (
           <>
             <DropdownMenuSeparator className="my-1.5" />
             <DropdownMenuItem className={itemClass} onSelect={() => go("/admin")}>

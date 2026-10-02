@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
 import { Field, ghostBtn, inkBtn, inputClass, Section, SettingsHeader } from "../settings-ui";
+import { TwoFactorSection } from "./two-factor-section";
 
 function strength(pw: string) {
   let score = 0;
@@ -126,7 +127,7 @@ export function SecuritySettings() {
 
   return (
     <div className="grid gap-5">
-      <SettingsHeader title="Sikkerhet" description="Passordet ditt, og hvor du er logget inn." />
+      <SettingsHeader title="Sikkerhet" description="Passordet ditt, to-trinns innlogging, og hvor du er logget inn." />
 
       <Section
         title="Passord"
@@ -169,6 +170,8 @@ export function SecuritySettings() {
           </label>
         </div>
       </Section>
+
+      <TwoFactorSection />
 
       <Section
         title="Innloggede enheter"

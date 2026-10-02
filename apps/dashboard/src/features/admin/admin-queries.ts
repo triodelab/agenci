@@ -49,6 +49,19 @@ export const useExtendTrial = () =>
     "Prøveperioden er forlenget.",
   );
 
+export const useSendPasswordReset = () =>
+  useAdminMutation(
+    (input: { userId: string }) => client.admin.sendPasswordReset(input),
+    "E-post med lenke for nytt passord er sendt.",
+  );
+
+export const useRevokeSessions = () =>
+  useAdminMutation((input: { userId: string }) => client.admin.revokeSessions(input), "Brukeren er logget ut overalt.");
+
+export function useAdminAudit() {
+  return useQuery({ queryKey: ["admin", "audit"], queryFn: () => client.admin.audit(), refetchInterval: 15_000 });
+}
+
 export const useSetEmailVerified = () =>
   useAdminMutation(
     (input: { userId: string; verified: boolean }) => client.admin.setEmailVerified(input),
