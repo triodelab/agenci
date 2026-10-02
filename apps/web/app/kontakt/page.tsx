@@ -1,3 +1,4 @@
+import { SupportChat } from "@/components/support-chat";
 import type { Metadata } from "next";
 import Image from "next/image";
 import { ContactFormCard } from "@/modules/landing/ui/components/contact-form-card";
@@ -71,6 +72,7 @@ export default function KontaktPage() {
           </figcaption>
         </figure>
       </main>
+      <SupportChat />
     </>
   );
 }

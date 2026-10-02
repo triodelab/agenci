@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Script from "next/script";
+import { SupportChat } from "@/components/support-chat";
 import { LandingPageView } from "@/modules/landing";
 
 export const metadata: Metadata = {
@@ -17,19 +17,10 @@ export const metadata: Metadata = {
 };
 
 export default function HomePage() {
-  const orgId = process.env.NEXT_PUBLIC_WIDGET_ORG_ID;
-  const agentId = process.env.NEXT_PUBLIC_WIDGET_AGENT_ID;
   return (
     <>
       <LandingPageView />
-      {orgId && (
-        <Script
-          src="/widget.iife.js"
-          data-organization-id={orgId}
-          {...(agentId ? { "data-agent-id": agentId } : {})}
-          strategy="afterInteractive"
-        />
-      )}
+      <SupportChat />
     </>
   );
 }
