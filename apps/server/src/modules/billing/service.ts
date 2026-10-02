@@ -19,7 +19,17 @@ import {
   NEXI_CHECKOUT_JS,
   nexiConfigured,
 } from "./nexi";
-import { GRACE_DAYS, isPlanId, type PlanId, PLANS, planAmounts, TRIAL_DAYS, TRIAL_PLAN } from "./plans";
+import {
+  type BillingInterval,
+  GRACE_DAYS,
+  isInterval,
+  isPlanId,
+  type PlanId,
+  PLANS,
+  planAmounts,
+  TRIAL_DAYS,
+  TRIAL_PLAN,
+} from "./plans";
 
 const DAY = 86_400_000;
 
@@ -43,15 +53,20 @@ export type BillingState = {
   cancelAtPeriodEnd: boolean;
   /** Plan that starts at the next charge, when it differs from `plan`. */
   nextPlan: PlanId | null;
+  /** How the subscription is charged ("month" until one exists). */
+  interval: BillingInterval;
   company: { orgNumber: string; name: string } | null;
   testMode: boolean;
 };
 
-function addMonth(d: Date) {
+function addPeriod(d: Date, interval: BillingInterval) {
   const n = new Date(d);
-  n.setMonth(n.getMonth() + 1);
+  if (interval === "year") n.setFullYear(n.getFullYear() + 1);
+  else n.setMonth(n.getMonth() + 1);
   return n;
 }
+
+const intervalOf = (v: string | null | undefined): BillingInterval => (isInterval(v) ? v : "month");
 
 /** "2026-10" in Norway's calendar. */
 export function osloPeriod(now = new Date()) {
@@ -87,6 +102,7 @@ export async function getBillingState(organizationId: string, now = new Date()):
     currentPeriodEnd: sub?.currentPeriodEnd?.toISOString() ?? null,
     cancelAtPeriodEnd: sub?.cancelAtPeriodEnd ?? false,
     nextPlan: null as PlanId | null,
+    interval: intervalOf(sub?.interval),
     testMode: env.NEXI_MODE !== "live",
   };
 
@@ -198,7 +214,12 @@ function requirePayer(email: string | null | undefined) {
 }
 
 /** Starts the embedded checkout for a plan: first month charged at once. */
-export async function startCheckout(organizationId: string, plan: PlanId, email?: string | null) {
+export async function startCheckout(
+  organizationId: string,
+  plan: PlanId,
+  interval: BillingInterval,
+  email?: string | null,
+) {
   requireNexi();
   requirePayer(email);
   const account = await prisma.billingAccount.findUnique({ where: { organizationId } });
@@ -212,14 +233,15 @@ export async function startCheckout(organizationId: string, plan: PlanId, email?
   const urls = publicUrls();
   const { paymentId } = await createSubscriptionCheckout({
     plan,
-    reference: `${organizationId}:${plan}:${Date.now()}`,
+    interval,
+    reference: `${organizationId}:${plan}:${interval}:${Date.now()}`,
     email,
     ...urls,
   });
   await prisma.subscription.upsert({
     where: { organizationId },
-    create: { organizationId, plan, status: "pending", nexiPaymentId: paymentId },
-    update: { plan, nexiPaymentId: paymentId, ...(sub?.status === "active" ? {} : { status: "pending" }) },
+    create: { organizationId, plan, interval, status: "pending", nexiPaymentId: paymentId },
+    update: { plan, interval, nexiPaymentId: paymentId, ...(sub?.status === "active" ? {} : { status: "pending" }) },
   });
   return { paymentId, checkoutKey: env.NEXI_CHECKOUT_KEY as string, scriptUrl: NEXI_CHECKOUT_JS };
 }
@@ -234,6 +256,7 @@ export async function startCardUpdate(organizationId: string, email?: string | n
   }
   const { paymentId } = await createSubscriptionCheckout({
     plan: sub.plan,
+    interval: intervalOf(sub.interval),
     reference: `${organizationId}:${sub.plan}:card:${Date.now()}`,
     subscriptionId: sub.nexiSubscriptionId,
     email,
@@ -269,7 +292,10 @@ export async function getInvoice(organizationId: string, paymentId: string) {
       name: account?.companyName ?? org?.name ?? "",
       orgNumber: account?.orgNumber ?? null,
     },
-    line: { description: `Agenci ${plan?.name ?? p.plan} – abonnement 1 måned`, conversations: plan?.conversations ?? null },
+    line: {
+      description: `Agenci ${plan?.name ?? p.plan} – abonnement ${p.interval === "year" ? "12 måneder (årlig)" : "1 måned"}`,
+      conversations: plan?.conversations ?? null,
+    },
     netAmount: p.netAmount || p.amount,
     vatAmount: p.vatAmount,
     amount: p.amount,
@@ -277,10 +303,14 @@ export async function getInvoice(organizationId: string, paymentId: string) {
   };
 }
 
-/** "<orgId>:<plan>:<…>" — the order reference we set on every payment. */
+/**
+ * "<orgId>:<plan>:<interval?>:<…>" — the order reference we set on every
+ * payment. Older references carry no interval (monthly).
+ */
 function parseReference(reference: string | undefined) {
-  const [organizationId, plan] = (reference ?? "").split(":");
-  return organizationId && plan && isPlanId(plan) ? { organizationId, plan } : null;
+  const [organizationId, plan, third] = (reference ?? "").split(":");
+  if (!organizationId || !plan || !isPlanId(plan)) return null;
+  return { organizationId, plan, interval: isInterval(third) ? third : null };
 }
 
 /**
@@ -302,7 +332,8 @@ export async function applyChargedPayment(paymentId: string) {
   const now = new Date();
   const renewing = Boolean(sub?.currentPeriodEnd && sub.status !== "pending" && sub.status !== "canceled");
   const periodStart = renewing && sub?.currentPeriodEnd && sub.currentPeriodEnd > now ? sub.currentPeriodEnd : now;
-  const periodEnd = addMonth(periodStart);
+  const interval: BillingInterval = ref.interval ?? intervalOf(sub?.interval);
+  const periodEnd = addPeriod(periodStart, interval);
 
   await prisma.$transaction([
     prisma.subscription.upsert({
@@ -310,6 +341,7 @@ export async function applyChargedPayment(paymentId: string) {
       create: {
         organizationId: ref.organizationId,
         plan: ref.plan,
+        interval,
         status: "active",
         nexiSubscriptionId: payment.subscription?.id ?? null,
         nexiPaymentId: paymentId,
@@ -318,6 +350,7 @@ export async function applyChargedPayment(paymentId: string) {
       },
       update: {
         plan: ref.plan,
+        interval,
         status: "active",
         pastDueSince: null,
         ...(payment.subscription?.id ? { nexiSubscriptionId: payment.subscription.id } : {}),
@@ -331,13 +364,14 @@ export async function applyChargedPayment(paymentId: string) {
         organizationId: ref.organizationId,
         nexiPaymentId: paymentId,
         plan: ref.plan,
+        interval,
         amount: charged,
         ...splitVat(charged),
         status: "paid",
         periodStart,
         periodEnd,
       },
-      update: { status: "paid", amount: charged, ...splitVat(charged), periodStart, periodEnd },
+      update: { status: "paid", interval, amount: charged, ...splitVat(charged), periodStart, periodEnd },
     }),
   ]);
   return { applied: true as const, organizationId: ref.organizationId };
@@ -376,13 +410,16 @@ export async function markChargeFailed(paymentId: string) {
 
 /* ── Plan changes ───────────────────────────────────────────────────── */
 
-export async function changePlan(organizationId: string, plan: PlanId) {
+export async function changePlan(organizationId: string, plan: PlanId, interval?: BillingInterval) {
   const sub = await prisma.subscription.findUnique({ where: { organizationId } });
   if (!sub || !["active", "charging", "past_due"].includes(sub.status)) {
     throw new ORPCError("PRECONDITION_FAILED", { message: "Velg en plan og betal først." });
   }
-  // Takes effect from the next monthly charge.
-  await prisma.subscription.update({ where: { organizationId }, data: { plan, cancelAtPeriodEnd: false } });
+  // Takes effect from the next charge.
+  await prisma.subscription.update({
+    where: { organizationId },
+    data: { plan, ...(interval ? { interval } : {}), cancelAtPeriodEnd: false },
+  });
 }
 
 export async function setCancelAtPeriodEnd(organizationId: string, cancel: boolean) {
@@ -398,7 +435,7 @@ export async function listPayments(organizationId: string) {
     where: { organizationId },
     orderBy: { createdAt: "desc" },
     take: 24,
-    select: { id: true, invoiceNumber: true, plan: true, amount: true, currency: true, status: true, periodStart: true, periodEnd: true, createdAt: true },
+    select: { id: true, invoiceNumber: true, plan: true, interval: true, amount: true, currency: true, status: true, periodStart: true, periodEnd: true, createdAt: true },
   });
 }
 
@@ -412,7 +449,13 @@ export async function runDailyBilling(now = new Date()) {
   const due = await prisma.subscription.findMany({
     where: { status: { in: ["active", "past_due"] }, currentPeriodEnd: { lte: now } },
   });
-  const toCharge: { subscriptionId: string; plan: PlanId; reference: string; organizationId: string }[] = [];
+  const toCharge: {
+    subscriptionId: string;
+    plan: PlanId;
+    interval: BillingInterval;
+    reference: string;
+    organizationId: string;
+  }[] = [];
   let ended = 0;
   for (const s of due) {
     const graceOver = s.status === "past_due" && s.pastDueSince && now.getTime() - s.pastDueSince.getTime() >= GRACE_DAYS * DAY;
@@ -424,8 +467,9 @@ export async function runDailyBilling(now = new Date()) {
     toCharge.push({
       subscriptionId: s.nexiSubscriptionId,
       plan: s.plan,
+      interval: intervalOf(s.interval),
       organizationId: s.organizationId,
-      reference: `${s.organizationId}:${s.plan}:${osloPeriod(s.currentPeriodEnd ?? now)}`,
+      reference: `${s.organizationId}:${s.plan}:${intervalOf(s.interval)}:${osloPeriod(s.currentPeriodEnd ?? now)}`,
     });
   }
   if (toCharge.length && nexiConfigured()) {

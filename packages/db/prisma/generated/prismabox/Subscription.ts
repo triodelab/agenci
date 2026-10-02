@@ -14,6 +14,9 @@ export const SubscriptionPlain = t.Object(
     status: t.String({
       description: `"pending" (checkout started) | "active" | "past_due" | "canceled"`,
     }),
+    interval: t.String({
+      description: `"month" | "year" — how often it is charged.`,
+    }),
     nexiSubscriptionId: __nullable__(
       t.String({
         description: `Nexi Checkout subscription id — charged every month.`,
@@ -73,6 +76,9 @@ export const SubscriptionPlainInputCreate = t.Object(
         description: `"pending" (checkout started) | "active" | "past_due" | "canceled"`,
       }),
     ),
+    interval: t.Optional(
+      t.String({ description: `"month" | "year" — how often it is charged.` }),
+    ),
     currentPeriodStart: t.Optional(__nullable__(t.Date())),
     currentPeriodEnd: t.Optional(__nullable__(t.Date())),
     cancelAtPeriodEnd: t.Optional(
@@ -105,6 +111,9 @@ export const SubscriptionPlainInputUpdate = t.Object(
       t.String({
         description: `"pending" (checkout started) | "active" | "past_due" | "canceled"`,
       }),
+    ),
+    interval: t.Optional(
+      t.String({ description: `"month" | "year" — how often it is charged.` }),
     ),
     currentPeriodStart: t.Optional(__nullable__(t.Date())),
     currentPeriodEnd: t.Optional(__nullable__(t.Date())),
@@ -184,6 +193,9 @@ export const SubscriptionWhere = t.Partial(
           }),
           status: t.String({
             description: `"pending" (checkout started) | "active" | "past_due" | "canceled"`,
+          }),
+          interval: t.String({
+            description: `"month" | "year" — how often it is charged.`,
           }),
           nexiSubscriptionId: t.String({
             description: `Nexi Checkout subscription id — charged every month.`,
@@ -268,6 +280,9 @@ export const SubscriptionWhereUnique = t.Recursive(
               status: t.String({
                 description: `"pending" (checkout started) | "active" | "past_due" | "canceled"`,
               }),
+              interval: t.String({
+                description: `"month" | "year" — how often it is charged.`,
+              }),
               nexiSubscriptionId: t.String({
                 description: `Nexi Checkout subscription id — charged every month.`,
               }),
@@ -302,6 +317,7 @@ export const SubscriptionSelect = t.Partial(
       organization: t.Boolean(),
       plan: t.Boolean(),
       status: t.Boolean(),
+      interval: t.Boolean(),
       nexiSubscriptionId: t.Boolean(),
       nexiPaymentId: t.Boolean(),
       currentPeriodStart: t.Boolean(),
@@ -342,6 +358,9 @@ export const SubscriptionOrderBy = t.Partial(
         additionalProperties: false,
       }),
       status: t.Union([t.Literal("asc"), t.Literal("desc")], {
+        additionalProperties: false,
+      }),
+      interval: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
       nexiSubscriptionId: t.Union([t.Literal("asc"), t.Literal("desc")], {

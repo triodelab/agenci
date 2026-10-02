@@ -10,7 +10,7 @@ import { env } from "@agenci/env/server";
 import { lookupCompany } from "./brreg";
 import { NEXI_CHECKOUT_JS, nexiConfigured } from "./nexi";
 import { sellerVatRegistered } from "./seller";
-import { PLAN_IDS, type PlanId, PLANS, planAmounts, TRIAL_DAYS } from "./plans";
+import { INTERVALS, PLAN_IDS, type PlanId, PLANS, planAmounts, TRIAL_DAYS } from "./plans";
 import {
   changePlan,
   canPay,
@@ -26,6 +26,7 @@ import {
 } from "./service";
 
 const PlanSchema = z.enum(PLAN_IDS as [PlanId, ...PlanId[]]);
+const IntervalSchema = z.enum(INTERVALS).default("month");
 
 /**
  * The session carries no role (Better Auth doesn't set activeOrganizationRole),
@@ -57,7 +58,13 @@ export const billingRouter = {
       canPay: canPay(context.user.email),
       checkout: nexiConfigured() ? { checkoutKey: env.NEXI_CHECKOUT_KEY as string, scriptUrl: NEXI_CHECKOUT_JS } : null,
       trialDays: TRIAL_DAYS,
-      plans: Object.values(PLANS).map((p) => ({ ...p, priceWithVat: planAmounts(p.id).gross })),
+      plans: Object.values(PLANS).map((p) => ({
+        ...p,
+        /** One month, billed monthly (øre, incl. any VAT). */
+        priceWithVat: planAmounts(p.id).gross,
+        /** Twelve months, billed yearly (øre, incl. any VAT). */
+        yearWithVat: planAmounts(p.id, "year").gross,
+      })),
       vatRegistered: sellerVatRegistered(),
     };
   }),
@@ -78,11 +85,11 @@ export const billingRouter = {
     }),
 
   startCheckout: privateProcedure
-    .input(z.object({ plan: PlanSchema }))
+    .input(z.object({ plan: PlanSchema, interval: IntervalSchema }))
     .output(CheckoutResponse)
     .handler(async ({ input, context }) => {
       await requireManager(context);
-      return startCheckout(context.organizationId, input.plan, context.user.email);
+      return startCheckout(context.organizationId, input.plan, input.interval, context.user.email);
     }),
 
   startCardUpdate: privateProcedure.output(CheckoutResponse).handler(async ({ context }) => {
@@ -94,9 +101,11 @@ export const billingRouter = {
     .input(z.object({ paymentId: z.string().min(8).max(64) }))
     .handler(async ({ input, context }) => confirmCheckout(context.organizationId, input.paymentId)),
 
-  changePlan: privateProcedure.input(z.object({ plan: PlanSchema })).handler(async ({ input, context }) => {
+  changePlan: privateProcedure
+    .input(z.object({ plan: PlanSchema, interval: z.enum(INTERVALS).optional() }))
+    .handler(async ({ input, context }) => {
     await requireManager(context);
-    await changePlan(context.organizationId, input.plan);
+    await changePlan(context.organizationId, input.plan, input.interval);
     return { ok: true };
   }),
 

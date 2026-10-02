@@ -46,7 +46,15 @@ function loadScript(src: string) {
  * Nexi's embedded payment form. The URL must be exactly the one given when
  * the payment was created (…/betaling), with ?paymentId= from the server.
  */
-export default function CheckoutView({ paymentId, plan: planId }: { paymentId: string; plan?: PlanId }) {
+export default function CheckoutView({
+  paymentId,
+  plan: planId,
+  interval,
+}: {
+  paymentId: string;
+  plan?: PlanId;
+  interval: "month" | "year";
+}) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const status = useBillingStatus();
@@ -58,6 +66,10 @@ export default function CheckoutView({ paymentId, plan: planId }: { paymentId: s
   const plan = planId ? status.data?.plans.find((p) => p.id === planId) : undefined;
   const company = status.data?.company;
   const vat = status.data?.vatRegistered ?? false;
+  const yearly = interval === "year";
+  /** Net price for the period (øre), and the total charged today. */
+  const net = plan ? (yearly ? plan.yearlyPrice * 12 : plan.price) : 0;
+  const total = plan ? (yearly ? plan.yearWithVat : plan.priceWithVat) : 0;
 
   useEffect(() => {
     if (!config || !paymentId || mounted.current) return;
@@ -113,7 +125,9 @@ export default function CheckoutView({ paymentId, plan: planId }: { paymentId: s
             </h1>
             <p className="mt-2 text-[14.5px] leading-relaxed text-(--agenci-ink-2)">
               {plan
-                ? "Første måned betales nå. Deretter trekkes beløpet automatisk hver måned. Ingen binding, si opp når du vil."
+                ? yearly
+                  ? "Første år betales nå. Deretter trekkes beløpet automatisk hvert år. Ingen binding, si opp når du vil."
+                  : "Første måned betales nå. Deretter trekkes beløpet automatisk hver måned. Ingen binding, si opp når du vil."
                 : "Det nye kortet brukes fra neste månedlige trekk. Ingenting trekkes nå."}
             </p>
 
@@ -129,10 +143,15 @@ export default function CheckoutView({ paymentId, plan: planId }: { paymentId: s
                 <>
                   <div className="p-6">
                     <div className="flex items-baseline justify-between gap-4">
-                      <p className="text-[15px] font-semibold text-(--agenci-ink)">{plan.name}</p>
+                      <div>
+                        <p className="text-[15px] font-semibold text-(--agenci-ink)">{plan.name}</p>
+                        <p className="mt-0.5 text-[12.5px] text-(--agenci-ink-3)">
+                          {yearly ? "Faktureres årlig · spar 20 %" : "Faktureres månedlig"}
+                        </p>
+                      </div>
                       <p className="text-(--agenci-ink)">
                         <span className="[font-family:var(--font-agenci-title)] text-[28px] leading-none font-medium tracking-[-0.03em] tabular-nums">
-                          {kr(plan.price)}
+                          {kr(yearly ? plan.yearlyPrice : plan.price)}
                         </span>
                         <span className="ml-1 text-[13px] text-(--agenci-ink-3)">kr / mnd</span>
                       </p>
@@ -152,18 +171,18 @@ export default function CheckoutView({ paymentId, plan: planId }: { paymentId: s
                   </div>
                   <dl className="border-t border-(--agenci-line) bg-(--dash-subtle-2) px-6 py-4 text-[13.5px]">
                     <div className="flex justify-between py-1">
-                      <dt className="text-(--agenci-ink-2)">Pris per måned</dt>
-                      <dd className="tabular-nums text-(--agenci-ink)">{kr(plan.price)} kr</dd>
+                      <dt className="text-(--agenci-ink-2)">{yearly ? "12 måneder" : "Pris per måned"}</dt>
+                      <dd className="tabular-nums text-(--agenci-ink)">{kr(net)} kr</dd>
                     </div>
                     <div className="flex justify-between py-1">
                       <dt className="text-(--agenci-ink-2)">Mva.</dt>
                       <dd className="tabular-nums text-(--agenci-ink)">
-                        {vat ? `${kr(plan.priceWithVat - plan.price)} kr` : "Ikke mva-pliktig"}
+                        {vat ? `${kr(total - net)} kr` : "Ikke mva-pliktig"}
                       </dd>
                     </div>
                     <div className="mt-2 flex items-baseline justify-between border-t border-(--agenci-line) pt-3">
                       <dt className="font-medium text-(--agenci-ink)">Å betale i dag</dt>
-                      <dd className="text-[18px] font-semibold tabular-nums text-(--agenci-ink)">{kr(plan.priceWithVat)} kr</dd>
+                      <dd className="text-[18px] font-semibold tabular-nums text-(--agenci-ink)">{kr(total)} kr</dd>
                     </div>
                   </dl>
                 </>
