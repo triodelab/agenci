@@ -9,7 +9,7 @@ export const heroStories = [
     person: "Nora",
     channel: "Chat",
     videoSrc:
-      "https://videos.pexels.com/video-files/7100944/7100944-hd_1280_720_30fps.mp4",
+      "https://videos.pexels.com/video-files/7100944/7100944-hd_1920_1080_30fps.mp4",
     posterSrc:
       "https://images.pexels.com/videos/7100944/pictures/preview-7.jpg",
     position: "62% center",
@@ -30,7 +30,7 @@ export const heroStories = [
     person: "Arne",
     channel: "Telefon",
     videoSrc:
-      "https://videos.pexels.com/video-files/9058053/9058053-hd_1280_720_50fps.mp4",
+      "https://videos.pexels.com/video-files/9058053/9058053-hd_1920_1080_25fps.mp4",
     posterSrc:
       "https://images.pexels.com/videos/9058053/pictures/preview-7.jpeg",
     position: "58% center",
@@ -51,7 +51,7 @@ export const heroStories = [
     person: "Jonas",
     channel: "Nettbutikk",
     videoSrc:
-      "https://videos.pexels.com/video-files/9057681/9057681-hd_1280_720_25fps.mp4",
+      "https://videos.pexels.com/video-files/9057681/9057681-hd_1920_1080_25fps.mp4",
     posterSrc:
       "https://images.pexels.com/videos/9057681/pictures/preview-5.jpeg",
     position: "center center",

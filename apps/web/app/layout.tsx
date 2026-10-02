@@ -8,6 +8,7 @@ import "@/styles/tokens.css";
 import "@/styles/marketing.css";
 import { CookiebotScrollLock } from "@/components/cookiebot-scroll-lock"
 import { Providers } from "@/components/providers"
+import { SitePreloader } from "@/components/site-preloader"
 import { Toaster } from "@workspace/ui/components/sonner";
 
 /**
@@ -130,6 +131,7 @@ export default function RootLayout({
           strategy="beforeInteractive"
         />
         <CookiebotScrollLock />
+        <SitePreloader />
         <Providers>
           {children}
           <Toaster />
