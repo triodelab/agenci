@@ -11,6 +11,7 @@ import { chatRouter } from "@/modules/chat/router";
 import { conversationsRouter } from "@/modules/conversations/router";
 import { widgetPublicRouter } from "@/modules/widget/router";
 import { billingRouter } from "@/modules/billing/router";
+import { adminRouter } from "@/modules/admin/router";
 
 const health = base
   .output(z.object({ ok: z.literal(true) }))
@@ -51,6 +52,8 @@ export const privateRouter = {
 export const appRouter = {
   public: publicRouter,
   private: privateRouter,
+  /** Agenci's own developers only (see modules/admin). */
+  admin: adminRouter,
 };
 
 export type AppRouter = typeof appRouter;
