@@ -1,11 +1,20 @@
 import { type FormEvent, useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
 
 import { AuthShell, authButtonCls, authInputCls, authLabelCls, PasswordInput } from "@/components/auth-shell";
 import { authClient } from "@/lib/auth-client";
 import { takePendingInvite } from "@/lib/pending-invite";
 import { errCls } from "@/lib/ui";
+
+/** Better Auth answers in English; show Norwegian. */
+function signInMessage(code: string | undefined, message: string | undefined) {
+  if (code === "INVALID_EMAIL_OR_PASSWORD" || /invalid email or password/i.test(message ?? "")) {
+    return "Feil e-post eller passord.";
+  }
+  if (/too many|rate/i.test(message ?? "")) return "For mange forsøk. Vent litt og prøv igjen.";
+  return "Kunne ikke logge inn. Prøv igjen.";
+}
 
 const signInSchema = z.object({
   email: z.email("Ugyldig e-postadresse"),
@@ -35,7 +44,9 @@ export default function SignInForm({
     setError(undefined);
     try {
       await authClient.signIn.email(result.data, {
-        onSuccess: () => {
+        onSuccess: (ctx) => {
+          // Two-factor login on: the client plugin takes over (→ /to-trinn).
+          if ((ctx.data as { twoFactorRedirect?: boolean } | undefined)?.twoFactorRedirect) return;
           // Came from an invitation link: go back and accept it.
           const invite = takePendingInvite();
           return invite
@@ -46,7 +57,7 @@ export default function SignInForm({
             : navigate({ to: "/" });
         },
         onError: ({ error: signInError }) => {
-          setError(signInError.message);
+          setError(signInMessage(signInError.code, signInError.message));
         },
       });
     } finally {
@@ -74,9 +85,14 @@ export default function SignInForm({
           <input id="email" name="email" type="email" autoComplete="email" required className={authInputCls} placeholder="navn@bedrift.no" />
         </div>
         <div className="space-y-1.5">
-          <label htmlFor="password" className={authLabelCls}>
-            Passord
-          </label>
+          <div className="flex items-baseline justify-between">
+            <label htmlFor="password" className={authLabelCls}>
+              Passord
+            </label>
+            <Link to="/glemt-passord" className="text-[13px] text-(--agenci-ink-2) underline-offset-4 hover:text-(--agenci-ink) hover:underline">
+              Glemt passord?
+            </Link>
+          </div>
           <PasswordInput id="password" name="password" autoComplete="current-password" minLength={8} required />
         </div>
         {error ? <p className={errCls}>{error}</p> : null}

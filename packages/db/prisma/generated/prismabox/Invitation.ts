@@ -38,6 +38,11 @@ export const InvitationRelations = t.Object(
         name: t.String(),
         email: t.String(),
         emailVerified: t.Boolean(),
+        twoFactorEnabled: __nullable__(
+          t.Boolean({
+            description: `Two-factor login on (Better Auth twoFactor plugin). Required for admin.`,
+          }),
+        ),
         image: __nullable__(t.String()),
         createdAt: t.Date(),
         updatedAt: t.Date(),

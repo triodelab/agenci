@@ -8,7 +8,7 @@ import AdminView from "@/features/admin/ui/admin-view";
  */
 export const Route = createFileRoute("/_authed/admin")({
   validateSearch: z.object({
-    tab: z.enum(["overview", "activity", "organizations", "users", "database"]).catch("overview"),
+    tab: z.enum(["overview", "activity", "organizations", "users", "database", "audit"]).catch("overview"),
     org: z.string().optional().catch(undefined),
   }),
   component: RouteComponent,

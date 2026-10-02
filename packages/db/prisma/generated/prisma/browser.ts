@@ -73,6 +73,16 @@ export type Member = Prisma.MemberModel
  */
 export type Invitation = Prisma.InvitationModel
 /**
+ * Model TwoFactor
+ * TOTP secret + backup codes (encrypted by Better Auth).
+ */
+export type TwoFactor = Prisma.TwoFactorModel
+/**
+ * Model AdminAuditLog
+ * Everything done in the admin area: who, what, on whom, when.
+ */
+export type AdminAuditLog = Prisma.AdminAuditLogModel
+/**
  * Model Subscription
  * One per organization once it has started a paid plan (none = free plan).
  */

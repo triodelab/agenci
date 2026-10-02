@@ -7,6 +7,9 @@ import {
   Building2Icon,
   CreditCardIcon,
   DatabaseIcon,
+  KeyRoundIcon,
+  LogOutIcon,
+  ScrollTextIcon,
   FileTextIcon,
   LayoutDashboardIcon,
   MessageCircleIcon,
@@ -26,10 +29,13 @@ import {
   useAdminOverview,
   useAdminUsers,
   useExtendTrial,
+  useAdminAudit,
+  useRevokeSessions,
+  useSendPasswordReset,
   useSetEmailVerified,
 } from "../admin-queries";
 
-export type AdminTab = "overview" | "activity" | "organizations" | "users" | "database";
+export type AdminTab = "overview" | "activity" | "organizations" | "users" | "database" | "audit";
 
 const TABS: { id: AdminTab; label: string; icon: typeof ActivityIcon }[] = [
   { id: "overview", label: "Oversikt", icon: LayoutDashboardIcon },
@@ -37,6 +43,7 @@ const TABS: { id: AdminTab; label: string; icon: typeof ActivityIcon }[] = [
   { id: "organizations", label: "Bedrifter", icon: Building2Icon },
   { id: "users", label: "Brukere", icon: UsersIcon },
   { id: "database", label: "Database", icon: DatabaseIcon },
+  { id: "audit", label: "Logg", icon: ScrollTextIcon },
 ];
 
 const card =
@@ -298,6 +305,8 @@ function Toolbar({ count, noun, q, setQ }: { count: number; noun: string; q: str
 function UsersTab({ openOrg }: { openOrg: (id: string) => void }) {
   const { data } = useAdminUsers();
   const verify = useSetEmailVerified();
+  const reset = useSendPasswordReset();
+  const revoke = useRevokeSessions();
   const [q, setQ] = useState("");
   if (!data) return <Loading />;
   const rows = data.filter((u) => `${u.name} ${u.email}`.toLowerCase().includes(q.toLowerCase()));
@@ -311,8 +320,12 @@ function UsersTab({ openOrg }: { openOrg: (id: string) => void }) {
               <th className="h-10 px-5 font-medium">Bruker</th>
               <th className="px-3 font-medium">Organisasjoner</th>
               <th className="px-3 font-medium">E-post bekreftet</th>
+              <th className="px-3 font-medium">2FA</th>
               <th className="px-3 font-medium">Sist aktiv</th>
-              <th className="px-5 font-medium">Registrert</th>
+              <th className="px-3 font-medium">Registrert</th>
+              <th className="px-5 font-medium">
+                <span className="sr-only">Handlinger</span>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -345,7 +358,12 @@ function UsersTab({ openOrg }: { openOrg: (id: string) => void }) {
                   <button
                     type="button"
                     disabled={verify.isPending}
-                    onClick={() => verify.mutate({ userId: u.id, verified: !u.emailVerified })}
+                    onClick={() => {
+                      const q = u.emailVerified
+                        ? `Fjerne bekreftelsen for ${u.email}? Utviklere mister da tilgangen.`
+                        : `Markere ${u.email} som bekreftet? Gjør dette bare når du vet at kontoen tilhører riktig person.`;
+                      if (window.confirm(q)) verify.mutate({ userId: u.id, verified: !u.emailVerified });
+                    }}
                     className={cn(
                       "rounded-full px-2.5 py-1 text-[12px] font-medium transition-colors",
                       u.emailVerified ? "bg-[#e9f4ec] text-[#2f6b3c]" : "bg-(--dash-subtle) text-(--agenci-ink-2) hover:text-(--agenci-ink)",
@@ -355,8 +373,39 @@ function UsersTab({ openOrg }: { openOrg: (id: string) => void }) {
                     {u.emailVerified ? "Bekreftet" : "Ikke bekreftet"}
                   </button>
                 </td>
+                <td className="px-3">
+                  <span className={cn("rounded-full px-2 py-0.5 text-[12px]", u.twoFactorEnabled ? "bg-[#e9f4ec] text-[#2f6b3c]" : "text-(--agenci-ink-3)")}>
+                    {u.twoFactorEnabled ? "På" : "Av"}
+                  </span>
+                </td>
                 <td className="px-3 text-(--agenci-ink-2)">{u.lastSeenAt ? `${ago(u.lastSeenAt)} siden` : "–"}</td>
-                <td className="px-5 text-(--agenci-ink-2)">{day(u.createdAt)}</td>
+                <td className="px-3 text-(--agenci-ink-2)">{day(u.createdAt)}</td>
+                <td className="px-5">
+                  <span className="flex justify-end gap-1">
+                    <button
+                      type="button"
+                      title="Send lenke for nytt passord på e-post"
+                      disabled={reset.isPending}
+                      onClick={() => {
+                        if (window.confirm(`Sende e-post med lenke for nytt passord til ${u.email}?`)) reset.mutate({ userId: u.id });
+                      }}
+                      className="inline-flex h-8 items-center gap-1.5 rounded-full border border-(--agenci-line) px-2.5 text-[12px] text-(--agenci-ink-2) hover:text-(--agenci-ink)"
+                    >
+                      <KeyRoundIcon className="size-3.5" /> Nytt passord
+                    </button>
+                    <button
+                      type="button"
+                      title="Logg ut på alle enheter"
+                      disabled={revoke.isPending}
+                      onClick={() => {
+                        if (window.confirm(`Logge ut ${u.email} på alle enheter?`)) revoke.mutate({ userId: u.id });
+                      }}
+                      className="inline-flex h-8 items-center gap-1.5 rounded-full border border-(--agenci-line) px-2.5 text-[12px] text-(--agenci-ink-2) hover:text-(--agenci-ink)"
+                    >
+                      <LogOutIcon className="size-3.5" /> Logg ut
+                    </button>
+                  </span>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -498,6 +547,59 @@ function DatabaseTab() {
         </Drawer>
       ) : null}
     </div>
+  );
+}
+
+/* ── Logg ─────────────────────────────────────────────────────────── */
+
+const ACTION_LABEL: Record<string, string> = {
+  view_organization: "Åpnet bedrift",
+  view_table: "Så på tabell",
+  extend_trial: "Forlenget prøveperiode",
+  verify_user: "Bekreftet bruker",
+  unverify_user: "Fjernet bekreftelse",
+  send_password_reset: "Sendte lenke for nytt passord",
+  revoke_sessions: "Logget ut bruker overalt",
+};
+
+function AuditTab() {
+  const { data } = useAdminAudit();
+  if (!data) return <Loading />;
+  return (
+    <section className={cn(card, "overflow-hidden")}>
+      <div className="px-5 pt-5 pb-3">
+        <h2 className="text-[14.5px] font-semibold text-(--agenci-ink)">Logg over alt som gjøres i admin</h2>
+        <p className="mt-1 text-[12.5px] text-(--agenci-ink-3)">Hvem, hva, på hvem og når. Kan ikke endres eller slettes herfra.</p>
+      </div>
+      {data.length === 0 ? (
+        <p className="border-t border-(--agenci-line) p-10 text-center text-[14px] text-(--agenci-ink-3)">Ingenting logget ennå.</p>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[760px] border-collapse text-[13px]">
+            <thead className="bg-(--dash-subtle-2) text-left text-[12px] text-(--agenci-ink-2) dark:bg-white/5">
+              <tr>
+                <th className="h-10 px-5 font-medium">Når</th>
+                <th className="px-3 font-medium">Hvem</th>
+                <th className="px-3 font-medium">Hva</th>
+                <th className="px-3 font-medium">Mål</th>
+                <th className="px-5 font-medium">Detaljer</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.map((a) => (
+                <tr key={a.id} className="border-t border-(--agenci-line) dark:border-white/5">
+                  <td className="h-11 px-5 whitespace-nowrap text-(--agenci-ink-2)">{when(a.createdAt)}</td>
+                  <td className="px-3">{a.actorEmail}</td>
+                  <td className="px-3 font-medium">{ACTION_LABEL[a.action] ?? a.action}</td>
+                  <td className="max-w-[200px] truncate px-3 font-mono text-[12px] text-(--agenci-ink-2)">{a.target ?? "–"}</td>
+                  <td className="max-w-[320px] truncate px-5 font-mono text-[12px] text-(--agenci-ink-3)">{a.details === "{}" ? "" : a.details}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </section>
   );
 }
 
@@ -673,6 +775,24 @@ export default function AdminView({ tab, org }: { tab: AdminTab; org?: string })
   const openOrg = (id: string) => setSearch({ org: id });
 
   if (access.isPending) return <Loading />;
+  // One of us, but without 2FA: say how to get in.
+  if (access.data?.needsTwoFactor) {
+    return (
+      <div className="flex min-h-svh items-center justify-center bg-(--dash-bg) px-4">
+        <div className={cn(card, "max-w-md p-8 text-center")}>
+          <ShieldCheckIcon className="mx-auto size-8 text-(--agenci-ink)" strokeWidth={1.6} />
+          <h1 className="mt-4 text-[20px] font-semibold text-(--agenci-ink)">Slå på to-trinns innlogging</h1>
+          <p className="mt-2 text-[14px] leading-relaxed text-(--agenci-ink-2)">
+            Adminsiden gir tilgang til alle kundene. Derfor krever den to-trinns innlogging. Slå det på under
+            Innstillinger → Sikkerhet, og kom tilbake hit.
+          </p>
+          <Link to="/" className="mt-6 inline-flex h-10 items-center rounded-full bg-(--agenci-ink) px-5 text-[14px] font-medium text-white dark:text-[#0b0c0e]">
+            Til dashbordet
+          </Link>
+        </div>
+      </div>
+    );
+  }
   // Not one of us: show nothing that hints at an admin area.
   if (!access.data?.admin) {
     return (
@@ -714,6 +834,7 @@ export default function AdminView({ tab, org }: { tab: AdminTab; org?: string })
         {tab === "organizations" ? <OrganizationsTab openOrg={openOrg} /> : null}
         {tab === "users" ? <UsersTab openOrg={openOrg} /> : null}
         {tab === "database" ? <DatabaseTab /> : null}
+        {tab === "audit" ? <AuditTab /> : null}
       </main>
       {org ? <OrgDrawer id={org} onClose={() => setSearch({ org: undefined })} /> : null}
     </div>

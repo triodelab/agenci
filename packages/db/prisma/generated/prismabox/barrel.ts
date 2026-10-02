@@ -14,6 +14,8 @@ export * from "./Team";
 export * from "./TeamMember";
 export * from "./Member";
 export * from "./Invitation";
+export * from "./TwoFactor";
+export * from "./AdminAuditLog";
 export * from "./Subscription";
 export * from "./BillingPayment";
 export * from "./UsageMonthly";

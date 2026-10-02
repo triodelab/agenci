@@ -4,7 +4,7 @@
  */
 import { ac, admin, member, owner } from "@agenci/auth/permissions";
 import { createAuthClient } from "better-auth/react";
-import { organizationClient } from "better-auth/client/plugins";
+import { organizationClient, twoFactorClient } from "better-auth/client/plugins";
 
 export const authClient = createAuthClient({
   baseURL:
@@ -12,6 +12,12 @@ export const authClient = createAuthClient({
       ? window.location.origin
       : "http://localhost:3004",
   plugins: [
+    // Sign-in with 2FA on stops halfway; the code is asked for on /to-trinn.
+    twoFactorClient({
+      onTwoFactorRedirect() {
+        window.location.href = "/to-trinn";
+      },
+    }),
     organizationClient({
       ac,
       roles: { owner, admin, member },
