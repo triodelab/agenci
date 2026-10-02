@@ -237,7 +237,10 @@ export default function BillingView() {
   }, [usage]);
   const memberNames = (org?.members ?? []).map((m) => m.user?.name || m.user?.email || "?");
   const status = billing?.status;
+  const developer = status === "developer";
   const subscribed = status === "active" || status === "past_due";
+  /** Test mode: only the developers can open the payment page. */
+  const canPay = billing?.canPay ?? false;
   const trialLeft = daysLeft(billing?.trialEndsAt);
 
   const refresh = async () => {
@@ -268,7 +271,9 @@ export default function BillingView() {
       : goToCheckout(() => client.private.billing.startCheckout({ plan: id }), `plan-${id}`);
 
   const headline =
-    status === "trialing"
+    developer
+      ? "har utviklertilgang: full tilgang, ingen betaling."
+      : status === "trialing"
       ? `er i prøveperioden – ${trialLeft} ${trialLeft === 1 ? "dag" : "dager"} igjen (til ${dateFmt(billing?.trialEndsAt)}).`
       : status === "active"
         ? billing?.cancelAtPeriodEnd
@@ -307,7 +312,15 @@ export default function BillingView() {
       </header>
 
       {/* Action banner: trial ending, no plan, or a failed payment */}
-      {status === "past_due" ? (
+      {developer ? (
+        <section className={cn(cardClass, "px-5 py-4")}>
+          <p className="text-[14px] font-medium text-(--agenci-ink)">Utviklertilgang</p>
+          <p className="mt-0.5 text-[13px] text-(--agenci-ink-2)">
+            Organisasjonen har et medlem fra Agenci-teamet og blir aldri fakturert. Betalingen under kan testes
+            {billing?.testMode ? " med Nexi sine testkort" : ""}.
+          </p>
+        </section>
+      ) : status === "past_due" ? (
         <section className={cn(cardClass, "flex flex-wrap items-center gap-4 border-(--dash-bad)/40 px-5 py-4")}>
           <div className="min-w-0 flex-1">
             <p className="text-[14px] font-medium text-(--agenci-ink)">Betalingen gikk ikke gjennom</p>
@@ -339,14 +352,18 @@ export default function BillingView() {
                 : "Velg en plan, så svarer agentene kundene igjen med en gang."}
             </p>
           </div>
-          <button
-            type="button"
-            className={inkBtn}
-            disabled={busy === "plan-starter"}
-            onClick={() => void choose("starter")}
-          >
-            Velg Starter
-          </button>
+          {canPay ? (
+            <button
+              type="button"
+              className={inkBtn}
+              disabled={busy === "plan-starter"}
+              onClick={() => void choose("starter")}
+            >
+              Velg Starter
+            </button>
+          ) : (
+            <span className="text-[13px] font-medium text-(--agenci-ink-2)">Betaling åpner snart</span>
+          )}
         </section>
       ) : null}
 
@@ -356,8 +373,14 @@ export default function BillingView() {
           <div className="flex items-start gap-3 p-5">
             <div className="min-w-0 flex-1">
               <p className="flex items-center gap-2 text-[15px] font-semibold text-(--agenci-ink)">
-                {status === "trialing" ? `Prøveperiode · ${plan.name}` : subscribed ? plan.name : "Ingen plan"}
-                {status === "trialing" || status === "active" ? (
+                {developer
+                  ? "Utviklertilgang"
+                  : status === "trialing"
+                    ? `Prøveperiode · ${plan.name}`
+                    : subscribed
+                      ? plan.name
+                      : "Ingen plan"}
+                {developer || status === "trialing" || status === "active" ? (
                   <span className="inline-flex items-center gap-1 rounded-full border border-(--agenci-line) px-2 py-px text-[11.5px] font-medium text-(--dash-good)">
                     <span className="size-1.5 rounded-full bg-[#5FA06F]" />
                     {billing?.cancelAtPeriodEnd ? "Avsluttes" : "Aktiv"}
@@ -388,7 +411,7 @@ export default function BillingView() {
           <div className="mt-auto flex flex-wrap items-center gap-3 border-t border-(--agenci-line) px-5 py-4 dark:border-white/5">
             <p className="text-(--agenci-ink)">
               <span className="[font-family:var(--font-agenci-title)] text-[30px] leading-none font-medium tracking-[-0.03em]">
-                {status === "trialing" ? "0" : kr(plan.price)} kr
+                {developer || status === "trialing" ? "0" : kr(plan.price)} kr
               </span>
               <span className="ml-1 text-[13px] text-(--agenci-ink-3)">/mnd</span>
             </p>
@@ -563,6 +586,8 @@ export default function BillingView() {
                   <span className="mt-3 text-[12.5px] font-medium text-(--agenci-ink-2)">Din plan</span>
                 ) : next ? (
                   <span className="mt-3 text-[12.5px] font-medium text-(--agenci-ink-2)">Fra neste trekk</span>
+                ) : !canPay ? (
+                  <span className="mt-3 text-[12.5px] font-medium text-(--agenci-ink-3)">Betaling åpner snart</span>
                 ) : (
                   <button
                     type="button"

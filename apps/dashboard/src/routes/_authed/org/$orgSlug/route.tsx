@@ -37,7 +37,9 @@ function RouteComponent() {
   // No org number yet (organizations made before it was required): the
   // company is registered first. The server enforces this too.
   if (billing.data?.status === "needs_registration") {
-    const role = org?.members.find((m) => m.userId === session?.user.id)?.role;
+    // Wait for the membership: deciding "not the owner" too early is wrong.
+    if (!org || !session) return null;
+    const role = org.members.find((m) => m.userId === session.user.id)?.role;
     return <RegisterCompanyView canEdit={role === "owner" || role === "admin"} />;
   }
   if (onboarding) return <Outlet />;

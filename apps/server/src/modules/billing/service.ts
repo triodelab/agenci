@@ -23,6 +23,7 @@ import { GRACE_DAYS, isPlanId, type PlanId, PLANS, planAmounts, TRIAL_DAYS, TRIA
 const DAY = 86_400_000;
 
 export type BillingStatus =
+  | "developer"
   | "needs_registration"
   | "trialing"
   | "trial_ended"
@@ -57,10 +58,27 @@ export function osloPeriod(now = new Date()) {
   return `${p.find((x) => x.type === "year")?.value}-${p.find((x) => x.type === "month")?.value}`;
 }
 
+/** The team building Agenci (DEV_ACCESS_EMAILS). */
+export function isDeveloperEmail(email: string | null | undefined) {
+  if (!email) return false;
+  const list = env.DEV_ACCESS_EMAILS.split(",").map((e) => e.trim().toLowerCase()).filter(Boolean);
+  return list.includes(email.trim().toLowerCase());
+}
+
+/** An organization with one of the developers as a member: never billed. */
+export async function isDeveloperOrganization(organizationId: string) {
+  const members = await prisma.member.findMany({
+    where: { organizationId },
+    select: { user: { select: { email: true } } },
+  });
+  return members.some((m) => isDeveloperEmail(m.user.email));
+}
+
 export async function getBillingState(organizationId: string, now = new Date()): Promise<BillingState> {
-  const [account, sub] = await Promise.all([
+  const [account, sub, developer] = await Promise.all([
     prisma.billingAccount.findUnique({ where: { organizationId } }),
     prisma.subscription.findUnique({ where: { organizationId } }),
+    isDeveloperOrganization(organizationId),
   ]);
   const base = {
     company: account ? { orgNumber: account.orgNumber, name: account.companyName } : null,
@@ -70,6 +88,10 @@ export async function getBillingState(organizationId: string, now = new Date()):
     nextPlan: null as PlanId | null,
     testMode: env.NEXI_MODE !== "live",
   };
+
+  if (developer) {
+    return { ...base, status: "developer", plan: "business", canUseAI: true, conversationLimit: PLANS.business.conversations };
+  }
 
   const paidUntil = sub?.currentPeriodEnd?.getTime() ?? 0;
   const inGrace =
@@ -151,9 +173,26 @@ function requireNexi() {
   }
 }
 
+/**
+ * Who may open the payment page: anyone once Nexi is live; while it is in
+ * test mode only the developers (test cards would otherwise unlock a plan).
+ */
+export function canPay(email: string | null | undefined) {
+  return env.NEXI_MODE === "live" || isDeveloperEmail(email);
+}
+
+function requirePayer(email: string | null | undefined) {
+  if (!canPay(email)) {
+    throw new ORPCError("PRECONDITION_FAILED", {
+      message: "Betaling åpner snart. Dere kan bruke prøveperioden fullt ut i mellomtiden.",
+    });
+  }
+}
+
 /** Starts the embedded checkout for a plan: first month charged at once. */
-export async function startCheckout(organizationId: string, plan: PlanId) {
+export async function startCheckout(organizationId: string, plan: PlanId, email?: string | null) {
   requireNexi();
+  requirePayer(email);
   const account = await prisma.billingAccount.findUnique({ where: { organizationId } });
   if (!account) {
     throw new ORPCError("PRECONDITION_FAILED", { message: "Registrer bedriften med organisasjonsnummer først." });
@@ -177,8 +216,9 @@ export async function startCheckout(organizationId: string, plan: PlanId) {
 }
 
 /** Lets the customer swap the card on the subscription (expired card etc.). */
-export async function startCardUpdate(organizationId: string) {
+export async function startCardUpdate(organizationId: string, email?: string | null) {
   requireNexi();
+  requirePayer(email);
   const sub = await prisma.subscription.findUnique({ where: { organizationId } });
   if (!sub?.nexiSubscriptionId || !isPlanId(sub.plan)) {
     throw new ORPCError("PRECONDITION_FAILED", { message: "Det finnes ikke noe abonnement å oppdatere." });
