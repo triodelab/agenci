@@ -1,8 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { demoKnowledge } from "@/features/agents/ui/components/overview-mock";
 import { client } from "@/lib/api";
-import { useDemoMode } from "@/lib/demo-mode";
 import { getQueryClient } from "@/router";
 
 export type KnowledgeOverview = Awaited<
@@ -27,22 +25,15 @@ function invalidateKnowledge(agentId: string) {
   void queryClient.invalidateQueries({ queryKey: ["agent", agentId] });
 }
 
-/**
- * Everything the agent knows. With "Demodata" on, agent profile and brand are
- * real but sources/chunks come from the seeded demo set.
- */
+/** Everything the agent knows. */
 export function useKnowledgeOverviewQuery(agentId: string) {
-  const { on: demo } = useDemoMode();
   return useQuery({
-    queryKey: ["knowledge", agentId, "overview", demo ? "demo" : "live"],
-    queryFn: async (): Promise<KnowledgeOverview> => {
-      const real = await client.private.knowledge.overview({ agentId });
-      if (!demo) return real;
-      return { ...real, ...demoKnowledge() } as KnowledgeOverview;
-    },
+    queryKey: ["knowledge", agentId, "overview"],
+    queryFn: (): Promise<KnowledgeOverview> =>
+      client.private.knowledge.overview({ agentId }),
     // Poll while something is still being indexed.
     refetchInterval: (query) =>
-      !demo && query.state.data?.sources.some(isSourceBusy) ? 4_000 : false,
+      query.state.data?.sources.some(isSourceBusy) ? 4_000 : false,
   });
 }
 
@@ -50,27 +41,11 @@ export function useKnowledgeSourceQuery(
   agentId: string,
   documentId: string | null,
 ) {
-  const { on: demo } = useDemoMode();
   return useQuery({
-    queryKey: ["knowledge", agentId, "source", documentId, demo],
+    queryKey: ["knowledge", agentId, "source", documentId],
     enabled: Boolean(documentId),
     queryFn: async (): Promise<KnowledgeSourceDetail | null> => {
       if (!documentId) return null;
-      if (demo) {
-        const s = demoKnowledge().sources.find((x) => x.id === documentId);
-        if (!s) return null;
-        return {
-          id: s.id,
-          name: s.name,
-          url: s.url,
-          preview: s.chunks.map((c) => c.excerpt).join("\n\n"),
-          chunks: s.chunks.map((c) => ({
-            index: c.index,
-            title: c.title,
-            text: c.excerpt,
-          })),
-        };
-      }
       const { source } = await client.private.knowledge.source({
         agentId,
         documentId,

@@ -11,6 +11,7 @@ import prisma from "@agenci/db";
 import { env } from "@agenci/env/server";
 import { ORPCError } from "@orpc/server";
 import { lookupCompany } from "./brreg";
+import { SELLER, sellerOrgLine, sellerVatRegistered } from "./seller";
 import {
   bulkCharge,
   createSubscriptionCheckout,
@@ -232,6 +233,41 @@ export async function startCardUpdate(organizationId: string, email?: string | n
   return { paymentId, checkoutKey: env.NEXI_CHECKOUT_KEY as string, scriptUrl: NEXI_CHECKOUT_JS };
 }
 
+/** Net and VAT inside a charged total (VAT only when VAT-registered). */
+function splitVat(total: number) {
+  if (!sellerVatRegistered()) return { netAmount: total, vatAmount: 0 };
+  const net = Math.round(total / 1.25);
+  return { netAmount: net, vatAmount: total - net };
+}
+
+/** Everything an invoice shows for one payment (this organization only). */
+export async function getInvoice(organizationId: string, paymentId: string) {
+  const p = await prisma.billingPayment.findFirst({ where: { id: paymentId, organizationId } });
+  if (!p) throw new ORPCError("NOT_FOUND", { message: "Fakturaen finnes ikke." });
+  const [account, org] = await Promise.all([
+    prisma.billingAccount.findUnique({ where: { organizationId } }),
+    prisma.organization.findUnique({ where: { id: organizationId }, select: { name: true } }),
+  ]);
+  const plan = isPlanId(p.plan) ? PLANS[p.plan] : null;
+  return {
+    number: `AG-${1000 + p.invoiceNumber}`,
+    issuedAt: p.createdAt.toISOString(),
+    status: p.status,
+    periodStart: p.periodStart.toISOString(),
+    periodEnd: p.periodEnd.toISOString(),
+    seller: { ...SELLER, orgLine: sellerOrgLine(), vatRegistered: sellerVatRegistered() },
+    buyer: {
+      name: account?.companyName ?? org?.name ?? "",
+      orgNumber: account?.orgNumber ?? null,
+    },
+    line: { description: `Agenci ${plan?.name ?? p.plan} – abonnement 1 måned`, conversations: plan?.conversations ?? null },
+    netAmount: p.netAmount || p.amount,
+    vatAmount: p.vatAmount,
+    amount: p.amount,
+    currency: p.currency,
+  };
+}
+
 /** "<orgId>:<plan>:<…>" — the order reference we set on every payment. */
 function parseReference(reference: string | undefined) {
   const [organizationId, plan] = (reference ?? "").split(":");
@@ -287,11 +323,12 @@ export async function applyChargedPayment(paymentId: string) {
         nexiPaymentId: paymentId,
         plan: ref.plan,
         amount: charged,
+        ...splitVat(charged),
         status: "paid",
         periodStart,
         periodEnd,
       },
-      update: { status: "paid", amount: charged, periodStart, periodEnd },
+      update: { status: "paid", amount: charged, ...splitVat(charged), periodStart, periodEnd },
     }),
   ]);
   return { applied: true as const, organizationId: ref.organizationId };
@@ -352,7 +389,7 @@ export async function listPayments(organizationId: string) {
     where: { organizationId },
     orderBy: { createdAt: "desc" },
     take: 24,
-    select: { id: true, plan: true, amount: true, currency: true, status: true, periodStart: true, periodEnd: true, createdAt: true },
+    select: { id: true, invoiceNumber: true, plan: true, amount: true, currency: true, status: true, periodStart: true, periodEnd: true, createdAt: true },
   });
 }
 

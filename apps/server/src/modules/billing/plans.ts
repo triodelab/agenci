@@ -1,6 +1,8 @@
+import { sellerVatRegistered } from "./seller";
+
 /**
- * Plans as sold on agenci.no/priser. Prices are per month, excluding 25 %
- * MVA, in øre. The 30-day trial gets the Starter limits.
+ * Plans as sold on agenci.no/priser. Prices are per month, excluding MVA,
+ * in øre. The 30-day trial gets the Starter limits.
  */
 export const PLANS = {
   starter: { id: "starter", name: "Starter", price: 49_900, conversations: 500, agents: 1 },
@@ -17,11 +19,15 @@ export const TRIAL_PLAN: PlanId = "starter";
 export const GRACE_DAYS = 7;
 export const VAT_RATE = 0.25;
 
-/** Amounts Nexi needs for one month of a plan (øre). */
+/**
+ * Amounts for one month of a plan (øre). No VAT until the seller is
+ * VAT-registered (it may not charge VAT before that).
+ */
 export function planAmounts(plan: PlanId) {
   const net = PLANS[plan].price;
-  const tax = Math.round(net * VAT_RATE);
-  return { net, tax, gross: net + tax, taxRate: Math.round(VAT_RATE * 10_000) };
+  const rate = sellerVatRegistered() ? VAT_RATE : 0;
+  const tax = Math.round(net * rate);
+  return { net, tax, gross: net + tax, taxRate: Math.round(rate * 10_000) };
 }
 
 export function isPlanId(value: string): value is PlanId {

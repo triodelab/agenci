@@ -14,6 +14,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthedIndexRouteImport } from './routes/_authed/index'
 import { Route as AuthedBetalingRouteImport } from './routes/_authed/betaling'
 import { Route as AcceptInvitationInvitationIdRouteImport } from './routes/accept-invitation.$invitationId'
+import { Route as AuthedFakturaInvoiceIdRouteImport } from './routes/_authed/faktura.$invoiceId'
 import { Route as AuthedOrgOrgSlugRouteRouteImport } from './routes/_authed/org/$orgSlug/route'
 import { Route as AuthedOrgCreateRouteImport } from './routes/_authed/org/create'
 import { Route as AuthedOrgOrganizationRouteImport } from './routes/_authed/org/organization'
@@ -64,6 +65,11 @@ const AcceptInvitationInvitationIdRoute =
     path: '/accept-invitation/$invitationId',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AuthedFakturaInvoiceIdRoute = AuthedFakturaInvoiceIdRouteImport.update({
+  id: '/faktura/$invoiceId',
+  path: '/faktura/$invoiceId',
+  getParentRoute: () => AuthedRoute,
+} as any)
 const AuthedOrgOrgSlugRouteRoute = AuthedOrgOrgSlugRouteRouteImport.update({
   id: '/org/$orgSlug',
   path: '/org/$orgSlug',
@@ -208,6 +214,7 @@ export interface FileRoutesByFullPath {
   '/betaling': typeof AuthedBetalingRoute
   '/accept-invitation/$invitationId': typeof AcceptInvitationInvitationIdRoute
   '/org/$orgSlug': typeof AuthedOrgOrgSlugRouteRouteWithChildren
+  '/faktura/$invoiceId': typeof AuthedFakturaInvoiceIdRoute
   '/org/create': typeof AuthedOrgCreateRoute
   '/org/organization': typeof AuthedOrgOrganizationRoute
   '/org/$orgSlug/agents': typeof AuthedOrgOrgSlugAgentsRouteWithChildren
@@ -237,6 +244,7 @@ export interface FileRoutesByTo {
   '/betaling': typeof AuthedBetalingRoute
   '/accept-invitation/$invitationId': typeof AcceptInvitationInvitationIdRoute
   '/': typeof AuthedIndexRoute
+  '/faktura/$invoiceId': typeof AuthedFakturaInvoiceIdRoute
   '/org/create': typeof AuthedOrgCreateRoute
   '/org/organization': typeof AuthedOrgOrganizationRoute
   '/org/$orgSlug/billing': typeof AuthedOrgOrgSlugBillingRoute
@@ -266,6 +274,7 @@ export interface FileRoutesById {
   '/accept-invitation/$invitationId': typeof AcceptInvitationInvitationIdRoute
   '/_authed/': typeof AuthedIndexRoute
   '/_authed/org/$orgSlug': typeof AuthedOrgOrgSlugRouteRouteWithChildren
+  '/_authed/faktura/$invoiceId': typeof AuthedFakturaInvoiceIdRoute
   '/_authed/org/create': typeof AuthedOrgCreateRoute
   '/_authed/org/organization': typeof AuthedOrgOrganizationRoute
   '/_authed/org/$orgSlug/agents': typeof AuthedOrgOrgSlugAgentsRouteWithChildren
@@ -298,6 +307,7 @@ export interface FileRouteTypes {
     | '/betaling'
     | '/accept-invitation/$invitationId'
     | '/org/$orgSlug'
+    | '/faktura/$invoiceId'
     | '/org/create'
     | '/org/organization'
     | '/org/$orgSlug/agents'
@@ -327,6 +337,7 @@ export interface FileRouteTypes {
     | '/betaling'
     | '/accept-invitation/$invitationId'
     | '/'
+    | '/faktura/$invoiceId'
     | '/org/create'
     | '/org/organization'
     | '/org/$orgSlug/billing'
@@ -355,6 +366,7 @@ export interface FileRouteTypes {
     | '/accept-invitation/$invitationId'
     | '/_authed/'
     | '/_authed/org/$orgSlug'
+    | '/_authed/faktura/$invoiceId'
     | '/_authed/org/create'
     | '/_authed/org/organization'
     | '/_authed/org/$orgSlug/agents'
@@ -422,6 +434,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/accept-invitation/$invitationId'
       preLoaderRoute: typeof AcceptInvitationInvitationIdRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authed/faktura/$invoiceId': {
+      id: '/_authed/faktura/$invoiceId'
+      path: '/faktura/$invoiceId'
+      fullPath: '/faktura/$invoiceId'
+      preLoaderRoute: typeof AuthedFakturaInvoiceIdRouteImport
+      parentRoute: typeof AuthedRoute
     }
     '/_authed/org/$orgSlug': {
       id: '/_authed/org/$orgSlug'
@@ -699,6 +718,7 @@ interface AuthedRouteChildren {
   AuthedBetalingRoute: typeof AuthedBetalingRoute
   AuthedIndexRoute: typeof AuthedIndexRoute
   AuthedOrgOrgSlugRouteRoute: typeof AuthedOrgOrgSlugRouteRouteWithChildren
+  AuthedFakturaInvoiceIdRoute: typeof AuthedFakturaInvoiceIdRoute
   AuthedOrgCreateRoute: typeof AuthedOrgCreateRoute
   AuthedOrgOrganizationRoute: typeof AuthedOrgOrganizationRoute
 }
@@ -707,6 +727,7 @@ const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedBetalingRoute: AuthedBetalingRoute,
   AuthedIndexRoute: AuthedIndexRoute,
   AuthedOrgOrgSlugRouteRoute: AuthedOrgOrgSlugRouteRouteWithChildren,
+  AuthedFakturaInvoiceIdRoute: AuthedFakturaInvoiceIdRoute,
   AuthedOrgCreateRoute: AuthedOrgCreateRoute,
   AuthedOrgOrganizationRoute: AuthedOrgOrganizationRoute,
 }

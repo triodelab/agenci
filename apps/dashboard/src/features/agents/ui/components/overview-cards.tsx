@@ -1,7 +1,7 @@
 /**
  * Agent overview tiles (reference: smart-home overview, warm palette).
  * Every number is derived from the conversations and knowledge-base sources
- * passed in — real data, or the seeded demo set when "Demodata" is on.
+ * passed in.
  * Type, radii, segment control and status tones follow apps/web/DESIGN.md.
  */
 import { Link, useParams } from "@tanstack/react-router";

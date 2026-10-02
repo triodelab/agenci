@@ -17,7 +17,6 @@ import {
   SlidersHorizontalIcon,
 } from "lucide-react";
 import { useMemo, useState } from "react";
-import { DemoSwitch } from "@/components/demo-switch";
 import {
   type ConversationSummary,
   useConversationsQuery,
@@ -193,7 +192,6 @@ export function ConversationsLayout({
           </DropdownMenu>
         </div>
         <div className="ml-auto flex shrink-0 items-center gap-2">
-          <DemoSwitch />
           <button
             aria-label="Oppdater"
             className={roundIconButton}

@@ -281,13 +281,11 @@ function SourcePanel({
   onSelect,
   onDelete,
   deleting,
-  readOnly,
 }: {
   source: KnowledgeSource;
   onSelect: (s: GraphSelection) => void;
   onDelete: () => void;
   deleting: boolean;
-  readOnly: boolean;
 }) {
   const [confirm, setConfirm] = useState(false);
   return (
@@ -352,10 +350,7 @@ function SourcePanel({
         ) : null}
         <button
           type="button"
-          disabled={readOnly || deleting}
-          title={
-            readOnly ? "Slå av demodata for å endre kunnskapsbasen" : undefined
-          }
+          disabled={deleting}
           onClick={() => (confirm ? onDelete() : setConfirm(true))}
           onBlur={() => setConfirm(false)}
           className={cn(
@@ -520,7 +515,6 @@ export function KnowledgePanel({
   onSelect,
   onDelete,
   deleting,
-  readOnly,
 }: {
   agentId: string;
   data: KnowledgeOverview;
@@ -529,7 +523,6 @@ export function KnowledgePanel({
   onSelect: (s: GraphSelection) => void;
   onDelete: (sourceId: string) => void;
   deleting: boolean;
-  readOnly: boolean;
 }) {
   const source = selection
     ? data.sources.find((s) => s.id === selection.sourceId)
@@ -552,7 +545,6 @@ export function KnowledgePanel({
         onSelect={onSelect}
         onDelete={() => onDelete(source.id)}
         deleting={deleting}
-        readOnly={readOnly}
       />
     );
   }

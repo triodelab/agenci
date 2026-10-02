@@ -272,7 +272,6 @@ export function KnowledgeAssistant({
   agentName,
   sources,
   focusSource,
-  demo,
   onClearFocus,
   onShowChunk,
   open,
@@ -282,7 +281,6 @@ export function KnowledgeAssistant({
   agentName: string;
   sources: KnowledgeSource[];
   focusSource: KnowledgeSource | null;
-  demo: boolean;
   onClearFocus: () => void;
   onShowChunk: (documentId: string, index: number) => void;
   /** The assistant is a slide-over panel; the page controls it. */
@@ -525,12 +523,6 @@ export function KnowledgeAssistant({
                   </button>
                 ))}
               </div>
-              {demo ? (
-                <p className="mt-3 text-center text-[12px] text-(--agenci-ink-3)">
-                  Svarer alltid ut fra den ekte kunnskapsbasen, også når
-                  demodata vises.
-                </p>
-              ) : null}
             </div>
           ) : null}
           {turns.map((t) =>

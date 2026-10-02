@@ -1,7 +1,6 @@
 import { useParams } from "@tanstack/react-router";
 import { cn } from "@workspace/ui/lib/utils";
-import { useEffect, useMemo, useState } from "react";
-import { DemoSwitch } from "@/components/demo-switch";
+import { useEffect, useState } from "react";
 import {
   useAgentDocumentsQuery,
   useAgentQuery,
@@ -14,10 +13,8 @@ import {
   ResolutionTile,
   tileClass,
 } from "@/features/agents/ui/components/overview-cards";
-import { demoDocuments } from "@/features/agents/ui/components/overview-mock";
 import { useConversationsQuery } from "@/features/conversations/queries/conversations-queries";
 import { authClient } from "@/lib/auth-client";
-import { useDemoMode } from "@/lib/demo-mode";
 
 function useNow(intervalMs = 30_000) {
   const [now, setNow] = useState(() => new Date());
@@ -54,15 +51,9 @@ export default function AgentOverviewView() {
   const { data, isPending } = useAgentQuery(agentId);
   const { data: conversations = [], isPending: conversationsPending } =
     useConversationsQuery(agentId);
-  const { data: realDocuments = [], isPending: documentsPending } =
+  const { data: documents = [], isPending: documentsPending } =
     useAgentDocumentsQuery(agentId);
   const agent = data?.agent;
-
-  // Conversations come from the shared query (demo-aware); documents are
-  // swapped here since the documents query is not demo-aware.
-  const { on: demo } = useDemoMode();
-  const demoDocs = useMemo(() => demoDocuments(), []);
-  const documents = demo ? demoDocs : realDocuments;
 
   if (!isPending && !agent) {
     return (
@@ -73,7 +64,7 @@ export default function AgentOverviewView() {
   }
 
   const loading =
-    isPending || (!demo && (conversationsPending || documentsPending));
+    isPending || conversationsPending || documentsPending;
   const state = (agent && AGENT_STATE[agent.status]) ?? {
     label: "er aktiv og svarer kunder",
     dot: "bg-[#3F7A4A]",
@@ -103,9 +94,6 @@ export default function AgentOverviewView() {
               "Laster agent…"
             )}
           </p>
-        </div>
-        <div className="ml-auto">
-          <DemoSwitch />
         </div>
       </header>
 

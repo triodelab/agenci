@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { toast } from "sonner";
-import { useDemoMode } from "@/lib/demo-mode";
 import {
   getSidebarStart,
   getStartPage,
@@ -10,10 +9,9 @@ import {
   type StartPage,
 } from "@/lib/preferences";
 import { useTheme } from "@/lib/theme";
-import { Choice, Section, SettingsHeader, ToggleRow } from "../settings-ui";
+import { Choice, Section, SettingsHeader } from "../settings-ui";
 
 export function PreferencesSettings() {
-  const demo = useDemoMode();
   const { theme, setTheme } = useTheme();
   const [start, setStart] = useState<StartPage>(getStartPage);
   const [sidebar, setSidebar] = useState<SidebarStart>(getSidebarStart);
@@ -80,19 +78,6 @@ export function PreferencesSettings() {
         />
       </Section>
 
-      <Section
-        title="Demodata"
-        description="Eksempeltall og samtaler som viser hvordan Agenci ser ut i bruk. Nyttig før du har trafikk, eller når du viser frem løsningen."
-      >
-        <div className="divide-y divide-(--agenci-line)">
-          <ToggleRow
-            title="Vis demodata"
-            description="Gjelder oversikten, samtaler, kunnskapsbasen og fakturasiden. Dine ekte data påvirkes ikke."
-            checked={demo.on}
-            onChange={() => demo.toggle()}
-          />
-        </div>
-      </Section>
     </div>
   );
 }
