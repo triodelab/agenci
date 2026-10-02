@@ -1,3 +1,4 @@
+import { SupportChat } from "@/components/support-chat";
 import type { Metadata } from "next";
 import { PriserView } from "@/modules/landing/ui/views/priser-view";
 
@@ -9,5 +10,10 @@ export const metadata: Metadata = {
 };
 
 export default function PriserPage() {
-  return <PriserView />;
+  return (
+    <>
+      <PriserView />
+      <SupportChat />
+    </>
+  );
 }

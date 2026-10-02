@@ -1,3 +1,4 @@
+import { SupportChat } from "@/components/support-chat";
 import type { Metadata } from "next";
 import { ProduktetView } from "@/modules/landing/ui/views/produktet-view";
 
@@ -9,5 +10,10 @@ export const metadata: Metadata = {
 };
 
 export default function ProduktetPage() {
-  return <ProduktetView />;
+  return (
+    <>
+      <ProduktetView />
+      <SupportChat />
+    </>
+  );
 }
