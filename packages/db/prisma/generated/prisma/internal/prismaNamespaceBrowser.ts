@@ -62,6 +62,11 @@ export const ModelName = {
   TeamMember: 'TeamMember',
   Member: 'Member',
   Invitation: 'Invitation',
+  Subscription: 'Subscription',
+  BillingPayment: 'BillingPayment',
+  UsageMonthly: 'UsageMonthly',
+  BillingAccount: 'BillingAccount',
+  TrialClaim: 'TrialClaim',
   ContactSession: 'ContactSession',
   Conversation: 'Conversation',
   Document: 'Document'
@@ -245,6 +250,78 @@ export const InvitationScalarFieldEnum = {
 export type InvitationScalarFieldEnum = (typeof InvitationScalarFieldEnum)[keyof typeof InvitationScalarFieldEnum]
 
 
+export const SubscriptionScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  plan: 'plan',
+  status: 'status',
+  nexiSubscriptionId: 'nexiSubscriptionId',
+  nexiPaymentId: 'nexiPaymentId',
+  currentPeriodStart: 'currentPeriodStart',
+  currentPeriodEnd: 'currentPeriodEnd',
+  cancelAtPeriodEnd: 'cancelAtPeriodEnd',
+  pastDueSince: 'pastDueSince',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SubscriptionScalarFieldEnum = (typeof SubscriptionScalarFieldEnum)[keyof typeof SubscriptionScalarFieldEnum]
+
+
+export const BillingPaymentScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  nexiPaymentId: 'nexiPaymentId',
+  plan: 'plan',
+  amount: 'amount',
+  currency: 'currency',
+  status: 'status',
+  periodStart: 'periodStart',
+  periodEnd: 'periodEnd',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type BillingPaymentScalarFieldEnum = (typeof BillingPaymentScalarFieldEnum)[keyof typeof BillingPaymentScalarFieldEnum]
+
+
+export const UsageMonthlyScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  period: 'period',
+  messages: 'messages',
+  inputTokens: 'inputTokens',
+  outputTokens: 'outputTokens',
+  byModel: 'byModel',
+  updatedAt: 'updatedAt'
+} as const
+
+export type UsageMonthlyScalarFieldEnum = (typeof UsageMonthlyScalarFieldEnum)[keyof typeof UsageMonthlyScalarFieldEnum]
+
+
+export const BillingAccountScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  orgNumber: 'orgNumber',
+  companyName: 'companyName',
+  trialStartedAt: 'trialStartedAt',
+  trialEndsAt: 'trialEndsAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type BillingAccountScalarFieldEnum = (typeof BillingAccountScalarFieldEnum)[keyof typeof BillingAccountScalarFieldEnum]
+
+
+export const TrialClaimScalarFieldEnum = {
+  orgNumber: 'orgNumber',
+  organizationId: 'organizationId',
+  claimedAt: 'claimedAt'
+} as const
+
+export type TrialClaimScalarFieldEnum = (typeof TrialClaimScalarFieldEnum)[keyof typeof TrialClaimScalarFieldEnum]
+
+
 export const ContactSessionScalarFieldEnum = {
   id: 'id',
   organizationId: 'organizationId',
@@ -311,6 +388,13 @@ export const NullableJsonNullValueInput = {
 } as const
 
 export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
 export const QueryMode = {

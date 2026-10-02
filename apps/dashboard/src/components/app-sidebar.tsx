@@ -59,6 +59,7 @@ import {
 import { useAgentQuery } from "@/features/agents/queries/agents-queries";
 import { authClient } from "@/lib/auth-client";
 import { getSidebarStart } from "@/lib/preferences";
+import { useBillingStatus } from "@/features/billing/billing-queries";
 import { useTheme } from "@/lib/theme";
 
 const WEB_APP_URL =
@@ -347,7 +348,7 @@ function SidebarBrand({
 }
 
 // ─── PlanCard ────────────────────────────────────────────────────────────────
-// Subscription data will come from oRPC when private billing router lands.
+// Trial days left, or what to do when there is no plan (server is the truth).
 
 function PlanCard({
   collapsed,
@@ -359,7 +360,21 @@ function PlanCard({
   /** Inside an agent the billing link stays in the agent (keeps its sidebar). */
   agentId?: string;
 }) {
+  const { data: billing } = useBillingStatus();
   if (collapsed) return null;
+  // Paying and fine: no nagging card.
+  if (billing?.status === "active" && !billing.cancelAtPeriodEnd) return null;
+  const left = billing?.trialEndsAt
+    ? Math.max(0, Math.ceil((new Date(billing.trialEndsAt).getTime() - Date.now()) / 86_400_000))
+    : 0;
+  const copy =
+    billing?.status === "trialing"
+      ? { title: `${left} ${left === 1 ? "dag" : "dager"} igjen av prøveperioden`, body: "Velg en plan når du er klar. Ingenting trekkes automatisk.", cta: "Velg plan" }
+      : billing?.status === "past_due"
+        ? { title: "Betalingen feilet", body: "Oppdater kortet, så fortsetter agentene å svare.", cta: "Oppdater kort" }
+        : billing?.status === "active"
+          ? { title: "Abonnementet avsluttes", body: "Fortsett abonnementet for å beholde agentene.", cta: "Se plan" }
+          : { title: "Ingen aktiv plan", body: "Agentene svarer ikke kundene før dere velger en plan.", cta: "Velg plan" };
 
   const billingUrl = agentId
     ? `${agentBase(orgSlug, agentId)}/billing`
@@ -371,16 +386,16 @@ function PlanCard({
         <ZapIcon className="size-3.5" strokeWidth={2} />
       </div>
       <p className="text-[13px] font-semibold leading-snug text-(--agenci-ink)">
-        Oppgrader plan
+        {copy.title}
       </p>
       <p className="mt-1 text-[12px] leading-relaxed text-(--agenci-ink-2)">
-        Lås opp AI-agenter, kunnskapsbase og tilpasning
+        {copy.body}
       </p>
       <DashboardNavLink
         to={billingUrl}
         className="mt-3 inline-flex h-8 items-center gap-1.5 rounded-full bg-(--agenci-accent) px-3.5 text-[12px] font-medium text-white transition-colors hover:bg-(--agenci-accent-hover) active:scale-[0.97] dark:text-[#0b0c0e]"
       >
-        Se planer <span aria-hidden>→</span>
+        {copy.cta} <span aria-hidden>→</span>
       </DashboardNavLink>
     </div>
   );

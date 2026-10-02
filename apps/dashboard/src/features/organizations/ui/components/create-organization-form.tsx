@@ -7,6 +7,12 @@ import { AgenciLoader } from "@/components/agenci-loader";
 import { authLabelCls, PasswordInput } from "@/components/auth-shell";
 import { OnboardingShell, onboardingLinkCls } from "@/components/onboarding-shell";
 import { authClient } from "@/lib/auth-client";
+import { client } from "@/lib/api";
+import {
+  CompanyNumberField,
+  prettyCompanyName,
+  useFoundCompany,
+} from "@/features/billing/ui/components/company-number-field";
 import { slugify } from "@/lib/ui";
 import { errCls } from "./org-shared-ui";
 
@@ -20,23 +26,29 @@ async function freeSlug(name: string) {
   return `${base}-${Math.random().toString(36).slice(2, 6)}`;
 }
 
-/** Step 1 of onboarding: name the company. Step 2 is the first agent. */
+/**
+ * Step 1 of onboarding: the company, by org number (Enhetsregisteret gives
+ * the name). The org number is what allows one free trial per company.
+ * Step 2 is the first agent.
+ */
 export default function CreateOrganizationForm() {
   const navigate = useNavigate();
   const { data: session } = authClient.useSession();
-  const [name, setName] = useState("");
+  const [orgNumber, setOrgNumber] = useState("");
+  const company = useFoundCompany(orgNumber);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const firstName = session?.user.name?.split(" ")[0];
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!name.trim()) return;
+    if (!company) return;
     setLoading(true);
     setError(null);
+    const name = prettyCompanyName(company.name);
     try {
       const { data, error: createError } = await authClient.organization.create({
-        name: name.trim(),
+        name,
         slug: await freeSlug(name),
       });
       if (createError || !data) {
@@ -44,6 +56,14 @@ export default function CreateOrganizationForm() {
         return;
       }
       await authClient.organization.setActive({ organizationId: data.id });
+      try {
+        await client.private.billing.registerCompany({ orgNumber: company.orgNumber });
+      } catch (registerError) {
+        // E.g. the company already uses Agenci: don't leave an empty organization behind.
+        await authClient.organization.delete({ organizationId: data.id });
+        setError(registerError instanceof Error ? registerError.message : "Kunne ikke registrere bedriften.");
+        return;
+      }
       await navigate({
         to: "/org/$orgSlug/onboarding",
         params: { orgSlug: data.slug },
@@ -80,39 +100,23 @@ export default function CreateOrganizationForm() {
           {firstName ? `Velkommen, ${firstName}.` : "Velkommen."}
         </p>
         <h1 className="mt-2 [font-family:var(--font-agenci-title)] text-[40px] leading-[1.05] font-medium tracking-[-0.03em] text-(--agenci-ink)">
-          Hva heter bedriften din?
+          Hvilken bedrift gjelder det?
         </h1>
         <p className="mt-4 text-[16px] leading-relaxed text-(--agenci-ink-2)">
-          Agentene, samtalene og teamet ditt samles her. Etterpå setter vi opp
-          den første agenten sammen, det tar et par minutter.
+          Skriv organisasjonsnummeret, så henter vi resten. Du får 30 dager
+          gratis, uten kort. Etterpå setter vi opp den første agenten sammen.
         </p>
 
-        <label className="mt-10 block">
-          <span className="mb-2.5 block text-[14px] font-medium text-(--agenci-ink)">
-            Bedriftsnavn
-          </span>
-          <input
-            // biome-ignore lint/a11y/noAutofocus: the only field of this step
-            autoFocus
-            required
-            value={name}
-            maxLength={80}
-            disabled={loading}
-            onChange={(e) => setName(e.currentTarget.value)}
-            placeholder="F.eks. Nordlys AS"
-            className="h-14 w-full rounded-[12px] border border-(--dash-field) bg-(--dash-surface) px-5 text-[17px] text-(--agenci-ink) outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-(--dash-placeholder) focus:border-(--agenci-ink-3) focus:shadow-[0_0_0_4px_rgb(36_50_54/0.07)] disabled:opacity-60"
-          />
-          <span className="mt-2.5 block text-[13px] text-(--agenci-ink-3)">
-            Du kan endre navnet og invitere kolleger senere.
-          </span>
-        </label>
+        <div className="mt-10">
+          <CompanyNumberField value={orgNumber} onChange={setOrgNumber} disabled={loading} autoFocus />
+        </div>
 
         {error ? <p className={cn(errCls, "mt-5")}>{error}</p> : null}
 
         <div className="mt-10 flex justify-end">
           <button
             type="submit"
-            disabled={loading || !name.trim()}
+            disabled={loading || !company}
             className="group inline-flex h-12 items-center gap-2 rounded-full bg-(--agenci-ink) pr-5 pl-6 text-[15px] font-medium text-(--dash-on-ink) shadow-[0_8px_20px_-10px_rgb(5_6_7/0.6)] transition-[background-color,opacity,transform] duration-150 hover:bg-(--agenci-accent-hover) active:scale-[0.97] disabled:pointer-events-none disabled:opacity-35"
           >
             {loading ? (

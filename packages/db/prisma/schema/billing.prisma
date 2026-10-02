@@ -1,0 +1,93 @@
+/// One per organization once it has started a paid plan (none = free plan).
+model Subscription {
+  id                 String       @id @default(cuid())
+  organizationId     String       @unique
+  organization       Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  /// "starter" | "pro" (see apps/server/src/modules/billing/plans.ts)
+  plan               String
+  /// "pending" (checkout started) | "active" | "past_due" | "canceled"
+  status             String       @default("pending")
+  /// Nexi Checkout subscription id — charged every month.
+  nexiSubscriptionId String?      @unique
+  /// The checkout payment that created (or last updated) the subscription.
+  nexiPaymentId      String?
+  currentPeriodStart DateTime?
+  currentPeriodEnd   DateTime?
+  /// Cancelled by the customer: stays active until currentPeriodEnd.
+  cancelAtPeriodEnd  Boolean      @default(false)
+  /// When the last charge failed (drives the grace period).
+  pastDueSince       DateTime?
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+
+  @@map("subscriptions")
+}
+
+/// Every charge attempt — the invoice list in the dashboard.
+model BillingPayment {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  nexiPaymentId  String       @unique
+  plan           String
+  /// Including VAT, in øre (499 kr = 49900).
+  amount         Int
+  currency       String       @default("NOK")
+  /// "pending" | "paid" | "failed"
+  status         String       @default("pending")
+  periodStart    DateTime
+  periodEnd      DateTime
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([organizationId, createdAt])
+  @@map("billing_payments")
+}
+
+/// AI usage per organization per calendar month (Europe/Oslo), for cost
+/// tracking. Conversations are counted from the conversations table.
+model UsageMonthly {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  /// "2026-10"
+  period         String
+  messages       Int          @default(0)
+  inputTokens    Int          @default(0)
+  outputTokens   Int          @default(0)
+  /// Tokens per model, e.g. {"openai/gpt-4o-mini":{"in":1200,"out":300}}
+  byModel        Json         @default("{}")
+  updatedAt      DateTime     @updatedAt
+
+  @@unique([organizationId, period])
+  @@map("usage_monthly")
+}
+
+/// The company behind an organization. Required before agents can answer:
+/// the org number (Enhetsregisteret) is what limits the trial to one per company.
+model BillingAccount {
+  id             String       @id @default(cuid())
+  organizationId String       @unique
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  /// 9 digits, verified active in Enhetsregisteret. One organization per company.
+  orgNumber      String       @unique
+  companyName    String
+  /// Null when the org number had already used its trial.
+  trialStartedAt DateTime?
+  trialEndsAt    DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@map("billing_accounts")
+}
+
+/// Org numbers that have had the free trial. Deliberately NOT linked to the
+/// organization: it outlives deleted organizations, so the trial is once per
+/// company, ever.
+model TrialClaim {
+  orgNumber      String   @id
+  organizationId String
+  claimedAt      DateTime @default(now())
+
+  @@map("trial_claims")
+}

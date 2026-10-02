@@ -197,6 +197,10 @@ export type OrganizationWhereInput = {
   agents?: Prisma.AgentListRelationFilter
   contactSessions?: Prisma.ContactSessionListRelationFilter
   conversations?: Prisma.ConversationListRelationFilter
+  subscription?: Prisma.XOR<Prisma.SubscriptionNullableScalarRelationFilter, Prisma.SubscriptionWhereInput> | null
+  billingPayments?: Prisma.BillingPaymentListRelationFilter
+  usageMonthly?: Prisma.UsageMonthlyListRelationFilter
+  billingAccount?: Prisma.XOR<Prisma.BillingAccountNullableScalarRelationFilter, Prisma.BillingAccountWhereInput> | null
 }
 
 export type OrganizationOrderByWithRelationInput = {
@@ -213,6 +217,10 @@ export type OrganizationOrderByWithRelationInput = {
   agents?: Prisma.AgentOrderByRelationAggregateInput
   contactSessions?: Prisma.ContactSessionOrderByRelationAggregateInput
   conversations?: Prisma.ConversationOrderByRelationAggregateInput
+  subscription?: Prisma.SubscriptionOrderByWithRelationInput
+  billingPayments?: Prisma.BillingPaymentOrderByRelationAggregateInput
+  usageMonthly?: Prisma.UsageMonthlyOrderByRelationAggregateInput
+  billingAccount?: Prisma.BillingAccountOrderByWithRelationInput
 }
 
 export type OrganizationWhereUniqueInput = Prisma.AtLeast<{
@@ -232,6 +240,10 @@ export type OrganizationWhereUniqueInput = Prisma.AtLeast<{
   agents?: Prisma.AgentListRelationFilter
   contactSessions?: Prisma.ContactSessionListRelationFilter
   conversations?: Prisma.ConversationListRelationFilter
+  subscription?: Prisma.XOR<Prisma.SubscriptionNullableScalarRelationFilter, Prisma.SubscriptionWhereInput> | null
+  billingPayments?: Prisma.BillingPaymentListRelationFilter
+  usageMonthly?: Prisma.UsageMonthlyListRelationFilter
+  billingAccount?: Prisma.XOR<Prisma.BillingAccountNullableScalarRelationFilter, Prisma.BillingAccountWhereInput> | null
 }, "id" | "slug">
 
 export type OrganizationOrderByWithAggregationInput = {
@@ -272,6 +284,10 @@ export type OrganizationCreateInput = {
   agents?: Prisma.AgentCreateNestedManyWithoutOrganizationInput
   contactSessions?: Prisma.ContactSessionCreateNestedManyWithoutOrganizationInput
   conversations?: Prisma.ConversationCreateNestedManyWithoutOrganizationInput
+  subscription?: Prisma.SubscriptionCreateNestedOneWithoutOrganizationInput
+  billingPayments?: Prisma.BillingPaymentCreateNestedManyWithoutOrganizationInput
+  usageMonthly?: Prisma.UsageMonthlyCreateNestedManyWithoutOrganizationInput
+  billingAccount?: Prisma.BillingAccountCreateNestedOneWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateInput = {
@@ -288,6 +304,10 @@ export type OrganizationUncheckedCreateInput = {
   agents?: Prisma.AgentUncheckedCreateNestedManyWithoutOrganizationInput
   contactSessions?: Prisma.ContactSessionUncheckedCreateNestedManyWithoutOrganizationInput
   conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutOrganizationInput
+  subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutOrganizationInput
+  billingPayments?: Prisma.BillingPaymentUncheckedCreateNestedManyWithoutOrganizationInput
+  usageMonthly?: Prisma.UsageMonthlyUncheckedCreateNestedManyWithoutOrganizationInput
+  billingAccount?: Prisma.BillingAccountUncheckedCreateNestedOneWithoutOrganizationInput
 }
 
 export type OrganizationUpdateInput = {
@@ -304,6 +324,10 @@ export type OrganizationUpdateInput = {
   agents?: Prisma.AgentUpdateManyWithoutOrganizationNestedInput
   contactSessions?: Prisma.ContactSessionUpdateManyWithoutOrganizationNestedInput
   conversations?: Prisma.ConversationUpdateManyWithoutOrganizationNestedInput
+  subscription?: Prisma.SubscriptionUpdateOneWithoutOrganizationNestedInput
+  billingPayments?: Prisma.BillingPaymentUpdateManyWithoutOrganizationNestedInput
+  usageMonthly?: Prisma.UsageMonthlyUpdateManyWithoutOrganizationNestedInput
+  billingAccount?: Prisma.BillingAccountUpdateOneWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateInput = {
@@ -320,6 +344,10 @@ export type OrganizationUncheckedUpdateInput = {
   agents?: Prisma.AgentUncheckedUpdateManyWithoutOrganizationNestedInput
   contactSessions?: Prisma.ContactSessionUncheckedUpdateManyWithoutOrganizationNestedInput
   conversations?: Prisma.ConversationUncheckedUpdateManyWithoutOrganizationNestedInput
+  subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutOrganizationNestedInput
+  billingPayments?: Prisma.BillingPaymentUncheckedUpdateManyWithoutOrganizationNestedInput
+  usageMonthly?: Prisma.UsageMonthlyUncheckedUpdateManyWithoutOrganizationNestedInput
+  billingAccount?: Prisma.BillingAccountUncheckedUpdateOneWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateManyInput = {
@@ -437,6 +465,62 @@ export type OrganizationUpdateOneRequiredWithoutInvitationsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.OrganizationUpdateToOneWithWhereWithoutInvitationsInput, Prisma.OrganizationUpdateWithoutInvitationsInput>, Prisma.OrganizationUncheckedUpdateWithoutInvitationsInput>
 }
 
+export type OrganizationCreateNestedOneWithoutSubscriptionInput = {
+  create?: Prisma.XOR<Prisma.OrganizationCreateWithoutSubscriptionInput, Prisma.OrganizationUncheckedCreateWithoutSubscriptionInput>
+  connectOrCreate?: Prisma.OrganizationCreateOrConnectWithoutSubscriptionInput
+  connect?: Prisma.OrganizationWhereUniqueInput
+}
+
+export type OrganizationUpdateOneRequiredWithoutSubscriptionNestedInput = {
+  create?: Prisma.XOR<Prisma.OrganizationCreateWithoutSubscriptionInput, Prisma.OrganizationUncheckedCreateWithoutSubscriptionInput>
+  connectOrCreate?: Prisma.OrganizationCreateOrConnectWithoutSubscriptionInput
+  upsert?: Prisma.OrganizationUpsertWithoutSubscriptionInput
+  connect?: Prisma.OrganizationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.OrganizationUpdateToOneWithWhereWithoutSubscriptionInput, Prisma.OrganizationUpdateWithoutSubscriptionInput>, Prisma.OrganizationUncheckedUpdateWithoutSubscriptionInput>
+}
+
+export type OrganizationCreateNestedOneWithoutBillingPaymentsInput = {
+  create?: Prisma.XOR<Prisma.OrganizationCreateWithoutBillingPaymentsInput, Prisma.OrganizationUncheckedCreateWithoutBillingPaymentsInput>
+  connectOrCreate?: Prisma.OrganizationCreateOrConnectWithoutBillingPaymentsInput
+  connect?: Prisma.OrganizationWhereUniqueInput
+}
+
+export type OrganizationUpdateOneRequiredWithoutBillingPaymentsNestedInput = {
+  create?: Prisma.XOR<Prisma.OrganizationCreateWithoutBillingPaymentsInput, Prisma.OrganizationUncheckedCreateWithoutBillingPaymentsInput>
+  connectOrCreate?: Prisma.OrganizationCreateOrConnectWithoutBillingPaymentsInput
+  upsert?: Prisma.OrganizationUpsertWithoutBillingPaymentsInput
+  connect?: Prisma.OrganizationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.OrganizationUpdateToOneWithWhereWithoutBillingPaymentsInput, Prisma.OrganizationUpdateWithoutBillingPaymentsInput>, Prisma.OrganizationUncheckedUpdateWithoutBillingPaymentsInput>
+}
+
+export type OrganizationCreateNestedOneWithoutUsageMonthlyInput = {
+  create?: Prisma.XOR<Prisma.OrganizationCreateWithoutUsageMonthlyInput, Prisma.OrganizationUncheckedCreateWithoutUsageMonthlyInput>
+  connectOrCreate?: Prisma.OrganizationCreateOrConnectWithoutUsageMonthlyInput
+  connect?: Prisma.OrganizationWhereUniqueInput
+}
+
+export type OrganizationUpdateOneRequiredWithoutUsageMonthlyNestedInput = {
+  create?: Prisma.XOR<Prisma.OrganizationCreateWithoutUsageMonthlyInput, Prisma.OrganizationUncheckedCreateWithoutUsageMonthlyInput>
+  connectOrCreate?: Prisma.OrganizationCreateOrConnectWithoutUsageMonthlyInput
+  upsert?: Prisma.OrganizationUpsertWithoutUsageMonthlyInput
+  connect?: Prisma.OrganizationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.OrganizationUpdateToOneWithWhereWithoutUsageMonthlyInput, Prisma.OrganizationUpdateWithoutUsageMonthlyInput>, Prisma.OrganizationUncheckedUpdateWithoutUsageMonthlyInput>
+}
+
+export type OrganizationCreateNestedOneWithoutBillingAccountInput = {
+  create?: Prisma.XOR<Prisma.OrganizationCreateWithoutBillingAccountInput, Prisma.OrganizationUncheckedCreateWithoutBillingAccountInput>
+  connectOrCreate?: Prisma.OrganizationCreateOrConnectWithoutBillingAccountInput
+  connect?: Prisma.OrganizationWhereUniqueInput
+}
+
+export type OrganizationUpdateOneRequiredWithoutBillingAccountNestedInput = {
+  create?: Prisma.XOR<Prisma.OrganizationCreateWithoutBillingAccountInput, Prisma.OrganizationUncheckedCreateWithoutBillingAccountInput>
+  connectOrCreate?: Prisma.OrganizationCreateOrConnectWithoutBillingAccountInput
+  upsert?: Prisma.OrganizationUpsertWithoutBillingAccountInput
+  connect?: Prisma.OrganizationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.OrganizationUpdateToOneWithWhereWithoutBillingAccountInput, Prisma.OrganizationUpdateWithoutBillingAccountInput>, Prisma.OrganizationUncheckedUpdateWithoutBillingAccountInput>
+}
+
 export type OrganizationCreateNestedOneWithoutContactSessionsInput = {
   create?: Prisma.XOR<Prisma.OrganizationCreateWithoutContactSessionsInput, Prisma.OrganizationUncheckedCreateWithoutContactSessionsInput>
   connectOrCreate?: Prisma.OrganizationCreateOrConnectWithoutContactSessionsInput
@@ -492,6 +576,10 @@ export type OrganizationCreateWithoutAgentsInput = {
   documents?: Prisma.DocumentCreateNestedManyWithoutOrganizationInput
   contactSessions?: Prisma.ContactSessionCreateNestedManyWithoutOrganizationInput
   conversations?: Prisma.ConversationCreateNestedManyWithoutOrganizationInput
+  subscription?: Prisma.SubscriptionCreateNestedOneWithoutOrganizationInput
+  billingPayments?: Prisma.BillingPaymentCreateNestedManyWithoutOrganizationInput
+  usageMonthly?: Prisma.UsageMonthlyCreateNestedManyWithoutOrganizationInput
+  billingAccount?: Prisma.BillingAccountCreateNestedOneWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutAgentsInput = {
@@ -507,6 +595,10 @@ export type OrganizationUncheckedCreateWithoutAgentsInput = {
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutOrganizationInput
   contactSessions?: Prisma.ContactSessionUncheckedCreateNestedManyWithoutOrganizationInput
   conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutOrganizationInput
+  subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutOrganizationInput
+  billingPayments?: Prisma.BillingPaymentUncheckedCreateNestedManyWithoutOrganizationInput
+  usageMonthly?: Prisma.UsageMonthlyUncheckedCreateNestedManyWithoutOrganizationInput
+  billingAccount?: Prisma.BillingAccountUncheckedCreateNestedOneWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutAgentsInput = {
@@ -538,6 +630,10 @@ export type OrganizationUpdateWithoutAgentsInput = {
   documents?: Prisma.DocumentUpdateManyWithoutOrganizationNestedInput
   contactSessions?: Prisma.ContactSessionUpdateManyWithoutOrganizationNestedInput
   conversations?: Prisma.ConversationUpdateManyWithoutOrganizationNestedInput
+  subscription?: Prisma.SubscriptionUpdateOneWithoutOrganizationNestedInput
+  billingPayments?: Prisma.BillingPaymentUpdateManyWithoutOrganizationNestedInput
+  usageMonthly?: Prisma.UsageMonthlyUpdateManyWithoutOrganizationNestedInput
+  billingAccount?: Prisma.BillingAccountUpdateOneWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutAgentsInput = {
@@ -553,6 +649,10 @@ export type OrganizationUncheckedUpdateWithoutAgentsInput = {
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   contactSessions?: Prisma.ContactSessionUncheckedUpdateManyWithoutOrganizationNestedInput
   conversations?: Prisma.ConversationUncheckedUpdateManyWithoutOrganizationNestedInput
+  subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutOrganizationNestedInput
+  billingPayments?: Prisma.BillingPaymentUncheckedUpdateManyWithoutOrganizationNestedInput
+  usageMonthly?: Prisma.UsageMonthlyUncheckedUpdateManyWithoutOrganizationNestedInput
+  billingAccount?: Prisma.BillingAccountUncheckedUpdateOneWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutTeamsInput = {
@@ -568,6 +668,10 @@ export type OrganizationCreateWithoutTeamsInput = {
   agents?: Prisma.AgentCreateNestedManyWithoutOrganizationInput
   contactSessions?: Prisma.ContactSessionCreateNestedManyWithoutOrganizationInput
   conversations?: Prisma.ConversationCreateNestedManyWithoutOrganizationInput
+  subscription?: Prisma.SubscriptionCreateNestedOneWithoutOrganizationInput
+  billingPayments?: Prisma.BillingPaymentCreateNestedManyWithoutOrganizationInput
+  usageMonthly?: Prisma.UsageMonthlyCreateNestedManyWithoutOrganizationInput
+  billingAccount?: Prisma.BillingAccountCreateNestedOneWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutTeamsInput = {
@@ -583,6 +687,10 @@ export type OrganizationUncheckedCreateWithoutTeamsInput = {
   agents?: Prisma.AgentUncheckedCreateNestedManyWithoutOrganizationInput
   contactSessions?: Prisma.ContactSessionUncheckedCreateNestedManyWithoutOrganizationInput
   conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutOrganizationInput
+  subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutOrganizationInput
+  billingPayments?: Prisma.BillingPaymentUncheckedCreateNestedManyWithoutOrganizationInput
+  usageMonthly?: Prisma.UsageMonthlyUncheckedCreateNestedManyWithoutOrganizationInput
+  billingAccount?: Prisma.BillingAccountUncheckedCreateNestedOneWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutTeamsInput = {
@@ -614,6 +722,10 @@ export type OrganizationUpdateWithoutTeamsInput = {
   agents?: Prisma.AgentUpdateManyWithoutOrganizationNestedInput
   contactSessions?: Prisma.ContactSessionUpdateManyWithoutOrganizationNestedInput
   conversations?: Prisma.ConversationUpdateManyWithoutOrganizationNestedInput
+  subscription?: Prisma.SubscriptionUpdateOneWithoutOrganizationNestedInput
+  billingPayments?: Prisma.BillingPaymentUpdateManyWithoutOrganizationNestedInput
+  usageMonthly?: Prisma.UsageMonthlyUpdateManyWithoutOrganizationNestedInput
+  billingAccount?: Prisma.BillingAccountUpdateOneWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutTeamsInput = {
@@ -629,6 +741,10 @@ export type OrganizationUncheckedUpdateWithoutTeamsInput = {
   agents?: Prisma.AgentUncheckedUpdateManyWithoutOrganizationNestedInput
   contactSessions?: Prisma.ContactSessionUncheckedUpdateManyWithoutOrganizationNestedInput
   conversations?: Prisma.ConversationUncheckedUpdateManyWithoutOrganizationNestedInput
+  subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutOrganizationNestedInput
+  billingPayments?: Prisma.BillingPaymentUncheckedUpdateManyWithoutOrganizationNestedInput
+  usageMonthly?: Prisma.UsageMonthlyUncheckedUpdateManyWithoutOrganizationNestedInput
+  billingAccount?: Prisma.BillingAccountUncheckedUpdateOneWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutMembersInput = {
@@ -644,6 +760,10 @@ export type OrganizationCreateWithoutMembersInput = {
   agents?: Prisma.AgentCreateNestedManyWithoutOrganizationInput
   contactSessions?: Prisma.ContactSessionCreateNestedManyWithoutOrganizationInput
   conversations?: Prisma.ConversationCreateNestedManyWithoutOrganizationInput
+  subscription?: Prisma.SubscriptionCreateNestedOneWithoutOrganizationInput
+  billingPayments?: Prisma.BillingPaymentCreateNestedManyWithoutOrganizationInput
+  usageMonthly?: Prisma.UsageMonthlyCreateNestedManyWithoutOrganizationInput
+  billingAccount?: Prisma.BillingAccountCreateNestedOneWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutMembersInput = {
@@ -659,6 +779,10 @@ export type OrganizationUncheckedCreateWithoutMembersInput = {
   agents?: Prisma.AgentUncheckedCreateNestedManyWithoutOrganizationInput
   contactSessions?: Prisma.ContactSessionUncheckedCreateNestedManyWithoutOrganizationInput
   conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutOrganizationInput
+  subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutOrganizationInput
+  billingPayments?: Prisma.BillingPaymentUncheckedCreateNestedManyWithoutOrganizationInput
+  usageMonthly?: Prisma.UsageMonthlyUncheckedCreateNestedManyWithoutOrganizationInput
+  billingAccount?: Prisma.BillingAccountUncheckedCreateNestedOneWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutMembersInput = {
@@ -690,6 +814,10 @@ export type OrganizationUpdateWithoutMembersInput = {
   agents?: Prisma.AgentUpdateManyWithoutOrganizationNestedInput
   contactSessions?: Prisma.ContactSessionUpdateManyWithoutOrganizationNestedInput
   conversations?: Prisma.ConversationUpdateManyWithoutOrganizationNestedInput
+  subscription?: Prisma.SubscriptionUpdateOneWithoutOrganizationNestedInput
+  billingPayments?: Prisma.BillingPaymentUpdateManyWithoutOrganizationNestedInput
+  usageMonthly?: Prisma.UsageMonthlyUpdateManyWithoutOrganizationNestedInput
+  billingAccount?: Prisma.BillingAccountUpdateOneWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutMembersInput = {
@@ -705,6 +833,10 @@ export type OrganizationUncheckedUpdateWithoutMembersInput = {
   agents?: Prisma.AgentUncheckedUpdateManyWithoutOrganizationNestedInput
   contactSessions?: Prisma.ContactSessionUncheckedUpdateManyWithoutOrganizationNestedInput
   conversations?: Prisma.ConversationUncheckedUpdateManyWithoutOrganizationNestedInput
+  subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutOrganizationNestedInput
+  billingPayments?: Prisma.BillingPaymentUncheckedUpdateManyWithoutOrganizationNestedInput
+  usageMonthly?: Prisma.UsageMonthlyUncheckedUpdateManyWithoutOrganizationNestedInput
+  billingAccount?: Prisma.BillingAccountUncheckedUpdateOneWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutInvitationsInput = {
@@ -720,6 +852,10 @@ export type OrganizationCreateWithoutInvitationsInput = {
   agents?: Prisma.AgentCreateNestedManyWithoutOrganizationInput
   contactSessions?: Prisma.ContactSessionCreateNestedManyWithoutOrganizationInput
   conversations?: Prisma.ConversationCreateNestedManyWithoutOrganizationInput
+  subscription?: Prisma.SubscriptionCreateNestedOneWithoutOrganizationInput
+  billingPayments?: Prisma.BillingPaymentCreateNestedManyWithoutOrganizationInput
+  usageMonthly?: Prisma.UsageMonthlyCreateNestedManyWithoutOrganizationInput
+  billingAccount?: Prisma.BillingAccountCreateNestedOneWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutInvitationsInput = {
@@ -735,6 +871,10 @@ export type OrganizationUncheckedCreateWithoutInvitationsInput = {
   agents?: Prisma.AgentUncheckedCreateNestedManyWithoutOrganizationInput
   contactSessions?: Prisma.ContactSessionUncheckedCreateNestedManyWithoutOrganizationInput
   conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutOrganizationInput
+  subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutOrganizationInput
+  billingPayments?: Prisma.BillingPaymentUncheckedCreateNestedManyWithoutOrganizationInput
+  usageMonthly?: Prisma.UsageMonthlyUncheckedCreateNestedManyWithoutOrganizationInput
+  billingAccount?: Prisma.BillingAccountUncheckedCreateNestedOneWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutInvitationsInput = {
@@ -766,6 +906,10 @@ export type OrganizationUpdateWithoutInvitationsInput = {
   agents?: Prisma.AgentUpdateManyWithoutOrganizationNestedInput
   contactSessions?: Prisma.ContactSessionUpdateManyWithoutOrganizationNestedInput
   conversations?: Prisma.ConversationUpdateManyWithoutOrganizationNestedInput
+  subscription?: Prisma.SubscriptionUpdateOneWithoutOrganizationNestedInput
+  billingPayments?: Prisma.BillingPaymentUpdateManyWithoutOrganizationNestedInput
+  usageMonthly?: Prisma.UsageMonthlyUpdateManyWithoutOrganizationNestedInput
+  billingAccount?: Prisma.BillingAccountUpdateOneWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutInvitationsInput = {
@@ -781,6 +925,378 @@ export type OrganizationUncheckedUpdateWithoutInvitationsInput = {
   agents?: Prisma.AgentUncheckedUpdateManyWithoutOrganizationNestedInput
   contactSessions?: Prisma.ContactSessionUncheckedUpdateManyWithoutOrganizationNestedInput
   conversations?: Prisma.ConversationUncheckedUpdateManyWithoutOrganizationNestedInput
+  subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutOrganizationNestedInput
+  billingPayments?: Prisma.BillingPaymentUncheckedUpdateManyWithoutOrganizationNestedInput
+  usageMonthly?: Prisma.UsageMonthlyUncheckedUpdateManyWithoutOrganizationNestedInput
+  billingAccount?: Prisma.BillingAccountUncheckedUpdateOneWithoutOrganizationNestedInput
+}
+
+export type OrganizationCreateWithoutSubscriptionInput = {
+  id: string
+  name: string
+  slug: string
+  logo?: string | null
+  createdAt: Date | string
+  metadata?: string | null
+  teams?: Prisma.TeamCreateNestedManyWithoutOrganizationInput
+  members?: Prisma.MemberCreateNestedManyWithoutOrganizationInput
+  invitations?: Prisma.InvitationCreateNestedManyWithoutOrganizationInput
+  documents?: Prisma.DocumentCreateNestedManyWithoutOrganizationInput
+  agents?: Prisma.AgentCreateNestedManyWithoutOrganizationInput
+  contactSessions?: Prisma.ContactSessionCreateNestedManyWithoutOrganizationInput
+  conversations?: Prisma.ConversationCreateNestedManyWithoutOrganizationInput
+  billingPayments?: Prisma.BillingPaymentCreateNestedManyWithoutOrganizationInput
+  usageMonthly?: Prisma.UsageMonthlyCreateNestedManyWithoutOrganizationInput
+  billingAccount?: Prisma.BillingAccountCreateNestedOneWithoutOrganizationInput
+}
+
+export type OrganizationUncheckedCreateWithoutSubscriptionInput = {
+  id: string
+  name: string
+  slug: string
+  logo?: string | null
+  createdAt: Date | string
+  metadata?: string | null
+  teams?: Prisma.TeamUncheckedCreateNestedManyWithoutOrganizationInput
+  members?: Prisma.MemberUncheckedCreateNestedManyWithoutOrganizationInput
+  invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutOrganizationInput
+  documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutOrganizationInput
+  agents?: Prisma.AgentUncheckedCreateNestedManyWithoutOrganizationInput
+  contactSessions?: Prisma.ContactSessionUncheckedCreateNestedManyWithoutOrganizationInput
+  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutOrganizationInput
+  billingPayments?: Prisma.BillingPaymentUncheckedCreateNestedManyWithoutOrganizationInput
+  usageMonthly?: Prisma.UsageMonthlyUncheckedCreateNestedManyWithoutOrganizationInput
+  billingAccount?: Prisma.BillingAccountUncheckedCreateNestedOneWithoutOrganizationInput
+}
+
+export type OrganizationCreateOrConnectWithoutSubscriptionInput = {
+  where: Prisma.OrganizationWhereUniqueInput
+  create: Prisma.XOR<Prisma.OrganizationCreateWithoutSubscriptionInput, Prisma.OrganizationUncheckedCreateWithoutSubscriptionInput>
+}
+
+export type OrganizationUpsertWithoutSubscriptionInput = {
+  update: Prisma.XOR<Prisma.OrganizationUpdateWithoutSubscriptionInput, Prisma.OrganizationUncheckedUpdateWithoutSubscriptionInput>
+  create: Prisma.XOR<Prisma.OrganizationCreateWithoutSubscriptionInput, Prisma.OrganizationUncheckedCreateWithoutSubscriptionInput>
+  where?: Prisma.OrganizationWhereInput
+}
+
+export type OrganizationUpdateToOneWithWhereWithoutSubscriptionInput = {
+  where?: Prisma.OrganizationWhereInput
+  data: Prisma.XOR<Prisma.OrganizationUpdateWithoutSubscriptionInput, Prisma.OrganizationUncheckedUpdateWithoutSubscriptionInput>
+}
+
+export type OrganizationUpdateWithoutSubscriptionInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  metadata?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  teams?: Prisma.TeamUpdateManyWithoutOrganizationNestedInput
+  members?: Prisma.MemberUpdateManyWithoutOrganizationNestedInput
+  invitations?: Prisma.InvitationUpdateManyWithoutOrganizationNestedInput
+  documents?: Prisma.DocumentUpdateManyWithoutOrganizationNestedInput
+  agents?: Prisma.AgentUpdateManyWithoutOrganizationNestedInput
+  contactSessions?: Prisma.ContactSessionUpdateManyWithoutOrganizationNestedInput
+  conversations?: Prisma.ConversationUpdateManyWithoutOrganizationNestedInput
+  billingPayments?: Prisma.BillingPaymentUpdateManyWithoutOrganizationNestedInput
+  usageMonthly?: Prisma.UsageMonthlyUpdateManyWithoutOrganizationNestedInput
+  billingAccount?: Prisma.BillingAccountUpdateOneWithoutOrganizationNestedInput
+}
+
+export type OrganizationUncheckedUpdateWithoutSubscriptionInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  metadata?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  teams?: Prisma.TeamUncheckedUpdateManyWithoutOrganizationNestedInput
+  members?: Prisma.MemberUncheckedUpdateManyWithoutOrganizationNestedInput
+  invitations?: Prisma.InvitationUncheckedUpdateManyWithoutOrganizationNestedInput
+  documents?: Prisma.DocumentUncheckedUpdateManyWithoutOrganizationNestedInput
+  agents?: Prisma.AgentUncheckedUpdateManyWithoutOrganizationNestedInput
+  contactSessions?: Prisma.ContactSessionUncheckedUpdateManyWithoutOrganizationNestedInput
+  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutOrganizationNestedInput
+  billingPayments?: Prisma.BillingPaymentUncheckedUpdateManyWithoutOrganizationNestedInput
+  usageMonthly?: Prisma.UsageMonthlyUncheckedUpdateManyWithoutOrganizationNestedInput
+  billingAccount?: Prisma.BillingAccountUncheckedUpdateOneWithoutOrganizationNestedInput
+}
+
+export type OrganizationCreateWithoutBillingPaymentsInput = {
+  id: string
+  name: string
+  slug: string
+  logo?: string | null
+  createdAt: Date | string
+  metadata?: string | null
+  teams?: Prisma.TeamCreateNestedManyWithoutOrganizationInput
+  members?: Prisma.MemberCreateNestedManyWithoutOrganizationInput
+  invitations?: Prisma.InvitationCreateNestedManyWithoutOrganizationInput
+  documents?: Prisma.DocumentCreateNestedManyWithoutOrganizationInput
+  agents?: Prisma.AgentCreateNestedManyWithoutOrganizationInput
+  contactSessions?: Prisma.ContactSessionCreateNestedManyWithoutOrganizationInput
+  conversations?: Prisma.ConversationCreateNestedManyWithoutOrganizationInput
+  subscription?: Prisma.SubscriptionCreateNestedOneWithoutOrganizationInput
+  usageMonthly?: Prisma.UsageMonthlyCreateNestedManyWithoutOrganizationInput
+  billingAccount?: Prisma.BillingAccountCreateNestedOneWithoutOrganizationInput
+}
+
+export type OrganizationUncheckedCreateWithoutBillingPaymentsInput = {
+  id: string
+  name: string
+  slug: string
+  logo?: string | null
+  createdAt: Date | string
+  metadata?: string | null
+  teams?: Prisma.TeamUncheckedCreateNestedManyWithoutOrganizationInput
+  members?: Prisma.MemberUncheckedCreateNestedManyWithoutOrganizationInput
+  invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutOrganizationInput
+  documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutOrganizationInput
+  agents?: Prisma.AgentUncheckedCreateNestedManyWithoutOrganizationInput
+  contactSessions?: Prisma.ContactSessionUncheckedCreateNestedManyWithoutOrganizationInput
+  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutOrganizationInput
+  subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutOrganizationInput
+  usageMonthly?: Prisma.UsageMonthlyUncheckedCreateNestedManyWithoutOrganizationInput
+  billingAccount?: Prisma.BillingAccountUncheckedCreateNestedOneWithoutOrganizationInput
+}
+
+export type OrganizationCreateOrConnectWithoutBillingPaymentsInput = {
+  where: Prisma.OrganizationWhereUniqueInput
+  create: Prisma.XOR<Prisma.OrganizationCreateWithoutBillingPaymentsInput, Prisma.OrganizationUncheckedCreateWithoutBillingPaymentsInput>
+}
+
+export type OrganizationUpsertWithoutBillingPaymentsInput = {
+  update: Prisma.XOR<Prisma.OrganizationUpdateWithoutBillingPaymentsInput, Prisma.OrganizationUncheckedUpdateWithoutBillingPaymentsInput>
+  create: Prisma.XOR<Prisma.OrganizationCreateWithoutBillingPaymentsInput, Prisma.OrganizationUncheckedCreateWithoutBillingPaymentsInput>
+  where?: Prisma.OrganizationWhereInput
+}
+
+export type OrganizationUpdateToOneWithWhereWithoutBillingPaymentsInput = {
+  where?: Prisma.OrganizationWhereInput
+  data: Prisma.XOR<Prisma.OrganizationUpdateWithoutBillingPaymentsInput, Prisma.OrganizationUncheckedUpdateWithoutBillingPaymentsInput>
+}
+
+export type OrganizationUpdateWithoutBillingPaymentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  metadata?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  teams?: Prisma.TeamUpdateManyWithoutOrganizationNestedInput
+  members?: Prisma.MemberUpdateManyWithoutOrganizationNestedInput
+  invitations?: Prisma.InvitationUpdateManyWithoutOrganizationNestedInput
+  documents?: Prisma.DocumentUpdateManyWithoutOrganizationNestedInput
+  agents?: Prisma.AgentUpdateManyWithoutOrganizationNestedInput
+  contactSessions?: Prisma.ContactSessionUpdateManyWithoutOrganizationNestedInput
+  conversations?: Prisma.ConversationUpdateManyWithoutOrganizationNestedInput
+  subscription?: Prisma.SubscriptionUpdateOneWithoutOrganizationNestedInput
+  usageMonthly?: Prisma.UsageMonthlyUpdateManyWithoutOrganizationNestedInput
+  billingAccount?: Prisma.BillingAccountUpdateOneWithoutOrganizationNestedInput
+}
+
+export type OrganizationUncheckedUpdateWithoutBillingPaymentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  metadata?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  teams?: Prisma.TeamUncheckedUpdateManyWithoutOrganizationNestedInput
+  members?: Prisma.MemberUncheckedUpdateManyWithoutOrganizationNestedInput
+  invitations?: Prisma.InvitationUncheckedUpdateManyWithoutOrganizationNestedInput
+  documents?: Prisma.DocumentUncheckedUpdateManyWithoutOrganizationNestedInput
+  agents?: Prisma.AgentUncheckedUpdateManyWithoutOrganizationNestedInput
+  contactSessions?: Prisma.ContactSessionUncheckedUpdateManyWithoutOrganizationNestedInput
+  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutOrganizationNestedInput
+  subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutOrganizationNestedInput
+  usageMonthly?: Prisma.UsageMonthlyUncheckedUpdateManyWithoutOrganizationNestedInput
+  billingAccount?: Prisma.BillingAccountUncheckedUpdateOneWithoutOrganizationNestedInput
+}
+
+export type OrganizationCreateWithoutUsageMonthlyInput = {
+  id: string
+  name: string
+  slug: string
+  logo?: string | null
+  createdAt: Date | string
+  metadata?: string | null
+  teams?: Prisma.TeamCreateNestedManyWithoutOrganizationInput
+  members?: Prisma.MemberCreateNestedManyWithoutOrganizationInput
+  invitations?: Prisma.InvitationCreateNestedManyWithoutOrganizationInput
+  documents?: Prisma.DocumentCreateNestedManyWithoutOrganizationInput
+  agents?: Prisma.AgentCreateNestedManyWithoutOrganizationInput
+  contactSessions?: Prisma.ContactSessionCreateNestedManyWithoutOrganizationInput
+  conversations?: Prisma.ConversationCreateNestedManyWithoutOrganizationInput
+  subscription?: Prisma.SubscriptionCreateNestedOneWithoutOrganizationInput
+  billingPayments?: Prisma.BillingPaymentCreateNestedManyWithoutOrganizationInput
+  billingAccount?: Prisma.BillingAccountCreateNestedOneWithoutOrganizationInput
+}
+
+export type OrganizationUncheckedCreateWithoutUsageMonthlyInput = {
+  id: string
+  name: string
+  slug: string
+  logo?: string | null
+  createdAt: Date | string
+  metadata?: string | null
+  teams?: Prisma.TeamUncheckedCreateNestedManyWithoutOrganizationInput
+  members?: Prisma.MemberUncheckedCreateNestedManyWithoutOrganizationInput
+  invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutOrganizationInput
+  documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutOrganizationInput
+  agents?: Prisma.AgentUncheckedCreateNestedManyWithoutOrganizationInput
+  contactSessions?: Prisma.ContactSessionUncheckedCreateNestedManyWithoutOrganizationInput
+  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutOrganizationInput
+  subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutOrganizationInput
+  billingPayments?: Prisma.BillingPaymentUncheckedCreateNestedManyWithoutOrganizationInput
+  billingAccount?: Prisma.BillingAccountUncheckedCreateNestedOneWithoutOrganizationInput
+}
+
+export type OrganizationCreateOrConnectWithoutUsageMonthlyInput = {
+  where: Prisma.OrganizationWhereUniqueInput
+  create: Prisma.XOR<Prisma.OrganizationCreateWithoutUsageMonthlyInput, Prisma.OrganizationUncheckedCreateWithoutUsageMonthlyInput>
+}
+
+export type OrganizationUpsertWithoutUsageMonthlyInput = {
+  update: Prisma.XOR<Prisma.OrganizationUpdateWithoutUsageMonthlyInput, Prisma.OrganizationUncheckedUpdateWithoutUsageMonthlyInput>
+  create: Prisma.XOR<Prisma.OrganizationCreateWithoutUsageMonthlyInput, Prisma.OrganizationUncheckedCreateWithoutUsageMonthlyInput>
+  where?: Prisma.OrganizationWhereInput
+}
+
+export type OrganizationUpdateToOneWithWhereWithoutUsageMonthlyInput = {
+  where?: Prisma.OrganizationWhereInput
+  data: Prisma.XOR<Prisma.OrganizationUpdateWithoutUsageMonthlyInput, Prisma.OrganizationUncheckedUpdateWithoutUsageMonthlyInput>
+}
+
+export type OrganizationUpdateWithoutUsageMonthlyInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  metadata?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  teams?: Prisma.TeamUpdateManyWithoutOrganizationNestedInput
+  members?: Prisma.MemberUpdateManyWithoutOrganizationNestedInput
+  invitations?: Prisma.InvitationUpdateManyWithoutOrganizationNestedInput
+  documents?: Prisma.DocumentUpdateManyWithoutOrganizationNestedInput
+  agents?: Prisma.AgentUpdateManyWithoutOrganizationNestedInput
+  contactSessions?: Prisma.ContactSessionUpdateManyWithoutOrganizationNestedInput
+  conversations?: Prisma.ConversationUpdateManyWithoutOrganizationNestedInput
+  subscription?: Prisma.SubscriptionUpdateOneWithoutOrganizationNestedInput
+  billingPayments?: Prisma.BillingPaymentUpdateManyWithoutOrganizationNestedInput
+  billingAccount?: Prisma.BillingAccountUpdateOneWithoutOrganizationNestedInput
+}
+
+export type OrganizationUncheckedUpdateWithoutUsageMonthlyInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  metadata?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  teams?: Prisma.TeamUncheckedUpdateManyWithoutOrganizationNestedInput
+  members?: Prisma.MemberUncheckedUpdateManyWithoutOrganizationNestedInput
+  invitations?: Prisma.InvitationUncheckedUpdateManyWithoutOrganizationNestedInput
+  documents?: Prisma.DocumentUncheckedUpdateManyWithoutOrganizationNestedInput
+  agents?: Prisma.AgentUncheckedUpdateManyWithoutOrganizationNestedInput
+  contactSessions?: Prisma.ContactSessionUncheckedUpdateManyWithoutOrganizationNestedInput
+  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutOrganizationNestedInput
+  subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutOrganizationNestedInput
+  billingPayments?: Prisma.BillingPaymentUncheckedUpdateManyWithoutOrganizationNestedInput
+  billingAccount?: Prisma.BillingAccountUncheckedUpdateOneWithoutOrganizationNestedInput
+}
+
+export type OrganizationCreateWithoutBillingAccountInput = {
+  id: string
+  name: string
+  slug: string
+  logo?: string | null
+  createdAt: Date | string
+  metadata?: string | null
+  teams?: Prisma.TeamCreateNestedManyWithoutOrganizationInput
+  members?: Prisma.MemberCreateNestedManyWithoutOrganizationInput
+  invitations?: Prisma.InvitationCreateNestedManyWithoutOrganizationInput
+  documents?: Prisma.DocumentCreateNestedManyWithoutOrganizationInput
+  agents?: Prisma.AgentCreateNestedManyWithoutOrganizationInput
+  contactSessions?: Prisma.ContactSessionCreateNestedManyWithoutOrganizationInput
+  conversations?: Prisma.ConversationCreateNestedManyWithoutOrganizationInput
+  subscription?: Prisma.SubscriptionCreateNestedOneWithoutOrganizationInput
+  billingPayments?: Prisma.BillingPaymentCreateNestedManyWithoutOrganizationInput
+  usageMonthly?: Prisma.UsageMonthlyCreateNestedManyWithoutOrganizationInput
+}
+
+export type OrganizationUncheckedCreateWithoutBillingAccountInput = {
+  id: string
+  name: string
+  slug: string
+  logo?: string | null
+  createdAt: Date | string
+  metadata?: string | null
+  teams?: Prisma.TeamUncheckedCreateNestedManyWithoutOrganizationInput
+  members?: Prisma.MemberUncheckedCreateNestedManyWithoutOrganizationInput
+  invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutOrganizationInput
+  documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutOrganizationInput
+  agents?: Prisma.AgentUncheckedCreateNestedManyWithoutOrganizationInput
+  contactSessions?: Prisma.ContactSessionUncheckedCreateNestedManyWithoutOrganizationInput
+  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutOrganizationInput
+  subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutOrganizationInput
+  billingPayments?: Prisma.BillingPaymentUncheckedCreateNestedManyWithoutOrganizationInput
+  usageMonthly?: Prisma.UsageMonthlyUncheckedCreateNestedManyWithoutOrganizationInput
+}
+
+export type OrganizationCreateOrConnectWithoutBillingAccountInput = {
+  where: Prisma.OrganizationWhereUniqueInput
+  create: Prisma.XOR<Prisma.OrganizationCreateWithoutBillingAccountInput, Prisma.OrganizationUncheckedCreateWithoutBillingAccountInput>
+}
+
+export type OrganizationUpsertWithoutBillingAccountInput = {
+  update: Prisma.XOR<Prisma.OrganizationUpdateWithoutBillingAccountInput, Prisma.OrganizationUncheckedUpdateWithoutBillingAccountInput>
+  create: Prisma.XOR<Prisma.OrganizationCreateWithoutBillingAccountInput, Prisma.OrganizationUncheckedCreateWithoutBillingAccountInput>
+  where?: Prisma.OrganizationWhereInput
+}
+
+export type OrganizationUpdateToOneWithWhereWithoutBillingAccountInput = {
+  where?: Prisma.OrganizationWhereInput
+  data: Prisma.XOR<Prisma.OrganizationUpdateWithoutBillingAccountInput, Prisma.OrganizationUncheckedUpdateWithoutBillingAccountInput>
+}
+
+export type OrganizationUpdateWithoutBillingAccountInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  metadata?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  teams?: Prisma.TeamUpdateManyWithoutOrganizationNestedInput
+  members?: Prisma.MemberUpdateManyWithoutOrganizationNestedInput
+  invitations?: Prisma.InvitationUpdateManyWithoutOrganizationNestedInput
+  documents?: Prisma.DocumentUpdateManyWithoutOrganizationNestedInput
+  agents?: Prisma.AgentUpdateManyWithoutOrganizationNestedInput
+  contactSessions?: Prisma.ContactSessionUpdateManyWithoutOrganizationNestedInput
+  conversations?: Prisma.ConversationUpdateManyWithoutOrganizationNestedInput
+  subscription?: Prisma.SubscriptionUpdateOneWithoutOrganizationNestedInput
+  billingPayments?: Prisma.BillingPaymentUpdateManyWithoutOrganizationNestedInput
+  usageMonthly?: Prisma.UsageMonthlyUpdateManyWithoutOrganizationNestedInput
+}
+
+export type OrganizationUncheckedUpdateWithoutBillingAccountInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  metadata?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  teams?: Prisma.TeamUncheckedUpdateManyWithoutOrganizationNestedInput
+  members?: Prisma.MemberUncheckedUpdateManyWithoutOrganizationNestedInput
+  invitations?: Prisma.InvitationUncheckedUpdateManyWithoutOrganizationNestedInput
+  documents?: Prisma.DocumentUncheckedUpdateManyWithoutOrganizationNestedInput
+  agents?: Prisma.AgentUncheckedUpdateManyWithoutOrganizationNestedInput
+  contactSessions?: Prisma.ContactSessionUncheckedUpdateManyWithoutOrganizationNestedInput
+  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutOrganizationNestedInput
+  subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutOrganizationNestedInput
+  billingPayments?: Prisma.BillingPaymentUncheckedUpdateManyWithoutOrganizationNestedInput
+  usageMonthly?: Prisma.UsageMonthlyUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutContactSessionsInput = {
@@ -796,6 +1312,10 @@ export type OrganizationCreateWithoutContactSessionsInput = {
   documents?: Prisma.DocumentCreateNestedManyWithoutOrganizationInput
   agents?: Prisma.AgentCreateNestedManyWithoutOrganizationInput
   conversations?: Prisma.ConversationCreateNestedManyWithoutOrganizationInput
+  subscription?: Prisma.SubscriptionCreateNestedOneWithoutOrganizationInput
+  billingPayments?: Prisma.BillingPaymentCreateNestedManyWithoutOrganizationInput
+  usageMonthly?: Prisma.UsageMonthlyCreateNestedManyWithoutOrganizationInput
+  billingAccount?: Prisma.BillingAccountCreateNestedOneWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutContactSessionsInput = {
@@ -811,6 +1331,10 @@ export type OrganizationUncheckedCreateWithoutContactSessionsInput = {
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutOrganizationInput
   agents?: Prisma.AgentUncheckedCreateNestedManyWithoutOrganizationInput
   conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutOrganizationInput
+  subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutOrganizationInput
+  billingPayments?: Prisma.BillingPaymentUncheckedCreateNestedManyWithoutOrganizationInput
+  usageMonthly?: Prisma.UsageMonthlyUncheckedCreateNestedManyWithoutOrganizationInput
+  billingAccount?: Prisma.BillingAccountUncheckedCreateNestedOneWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutContactSessionsInput = {
@@ -842,6 +1366,10 @@ export type OrganizationUpdateWithoutContactSessionsInput = {
   documents?: Prisma.DocumentUpdateManyWithoutOrganizationNestedInput
   agents?: Prisma.AgentUpdateManyWithoutOrganizationNestedInput
   conversations?: Prisma.ConversationUpdateManyWithoutOrganizationNestedInput
+  subscription?: Prisma.SubscriptionUpdateOneWithoutOrganizationNestedInput
+  billingPayments?: Prisma.BillingPaymentUpdateManyWithoutOrganizationNestedInput
+  usageMonthly?: Prisma.UsageMonthlyUpdateManyWithoutOrganizationNestedInput
+  billingAccount?: Prisma.BillingAccountUpdateOneWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutContactSessionsInput = {
@@ -857,6 +1385,10 @@ export type OrganizationUncheckedUpdateWithoutContactSessionsInput = {
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   agents?: Prisma.AgentUncheckedUpdateManyWithoutOrganizationNestedInput
   conversations?: Prisma.ConversationUncheckedUpdateManyWithoutOrganizationNestedInput
+  subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutOrganizationNestedInput
+  billingPayments?: Prisma.BillingPaymentUncheckedUpdateManyWithoutOrganizationNestedInput
+  usageMonthly?: Prisma.UsageMonthlyUncheckedUpdateManyWithoutOrganizationNestedInput
+  billingAccount?: Prisma.BillingAccountUncheckedUpdateOneWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutConversationsInput = {
@@ -872,6 +1404,10 @@ export type OrganizationCreateWithoutConversationsInput = {
   documents?: Prisma.DocumentCreateNestedManyWithoutOrganizationInput
   agents?: Prisma.AgentCreateNestedManyWithoutOrganizationInput
   contactSessions?: Prisma.ContactSessionCreateNestedManyWithoutOrganizationInput
+  subscription?: Prisma.SubscriptionCreateNestedOneWithoutOrganizationInput
+  billingPayments?: Prisma.BillingPaymentCreateNestedManyWithoutOrganizationInput
+  usageMonthly?: Prisma.UsageMonthlyCreateNestedManyWithoutOrganizationInput
+  billingAccount?: Prisma.BillingAccountCreateNestedOneWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutConversationsInput = {
@@ -887,6 +1423,10 @@ export type OrganizationUncheckedCreateWithoutConversationsInput = {
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutOrganizationInput
   agents?: Prisma.AgentUncheckedCreateNestedManyWithoutOrganizationInput
   contactSessions?: Prisma.ContactSessionUncheckedCreateNestedManyWithoutOrganizationInput
+  subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutOrganizationInput
+  billingPayments?: Prisma.BillingPaymentUncheckedCreateNestedManyWithoutOrganizationInput
+  usageMonthly?: Prisma.UsageMonthlyUncheckedCreateNestedManyWithoutOrganizationInput
+  billingAccount?: Prisma.BillingAccountUncheckedCreateNestedOneWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutConversationsInput = {
@@ -918,6 +1458,10 @@ export type OrganizationUpdateWithoutConversationsInput = {
   documents?: Prisma.DocumentUpdateManyWithoutOrganizationNestedInput
   agents?: Prisma.AgentUpdateManyWithoutOrganizationNestedInput
   contactSessions?: Prisma.ContactSessionUpdateManyWithoutOrganizationNestedInput
+  subscription?: Prisma.SubscriptionUpdateOneWithoutOrganizationNestedInput
+  billingPayments?: Prisma.BillingPaymentUpdateManyWithoutOrganizationNestedInput
+  usageMonthly?: Prisma.UsageMonthlyUpdateManyWithoutOrganizationNestedInput
+  billingAccount?: Prisma.BillingAccountUpdateOneWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutConversationsInput = {
@@ -933,6 +1477,10 @@ export type OrganizationUncheckedUpdateWithoutConversationsInput = {
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutOrganizationNestedInput
   agents?: Prisma.AgentUncheckedUpdateManyWithoutOrganizationNestedInput
   contactSessions?: Prisma.ContactSessionUncheckedUpdateManyWithoutOrganizationNestedInput
+  subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutOrganizationNestedInput
+  billingPayments?: Prisma.BillingPaymentUncheckedUpdateManyWithoutOrganizationNestedInput
+  usageMonthly?: Prisma.UsageMonthlyUncheckedUpdateManyWithoutOrganizationNestedInput
+  billingAccount?: Prisma.BillingAccountUncheckedUpdateOneWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutDocumentsInput = {
@@ -948,6 +1496,10 @@ export type OrganizationCreateWithoutDocumentsInput = {
   agents?: Prisma.AgentCreateNestedManyWithoutOrganizationInput
   contactSessions?: Prisma.ContactSessionCreateNestedManyWithoutOrganizationInput
   conversations?: Prisma.ConversationCreateNestedManyWithoutOrganizationInput
+  subscription?: Prisma.SubscriptionCreateNestedOneWithoutOrganizationInput
+  billingPayments?: Prisma.BillingPaymentCreateNestedManyWithoutOrganizationInput
+  usageMonthly?: Prisma.UsageMonthlyCreateNestedManyWithoutOrganizationInput
+  billingAccount?: Prisma.BillingAccountCreateNestedOneWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutDocumentsInput = {
@@ -963,6 +1515,10 @@ export type OrganizationUncheckedCreateWithoutDocumentsInput = {
   agents?: Prisma.AgentUncheckedCreateNestedManyWithoutOrganizationInput
   contactSessions?: Prisma.ContactSessionUncheckedCreateNestedManyWithoutOrganizationInput
   conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutOrganizationInput
+  subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutOrganizationInput
+  billingPayments?: Prisma.BillingPaymentUncheckedCreateNestedManyWithoutOrganizationInput
+  usageMonthly?: Prisma.UsageMonthlyUncheckedCreateNestedManyWithoutOrganizationInput
+  billingAccount?: Prisma.BillingAccountUncheckedCreateNestedOneWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutDocumentsInput = {
@@ -994,6 +1550,10 @@ export type OrganizationUpdateWithoutDocumentsInput = {
   agents?: Prisma.AgentUpdateManyWithoutOrganizationNestedInput
   contactSessions?: Prisma.ContactSessionUpdateManyWithoutOrganizationNestedInput
   conversations?: Prisma.ConversationUpdateManyWithoutOrganizationNestedInput
+  subscription?: Prisma.SubscriptionUpdateOneWithoutOrganizationNestedInput
+  billingPayments?: Prisma.BillingPaymentUpdateManyWithoutOrganizationNestedInput
+  usageMonthly?: Prisma.UsageMonthlyUpdateManyWithoutOrganizationNestedInput
+  billingAccount?: Prisma.BillingAccountUpdateOneWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutDocumentsInput = {
@@ -1009,6 +1569,10 @@ export type OrganizationUncheckedUpdateWithoutDocumentsInput = {
   agents?: Prisma.AgentUncheckedUpdateManyWithoutOrganizationNestedInput
   contactSessions?: Prisma.ContactSessionUncheckedUpdateManyWithoutOrganizationNestedInput
   conversations?: Prisma.ConversationUncheckedUpdateManyWithoutOrganizationNestedInput
+  subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutOrganizationNestedInput
+  billingPayments?: Prisma.BillingPaymentUncheckedUpdateManyWithoutOrganizationNestedInput
+  usageMonthly?: Prisma.UsageMonthlyUncheckedUpdateManyWithoutOrganizationNestedInput
+  billingAccount?: Prisma.BillingAccountUncheckedUpdateOneWithoutOrganizationNestedInput
 }
 
 
@@ -1024,6 +1588,8 @@ export type OrganizationCountOutputType = {
   agents: number
   contactSessions: number
   conversations: number
+  billingPayments: number
+  usageMonthly: number
 }
 
 export type OrganizationCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1034,6 +1600,8 @@ export type OrganizationCountOutputTypeSelect<ExtArgs extends runtime.Types.Exte
   agents?: boolean | OrganizationCountOutputTypeCountAgentsArgs
   contactSessions?: boolean | OrganizationCountOutputTypeCountContactSessionsArgs
   conversations?: boolean | OrganizationCountOutputTypeCountConversationsArgs
+  billingPayments?: boolean | OrganizationCountOutputTypeCountBillingPaymentsArgs
+  usageMonthly?: boolean | OrganizationCountOutputTypeCountUsageMonthlyArgs
 }
 
 /**
@@ -1095,6 +1663,20 @@ export type OrganizationCountOutputTypeCountConversationsArgs<ExtArgs extends ru
   where?: Prisma.ConversationWhereInput
 }
 
+/**
+ * OrganizationCountOutputType without action
+ */
+export type OrganizationCountOutputTypeCountBillingPaymentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.BillingPaymentWhereInput
+}
+
+/**
+ * OrganizationCountOutputType without action
+ */
+export type OrganizationCountOutputTypeCountUsageMonthlyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.UsageMonthlyWhereInput
+}
+
 
 export type OrganizationSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1110,6 +1692,10 @@ export type OrganizationSelect<ExtArgs extends runtime.Types.Extensions.Internal
   agents?: boolean | Prisma.Organization$agentsArgs<ExtArgs>
   contactSessions?: boolean | Prisma.Organization$contactSessionsArgs<ExtArgs>
   conversations?: boolean | Prisma.Organization$conversationsArgs<ExtArgs>
+  subscription?: boolean | Prisma.Organization$subscriptionArgs<ExtArgs>
+  billingPayments?: boolean | Prisma.Organization$billingPaymentsArgs<ExtArgs>
+  usageMonthly?: boolean | Prisma.Organization$usageMonthlyArgs<ExtArgs>
+  billingAccount?: boolean | Prisma.Organization$billingAccountArgs<ExtArgs>
   _count?: boolean | Prisma.OrganizationCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["organization"]>
 
@@ -1149,6 +1735,10 @@ export type OrganizationInclude<ExtArgs extends runtime.Types.Extensions.Interna
   agents?: boolean | Prisma.Organization$agentsArgs<ExtArgs>
   contactSessions?: boolean | Prisma.Organization$contactSessionsArgs<ExtArgs>
   conversations?: boolean | Prisma.Organization$conversationsArgs<ExtArgs>
+  subscription?: boolean | Prisma.Organization$subscriptionArgs<ExtArgs>
+  billingPayments?: boolean | Prisma.Organization$billingPaymentsArgs<ExtArgs>
+  usageMonthly?: boolean | Prisma.Organization$usageMonthlyArgs<ExtArgs>
+  billingAccount?: boolean | Prisma.Organization$billingAccountArgs<ExtArgs>
   _count?: boolean | Prisma.OrganizationCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type OrganizationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1164,6 +1754,10 @@ export type $OrganizationPayload<ExtArgs extends runtime.Types.Extensions.Intern
     agents: Prisma.$AgentPayload<ExtArgs>[]
     contactSessions: Prisma.$ContactSessionPayload<ExtArgs>[]
     conversations: Prisma.$ConversationPayload<ExtArgs>[]
+    subscription: Prisma.$SubscriptionPayload<ExtArgs> | null
+    billingPayments: Prisma.$BillingPaymentPayload<ExtArgs>[]
+    usageMonthly: Prisma.$UsageMonthlyPayload<ExtArgs>[]
+    billingAccount: Prisma.$BillingAccountPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1573,6 +2167,10 @@ export interface Prisma__OrganizationClient<T, Null = never, ExtArgs extends run
   agents<T extends Prisma.Organization$agentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$agentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   contactSessions<T extends Prisma.Organization$contactSessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$contactSessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ContactSessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   conversations<T extends Prisma.Organization$conversationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$conversationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ConversationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  subscription<T extends Prisma.Organization$subscriptionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$subscriptionArgs<ExtArgs>>): Prisma.Prisma__SubscriptionClient<runtime.Types.Result.GetResult<Prisma.$SubscriptionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  billingPayments<T extends Prisma.Organization$billingPaymentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$billingPaymentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BillingPaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  usageMonthly<T extends Prisma.Organization$usageMonthlyArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$usageMonthlyArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UsageMonthlyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  billingAccount<T extends Prisma.Organization$billingAccountArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$billingAccountArgs<ExtArgs>>): Prisma.Prisma__BillingAccountClient<runtime.Types.Result.GetResult<Prisma.$BillingAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2166,6 +2764,92 @@ export type Organization$conversationsArgs<ExtArgs extends runtime.Types.Extensi
   take?: number
   skip?: number
   distinct?: Prisma.ConversationScalarFieldEnum | Prisma.ConversationScalarFieldEnum[]
+}
+
+/**
+ * Organization.subscription
+ */
+export type Organization$subscriptionArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Subscription
+   */
+  select?: Prisma.SubscriptionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Subscription
+   */
+  omit?: Prisma.SubscriptionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SubscriptionInclude<ExtArgs> | null
+  where?: Prisma.SubscriptionWhereInput
+}
+
+/**
+ * Organization.billingPayments
+ */
+export type Organization$billingPaymentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the BillingPayment
+   */
+  select?: Prisma.BillingPaymentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the BillingPayment
+   */
+  omit?: Prisma.BillingPaymentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.BillingPaymentInclude<ExtArgs> | null
+  where?: Prisma.BillingPaymentWhereInput
+  orderBy?: Prisma.BillingPaymentOrderByWithRelationInput | Prisma.BillingPaymentOrderByWithRelationInput[]
+  cursor?: Prisma.BillingPaymentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.BillingPaymentScalarFieldEnum | Prisma.BillingPaymentScalarFieldEnum[]
+}
+
+/**
+ * Organization.usageMonthly
+ */
+export type Organization$usageMonthlyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the UsageMonthly
+   */
+  select?: Prisma.UsageMonthlySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the UsageMonthly
+   */
+  omit?: Prisma.UsageMonthlyOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UsageMonthlyInclude<ExtArgs> | null
+  where?: Prisma.UsageMonthlyWhereInput
+  orderBy?: Prisma.UsageMonthlyOrderByWithRelationInput | Prisma.UsageMonthlyOrderByWithRelationInput[]
+  cursor?: Prisma.UsageMonthlyWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.UsageMonthlyScalarFieldEnum | Prisma.UsageMonthlyScalarFieldEnum[]
+}
+
+/**
+ * Organization.billingAccount
+ */
+export type Organization$billingAccountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the BillingAccount
+   */
+  select?: Prisma.BillingAccountSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the BillingAccount
+   */
+  omit?: Prisma.BillingAccountOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.BillingAccountInclude<ExtArgs> | null
+  where?: Prisma.BillingAccountWhereInput
 }
 
 /**

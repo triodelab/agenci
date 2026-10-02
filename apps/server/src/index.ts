@@ -17,6 +17,7 @@ import { SITE_PREVIEW_PORT, sitePreviewApp } from "./lib/site-proxy";
 import { registerOrpc } from "./plugins/orpc";
 import { registerWebsocket } from "./plugins/websocket";
 import { registerInngest } from "./plugins/inngest";
+import { registerNexiWebhook } from "./modules/billing/webhook";
 import { AuthenticationRouter } from "./modules/authentication/router";
 import { type HonoBindings, type HonoVariables, MastraServer } from '@mastra/hono'
 import { mastra } from "./mastra";
@@ -99,6 +100,7 @@ app.route("/api", AuthenticationRouter);
 registerOrpc(app);
 registerWebsocket(app);
 registerInngest(app);
+registerNexiWebhook(app);
 
 const wss = new WebSocketServer({ noServer: true });
 

@@ -82,6 +82,10 @@ model Organization {
   agents      Agent[]
   contactSessions ContactSession[]
   conversations   Conversation[]
+  subscription    Subscription?
+  billingPayments BillingPayment[]
+  usageMonthly    UsageMonthly[]
+  billingAccount  BillingAccount?
 
   @@unique([slug])
   @@map("organization")

@@ -263,7 +263,7 @@ export function LandingWorkflowSection() {
         <div id="final-cta" className={styles.startBar}>
           <div>
             <h3>Prøv den på din egen nettside.</h3>
-            <p>Gratis opp til 50 samtaler i måneden. Ingen kort, ingen binding.</p>
+            <p>30 dager gratis, uten kort. Deretter fra 499 kr i måneden, uten binding.</p>
           </div>
           <div id="contact" className={styles.actions}>
             <Link className={styles.primaryLink} href={LANDING_AUTH_PATHS.signUp}>

@@ -18,6 +18,17 @@ import {
   handoverEnabled,
 } from "../agent-behavior";
 
+/**
+ * The model a customer agent runs on. Mini models keep answering in
+ * Norwegian; replying in the customer's own language needs GPT-4o unless a
+ * stronger model is already chosen.
+ */
+export function customerAgentModel(behavior: AgentBehaviorInput | null | undefined): string {
+  return behavior?.language === "kundens" && (!behavior.model || behavior.model.endsWith("-mini"))
+    ? "openai/gpt-4o"
+    : behavior?.model || CUSTOMER_AGENT_MODEL;
+}
+
 export type CustomerServiceAgentInput = {
   /** Prisma `Agent.id` — also used as the Mastra registration key. */
   id: string;
@@ -62,10 +73,7 @@ export function createCustomerServiceAgent({
         : `\n## Overlevering\n${buildHandoverInstructions(undefined)}\n`),
     // Mini models keep answering in Norwegian; replying in the customer's own
     // language needs GPT-4o unless a stronger model is already chosen.
-    model:
-      behavior?.language === "kundens" && (!behavior.model || behavior.model.endsWith("-mini"))
-        ? "openai/gpt-4o"
-        : behavior?.model || CUSTOMER_AGENT_MODEL,
+    model: customerAgentModel(behavior),
     tools: {
       // Keys must match the names the system prompt uses.
       searchTool: createKnowledgeSearchTool(id),
