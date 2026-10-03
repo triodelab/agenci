@@ -381,7 +381,7 @@ export default function BillingView() {
           <div>
             <h2 className="text-[17px] font-semibold text-(--agenci-ink)">Planer</h2>
             <p className="mt-1 text-[13px] text-(--agenci-ink-2)">
-              Priser eks. mva. Ingen binding. Oppsigelse gjelder ut perioden som er betalt.
+              {billing?.vatRegistered ? "Priser eks. mva." : "Ingen mva. i tillegg."} Ingen binding. Oppsigelse gjelder ut perioden som er betalt.
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -535,7 +535,7 @@ export default function BillingView() {
           })}
         </div>
         <p className="mt-4 text-center text-[13px] text-(--agenci-ink-3)">
-          Alle priser eks. mva. · Ingen bindingstid{interval === "year" ? " · Faktureres årlig" : ""}
+          {billing?.vatRegistered ? "Alle priser eks. mva." : "Ingen mva. i tillegg"} · Ingen bindingstid{interval === "year" ? " · Faktureres årlig" : ""}
         </p>
       </section>
 

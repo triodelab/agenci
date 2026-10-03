@@ -239,3 +239,37 @@ export async function deleteConversationThreads(threadIds: string[]) {
     await storage.deleteThread({ threadId }).catch(() => undefined);
   }
 }
+
+// ─── Retention ──────────────────────────────────────────────────────────────
+
+/** How long a conversation is kept after its last message (personvernerklæringen). */
+export const CONVERSATION_RETENTION_MONTHS = 12;
+
+/**
+ * Deletes conversations whose last message is older than the retention
+ * period: the inbox row, the messages in the agent's memory, and visitor
+ * sessions left with no conversations. Runs every night.
+ */
+export async function purgeOldConversations(now = new Date()) {
+  const cutoff = new Date(now);
+  cutoff.setMonth(cutoff.getMonth() - CONVERSATION_RETENTION_MONTHS);
+  let deleted = 0;
+  // In batches, so one night with many old chats doesn't hold the database.
+  for (;;) {
+    const batch = await prisma.conversation.findMany({
+      where: { lastMessageAt: { lt: cutoff } },
+      select: { id: true },
+      take: 200,
+    });
+    if (batch.length === 0) break;
+    const ids = batch.map((c) => c.id);
+    await deleteConversationThreads(ids);
+    await prisma.conversation.deleteMany({ where: { id: { in: ids } } });
+    deleted += ids.length;
+  }
+  // Expired visitor sessions that no longer have any conversation.
+  const sessions = await prisma.contactSession.deleteMany({
+    where: { expiresAt: { lt: cutoff }, conversations: { none: {} } },
+  });
+  return { deleted, sessions: sessions.count, cutoff: cutoff.toISOString() };
+}

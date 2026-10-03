@@ -52,6 +52,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
 			priority: 0.3,
 		},
 		{
+			url: `${base}/databehandleravtale`,
+			lastModified: now,
+			changeFrequency: "yearly",
+			priority: 0.3,
+		},
+		{
 			url: `${base}/vilkar`,
 			lastModified: now,
 			changeFrequency: "yearly",

@@ -141,10 +141,18 @@ export default function VilkarPage() {
 
 			<Clause id="betaling" n={6} title="Priser og betaling">
 				<p>
-					Priser fremgår av prissiden og oppgis eksklusive merverdiavgift.
-					Abonnementet betales forskuddsvis per måned eller år via Stripe og
-					fornyes automatisk til det sies opp. Prisendringer for eksisterende
-					kunder varsles minst 30 dager før de trer i kraft.
+					Priser fremgår av prissiden. Vi er foreløpig ikke registrert i
+					Merverdiavgiftsregisteret, så det beregnes ikke merverdiavgift. Blir vi
+					registrert, varsler vi kundene minst 30 dager før merverdiavgift legges
+					til. Abonnementet betales forskuddsvis per måned eller år med kort via
+					vår betalingsleverandør, og fornyes automatisk til det sies opp.
+					Prisendringer for eksisterende kunder varsles minst 30 dager før de
+					trer i kraft.
+				</p>
+				<p>
+					Nye kunder får 30 dagers gratis prøveperiode, uten kort. Prøveperioden
+					gis én gang per organisasjonsnummer. Når den er over, trekkes ingenting
+					automatisk; tjenesten stopper til kunden velger en plan.
 				</p>
 				<p>
 					Ved manglende betaling kan vi, etter påminnelse, begrense eller stanse
@@ -178,8 +186,12 @@ export default function VilkarPage() {
 			<Clause id="personvern" n={9} title="Personvern og databehandling">
 				<p>
 					For personopplysninger om Besøkende er Kunden behandlingsansvarlig og
-					Agenci databehandler. Databehandleravtalen er en del av disse
-					vilkårene og kan fås på forespørsel. Kunden sørger for å informere
+					Agenci databehandler.{" "}
+					<Link href="/databehandleravtale" className={l.link}>
+						Databehandleravtalen
+					</Link>{" "}
+					er en del av disse vilkårene og gjelder fra Kunden tar tjenesten i
+					bruk. Kunden sørger for å informere
 					Besøkende om behandlingen, for eksempel i sin egen
 					personvernerklæring, og for at det finnes et gyldig rettslig grunnlag.
 				</p>
