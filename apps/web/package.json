@@ -17,7 +17,6 @@
   "dependencies": {
     "@agenci/auth": "workspace:*",
     "@agenci/backend": "workspace:*",
-    "server": "workspace:*",
     "@convex-dev/agent": "^0.1.16",
     "@hookform/resolvers": "^5.2.0",
     "@mendable/firecrawl-js": "^4.24.2",
@@ -34,13 +33,14 @@
     "jotai": "^2.12.5",
     "lucide-react": "^0.475.0",
     "motion": "^12.26.2",
-    "next": "16.3.3",
+    "next": "^16.3.6",
     "next-themes": "^0.4.4",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "react-hook-form": "^7.61.1",
     "react-use-measure": "^2.1.7",
     "remotion": "4.0.526",
+    "server": "workspace:*",
     "sonner": "^2.0.6",
     "stripe": "^22.1.1",
     "zod": "catalog:"

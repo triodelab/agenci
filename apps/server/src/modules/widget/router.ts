@@ -6,6 +6,7 @@ import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 import { createPrismaClient } from "@agenci/db";
 import { base, contactProcedure } from "@/routers/procedures";
+import { clientIp, DAY, HOUR, MINUTE, rateLimit } from "@/lib/rate-limit";
 import {
   appendThreadMessage,
   deleteConversationThreads,
@@ -76,7 +77,9 @@ const contactSessionsRouter = {
   create: base
     .input(CreateContactSessionSchema)
     .output(ContactSessionIdResponseSchema)
-    .handler(async ({ input }) => {
+    .handler(async ({ input, context }) => {
+      // New chat sessions per visitor IP (stops scripted session spam).
+      rateLimit(`session:${clientIp(context.headers)}`, 20, HOUR);
       const org = await prisma.organization.findUnique({
         where: { id: input.organizationId },
         select: { id: true },
@@ -110,6 +113,7 @@ const contactSessionsRouter = {
     .input(UpdateContactSessionIdentitySchema)
     .output(OkResponseSchema)
     .handler(async ({ input, context }) => {
+      rateLimit(`identity:${context.contactSession.id}`, 10, HOUR);
       await updateContactSessionIdentity({
         id: context.contactSession.id,
         name: input.name,
@@ -210,6 +214,10 @@ const publicChatRouter = {
     .output(SendPublicChatMessageResponseSchema)
     .handler(async ({ input, context }) => {
       const { organizationId, id: contactSessionId } = context.contactSession;
+      // Every message costs an AI call: cap per visitor and per IP.
+      rateLimit(`chat-min:${contactSessionId}`, 15, MINUTE);
+      rateLimit(`chat-day:${contactSessionId}`, 300, DAY);
+      rateLimit(`chat-ip:${clientIp(context.headers)}`, 40, MINUTE);
       const threadId = input.threadId ?? crypto.randomUUID();
       const memoryResourceId = `${organizationId}:contact:${contactSessionId}`;
       // Trial over, no plan, or this month's conversations used up: no AI
