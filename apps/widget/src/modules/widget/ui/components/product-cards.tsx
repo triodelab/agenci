@@ -17,7 +17,7 @@ export const ProductCards = ({ products }: { products: ProductCardData[] }) => {
       className="-mr-3 flex snap-x snap-mandatory scroll-pl-9 gap-2.5 overflow-x-auto pb-1 pl-9 pr-3 [scrollbar-width:none] sm:-mr-4 sm:pr-4 [&::-webkit-scrollbar]:hidden"
       aria-label="Produkter"
     >
-      {products.map((p) => (
+      {products.filter((p) => /^https?:\/\//i.test(p.url)).map((p) => (
         <a
           key={p.url}
           href={p.url}

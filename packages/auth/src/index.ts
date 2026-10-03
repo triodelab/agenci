@@ -107,18 +107,40 @@ export function createAuth() {
     // Public URL of the auth API (Hono). For local Next rewrites, keep this as the server origin.
     baseURL: env.BETTER_AUTH_URL,
 
+    /**
+     * Brute-force protection. Limits per client IP (Caddy passes the real
+     * visitor IP from Cloudflare in X-Forwarded-For; see deploy/Caddyfile).
+     */
+    rateLimit: {
+      enabled: isProd,
+      window: 60,
+      max: 100,
+      customRules: {
+        "/sign-in/email": { window: 60, max: 5 },
+        "/sign-up/email": { window: 60 * 60, max: 5 },
+        "/request-password-reset": { window: 60 * 60, max: 5 },
+        "/reset-password": { window: 60 * 60, max: 10 },
+        "/two-factor/verify-totp": { window: 60, max: 5 },
+        "/two-factor/verify-backup-code": { window: 60, max: 5 },
+        "/change-password": { window: 60 * 60, max: 10 },
+      },
+    },
+
     advanced: {
       database: {
         joins: true,
       },
+      ipAddress: {
+        ipAddressHeaders: ["x-forwarded-for"],
+      },
       /**
-       * Task 1.1 Step 4 — cookie policy
-       * - production: cross-site ready (web + API on different hosts) → SameSite=None; Secure
-       * - development: same-site via Next rewrite / Vite proxy → SameSite=Lax; Secure=false on HTTP
+       * Cookie policy. Dashboard and API share one origin (app.agenci.no, Caddy
+       * proxies /api), and agenci.no is the same site, so SameSite=Lax works
+       * everywhere and blocks cross-site request forgery.
        */
       defaultCookieAttributes: isProd
         ? {
-            sameSite: "none" as const,
+            sameSite: "lax" as const,
             secure: true,
             httpOnly: true,
           }

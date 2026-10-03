@@ -15,12 +15,16 @@ export const ValidateOrganizationResponseSchema = z.object({
 // ─── Contact sessions ───────────────────────────────────────────────────────
 
 export const CreateContactSessionSchema = z.object({
-  organizationId: z.string().min(1),
-  agentId: z.string().min(1).optional(),
-  name: z.string().min(1).optional(),
-  email: z.string().email().optional(),
+  organizationId: z.string().min(1).max(64),
+  agentId: z.string().min(1).max(64).optional(),
+  name: z.string().min(1).max(120).optional(),
+  email: z.string().email().max(254).optional(),
   anonymous: z.boolean().optional(),
-  metadata: z.record(z.string(), z.unknown()).optional(),
+  // Browser details from the widget. Bounded: anyone on the internet can call this.
+  metadata: z
+    .record(z.string().max(64), z.union([z.string().max(500), z.number(), z.boolean(), z.null()]))
+    .refine((m) => Object.keys(m).length <= 30, "For mange felter")
+    .optional(),
 });
 
 export const ContactSessionIdResponseSchema = z.object({
@@ -37,8 +41,8 @@ export const ValidateContactSessionResponseSchema = z.object({
 });
 
 export const UpdateContactSessionIdentitySchema = z.object({
-  name: z.string().min(1),
-  email: z.string().email(),
+  name: z.string().trim().min(1).max(120),
+  email: z.string().email().max(254),
 });
 
 // ─── Widget settings ────────────────────────────────────────────────────────
@@ -154,9 +158,9 @@ export const WidgetSettingsResponseSchema = z.object({
 // ─── Chat (public) ──────────────────────────────────────────────────────────
 
 export const SendPublicChatMessageSchema = z.object({
-  agentId: z.string().min(1),
-  message: z.string().min(1, "Melding er påkrevd"),
-  threadId: z.string().min(1).optional(),
+  agentId: z.string().min(1).max(64),
+  message: z.string().trim().min(1, "Melding er påkrevd").max(2000, "Meldingen er for lang (maks 2000 tegn)."),
+  threadId: z.string().min(1).max(64).optional(),
 });
 
 const ConversationStatus = z.enum(["unresolved", "escalated", "resolved"]);
