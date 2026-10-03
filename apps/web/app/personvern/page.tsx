@@ -42,8 +42,8 @@ export default function PersonvernPage() {
 			eyebrow="Juridisk"
 			title="Personvernerklæring"
 			lead="Slik behandler vi personopplysninger når du bruker Agenci — enten du er kunde, bruker av dashboardet eller besøkende som chatter med en Agenci-assistent på en nettside."
-			updated="2026-09-26"
-			version="2.0"
+			updated="2026-10-03"
+			version="2.1"
 			toc={TOC}
 			related={{ href: "/vilkar", label: "Les vilkårene" }}
 			summary={[
@@ -74,7 +74,11 @@ export default function PersonvernPage() {
 					bedriftens nettside, er{" "}
 					<strong>bedriften behandlingsansvarlig</strong> for samtalen. Vi er da{" "}
 					<strong>databehandler</strong> og behandler opplysningene kun etter
-					bedriftens instruks, i tråd med databehandleravtalen vi har med dem.
+					bedriftens instruks, i tråd med{" "}
+					<Link href="/databehandleravtale" className={l.link}>
+						databehandleravtalen
+					</Link>{" "}
+					vi har med dem.
 					Spørsmål om slike samtaler bør rettes til bedriften — kontakter du
 					oss, videreformidler vi henvendelsen.
 				</p>
@@ -97,7 +101,7 @@ export default function PersonvernPage() {
 						},
 						{
 							label: "Betaling",
-							text: "Faktura- og abonnementsopplysninger. Kortinformasjon behandles av Stripe — vi lagrer aldri kortnummer.",
+							text: "Faktura- og abonnementsopplysninger. Kortbetaling håndteres av betalingsleverandøren vår — vi ser og lagrer aldri kortnummer.",
 						},
 						{
 							label: "Henvendelser",
@@ -140,10 +144,10 @@ export default function PersonvernPage() {
 
 			<Clause id="ki" n={5} title="Kunstig intelligens">
 				<p>
-					Assistenten bruker språkmodeller fra OpenAI via deres API for å forstå
+					Assistenten bruker språkmodeller fra en leverandør i USA for å forstå
 					spørsmål og skrive svar ut fra bedriftens kunnskap. Samtaleinnholdet
-					sendes til modellen for å lage svaret. Etter OpenAIs vilkår for
-					API-bruk brukes ikke disse dataene til å trene modellene deres.
+					sendes til modellen for å lage svaret. Etter leverandørens vilkår for
+					bruk via API brukes ikke disse dataene til å trene modellene.
 				</p>
 				<p>
 					Assistenten tar ikke automatiserte avgjørelser som har rettslig
@@ -163,7 +167,7 @@ export default function PersonvernPage() {
 						},
 						{
 							label: "Samtaler",
-							text: "Lagres så lenge bedriften har konto hos oss, slik at de kan følges opp. De slettes når bedriften sletter samtalen, assistenten eller kontoen.",
+							text: "Slettes automatisk 12 måneder etter siste melding i samtalen, eller tidligere hvis bedriften sletter samtalen, assistenten eller kontoen.",
 						},
 						{
 							label: "Kunnskap og filer",
@@ -188,56 +192,65 @@ export default function PersonvernPage() {
 			<Clause id="underleverandorer" n={7} title="Underleverandører">
 				<p>
 					Vi bruker nøye utvalgte leverandører for å drive tjenesten. De
-					behandler opplysninger kun på våre vegne og etter databehandleravtale:
+					behandler opplysninger kun på våre vegne, etter våre instrukser og
+					etter avtale om databehandling. Selve tjenesten og alle lagrede data
+					driftes på servere i Norge.
 				</p>
 				<Terms
 					items={[
 						{
-							label: "OpenAI",
-							text: "Språkmodeller som skriver svar og gjør kunnskapen søkbar.",
+							label: "Drift og lagring",
+							text: "Servere, database og fillagring for tjenesten. Datasenter i Norge.",
 						},
 						{
-							label: "Firecrawl",
-							text: "Henter innhold og profil fra bedriftens nettside når en assistent opprettes.",
+							label: "Språkmodeller",
+							text: "Skriver svarene i chatten og gjør kunnskapen søkbar. USA.",
 						},
 						{
-							label: "LlamaIndex",
-							text: "Leser og strukturerer opplastede dokumenter.",
+							label: "Innhenting fra nettsider",
+							text: "Henter innhold fra bedriftens nettside når en assistent opprettes eller oppdateres. USA.",
 						},
 						{
-							label: "Inngest",
-							text: "Kjører bakgrunnsjobber, som innlesing av kunnskap.",
-						},
-						{ label: "Stripe", text: "Betaling og abonnement." },
-						{
-							label: "Sentry",
-							text: "Feilsporing, med lagring i EU. Ytelsesmåling kun med samtykke.",
+							label: "Lesing av dokumenter",
+							text: "Leser og strukturerer dokumenter bedriften laster opp. USA.",
 						},
 						{
-							label: "Resend",
-							text: "Sender e-post fra kontaktskjema og nyhetsbrev.",
+							label: "Nettverk og sikkerhet",
+							text: "Beskytter tjenesten mot angrep og leverer den raskt. Globalt nettverk.",
+						},
+						{ label: "Betaling", text: "Kortbetaling og abonnement. EU/EØS." },
+						{
+							label: "E-post",
+							text: "Sender e-post fra tjenesten, som invitasjoner, lenker for nytt passord og svar på henvendelser.",
 						},
 						{
-							label: "Cookiebot",
-							text: "Håndterer samtykke til informasjonskapsler.",
+							label: "Feilsporing",
+							text: "Fanger opp tekniske feil, med lagring i EU. Ytelsesmåling kun med samtykke.",
 						},
 						{
-							label: "Skyleverandør",
-							text: "Drift av database og fillagring for tjenesten.",
+							label: "Samtykke",
+							text: "Håndterer samtykke til informasjonskapsler på agenci.no. EU.",
 						},
 					]}
 				/>
 				<p>
-					Oppdatert oversikt over underleverandører får du ved å kontakte oss.
+					Kunder får en fullstendig liste over underleverandører med navn på
+					forespørsel, og varsles før vi tar i bruk nye. Se også{" "}
+					<Link href="/databehandleravtale" className={l.link}>
+						databehandleravtalen
+					</Link>
+					.
 				</p>
 			</Clause>
 
 			<Clause id="tredjeland" n={8} title="Overføring utenfor EØS">
 				<p>
-					Noen leverandører er etablert i USA. Overføring skjer bare med gyldig
-					overføringsgrunnlag etter GDPR, som EU–US Data Privacy Framework eller
-					EU-kommisjonens standardkontraktsklausuler, med nødvendige
-					tilleggstiltak.
+											Noen leverandører er etablert i USA, blant annet leverandøren av
+					språkmodeller. For å lage et svar sendes innholdet i samtalen dit.
+					Overføring skjer bare med gyldig overføringsgrunnlag etter GDPR, som
+					EU–US Data Privacy Framework eller EU-kommisjonens
+					standardkontraktsklausuler, med nødvendige tilleggstiltak. Alt annet
+					lagres i Norge.
 				</p>
 			</Clause>
 
@@ -313,9 +326,12 @@ export default function PersonvernPage() {
 
 			<Clause id="sikkerhet" n={11} title="Sikkerhet">
 				<p>
-					Vi beskytter opplysningene med tekniske og organisatoriske tiltak:
+										Vi beskytter opplysningene med tekniske og organisatoriske tiltak:
 					kryptert overføring, tilgangsstyring per organisasjon, adskilte data
-					mellom kunder, begrenset tilgang for ansatte og løpende overvåking.
+					mellom kunder, to-trinns innlogging og løpende overvåking. Bare et
+					fåtall navngitte personer hos oss har tilgang til kundedata, og bare
+					når det trengs for drift, sikkerhet eller support. All slik tilgang
+					logges.
 					Ved et sikkerhetsbrudd som kan ramme deg, varsler vi Datatilsynet
 					innen 72 timer der loven krever det — og deg og berørte kunder uten
 					ugrunnet opphold.

@@ -40,7 +40,7 @@ const faqs = [
   },
   {
     q: "Hva koster det etter prøveperioden?",
-    a: "De første 30 dagene er gratis, med alt i Starter og 500 samtaler. Du legger ikke inn kort for å prøve. Etterpå velger du Starter (499 kr), Pro (1 499 kr) eller Business (3 999 kr) i måneden, eks. mva. Velger du ingenting, slutter chatten å svare, og ingenting trekkes. Ingen bindingstid.",
+    a: "De første 30 dagene er gratis, med alt i Starter og 500 samtaler. Du legger ikke inn kort for å prøve. Etterpå velger du Starter (499 kr), Pro (1 499 kr) eller Business (3 999 kr) i måneden. Ingen mva. kommer i tillegg. Velger du ingenting, slutter chatten å svare, og ingenting trekkes. Ingen bindingstid.",
   },
   {
     q: "Kan chatten anbefale produkter fra nettbutikken min?",

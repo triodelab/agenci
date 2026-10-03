@@ -17,7 +17,7 @@ export type LegalToc = { id: string; label: string }[];
 export const COMPANY = {
 	legalLine:
 		process.env.NEXT_PUBLIC_COMPANY_LEGAL_LINE ??
-		"Hassan Triodelab DA, org.nr. 835 796 892, Gildevangen 16 B, 0585 Oslo",
+		"Hassan Triodelab DA, org.nr. 835 796 892, Sigurd Hoels vei 114, 0655 Oslo",
 	name: "Hassan Triodelab DA",
 	orgNr: "835 796 892",
 	email: "post@triodelab.no",

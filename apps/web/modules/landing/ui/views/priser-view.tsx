@@ -197,7 +197,7 @@ export function PriserView() {
 								))}
 							</div>
 							<p className={local.footnote}>
-								Alle priser ekskl. 25 % MVA · Ingen bindingstid
+								Ingen mva. i tillegg · Ingen bindingstid
 								{isYearly ? " · Faktureres årlig" : ""}
 							</p>
 
