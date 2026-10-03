@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import AdminView from "@/features/admin/ui/admin-view";
+import { ADMIN_TABS } from "@/features/admin/ui/nav";
 
 /**
  * Agenci's own admin area. Only the developers get data from it — the server
@@ -8,13 +9,10 @@ import AdminView from "@/features/admin/ui/admin-view";
  */
 export const Route = createFileRoute("/_authed/admin")({
   validateSearch: z.object({
-    tab: z.enum(["overview", "activity", "organizations", "users", "database", "audit"]).catch("overview"),
+    tab: z.enum(ADMIN_TABS).catch("overview"),
     org: z.string().optional().catch(undefined),
+    user: z.string().optional().catch(undefined),
+    conv: z.string().optional().catch(undefined),
   }),
-  component: RouteComponent,
+  component: AdminView,
 });
-
-function RouteComponent() {
-  const { tab, org } = Route.useSearch();
-  return <AdminView tab={tab} org={org} />;
-}
